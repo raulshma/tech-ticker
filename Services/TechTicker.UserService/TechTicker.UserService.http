@@ -1,0 +1,6 @@
+@TechTicker.UserService_HostAddress = http://localhost:5101
+
+GET {{TechTicker.UserService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

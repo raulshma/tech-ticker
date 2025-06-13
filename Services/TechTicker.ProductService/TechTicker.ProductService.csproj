@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Scalar.AspNetCore" Version="2.4.13" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.66.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Aspire\TechTicker.ServiceDefaults\TechTicker.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\TechTicker.Shared\TechTicker.Shared.csproj" />
+    <ProjectReference Include="..\..\TechTicker.Grpc.Contracts\TechTicker.Grpc.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

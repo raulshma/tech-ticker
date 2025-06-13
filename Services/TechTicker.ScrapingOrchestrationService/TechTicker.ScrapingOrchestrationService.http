@@ -1,0 +1,67 @@
+# TechTicker Scraping Orchestration Service HTTP Tests
+
+### Test Service Health (when implemented)
+# This would be available if we added health check endpoints
+# GET https://localhost:8080/health
+
+### Sample Message Contract - ScrapeProductPageCommand
+# This shows the structure of messages published by the orchestration service
+
+### Sample Message - Successful Scraping Command
+POST https://localhost:5672/exchange/techticker.scraping/scrape.product.page
+Content-Type: application/json
+
+{
+  "MappingId": "550e8400-e29b-41d4-a716-446655440000",
+  "CanonicalProductId": "550e8400-e29b-41d4-a716-446655440001",
+  "SellerName": "Newegg US",
+  "ExactProductUrl": "https://www.newegg.com/example-product",
+  "Selectors": {
+    "ProductNameSelector": "h1.product-title",
+    "PriceSelector": ".price-current",
+    "StockSelector": "#stock-status",
+    "SellerNameOnPageSelector": ".seller-name"
+  },
+  "ScrapingProfile": {
+    "UserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Headers": {
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Accept-Encoding": "gzip, deflate, br",
+      "DNT": "1",
+      "Connection": "keep-alive",
+      "Upgrade-Insecure-Requests": "1"
+    }
+  },
+  "ScheduledAt": "2025-06-12T10:30:00Z"
+}
+
+###
+
+### Sample Message - ScrapingResultEvent (received)
+POST https://localhost:5672/exchange/techticker.scraping/scraping.result.success
+Content-Type: application/json
+
+{
+  "MappingId": "550e8400-e29b-41d4-a716-446655440000",
+  "WasSuccessful": true,
+  "Timestamp": "2025-06-12T10:30:15Z",
+  "ErrorMessage": null,
+  "ErrorCode": null,
+  "HttpStatusCode": 200
+}
+
+###
+
+### Sample Message - ScrapingResultEvent (failed)
+POST https://localhost:5672/exchange/techticker.scraping/scraping.result.failure
+Content-Type: application/json
+
+{
+  "MappingId": "550e8400-e29b-41d4-a716-446655440000",
+  "WasSuccessful": false,
+  "Timestamp": "2025-06-12T10:30:15Z",
+  "ErrorMessage": "Rate limited by server",
+  "ErrorCode": "HTTP_ERROR",
+  "HttpStatusCode": 429
+}

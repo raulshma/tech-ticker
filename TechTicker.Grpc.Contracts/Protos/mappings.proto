@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package techticker.mappings;
+
+option csharp_namespace = "TechTicker.Grpc.Contracts.Mappings";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// Product Seller Mapping Service
+service MappingGrpcService {
+  // Get mapping by ID
+  rpc GetMapping(GetMappingRequest) returns (MappingResponse);
+  
+  // Get mappings by product ID
+  rpc GetMappingsByProduct(GetMappingsByProductRequest) returns (GetMappingsResponse);
+  
+  // Get active mappings (for orchestrator)
+  rpc GetActiveMappings(GetActiveMappingsRequest) returns (GetMappingsResponse);
+  
+  // Get mappings by seller
+  rpc GetMappingsBySeller(GetMappingsBySellerRequest) returns (GetMappingsResponse);
+  
+  // Check if mapping exists
+  rpc MappingExists(MappingExistsRequest) returns (MappingExistsResponse);
+  
+  // Update scraping timestamps (called by orchestrator)
+  rpc UpdateScrapingTimestamps(UpdateScrapingTimestampsRequest) returns (UpdateScrapingTimestampsResponse);
+  
+  // Stream mapping updates (for real-time sync)
+  rpc StreamMappingUpdates(google.protobuf.Empty) returns (stream MappingUpdateEvent);
+}
+
+// Messages for Mapping operations
+message GetMappingRequest {
+  string mapping_id = 1; // GUID as string
+}
+
+message GetMappingsByProductRequest {
+  string canonical_product_id = 1;
+  int32 page_number = 2;
+  int32 page_size = 3;
+}
+
+message GetActiveMappingsRequest {
+  int32 page_number = 1;
+  int32 page_size = 2;
+  string seller_name_filter = 3; // Optional filter
+}
+
+message GetMappingsBySellerRequest {
+  string seller_name = 1;
+  int32 page_number = 2;
+  int32 page_size = 3;
+}
+
+message GetMappingsResponse {
+  repeated MappingResponse mappings = 1;
+  int32 total_count = 2;
+  int32 page_number = 3;
+  int32 page_size = 4;
+  bool has_next_page = 5;
+}
+
+message MappingExistsRequest {
+  string mapping_id = 1;
+}
+
+message MappingExistsResponse {
+  bool exists = 1;
+}
+
+message UpdateScrapingTimestampsRequest {
+  string mapping_id = 1;
+  google.protobuf.Timestamp last_scraped_at = 2;
+  google.protobuf.Timestamp next_scrape_at = 3;
+}
+
+message UpdateScrapingTimestampsResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message MappingResponse {
+  string mapping_id = 1;
+  string canonical_product_id = 2;
+  string seller_name = 3;
+  string exact_product_url = 4;
+  bool is_active_for_scraping = 5;
+  string scraping_frequency_override = 6;
+  string site_specific_selectors_id = 7; // GUID as string, optional
+  google.protobuf.Timestamp last_scraped_at = 8;
+  google.protobuf.Timestamp next_scrape_at = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+// Event messages for streaming
+message MappingUpdateEvent {
+  enum EventType {
+    CREATED = 0;
+    UPDATED = 1;
+    DELETED = 2;
+    SCRAPING_COMPLETED = 3;
+  }
+  
+  EventType event_type = 1;
+  MappingResponse mapping = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}

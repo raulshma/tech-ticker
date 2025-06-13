@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package techticker.products;
+
+option csharp_namespace = "TechTicker.Grpc.Contracts.Products";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// Product Service
+service ProductGrpcService {
+  // Get product by ID
+  rpc GetProduct(GetProductRequest) returns (ProductResponse);
+  
+  // Get products by IDs (batch)
+  rpc GetProducts(GetProductsRequest) returns (GetProductsResponse);
+  
+  // Check if product exists
+  rpc ProductExists(ProductExistsRequest) returns (ProductExistsResponse);
+  
+  // Get category by ID
+  rpc GetCategory(GetCategoryRequest) returns (CategoryResponse);
+  
+  // Get categories by IDs (batch)
+  rpc GetCategories(GetCategoriesRequest) returns (GetCategoriesResponse);
+  
+  // Check if category exists
+  rpc CategoryExists(CategoryExistsRequest) returns (CategoryExistsResponse);
+  
+  // Stream product updates (for real-time sync)
+  rpc StreamProductUpdates(google.protobuf.Empty) returns (stream ProductUpdateEvent);
+}
+
+// Messages for Product operations
+message GetProductRequest {
+  string product_id = 1; // GUID as string
+}
+
+message GetProductsRequest {
+  repeated string product_ids = 1; // GUIDs as strings
+}
+
+message GetProductsResponse {
+  repeated ProductResponse products = 1;
+}
+
+message ProductExistsRequest {
+  string product_id = 1;
+}
+
+message ProductExistsResponse {
+  bool exists = 1;
+}
+
+message ProductResponse {
+  string product_id = 1;
+  string name = 2;
+  string manufacturer = 3;
+  string model_number = 4;
+  string sku = 5;
+  CategoryResponse category = 6;
+  string description = 7;
+  map<string, string> specifications = 8;
+  bool is_active = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+// Messages for Category operations
+message GetCategoryRequest {
+  string category_id = 1; // GUID as string
+}
+
+message GetCategoriesRequest {
+  repeated string category_ids = 1; // GUIDs as strings
+}
+
+message GetCategoriesResponse {
+  repeated CategoryResponse categories = 1;
+}
+
+message CategoryExistsRequest {
+  string category_id = 1;
+}
+
+message CategoryExistsResponse {
+  bool exists = 1;
+}
+
+message CategoryResponse {
+  string category_id = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  int32 product_count = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Event messages for streaming
+message ProductUpdateEvent {
+  enum EventType {
+    CREATED = 0;
+    UPDATED = 1;
+    DELETED = 2;
+  }
+  
+  EventType event_type = 1;
+  ProductResponse product = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}

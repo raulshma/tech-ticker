@@ -1,0 +1,31 @@
+### TechTicker Scraper Service API Testing
+
+# Note: The Scraper Service is a Worker Service that primarily communicates via RabbitMQ messages
+# It does not expose HTTP endpoints for direct testing
+# This file is included for consistency with other services in the solution
+
+### RabbitMQ Message Testing
+# To test the Scraper Service:
+# 1. Ensure RabbitMQ is running
+# 2. Start the TechTicker solution with Aspire
+# 3. Send ScrapeProductPageCommand messages to the scraper queue
+# 4. Monitor the output queues for RawPriceDataEvent and ScrapingResultEvent messages
+
+### Example message structure for ScrapeProductPageCommand:
+# {
+#   "CorrelationId": "12345",
+#   "ProductId": "550e8400-e29b-41d4-a716-446655440000",
+#   "Url": "https://example.com/product",
+#   "Priority": 1,
+#   "ScrapingSettings": {
+#     "ProductNameSelector": ".product-title",
+#     "PriceSelector": ".price",
+#     "StockStatusSelector": ".stock-status",
+#     "RequestDelay": 1000,
+#     "UserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+#   }
+# }
+
+### Monitoring
+# Monitor service logs for scraping activity and error handling
+# Check Aspire dashboard for service health and message flow

@@ -1,0 +1,179 @@
+@TechTicker.ProductService_HostAddress = http://localhost:5074
+
+### Create a new product
+POST {{TechTicker.ProductService_HostAddress}}/api/products
+Content-Type: application/json
+X-Correlation-ID: {{$guid}}
+
+{
+  "name": "Nvidia RTX 4070 Ti FE",
+  "manufacturer": "Nvidia",
+  "modelNumber": "PG141-SKU331",
+  "sku": "NV-RTX4070TI-FE-001",
+  "categoryId": "{{$guid}}",
+  "description": "High-performance graphics card for gaming and content creation",
+  "specifications": {
+    "memory": "12GB GDDR6X",
+    "coreClock": "2310 MHz",
+    "memoryClock": "21000 MHz",
+    "memoryInterface": "192-bit",
+    "maxResolution": "7680x4320",
+    "ports": ["3x DisplayPort 1.4a", "1x HDMI 2.1"],
+    "powerConsumption": "285W",
+    "recommendedPSU": "700W"
+  },
+  "isActive": true
+}
+
+### Get all products
+GET {{TechTicker.ProductService_HostAddress}}/api/products
+X-Correlation-ID: {{$guid}}
+
+### Get products with search and pagination
+GET {{TechTicker.ProductService_HostAddress}}/api/products?search=nvidia&pageNumber=1&pageSize=10
+X-Correlation-ID: {{$guid}}
+
+### Get products by category (using category ID)
+GET {{TechTicker.ProductService_HostAddress}}/api/products?categoryId={{$guid}}
+X-Correlation-ID: {{$guid}}
+
+### Get products by category (using category slug)
+GET {{TechTicker.ProductService_HostAddress}}/api/products?categoryId=graphics-cards
+X-Correlation-ID: {{$guid}}
+
+### Get active products only
+GET {{TechTicker.ProductService_HostAddress}}/api/products?isActive=true
+X-Correlation-ID: {{$guid}}
+
+### Get product by ID
+GET {{TechTicker.ProductService_HostAddress}}/api/products/{{$guid}}
+X-Correlation-ID: {{$guid}}
+
+### Check if product exists
+HEAD {{TechTicker.ProductService_HostAddress}}/api/products/{{$guid}}
+X-Correlation-ID: {{$guid}}
+
+### Check if product exists (alternative endpoint)
+GET {{TechTicker.ProductService_HostAddress}}/api/products/{{$guid}}/exists
+X-Correlation-ID: {{$guid}}
+
+### Update a product
+PUT {{TechTicker.ProductService_HostAddress}}/api/products/{{$guid}}
+Content-Type: application/json
+X-Correlation-ID: {{$guid}}
+
+{
+  "name": "Nvidia RTX 4070 Ti Super FE",
+  "manufacturer": "Nvidia",
+  "modelNumber": "PG141-SKU332",
+  "sku": "NV-RTX4070TISUPER-FE-001",
+  "categoryId": "{{$guid}}",
+  "description": "Enhanced high-performance graphics card for gaming and content creation",
+  "specifications": {
+    "memory": "16GB GDDR6X",
+    "coreClock": "2340 MHz",
+    "memoryClock": "21000 MHz",
+    "memoryInterface": "256-bit",
+    "maxResolution": "7680x4320",
+    "ports": ["3x DisplayPort 1.4a", "1x HDMI 2.1"],
+    "powerConsumption": "295W",
+    "recommendedPSU": "750W"
+  },
+  "isActive": true
+}
+
+### Delete a product
+DELETE {{TechTicker.ProductService_HostAddress}}/api/products/{{$guid}}
+X-Correlation-ID: {{$guid}}
+
+### Test error handling - Create product with invalid data
+POST {{TechTicker.ProductService_HostAddress}}/api/products
+Content-Type: application/json
+X-Correlation-ID: {{$guid}}
+
+{
+  "name": "",
+  "categoryId": "invalid-guid"
+}
+
+### Test error handling - Get non-existent product
+GET {{TechTicker.ProductService_HostAddress}}/api/products/{{$guid}}
+X-Correlation-ID: {{$guid}}
+
+### Test error handling - Update non-existent product
+PUT {{TechTicker.ProductService_HostAddress}}/api/products/{{$guid}}
+Content-Type: application/json
+X-Correlation-ID: {{$guid}}
+
+{
+  "name": "Test Product",
+  "categoryId": "{{$guid}}"
+}
+
+### Test error handling - Delete non-existent product
+DELETE {{TechTicker.ProductService_HostAddress}}/api/products/{{$guid}}
+X-Correlation-ID: {{$guid}}
+
+###
+### CATEGORIES API ENDPOINTS
+###
+
+### Create a new category
+POST {{TechTicker.ProductService_HostAddress}}/api/categories
+Content-Type: application/json
+X-Correlation-ID: {{$guid}}
+
+{
+  "name": "Graphics Processing Unit",
+  "slug": "gpu",
+  "description": "Dedicated graphics cards for gaming and professional workloads"
+}
+
+### Create another category
+POST {{TechTicker.ProductService_HostAddress}}/api/categories
+Content-Type: application/json
+X-Correlation-ID: {{$guid}}
+
+{
+  "name": "Central Processing Unit",
+  "description": "Computer processors and CPUs"
+}
+
+### Get all categories
+GET {{TechTicker.ProductService_HostAddress}}/api/categories
+X-Correlation-ID: {{$guid}}
+
+### Get categories with search
+GET {{TechTicker.ProductService_HostAddress}}/api/categories?search=graphics
+X-Correlation-ID: {{$guid}}
+
+### Get categories with pagination
+GET {{TechTicker.ProductService_HostAddress}}/api/categories?pageNumber=1&pageSize=5
+X-Correlation-ID: {{$guid}}
+
+### Get categories without product count
+GET {{TechTicker.ProductService_HostAddress}}/api/categories?includeProductCount=false
+X-Correlation-ID: {{$guid}}
+
+### Get category by ID (replace with actual GUID)
+GET {{TechTicker.ProductService_HostAddress}}/api/categories/{{$guid}}
+X-Correlation-ID: {{$guid}}
+
+### Get category by slug
+GET {{TechTicker.ProductService_HostAddress}}/api/categories/gpu
+X-Correlation-ID: {{$guid}}
+
+### Update category (replace with actual GUID)
+PUT {{TechTicker.ProductService_HostAddress}}/api/categories/{{$guid}}
+Content-Type: application/json
+X-Correlation-ID: {{$guid}}
+
+{
+  "name": "Graphics Processing Units",
+  "slug": "graphics-cards",
+  "description": "High-performance graphics cards for gaming, content creation, and AI workloads"
+}
+
+### Delete category (replace with actual GUID)
+DELETE {{TechTicker.ProductService_HostAddress}}/api/categories/{{$guid}}
+X-Correlation-ID: {{$guid}}

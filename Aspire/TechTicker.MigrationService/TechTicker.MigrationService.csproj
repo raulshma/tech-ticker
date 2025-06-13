@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-TechTicker.MigrationService-fc1568e3-6a42-49b5-9a16-743fbc73eddb</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.3.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Services\TechTicker.ProductSellerMappingService\TechTicker.ProductSellerMappingService.csproj" />
+    <ProjectReference Include="..\..\Services\TechTicker.ProductService\TechTicker.ProductService.csproj" />
+    <ProjectReference Include="..\TechTicker.ServiceDefaults\TechTicker.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>
