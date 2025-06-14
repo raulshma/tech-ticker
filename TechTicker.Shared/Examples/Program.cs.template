@@ -1,11 +1,8 @@
-using TechTicker.PriceHistoryService.Workers;
-using TechTicker.PriceHistoryService.Services;
-using TechTicker.PriceHistoryService.Data;
-using TechTicker.Shared.Extensions;
+// Template Program.cs for TechTicker services with authentication
 using TechTicker.ServiceDefaults;
-using Microsoft.EntityFrameworkCore;
+using TechTicker.Shared.Extensions;
 
-namespace TechTicker.PriceHistoryService;
+namespace TechTicker.SampleService;
 
 public class Program
 {
@@ -16,29 +13,32 @@ public class Program
         // Add Aspire service defaults (health checks, logging, telemetry)
         builder.AddServiceDefaults();
 
-        // Add RabbitMQ client for message consumption
-        builder.AddRabbitMQClient("messaging");
+        // Add database context (if needed)
+        // builder.AddNpgsqlDbContext<YourDbContext>("your-connection-name");
 
-        // Add PostgreSQL database connection
-        builder.AddNpgsqlDbContext<PriceHistoryDbContext>("pricehistorydb");        // Add TechTicker shared services with authentication
+        // Add messaging (if needed)
+        // builder.AddRabbitMQClient("messaging");
+
+        // Add TechTicker shared services with authentication
         builder.Services.AddTechTickerShared(
             builder.Configuration, 
             enableAuthentication: true, 
             isDevelopment: builder.Environment.IsDevelopment());
 
-        // Register application services
-        builder.Services.AddScoped<IPriceHistoryService, Services.PriceHistoryService>();
-        builder.Services.AddScoped<IMessageConsumerService, MessageConsumerService>();
-
-        // Register the price history ingestion worker (background service)
-        builder.Services.AddHostedService<PriceHistoryIngestionWorker>();
-
         // Add controllers for API endpoints
         builder.Services.AddControllers();
 
-        // Add Swagger/OpenAPI
+        // Add your application services here
+        // builder.Services.AddScoped<IYourService, YourService>();
+
+        // Add background services (if needed)
+        // builder.Services.AddHostedService<YourWorker>();
+
+        // Add API documentation
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();        var app = builder.Build();
+        builder.Services.AddSwaggerGen();
+
+        var app = builder.Build();
 
         // Configure the HTTP request pipeline
         if (app.Environment.IsDevelopment())

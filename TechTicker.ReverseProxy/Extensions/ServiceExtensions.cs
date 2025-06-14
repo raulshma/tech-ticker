@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using TechTicker.ReverseProxy.Configuration;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
@@ -12,60 +9,14 @@ namespace TechTicker.ReverseProxy.Extensions;
 /// Extension methods for configuring API Gateway services
 /// </summary>
 public static class ServiceExtensions
-{
-    /// <summary>
-    /// Configure JWT authentication for the API Gateway
+{    /// <summary>
+    /// This method has been replaced by TechTicker shared authentication.
+    /// Use services.AddTechTickerAuth(configuration) instead.
     /// </summary>
+    [Obsolete("Use TechTicker shared authentication instead")]
     public static IServiceCollection AddApiGatewayAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>() ?? new JwtSettings();
-        
-        if (string.IsNullOrEmpty(jwtSettings.SecretKey))
-        {
-            throw new InvalidOperationException("JWT SecretKey is required in configuration");
-        }
-
-        var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
-
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false; // For development - should be true in production
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = true,
-                    ValidIssuer = jwtSettings.Issuer,
-                    ValidateAudience = true,
-                    ValidAudience = jwtSettings.Audience,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
-                };
-
-                // Configure JWT events for better logging
-                options.Events = new JwtBearerEvents
-                {
-                    OnAuthenticationFailed = context =>
-                    {
-                        context.HttpContext.RequestServices
-                            .GetRequiredService<ILogger<JwtBearerEvents>>()
-                            .LogWarning("JWT Authentication failed: {Error}", context.Exception.Message);
-                        return Task.CompletedTask;
-                    },
-                    OnTokenValidated = context =>
-                    {
-                        context.HttpContext.RequestServices
-                            .GetRequiredService<ILogger<JwtBearerEvents>>()
-                            .LogDebug("JWT Token validated for user: {UserId}", 
-                                context.Principal?.FindFirst("sub")?.Value ?? "Unknown");
-                        return Task.CompletedTask;
-                    }
-                };
-            });
-
-        return services;
+        throw new NotSupportedException("Use services.AddTechTickerAuth(configuration) from TechTicker.Shared instead");
     }
 
     /// <summary>

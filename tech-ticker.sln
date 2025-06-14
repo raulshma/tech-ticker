@@ -36,6 +36,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechTicker.PriceHistoryService", "Services\TechTicker.PriceHistoryService\TechTicker.PriceHistoryService.csproj", "{4369B619-D677-93CE-146C-DAD9C7CC7FB7}"
 EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "TechTicker.UI", "Services\TechTicker.UI\TechTicker.UI.esproj", "{F34327FC-F2AA-126C-B227-2B565D08A90D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,12 @@ Global
 		{4369B619-D677-93CE-146C-DAD9C7CC7FB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4369B619-D677-93CE-146C-DAD9C7CC7FB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4369B619-D677-93CE-146C-DAD9C7CC7FB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F34327FC-F2AA-126C-B227-2B565D08A90D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F34327FC-F2AA-126C-B227-2B565D08A90D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F34327FC-F2AA-126C-B227-2B565D08A90D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{F34327FC-F2AA-126C-B227-2B565D08A90D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F34327FC-F2AA-126C-B227-2B565D08A90D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F34327FC-F2AA-126C-B227-2B565D08A90D}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +121,7 @@ Global
 		{B16DECDB-D086-6FAF-00F3-41271B9C21C6} = {5854FF58-B8C5-05C6-5BF2-ACE42193F22B}
 		{75BAA14A-89DF-D984-A7FB-D8294BAA2ECE} = {5854FF58-B8C5-05C6-5BF2-ACE42193F22B}
 		{4369B619-D677-93CE-146C-DAD9C7CC7FB7} = {5854FF58-B8C5-05C6-5BF2-ACE42193F22B}
+		{F34327FC-F2AA-126C-B227-2B565D08A90D} = {5854FF58-B8C5-05C6-5BF2-ACE42193F22B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B88CBE7C-6965-4D86-A936-4B99420FC395}

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TechTicker.Shared.Common;
 using TechTicker.Shared.Utilities;
+using System.Security.Claims;
 
 namespace TechTicker.Shared.Controllers
 {
@@ -19,6 +20,93 @@ namespace TechTicker.Shared.Controllers
             Request.Headers.TryGetValue("X-Correlation-ID", out var correlationId) 
                 ? correlationId.ToString() 
                 : Guid.NewGuid().ToString();
+
+        /// <summary>
+        /// Gets the current user ID from the authenticated user
+        /// </summary>
+        protected string? CurrentUserId => 
+            User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+            User.FindFirst("sub")?.Value ??
+            User.FindFirst("id")?.Value ??
+            HttpContext.Items["UserId"]?.ToString();
+
+        /// <summary>
+        /// Gets the current user email from the authenticated user
+        /// </summary>
+        protected string? CurrentUserEmail =>
+            User.FindFirst(ClaimTypes.Email)?.Value ??
+            User.FindFirst("email")?.Value ??
+            HttpContext.Items["UserEmail"]?.ToString();
+
+        /// <summary>
+        /// Gets the current user name from the authenticated user
+        /// </summary>
+        protected string? CurrentUserName =>
+            User.FindFirst(ClaimTypes.Name)?.Value ??
+            User.FindFirst("name")?.Value ??
+            User.FindFirst("preferred_username")?.Value ??
+            HttpContext.Items["UserName"]?.ToString();
+
+        /// <summary>
+        /// Gets the current user roles from the authenticated user
+        /// </summary>
+        protected IEnumerable<string> CurrentUserRoles =>
+            User.FindAll(ClaimTypes.Role)
+                .Concat(User.FindAll("role"))
+                .Select(c => c.Value)
+                .Concat((HttpContext.Items["UserRoles"] as IEnumerable<string>) ?? Enumerable.Empty<string>())
+                .Distinct();
+
+        /// <summary>
+        /// Gets the current user scopes from the authenticated user
+        /// </summary>
+        protected IEnumerable<string> CurrentUserScopes =>
+            User.FindAll("scope")
+                .Select(c => c.Value)
+                .Concat((HttpContext.Items["UserScopes"] as IEnumerable<string>) ?? Enumerable.Empty<string>())
+                .Distinct();
+
+        /// <summary>
+        /// Checks if the current user is authenticated
+        /// </summary>
+        protected bool IsAuthenticated => User.Identity?.IsAuthenticated == true;
+
+        /// <summary>
+        /// Checks if the current user has the specified role
+        /// </summary>
+        protected bool IsInRole(string role) => CurrentUserRoles.Contains(role);
+
+        /// <summary>
+        /// Checks if the current user is an admin
+        /// </summary>
+        protected bool IsAdmin => IsInRole("Admin");
+
+        /// <summary>
+        /// Checks if the current user has the specified scope
+        /// </summary>
+        protected bool HasScope(string scope) => CurrentUserScopes.Contains(scope);
+
+        /// <summary>
+        /// Checks if the current user can access the specified user's data
+        /// </summary>
+        protected bool CanAccessUserData(string targetUserId)
+        {
+            if (IsAdmin) return true;
+            if (string.IsNullOrEmpty(CurrentUserId)) return false;
+            return CurrentUserId.Equals(targetUserId, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Ensures the current user can access the specified user's data, returns Forbid if not
+        /// </summary>
+        protected IActionResult? EnsureCanAccessUserData(string targetUserId)
+        {
+            if (!CanAccessUserData(targetUserId))
+            {
+                return Forbid("You do not have permission to access this user's data");
+            }
+            return null;
+        }
 
         /// <summary>
         /// Creates an OK response with the specified data

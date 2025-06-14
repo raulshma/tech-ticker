@@ -3,6 +3,8 @@ using TechTicker.ProductService.DTOs;
 using TechTicker.ProductService.Services;
 using TechTicker.Shared.Controllers;
 using TechTicker.Shared.Common;
+using TechTicker.Shared.Attributes;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TechTicker.ProductService.Controllers
 {
@@ -31,13 +33,15 @@ namespace TechTicker.ProductService.Controllers
         /// <response code="404">Category not found</response>
         /// <response code="409">SKU already exists</response>
         [HttpPost]
+        [WriteAccess]
         [ProducesResponseType(typeof(ApiResponse<ProductResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductRequest request)
         {
-            _logger.LogInformation("Creating new product: {ProductName}", request.Name);
+            _logger.LogInformation("Creating new product: {ProductName} by user: {UserId}", 
+                request.Name, CurrentUserId);
 
             if (!ModelState.IsValid)
             {
@@ -56,9 +60,7 @@ namespace TechTicker.ProductService.Controllers
             }
 
             return HandleResult(result);
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Gets a list of products with optional filtering
         /// </summary>
         /// <param name="categoryId">Category ID or slug to filter by</param>
@@ -70,6 +72,7 @@ namespace TechTicker.ProductService.Controllers
         /// <response code="200">Products retrieved successfully</response>
         /// <response code="400">Invalid query parameters</response>
         [HttpGet]
+        [ReadOnlyAccess]
         [ProducesResponseType(typeof(PagedResponse<ProductResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetProducts(
@@ -97,9 +100,7 @@ namespace TechTicker.ProductService.Controllers
             }
 
             return HandleResult(result);
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Gets a product by ID
         /// </summary>
         /// <param name="productId">Product ID</param>
@@ -107,11 +108,13 @@ namespace TechTicker.ProductService.Controllers
         /// <response code="200">Product retrieved successfully</response>
         /// <response code="404">Product not found</response>
         [HttpGet("{productId:guid}")]
+        [ReadOnlyAccess]
         [ProducesResponseType(typeof(ApiResponse<ProductResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProduct(Guid productId)
         {
-            _logger.LogInformation("Retrieving product with ID: {ProductId}", productId);
+            _logger.LogInformation("Retrieving product with ID: {ProductId} by user: {UserId}", 
+                productId, CurrentUserId);
 
             var result = await _productService.GetProductByIdAsync(productId);
             return HandleResult(result);
@@ -128,13 +131,15 @@ namespace TechTicker.ProductService.Controllers
         /// <response code="404">Product or category not found</response>
         /// <response code="409">SKU already exists</response>
         [HttpPut("{productId:guid}")]
+        [WriteAccess]
         [ProducesResponseType(typeof(ApiResponse<ProductResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> UpdateProduct(Guid productId, [FromBody] UpdateProductRequest request)
         {
-            _logger.LogInformation("Updating product with ID: {ProductId}", productId);
+            _logger.LogInformation("Updating product with ID: {ProductId} by user: {UserId}", 
+                productId, CurrentUserId);
 
             if (!ModelState.IsValid)
             {

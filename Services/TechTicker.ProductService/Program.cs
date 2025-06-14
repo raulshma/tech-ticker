@@ -23,17 +23,18 @@ public class Program
         // Add gRPC services
         builder.Services.AddGrpc();
         
-        // Add TechTicker shared services
-        builder.Services.AddTechTickerShared();
+        // Add TechTicker shared services with authentication
+        builder.Services.AddTechTickerShared(
+            builder.Configuration, 
+            enableAuthentication: true, 
+            isDevelopment: builder.Environment.IsDevelopment());
         
         // Register application services
         builder.Services.AddScoped<IProductService, Services.ProductService>();
         builder.Services.AddScoped<ICategoryService, CategoryService>();
         
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi();
-
-        var app = builder.Build();
+        builder.Services.AddOpenApi();        var app = builder.Build();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -44,11 +45,10 @@ public class Program
         
         app.UseHttpLogging();
         
-        // Add TechTicker shared middleware (should be early in pipeline)
-        app.UseTechTickerExceptionHandling();
-        app.UseCorrelationId();
-          app.UseHttpsRedirection();
-        app.UseAuthorization();
+        // Add TechTicker shared middleware pipeline (includes auth)
+        app.UseTechTickerPipeline(enableAuthentication: true);
+        
+        app.UseHttpsRedirection();
         
         // Map HTTP controllers
         app.MapControllers();

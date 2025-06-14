@@ -3,6 +3,7 @@ using TechTicker.PriceHistoryService.Models;
 using TechTicker.PriceHistoryService.Services;
 using TechTicker.Shared.Controllers;
 using TechTicker.Shared.Constants;
+using TechTicker.Shared.Attributes;
 
 namespace TechTicker.PriceHistoryService.Controllers
 {
@@ -35,6 +36,7 @@ namespace TechTicker.PriceHistoryService.Controllers
         /// <param name="pageSize">Number of items per page (default: 50, max: 1000)</param>
         /// <returns>Paginated price history data</returns>
         [HttpGet("products/{canonicalProductId:guid}")]
+        [ReadOnlyAccess]
         public async Task<IActionResult> GetPriceHistory(
             Guid canonicalProductId,
             [FromQuery] string? sellerName = null,
@@ -43,7 +45,8 @@ namespace TechTicker.PriceHistoryService.Controllers
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 50)
         {
-            _logger.LogInformation("Received price history request for product {ProductId}", canonicalProductId);
+            _logger.LogInformation("Received price history request for product {ProductId} by user {UserId}", 
+                canonicalProductId, CurrentUserId);
 
             var request = new PriceHistoryQueryRequest
             {

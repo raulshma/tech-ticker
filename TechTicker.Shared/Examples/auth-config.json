@@ -1,10 +1,4 @@
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
   "OpenIddictAuthentication": {
     "AuthorizationServerUrl": "https://localhost:7001",
     "Audience": "techticker-api",
