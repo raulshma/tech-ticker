@@ -15,7 +15,7 @@ var scrapingOrchestrationDb = postgres.AddDatabase("scraping-orchestration");
 
 builder
     .AddNpmApp("AngularFrontEnd", "../../Services/TechTicker.UI")
-    .WithHttpEndpoint(env: "PORT")
+    .WithHttpEndpoint(env: "PORT", port: 4200)
     .WithExternalHttpEndpoints();
 
 var productService = builder.AddProject<Projects.TechTicker_ProductService>("techticker-productservice")

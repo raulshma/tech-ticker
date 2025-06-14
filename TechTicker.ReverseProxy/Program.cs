@@ -25,10 +25,9 @@ public class Program
         // Add TechTicker shared services
         builder.Services.AddTechTickerShared();
         
-        // Add HTTP logging
-        builder.Services.AddHttpLogging(o => { });
+        // Add HTTP logging        builder.Services.AddHttpLogging(o => { });
           // Configure API Gateway services using extension methods
-        builder.Services.AddApiGatewayAuthentication(builder.Configuration);
+        builder.Services.AddTechTickerAuth(builder.Configuration);
         builder.Services.AddApiGatewayAuthorization();
         builder.Services.AddApiGatewayRateLimiting(builder.Configuration);
         builder.Services.AddApiGatewayCors(builder.Configuration);        // Configure YARP Reverse Proxy
@@ -127,7 +126,6 @@ public class Program
         // Add enhanced request logging middleware
         app.UseMiddleware<RequestLoggingMiddleware>();
           // Add HTTP logging
-        app.UseHttpLogging();
         
         // Enable CORS
         app.UseCors();
