@@ -10,6 +10,7 @@ using TechTicker.PriceHistoryService.Data;
 using TechTicker.ProductSellerMappingService.Data;
 using TechTicker.ProductService.Data;
 using TechTicker.ScrapingOrchestrationService.Data;
+using TechTicker.UserService.Data;
 
 public class Worker(
     IServiceProvider serviceProvider,
@@ -68,6 +69,14 @@ public class Worker(
         {
             // Run migration in a transaction to avoid partial migration if it fails.
             await scrapingOrchestrationDbContext.Database.MigrateAsync(cancellationToken);
+        });
+
+        var userDbContext = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+        strategy = userDbContext.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async () =>
+        {
+            // Run migration in a transaction to avoid partial migration if it fails.
+            await userDbContext.Database.MigrateAsync(cancellationToken);
         });
     }
 

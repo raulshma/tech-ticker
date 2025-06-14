@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\Services\TechTicker.ProductService\TechTicker.ProductService.csproj" />
     <ProjectReference Include="..\..\Services\TechTicker.PriceHistoryService\TechTicker.PriceHistoryService.csproj" />
     <ProjectReference Include="..\..\Services\TechTicker.ScrapingOrchestrationService\TechTicker.ScrapingOrchestrationService.csproj" />
+    <ProjectReference Include="..\..\Services\TechTicker.UserService\TechTicker.UserService.csproj" />
     <ProjectReference Include="..\TechTicker.ServiceDefaults\TechTicker.ServiceDefaults.csproj" />
   </ItemGroup>
 </Project>
