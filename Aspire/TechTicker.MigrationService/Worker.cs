@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 
 using OpenTelemetry.Trace;
+using TechTicker.PriceHistoryService.Data;
 using TechTicker.ProductSellerMappingService.Data;
 using TechTicker.ProductService.Data;
 
@@ -52,6 +53,14 @@ public class Worker(
         {
             // Run migration in a transaction to avoid partial migration if it fails.
             await productSellerMappingDbContext.Database.MigrateAsync(cancellationToken);
+        });
+
+        var priceHistoryDbContext = scope.ServiceProvider.GetRequiredService<PriceHistoryDbContext>();
+        strategy = priceHistoryDbContext.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async () =>
+        {
+            // Run migration in a transaction to avoid partial migration if it fails.
+            await priceHistoryDbContext.Database.MigrateAsync(cancellationToken);
         });
     }
 
