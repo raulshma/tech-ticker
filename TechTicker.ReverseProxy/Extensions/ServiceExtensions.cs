@@ -3,6 +3,8 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TechTicker.ReverseProxy.Configuration;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace TechTicker.ReverseProxy.Extensions;
 
@@ -88,14 +90,44 @@ public static class ServiceExtensions
     /// </summary>
     public static IServiceCollection AddApiGatewayRateLimiting(this IServiceCollection services, IConfiguration configuration)
     {
-        // For now, we'll implement a basic in-memory rate limiter
-        // In production, consider using:
-        // - Redis-based rate limiting
-        // - AspNetCoreRateLimit package
-        // - Cloud-based rate limiting (Azure API Management, AWS API Gateway)
-        
-        // TODO: Implement proper rate limiting middleware
-        // This is a placeholder that can be enhanced with proper rate limiting logic
+        var rateLimitingSection = configuration.GetSection("RateLimiting");
+        var defaultPolicy = rateLimitingSection.GetSection("DefaultPolicy");        services.AddRateLimiter(options =>
+        {
+            // Standard policy for general API access (renamed from "default" to avoid YARP conflicts)
+            options.AddFixedWindowLimiter("standard", configureOptions =>
+            {
+                configureOptions.PermitLimit = defaultPolicy.GetValue<int>("PermitLimit", 100);
+                configureOptions.Window = defaultPolicy.GetValue<TimeSpan>("Window", TimeSpan.FromMinutes(1));
+                configureOptions.QueueLimit = defaultPolicy.GetValue<int>("QueueLimit", 50);
+                configureOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            });
+
+            // Readonly policy for read operations (more permissive)
+            options.AddFixedWindowLimiter("readonly", configureOptions =>
+            {
+                configureOptions.PermitLimit = 200; // Higher limit for readonly operations
+                configureOptions.Window = TimeSpan.FromMinutes(1);
+                configureOptions.QueueLimit = 100;
+                configureOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            });
+
+            // Auth policy for authentication endpoints (more restrictive)
+            options.AddFixedWindowLimiter("auth", configureOptions =>
+            {
+                configureOptions.PermitLimit = 20; // Lower limit for auth operations
+                configureOptions.Window = TimeSpan.FromMinutes(1);
+                configureOptions.QueueLimit = 10;
+                configureOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            });
+
+            // Configure rejection response
+            options.OnRejected = async (context, token) =>
+            {
+                context.HttpContext.Response.StatusCode = 429;
+                await context.HttpContext.Response.WriteAsync(
+                    "Rate limit exceeded. Please try again later.", token);
+            };
+        });
         
         return services;
     }

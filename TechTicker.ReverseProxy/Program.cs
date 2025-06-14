@@ -71,10 +71,8 @@ public class Program
         
         // Enable CORS
         app.UseCors();
-        
-        // Enable rate limiting
-        // Rate limiting (currently placeholder - TODO: implement proper rate limiting)
-        // app.UseRateLimiter();
+          // Enable rate limiting
+        app.UseRateLimiter();
         
         // Enable authentication and authorization
         app.UseAuthentication();
