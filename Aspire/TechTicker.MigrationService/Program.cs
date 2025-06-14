@@ -3,7 +3,9 @@ using TechTicker.ProductSellerMappingService.Data;
 using TechTicker.ProductService.Data;
 using TechTicker.PriceHistoryService.Data;
 using TechTicker.ScrapingOrchestrationService.Data;
+using TechTicker.UserService.Data;
 using TechTicker.ServiceDefaults;
+using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -15,6 +17,10 @@ builder.AddNpgsqlDbContext<ProductDbContext>("product");
 builder.AddNpgsqlDbContext<ProductSellerMappingDbContext>("product-seller-mapping");
 builder.AddNpgsqlDbContext<PriceHistoryDbContext>("price-history");
 builder.AddNpgsqlDbContext<ScrapingOrchestrationDbContext>("scraping-orchestration");
+builder.AddNpgsqlDbContext<UserDbContext>("user", configureDbContextOptions: options =>
+{
+    options.UseOpenIddict();
+});
 
 builder.Services.AddHostedService<Worker>();
 

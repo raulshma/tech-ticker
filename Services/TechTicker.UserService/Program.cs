@@ -13,10 +13,8 @@ public class Program
     public static void Main(string[] args)
     {        var builder = WebApplication.CreateBuilder(args);        // Add database
         builder.AddServiceDefaults();
-        builder.Services.AddDbContext<UserDbContext>(options =>
+        builder.AddNpgsqlDbContext<UserDbContext>("user", configureDbContextOptions: options =>
         {
-            var connectionString = builder.Configuration.GetConnectionString("user");
-            options.UseNpgsql(connectionString);
             options.UseOpenIddict();
         });
         builder.Services.AddHttpLogging(o => { });

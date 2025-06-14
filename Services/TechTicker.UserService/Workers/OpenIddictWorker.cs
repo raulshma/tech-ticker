@@ -1,4 +1,9 @@
 using OpenIddict.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using TechTicker.UserService.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace TechTicker.UserService.Workers
 {
@@ -16,11 +21,13 @@ namespace TechTicker.UserService.Workers
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
-        }
-
-        public async Task StartAsync(CancellationToken cancellationToken)
+        }        public async Task StartAsync(CancellationToken cancellationToken)
         {
             await using var scope = _serviceProvider.CreateAsyncScope();
+
+            // Ensure database is created and up to date
+            var context = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+            await context.Database.EnsureCreatedAsync(cancellationToken);
 
             var applicationManager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
             var scopeManager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
