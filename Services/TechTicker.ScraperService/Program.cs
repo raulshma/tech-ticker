@@ -1,6 +1,7 @@
 using TechTicker.ScraperService.Workers;
 using TechTicker.ScraperService.Services;
 using TechTicker.Shared.Extensions;
+using TechTicker.ServiceDefaults;
 
 namespace TechTicker.ScraperService;
 

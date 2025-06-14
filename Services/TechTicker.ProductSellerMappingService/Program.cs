@@ -6,6 +6,7 @@ using TechTicker.Shared.Extensions;
 using TechTicker.Grpc.Clients.Products;
 using TechTicker.Grpc.Contracts.Products;
 using TechTicker.Shared.Utilities;
+using TechTicker.ServiceDefaults;
 
 namespace TechTicker.ProductSellerMappingService;
 

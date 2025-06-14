@@ -1,6 +1,7 @@
 using TechTicker.MigrationService;
 using TechTicker.ProductSellerMappingService.Data;
 using TechTicker.ProductService.Data;
+using TechTicker.ServiceDefaults;
 
 var builder = Host.CreateApplicationBuilder(args);
 

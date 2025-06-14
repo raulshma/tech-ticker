@@ -2,6 +2,7 @@ using TechTicker.ScrapingOrchestrationService.Workers;
 using TechTicker.ScrapingOrchestrationService.Services;
 using TechTicker.ScrapingOrchestrationService.Data;
 using TechTicker.Shared.Extensions;
+using TechTicker.ServiceDefaults;
 
 namespace TechTicker.ScrapingOrchestrationService;
 

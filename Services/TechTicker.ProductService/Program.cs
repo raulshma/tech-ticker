@@ -4,6 +4,7 @@ using TechTicker.ProductService.Data;
 using TechTicker.ProductService.Services;
 using TechTicker.ProductService.Grpc;
 using TechTicker.Shared.Extensions;
+using TechTicker.ServiceDefaults;
 
 namespace TechTicker.ProductService;
 

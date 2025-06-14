@@ -15,8 +15,8 @@
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.0" />
     <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.3.0" />
     <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="9.3.0" />
-  </ItemGroup>
-  <ItemGroup>
+  </ItemGroup>  <ItemGroup>
+    <ProjectReference Include="..\..\Services\TechTicker.PriceNormalizationService\TechTicker.PriceNormalizationService.csproj" />
     <ProjectReference Include="..\..\Services\TechTicker.ProductSellerMappingService\TechTicker.ProductSellerMappingService.csproj" />
     <ProjectReference Include="..\..\Services\TechTicker.ProductService\TechTicker.ProductService.csproj" />
     <ProjectReference Include="..\..\Services\TechTicker.ScraperService\TechTicker.ScraperService.csproj" />

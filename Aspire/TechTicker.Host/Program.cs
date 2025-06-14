@@ -41,4 +41,8 @@ builder.AddProject<Projects.TechTicker_ScraperService>("techticker-scraperservic
     .WithReference(rabbitmq)
     .WaitFor(rabbitmq);
 
+builder.AddProject<Projects.TechTicker_PriceNormalizationService>("techticker-pricenormalizationservice")
+    .WithReference(rabbitmq)
+    .WaitFor(rabbitmq);
+
 builder.Build().Run();
