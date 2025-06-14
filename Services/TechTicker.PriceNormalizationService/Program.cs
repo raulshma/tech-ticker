@@ -8,8 +8,10 @@ namespace TechTicker.PriceNormalizationService;
 public class Program
 {
     public static void Main(string[] args)
-    {
-        var builder = Host.CreateApplicationBuilder(args);
+    {        var builder = Host.CreateApplicationBuilder(args);
+
+        // Add RabbitMQ client
+        builder.AddRabbitMQClient("messaging");
 
         builder.AddServiceDefaults();
 

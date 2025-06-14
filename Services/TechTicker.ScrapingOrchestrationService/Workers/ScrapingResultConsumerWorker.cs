@@ -6,13 +6,11 @@ using TechTicker.ScrapingOrchestrationService.Messages;
 using TechTicker.ScrapingOrchestrationService.Services;
 
 namespace TechTicker.ScrapingOrchestrationService.Workers
-{
-    public class ScrapingResultConsumerWorker : BackgroundService
+{    public class ScrapingResultConsumerWorker : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<ScrapingResultConsumerWorker> _logger;
-        private readonly IConfiguration _configuration;
-        private IConnection? _connection;
+        private readonly IConnection _connection;
         private IModel? _channel;
 
         // Queue and exchange names
@@ -23,11 +21,11 @@ namespace TechTicker.ScrapingOrchestrationService.Workers
         public ScrapingResultConsumerWorker(
             IServiceProvider serviceProvider,
             ILogger<ScrapingResultConsumerWorker> logger,
-            IConfiguration configuration)
+            IConnection connection)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
-            _configuration = configuration;
+            _connection = connection;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -43,21 +41,10 @@ namespace TechTicker.ScrapingOrchestrationService.Workers
             {
                 _logger.LogError(ex, "Error in Scraping Result Consumer Worker");
             }
-        }
-
-        private async Task InitializeAsync()
+        }        private Task InitializeAsync()
         {
-            var factory = new ConnectionFactory
-            {
-                HostName = _configuration.GetConnectionString("messaging") ?? "localhost",
-                UserName = "guest",
-                Password = "guest",
-                VirtualHost = "/",
-                AutomaticRecoveryEnabled = true,
-                NetworkRecoveryInterval = TimeSpan.FromSeconds(10)
-            };
+            _logger.LogInformation("Initializing RabbitMQ consumer");
 
-            _connection = factory.CreateConnection("TechTicker.ScrapingOrchestrationService.Consumer");
             _channel = _connection.CreateModel();
 
             // Declare exchange
@@ -78,9 +65,8 @@ namespace TechTicker.ScrapingOrchestrationService.Workers
             _channel.QueueBind(
                 queue: ScrapingResultQueueName,
                 exchange: ScrapingExchangeName,
-                routingKey: ScrapingResultRoutingKey);
-
-            _logger.LogInformation("RabbitMQ consumer initialized successfully");
+                routingKey: ScrapingResultRoutingKey);            _logger.LogInformation("RabbitMQ consumer initialized successfully");
+            return Task.CompletedTask;
         }
 
         private async Task ConsumeMessagesAsync(CancellationToken stoppingToken)
@@ -198,14 +184,12 @@ namespace TechTicker.ScrapingOrchestrationService.Workers
             }
 
             await base.StopAsync(cancellationToken);
-        }
-
-        public override void Dispose()
+        }        public override void Dispose()
         {
             try
             {
                 _channel?.Dispose();
-                _connection?.Dispose();
+                // Don't dispose the connection as it's managed by the DI container
             }
             catch (Exception ex)
             {

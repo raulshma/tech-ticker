@@ -10,13 +10,10 @@ namespace TechTicker.ScrapingOrchestrationService.Services
         Task PublishScrapeCommandAsync(ScrapeProductPageCommand command);
         Task InitializeAsync();
         void Dispose();
-    }
-
-    public class MessagePublisherService : IMessagePublisherService, IDisposable
+    }    public class MessagePublisherService : IMessagePublisherService, IDisposable
     {
         private readonly ILogger<MessagePublisherService> _logger;
-        private readonly IConfiguration _configuration;
-        private IConnection? _connection;
+        private readonly IConnection _connection;
         private IModel? _channel;
         private bool _disposed = false;
 
@@ -27,27 +24,16 @@ namespace TechTicker.ScrapingOrchestrationService.Services
 
         public MessagePublisherService(
             ILogger<MessagePublisherService> logger,
-            IConfiguration configuration)
+            IConnection connection)
         {
             _logger = logger;
-            _configuration = configuration;
-        }
-
-        public async Task InitializeAsync()
+            _connection = connection;
+        }        public Task InitializeAsync()
         {
             try
             {
-                var factory = new ConnectionFactory
-                {
-                    HostName = _configuration.GetConnectionString("messaging") ?? "localhost",
-                    UserName = "guest",
-                    Password = "guest",
-                    VirtualHost = "/",
-                    AutomaticRecoveryEnabled = true,
-                    NetworkRecoveryInterval = TimeSpan.FromSeconds(10)
-                };
+                _logger.LogInformation("Initializing RabbitMQ messaging");
 
-                _connection = factory.CreateConnection("TechTicker.ScrapingOrchestrationService");
                 _channel = _connection.CreateModel();
 
                 // Declare exchange
@@ -68,9 +54,8 @@ namespace TechTicker.ScrapingOrchestrationService.Services
                 _channel.QueueBind(
                     queue: ScrapeCommandQueueName,
                     exchange: ScrapingExchangeName,
-                    routingKey: ScrapeCommandRoutingKey);
-
-                _logger.LogInformation("RabbitMQ messaging initialized successfully");
+                    routingKey: ScrapeCommandRoutingKey);                _logger.LogInformation("RabbitMQ messaging initialized successfully");
+                return Task.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -117,9 +102,7 @@ namespace TechTicker.ScrapingOrchestrationService.Services
                 _logger.LogError(ex, "Failed to publish scrape command for mapping {MappingId}", command.MappingId);
                 throw;
             }
-        }
-
-        public void Dispose()
+        }        public void Dispose()
         {
             if (_disposed) return;
 
@@ -127,8 +110,7 @@ namespace TechTicker.ScrapingOrchestrationService.Services
             {
                 _channel?.Close();
                 _channel?.Dispose();
-                _connection?.Close();
-                _connection?.Dispose();
+                // Don't dispose the connection as it's managed by the DI container
             }
             catch (Exception ex)
             {

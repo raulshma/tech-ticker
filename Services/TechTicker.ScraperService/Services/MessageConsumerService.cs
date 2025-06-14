@@ -12,16 +12,15 @@ namespace TechTicker.ScraperService.Services
     public class MessageConsumerService : IMessageConsumerService, IDisposable
     {
         private readonly ILogger<MessageConsumerService> _logger;
-        private readonly IConfiguration _configuration;
-        private IConnection? _connection;
+        private readonly IConnection _connection;
         private IModel? _channel;
         private EventingBasicConsumer? _consumer;
         private string? _consumerTag;
 
-        public MessageConsumerService(ILogger<MessageConsumerService> logger, IConfiguration configuration)
+        public MessageConsumerService(ILogger<MessageConsumerService> logger, IConnection connection)
         {
             _logger = logger;
-            _configuration = configuration;
+            _connection = connection;
         }
 
         public async Task StartConsumingAsync(Func<ScrapeProductPageCommand, Task> messageHandler, CancellationToken cancellationToken)
@@ -35,7 +34,7 @@ namespace TechTicker.ScraperService.Services
                     throw new InvalidOperationException("RabbitMQ channel or consumer not initialized");
                 }
 
-                var queueName = _configuration["RabbitMQ:ScrapeCommandQueue"] ?? "scrape-product-page-commands";
+                var queueName = "scrape-product-page-commands";
 
                 _consumer.Received += async (model, ea) =>
                 {
@@ -111,16 +110,11 @@ namespace TechTicker.ScraperService.Services
         {
             try
             {
-                var connectionString = _configuration["RabbitMQ:ConnectionString"] ?? "amqp://localhost:5672";
-                var factory = new ConnectionFactory
-                {
-                    Uri = new Uri(connectionString)
-                };
+                _logger.LogInformation("Initializing RabbitMQ consumer");
 
-                _connection = factory.CreateConnection();
                 _channel = _connection.CreateModel();
 
-                var queueName = _configuration["RabbitMQ:ScrapeCommandQueue"] ?? "scrape-product-page-commands";
+                var queueName = "scrape-product-page-commands";
 
                 // Declare queue (idempotent)
                 _channel.QueueDeclare(
@@ -149,7 +143,7 @@ namespace TechTicker.ScraperService.Services
             try
             {
                 _channel?.Dispose();
-                _connection?.Dispose();
+                // Don't dispose the connection as it's managed by the DI container
             }
             catch (Exception ex)
             {

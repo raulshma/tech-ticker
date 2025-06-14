@@ -1,7 +1,8 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var rabbitmq = builder.AddRabbitMQ("messaging")
-    .WithDataVolume(isReadOnly: false);
+    .WithDataVolume(isReadOnly: false)
+    .WithManagementPlugin();;
 
 var postgres = builder.AddPostgres("postgres")
     .WithDataVolume(isReadOnly: false)

@@ -9,19 +9,25 @@ namespace TechTicker.ScrapingOrchestrationService;
 public class Program
 {
     public static void Main(string[] args)
-    {
-        var builder = Host.CreateApplicationBuilder(args);
+    {        var builder = Host.CreateApplicationBuilder(args);        // Add database - use the same connection as ProductSellerMappingService since we need to read from it
+        builder.AddNpgsqlDbContext<ScrapingOrchestrationDbContext>("product-seller-mapping");
+        
+        // Add RabbitMQ client
+        builder.AddRabbitMQClient("messaging");
+        
+        builder.AddServiceDefaults();
 
-        // Add database - use the same connection as ProductSellerMappingService since we need to read from it
-        builder.AddNpgsqlDbContext<ScrapingOrchestrationDbContext>("product-seller-mapping");        builder.AddServiceDefaults();// Add TechTicker shared services
+        // Add TechTicker shared services
         builder.Services.AddTechTickerShared();
 
         // Register application services
         builder.Services.AddScoped<IScrapingSchedulerService, ScrapingSchedulerService>();
         builder.Services.AddScoped<IDomainScrapingProfileService, DomainScrapingProfileService>();
-        builder.Services.AddScoped<IMessagePublisherService, MessagePublisherService>();// Register the orchestration workers
+        builder.Services.AddScoped<IMessagePublisherService, MessagePublisherService>();        // Register the orchestration workers
         builder.Services.AddHostedService<ScrapingOrchestrationWorker>();
-        builder.Services.AddHostedService<ScrapingResultConsumerWorker>();        var host = builder.Build();
+        builder.Services.AddHostedService<ScrapingResultConsumerWorker>();
+
+        var host = builder.Build();
         
         host.Run();
     }

@@ -11,14 +11,13 @@ namespace TechTicker.ScraperService.Services
     public class MessagePublisherService : IMessagePublisherService, IDisposable
     {
         private readonly ILogger<MessagePublisherService> _logger;
-        private readonly IConfiguration _configuration;
-        private IConnection? _connection;
+        private readonly IConnection _connection;
         private IModel? _channel;
 
-        public MessagePublisherService(ILogger<MessagePublisherService> logger, IConfiguration configuration)
+        public MessagePublisherService(ILogger<MessagePublisherService> logger, IConnection connection)
         {
             _logger = logger;
-            _configuration = configuration;
+            _connection = connection;
             InitializeRabbitMQ();
         }
 
@@ -28,7 +27,7 @@ namespace TechTicker.ScraperService.Services
             {
                 EnsureChannelInitialized();
                 
-                var exchange = _configuration["RabbitMQ:RawPriceDataExchange"] ?? "raw-price-data";
+                var exchange = "raw-price-data";
                 var message = JsonSerializer.Serialize(priceData);
                 var body = Encoding.UTF8.GetBytes(message);
 
@@ -61,7 +60,7 @@ namespace TechTicker.ScraperService.Services
             {
                 EnsureChannelInitialized();
                 
-                var exchange = _configuration["RabbitMQ:ScrapingResultExchange"] ?? "scraping-results";
+                var exchange = "scraping-results";
                 var message = JsonSerializer.Serialize(result);
                 var body = Encoding.UTF8.GetBytes(message);
 
@@ -92,18 +91,13 @@ namespace TechTicker.ScraperService.Services
         {
             try
             {
-                var connectionString = _configuration["RabbitMQ:ConnectionString"] ?? "amqp://localhost:5672";
-                var factory = new ConnectionFactory
-                {
-                    Uri = new Uri(connectionString)
-                };
+                _logger.LogInformation("Initializing RabbitMQ publisher");
 
-                _connection = factory.CreateConnection();
                 _channel = _connection.CreateModel();
 
                 // Declare exchanges (idempotent)
-                var rawPriceDataExchange = _configuration["RabbitMQ:RawPriceDataExchange"] ?? "raw-price-data";
-                var scrapingResultExchange = _configuration["RabbitMQ:ScrapingResultExchange"] ?? "scraping-results";
+                var rawPriceDataExchange = "raw-price-data";
+                var scrapingResultExchange = "scraping-results";
 
                 _channel.ExchangeDeclare(
                     exchange: rawPriceDataExchange,
@@ -139,7 +133,7 @@ namespace TechTicker.ScraperService.Services
             try
             {
                 _channel?.Dispose();
-                _connection?.Dispose();
+                // Don't dispose the connection as it's managed by the DI container
             }
             catch (Exception ex)
             {

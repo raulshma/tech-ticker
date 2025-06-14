@@ -11,14 +11,13 @@ namespace TechTicker.PriceNormalizationService.Services
     public class MessagePublisherService : IMessagePublisherService, IDisposable
     {
         private readonly ILogger<MessagePublisherService> _logger;
-        private readonly IConfiguration _configuration;
-        private IConnection? _connection;
+        private readonly IConnection _connection;
         private IModel? _channel;
 
-        public MessagePublisherService(ILogger<MessagePublisherService> logger, IConfiguration configuration)
+        public MessagePublisherService(ILogger<MessagePublisherService> logger, IConnection connection)
         {
             _logger = logger;
-            _configuration = configuration;
+            _connection = connection;
             InitializeRabbitMQ();
         }
 
@@ -28,8 +27,8 @@ namespace TechTicker.PriceNormalizationService.Services
             {
                 EnsureChannelInitialized();
                 
-                var exchange = _configuration["RabbitMQ:PricePointRecordedExchange"] ?? "price-point-recorded";
-                var routingKey = _configuration["RabbitMQ:PricePointRecordedRoutingKey"] ?? "price.point.recorded";
+                var exchange = "price-point-recorded";
+                var routingKey = "price.point.recorded";
                 var message = JsonSerializer.Serialize(pricePointEvent);
                 var body = Encoding.UTF8.GetBytes(message);
 
@@ -51,15 +50,14 @@ namespace TechTicker.PriceNormalizationService.Services
                     basicProperties: properties,
                     body: body);
 
-                _logger.LogDebug("Published price point recorded event for product {ProductId} from {Seller} at price {Price}", 
-                    pricePointEvent.CanonicalProductId, pricePointEvent.SellerName, pricePointEvent.Price);
+                _logger.LogDebug("Published price point recorded event for product {ProductId} from {Seller}", 
+                    pricePointEvent.CanonicalProductId, pricePointEvent.SellerName);
                 
                 await Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error publishing price point recorded event for product {ProductId}", 
-                    pricePointEvent.CanonicalProductId);
+                _logger.LogError(ex, "Error publishing price point recorded event");
                 throw;
             }
         }
@@ -68,29 +66,24 @@ namespace TechTicker.PriceNormalizationService.Services
         {
             try
             {
-                var connectionString = _configuration["RabbitMQ:ConnectionString"] ?? "amqp://localhost:5672";
-                var factory = new ConnectionFactory
-                {
-                    Uri = new Uri(connectionString)
-                };
+                _logger.LogInformation("Initializing RabbitMQ publisher for price normalization");
 
-                _connection = factory.CreateConnection();
                 _channel = _connection.CreateModel();
 
-                // Declare exchanges (idempotent)
-                var pricePointRecordedExchange = _configuration["RabbitMQ:PricePointRecordedExchange"] ?? "price-point-recorded";
+                // Declare exchange for price point recorded events
+                var exchange = "price-point-recorded";
 
                 _channel.ExchangeDeclare(
-                    exchange: pricePointRecordedExchange,
+                    exchange: exchange,
                     type: ExchangeType.Topic,
                     durable: true,
                     autoDelete: false);
 
-                _logger.LogInformation("RabbitMQ publisher connection initialized");
+                _logger.LogInformation("RabbitMQ price normalization publisher initialized");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error initializing RabbitMQ publisher connection");
+                _logger.LogError(ex, "Error initializing RabbitMQ price normalization publisher connection");
                 throw;
             }
         }
@@ -108,7 +101,7 @@ namespace TechTicker.PriceNormalizationService.Services
             try
             {
                 _channel?.Dispose();
-                _connection?.Dispose();
+                // Don't dispose the connection as it's managed by the DI container
             }
             catch (Exception ex)
             {

@@ -12,16 +12,15 @@ namespace TechTicker.PriceNormalizationService.Services
     public class MessageConsumerService : IMessageConsumerService, IDisposable
     {
         private readonly ILogger<MessageConsumerService> _logger;
-        private readonly IConfiguration _configuration;
-        private IConnection? _connection;
+        private readonly IConnection _connection;
         private IModel? _channel;
         private EventingBasicConsumer? _consumer;
         private string? _consumerTag;
 
-        public MessageConsumerService(ILogger<MessageConsumerService> logger, IConfiguration configuration)
+        public MessageConsumerService(ILogger<MessageConsumerService> logger, IConnection connection)
         {
             _logger = logger;
-            _configuration = configuration;
+            _connection = connection;
         }
 
         public async Task StartConsumingAsync(Func<RawPriceDataEvent, Task> messageHandler, CancellationToken cancellationToken)
@@ -35,7 +34,7 @@ namespace TechTicker.PriceNormalizationService.Services
                     throw new InvalidOperationException("RabbitMQ channel or consumer not initialized");
                 }
 
-                var queueName = _configuration["RabbitMQ:RawPriceDataQueue"] ?? "raw-price-data-queue";
+                var queueName = "raw-price-data-queue";
 
                 _consumer.Received += async (model, ea) =>
                 {
@@ -51,8 +50,7 @@ namespace TechTicker.PriceNormalizationService.Services
                         {
                             await messageHandler(rawPriceData);
                             _channel.BasicAck(ea.DeliveryTag, false);
-                            _logger.LogDebug("Raw price data message processed and acknowledged for product {ProductId}", 
-                                rawPriceData.CanonicalProductId);
+                            _logger.LogDebug("Raw price data message processed and acknowledged");
                         }
                         else
                         {
@@ -69,7 +67,7 @@ namespace TechTicker.PriceNormalizationService.Services
                         }
                         catch (Exception nackEx)
                         {
-                            _logger.LogError(nackEx, "Error sending NACK");
+                            _logger.LogError(nackEx, "Error sending NACK for raw price data message");
                         }
                     }
                 };
@@ -81,7 +79,12 @@ namespace TechTicker.PriceNormalizationService.Services
 
                 _logger.LogInformation("Started consuming raw price data messages from queue: {QueueName}", queueName);
                 
-                await Task.CompletedTask;
+                // Keep the method running
+                await Task.Delay(Timeout.Infinite, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("Raw price data consumer cancelled");
             }
             catch (Exception ex)
             {
@@ -111,27 +114,21 @@ namespace TechTicker.PriceNormalizationService.Services
         {
             try
             {
-                var connectionString = _configuration["RabbitMQ:ConnectionString"] ?? "amqp://localhost:5672";
-                var factory = new ConnectionFactory
-                {
-                    Uri = new Uri(connectionString)
-                };
+                _logger.LogInformation("Initializing RabbitMQ consumer for price normalization");
 
-                _connection = factory.CreateConnection();
                 _channel = _connection.CreateModel();
 
-                var exchangeName = _configuration["RabbitMQ:RawPriceDataExchange"] ?? "raw-price-data";
-                var queueName = _configuration["RabbitMQ:RawPriceDataQueue"] ?? "raw-price-data-queue";
-                var routingKey = _configuration["RabbitMQ:RawPriceDataRoutingKey"] ?? "raw.price.data";
+                var queueName = "raw-price-data-queue";
+                var exchangeName = "raw-price-data";
 
-                // Declare exchange (idempotent)
+                // Declare exchange
                 _channel.ExchangeDeclare(
                     exchange: exchangeName,
                     type: ExchangeType.Topic,
                     durable: true,
                     autoDelete: false);
 
-                // Declare queue (idempotent)
+                // Declare queue
                 _channel.QueueDeclare(
                     queue: queueName,
                     durable: true,
@@ -143,18 +140,18 @@ namespace TechTicker.PriceNormalizationService.Services
                 _channel.QueueBind(
                     queue: queueName,
                     exchange: exchangeName,
-                    routingKey: routingKey);
+                    routingKey: "raw.price.data");
 
                 // Set QoS to process one message at a time
                 _channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
 
                 _consumer = new EventingBasicConsumer(_channel);
 
-                _logger.LogInformation("RabbitMQ connection initialized for consuming from queue: {QueueName}", queueName);
+                _logger.LogInformation("RabbitMQ price normalization consumer initialized for queue: {QueueName}", queueName);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error initializing RabbitMQ connection for consuming");
+                _logger.LogError(ex, "Error initializing RabbitMQ price normalization consumer connection");
                 throw;
             }
         }
@@ -164,7 +161,7 @@ namespace TechTicker.PriceNormalizationService.Services
             try
             {
                 _channel?.Dispose();
-                _connection?.Dispose();
+                // Don't dispose the connection as it's managed by the DI container
             }
             catch (Exception ex)
             {
