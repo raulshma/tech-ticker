@@ -429,7 +429,7 @@ Each service description will cover its purpose, key features, API endpoints (ex
     *   `POST /api/v1/mappings` -> `Product Mapping & Site Configuration Service`
     *   `POST /api/v1/site-configs` -> `Product Mapping & Site Configuration Service`
     *   `POST /api/v1/auth/login` -> `User Service`
-    *   `GET /api/v1/users/me/alerts` -> `Alert Definition Service`
+    *   Skip: `GET /api/v1/users/me/alerts` -> `Alert Definition Service`
 *   **Data Storage:** None.
 *   **Inter-service Communication:** Synchronous HTTP/gRPC calls to all other API-exposed services.
 *   **Technology:** ASP.NET Core Web API with Ocelot or YARP.

@@ -13,7 +13,7 @@ var productSellerMappingDb = postgres.AddDatabase("product-seller-mapping");
 var priceHistoryDb = postgres.AddDatabase("price-history");
 var scrapingOrchestrationDb = postgres.AddDatabase("scraping-orchestration");
 
-builder.AddProject<Projects.TechTicker_ReverseProxy>("techticker-reverseproxy");
+builder.AddProject<Projects.TechTicker_ReverseProxy>("techticker-apigateway");
 
 var productService = builder.AddProject<Projects.TechTicker_ProductService>("techticker-productservice")
     .WithReference(productDb)
