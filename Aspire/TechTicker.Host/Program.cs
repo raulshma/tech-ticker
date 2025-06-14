@@ -13,17 +13,16 @@ var productSellerMappingDb = postgres.AddDatabase("product-seller-mapping");
 var priceHistoryDb = postgres.AddDatabase("price-history");
 var scrapingOrchestrationDb = postgres.AddDatabase("scraping-orchestration");
 
-builder.AddProject<Projects.TechTicker_ReverseProxy>("techticker-apigateway");
 
 var productService = builder.AddProject<Projects.TechTicker_ProductService>("techticker-productservice")
     .WithReference(productDb)
     .WaitFor(postgres);
 
-builder.AddProject<Projects.TechTicker_UserService>("techticker-userservice")
+var userService = builder.AddProject<Projects.TechTicker_UserService>("techticker-userservice")
     .WithReference(userDb)
     .WaitFor(postgres);
 
-builder.AddProject<Projects.TechTicker_MigrationService>("migrations")
+var migrationService = builder.AddProject<Projects.TechTicker_MigrationService>("migrations")
     .WithReference(productDb)
     .WithReference(userDb)
     .WithReference(productSellerMappingDb)
@@ -31,30 +30,38 @@ builder.AddProject<Projects.TechTicker_MigrationService>("migrations")
     .WithReference(scrapingOrchestrationDb)
     .WaitFor(postgres);
 
-builder.AddProject<Projects.TechTicker_ProductSellerMappingService>("techticker-productsellermappingservice")
+var productSellerMappingService = builder.AddProject<Projects.TechTicker_ProductSellerMappingService>("techticker-productsellermappingservice")
     .WithReference(productSellerMappingDb)
     .WithReference(productService)
     .WaitFor(postgres);
 
-builder.AddProject<Projects.TechTicker_ScrapingOrchestrationService>("techticker-scrapingorchestrationservice")
+var scrapingOrchestrationService = builder.AddProject<Projects.TechTicker_ScrapingOrchestrationService>("techticker-scrapingorchestrationservice")
     .WithReference(scrapingOrchestrationDb)
     .WithReference(productSellerMappingDb)
     .WithReference(rabbitmq)
     .WaitFor(postgres)
     .WaitFor(rabbitmq);
 
-builder.AddProject<Projects.TechTicker_ScraperService>("techticker-scraperservice")
+var scraperService = builder.AddProject<Projects.TechTicker_ScraperService>("techticker-scraperservice")
     .WithReference(rabbitmq)
     .WaitFor(rabbitmq);
 
-builder.AddProject<Projects.TechTicker_PriceNormalizationService>("techticker-pricenormalizationservice")
+var priceNormalizationService = builder.AddProject<Projects.TechTicker_PriceNormalizationService>("techticker-pricenormalizationservice")
     .WithReference(rabbitmq)
     .WaitFor(rabbitmq);
 
-builder.AddProject<Projects.TechTicker_PriceHistoryService>("techticker-pricehistoryservice")
+var priceHistoryService = builder.AddProject<Projects.TechTicker_PriceHistoryService>("techticker-pricehistoryservice")
     .WithReference(priceHistoryDb)
     .WithReference(rabbitmq)
     .WaitFor(postgres)
     .WaitFor(rabbitmq);
+
+// API Gateway - waits for all API services to be ready before starting
+var apiGateway = builder.AddProject<Projects.TechTicker_ReverseProxy>("techticker-apigateway")
+    .WaitFor(productService)
+    .WaitFor(userService)
+    .WaitFor(productSellerMappingService)
+    .WaitFor(priceHistoryService)
+    .WaitFor(migrationService); // Wait for migrations to complete database setup
 
 builder.Build().Run();

@@ -212,3 +212,25 @@ The API Gateway is fully integrated with .NET Aspire for:
 - **Load Balancing**: Advanced load balancing strategies
 - **API Versioning**: Support for multiple API versions
 - **WebSocket Support**: Real-time communication support
+
+### Startup Dependencies and Health Monitoring
+
+The API Gateway implements comprehensive startup dependency management:
+
+- **Service Dependencies**: Waits for all downstream API services before becoming ready
+- **Health Validation**: Continuous monitoring of downstream service health
+- **Startup Health Check**: Validates all dependencies before accepting traffic
+- **Background Monitoring**: Periodic health checks with alerting
+
+For detailed information, see [STARTUP_DEPENDENCIES.md](STARTUP_DEPENDENCIES.md).
+
+### Scalar API Documentation
+
+Enhanced API documentation powered by Scalar:
+
+- **Interactive Interface**: Beautiful, responsive documentation UI
+- **Code Generation**: Client code samples in multiple languages
+- **Authentication Testing**: Built-in JWT token testing
+- **Comprehensive Documentation**: All endpoints, models, and examples
+
+For detailed information, see [SCALAR_DOCUMENTATION.md](SCALAR_DOCUMENTATION.md).
