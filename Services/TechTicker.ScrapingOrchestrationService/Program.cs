@@ -1,6 +1,7 @@
 using TechTicker.ScrapingOrchestrationService.Workers;
 using TechTicker.ScrapingOrchestrationService.Services;
 using TechTicker.ScrapingOrchestrationService.Data;
+using TechTicker.ProductSellerMappingService.Data;
 using TechTicker.Shared.Extensions;
 using TechTicker.ServiceDefaults;
 
@@ -9,8 +10,11 @@ namespace TechTicker.ScrapingOrchestrationService;
 public class Program
 {
     public static void Main(string[] args)
-    {        var builder = Host.CreateApplicationBuilder(args);        // Add database - use the same connection as ProductSellerMappingService since we need to read from it
-        builder.AddNpgsqlDbContext<ScrapingOrchestrationDbContext>("product-seller-mapping");
+    {        var builder = Host.CreateApplicationBuilder(args);        // Add database - use separate database for this service's own entities
+        builder.AddNpgsqlDbContext<ScrapingOrchestrationDbContext>("scraping-orchestration");
+        
+        // Add read-only access to ProductSellerMapping database for shared entities
+        builder.AddNpgsqlDbContext<ProductSellerMappingDbContext>("product-seller-mapping");
         
         // Add RabbitMQ client
         builder.AddRabbitMQClient("messaging");

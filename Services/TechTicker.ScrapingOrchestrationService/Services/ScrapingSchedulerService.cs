@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TechTicker.ScrapingOrchestrationService.Data;
+using TechTicker.ProductSellerMappingService.Data;
 using TechTicker.Shared.Models;
 
 namespace TechTicker.ScrapingOrchestrationService.Services
@@ -9,11 +9,9 @@ namespace TechTicker.ScrapingOrchestrationService.Services
         Task<List<ProductSellerMapping>> GetMappingsDueForScrapingAsync(int maxMappings = 100);
         Task UpdateMappingScheduleAsync(Guid mappingId, DateTimeOffset? lastScrapedAt, DateTimeOffset? nextScrapeAt);
         Task<TimeSpan> GetScrapingFrequencyAsync(ProductSellerMapping mapping);
-    }
-
-    public class ScrapingSchedulerService : IScrapingSchedulerService
+    }    public class ScrapingSchedulerService : IScrapingSchedulerService
     {
-        private readonly ScrapingOrchestrationDbContext _context;
+        private readonly ProductSellerMappingDbContext _context;
         private readonly ILogger<ScrapingSchedulerService> _logger;
 
         // Default scraping frequencies
@@ -28,10 +26,8 @@ namespace TechTicker.ScrapingOrchestrationService.Services
             ["P1D"] = TimeSpan.FromDays(1),
             ["P2D"] = TimeSpan.FromDays(2),
             ["P7D"] = TimeSpan.FromDays(7)
-        };
-
-        public ScrapingSchedulerService(
-            ScrapingOrchestrationDbContext context,
+        };        public ScrapingSchedulerService(
+            ProductSellerMappingDbContext context,
             ILogger<ScrapingSchedulerService> logger)
         {
             _context = context;
@@ -87,22 +83,20 @@ namespace TechTicker.ScrapingOrchestrationService.Services
 
             _logger.LogDebug("Updated schedule for mapping {MappingId}. Next scrape: {NextScrape}", 
                 mappingId, mapping.NextScrapeAt);
-        }
-
-        public async Task<TimeSpan> GetScrapingFrequencyAsync(ProductSellerMapping mapping)
+        }        public Task<TimeSpan> GetScrapingFrequencyAsync(ProductSellerMapping mapping)
         {
             // Check if mapping has a frequency override
             if (!string.IsNullOrEmpty(mapping.ScrapingFrequencyOverride))
             {
                 if (FrequencyMapping.TryGetValue(mapping.ScrapingFrequencyOverride, out var overrideFrequency))
                 {
-                    return overrideFrequency;
+                    return Task.FromResult(overrideFrequency);
                 }
                 
                 // Try to parse as TimeSpan directly
                 if (TimeSpan.TryParse(mapping.ScrapingFrequencyOverride, out var parsedFrequency))
                 {
-                    return parsedFrequency;
+                    return Task.FromResult(parsedFrequency);
                 }
 
                 _logger.LogWarning("Invalid scraping frequency override '{Override}' for mapping {MappingId}", 
@@ -110,7 +104,7 @@ namespace TechTicker.ScrapingOrchestrationService.Services
             }
 
             // Return default frequency
-            return DefaultScrapingFrequency;
+            return Task.FromResult(DefaultScrapingFrequency);
         }
     }
 }
