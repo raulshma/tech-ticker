@@ -14,7 +14,7 @@ var priceHistoryDb = postgres.AddDatabase("price-history");
 var scrapingOrchestrationDb = postgres.AddDatabase("scraping-orchestration");
 
 builder
-    .AddNpmApp("AngularFrontEnd", "./../Services/TechTicker.UI")
+    .AddNpmApp("AngularFrontEnd", "../../Services/TechTicker.UI")
     .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints();
 
