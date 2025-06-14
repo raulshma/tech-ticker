@@ -1,0 +1,29 @@
+@baseUrl = http://localhost:5000
+
+### Get price history for a product
+GET {{baseUrl}}/api/pricehistory/product/64b1e9f2c4f1a2b3d4e5f678
+?startDate=2024-01-01T00:00:00Z
+&endDate=2024-12-31T23:59:59Z
+&sellerId=64b1e9f2c4f1a2b3d4e5f679
+
+### Get price statistics for a product
+GET {{baseUrl}}/api/pricehistory/product/64b1e9f2c4f1a2b3d4e5f678/statistics
+?startDate=2024-01-01T00:00:00Z
+&endDate=2024-12-31T23:59:59Z
+&sellerId=64b1e9f2c4f1a2b3d4e5f679
+
+### Get latest price for a product
+GET {{baseUrl}}/api/pricehistory/product/64b1e9f2c4f1a2b3d4e5f678/latest
+?sellerId=64b1e9f2c4f1a2b3d4e5f679
+
+### Get sellers for a product
+GET {{baseUrl}}/api/pricehistory/product/64b1e9f2c4f1a2b3d4e5f678/sellers
+
+### Get price history for a product with default parameters
+GET {{baseUrl}}/api/pricehistory/product/64b1e9f2c4f1a2b3d4e5f678
+
+### Get price statistics with period (no date range)
+GET {{baseUrl}}/api/pricehistory/product/64b1e9f2c4f1a2b3d4e5f678/statistics
+
+### Health check
+GET {{baseUrl}}/health

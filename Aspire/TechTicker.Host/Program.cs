@@ -10,6 +10,7 @@ var postgres = builder.AddPostgres("postgres")
 var productDb = postgres.AddDatabase("product");
 var userDb = postgres.AddDatabase("user");
 var productSellerMappingDb = postgres.AddDatabase("product-seller-mapping");
+var priceHistoryDb = postgres.AddDatabase("price-history");
 
 builder.AddProject<Projects.TechTicker_ReverseProxy>("techticker-reverseproxy");
 
@@ -25,6 +26,7 @@ builder.AddProject<Projects.TechTicker_MigrationService>("migrations")
     .WithReference(productDb)
     .WithReference(userDb)
     .WithReference(productSellerMappingDb)
+    .WithReference(priceHistoryDb)
     .WaitFor(postgres);
 
 builder.AddProject<Projects.TechTicker_ProductSellerMappingService>("techticker-productsellermappingservice")
@@ -44,6 +46,12 @@ builder.AddProject<Projects.TechTicker_ScraperService>("techticker-scraperservic
 
 builder.AddProject<Projects.TechTicker_PriceNormalizationService>("techticker-pricenormalizationservice")
     .WithReference(rabbitmq)
+    .WaitFor(rabbitmq);
+
+builder.AddProject<Projects.TechTicker_PriceHistoryService>("techticker-pricehistoryservice")
+    .WithReference(priceHistoryDb)
+    .WithReference(rabbitmq)
+    .WaitFor(postgres)
     .WaitFor(rabbitmq);
 
 builder.Build().Run();
