@@ -19,11 +19,13 @@ var apiService = builder.AddProject<Projects.TechTicker_ApiService>("apiservice"
 
 // Add Scraping Worker
 var scrapingWorker = builder.AddProject<Projects.TechTicker_ScrapingWorker>("scrapingworker")
+    .WaitFor(rabbitmq)
     .WithReference(techtickerDb)
     .WithReference(rabbitmq);
 
 // Add Notification Worker
 var notificationWorker = builder.AddProject<Projects.TechTicker_NotificationWorker>("notificationworker")
+    .WaitFor(rabbitmq)
     .WithReference(techtickerDb)
     .WithReference(rabbitmq)
     .WithEnvironment("Email__SmtpHost", "localhost")
