@@ -1,0 +1,161 @@
+<div class="mappings-container">
+  <div class="header-section">
+    <h1>Product Mappings</h1>
+    <button mat-raised-button color="primary" (click)="createMapping()">
+      <mat-icon>add</mat-icon>
+      Add Mapping
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Manage Product-Seller Mappings</mat-card-title>
+      <mat-card-subtitle>Configure product mappings for price scraping</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Filters -->
+      <div class="filters-section">
+        <mat-form-field appearance="outline" class="product-filter">
+          <mat-label>Filter by Product</mat-label>
+          <mat-select [formControl]="productControl">
+            <mat-option value="">All Products</mat-option>
+            <mat-option *ngFor="let product of products" [value]="product.productId">
+              {{product.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-button (click)="clearFilters()" class="clear-filters-btn">
+          <mat-icon>clear</mat-icon>
+          Clear Filters
+        </button>
+      </div>
+
+      <!-- Loading spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading mappings...</p>
+      </div>
+
+      <!-- Mappings table -->
+      <div *ngIf="!isLoading" class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="mappings-table">
+          <!-- Product Column -->
+          <ng-container matColumnDef="product">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Product</th>
+            <td mat-cell *matCellDef="let mapping">
+              <div class="product-info">
+                <strong>{{getProductName(mapping.canonicalProductId)}}</strong>
+                <small *ngIf="mapping.product?.manufacturer" class="product-details">
+                  {{mapping.product.manufacturer}} - {{mapping.product.modelNumber}}
+                </small>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Seller Name Column -->
+          <ng-container matColumnDef="sellerName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Seller</th>
+            <td mat-cell *matCellDef="let mapping">
+              {{mapping.sellerName || 'N/A'}}
+            </td>
+          </ng-container>
+
+          <!-- Product URL Column -->
+          <ng-container matColumnDef="exactProductUrl">
+            <th mat-header-cell *matHeaderCellDef>Product URL</th>
+            <td mat-cell *matCellDef="let mapping">
+              <a *ngIf="mapping.exactProductUrl" 
+                 [href]="mapping.exactProductUrl" 
+                 target="_blank" 
+                 class="product-url"
+                 matTooltip="Open product page">
+                <mat-icon>open_in_new</mat-icon>
+                View Product
+              </a>
+              <span *ngIf="!mapping.exactProductUrl">No URL</span>
+            </td>
+          </ng-container>
+
+          <!-- Active Status Column -->
+          <ng-container matColumnDef="isActiveForScraping">
+            <th mat-header-cell *matHeaderCellDef>Scraping Status</th>
+            <td mat-cell *matCellDef="let mapping">
+              <mat-chip-set>
+                <mat-chip [class]="mapping.isActiveForScraping ? 'status-active' : 'status-inactive'">
+                  {{mapping.isActiveForScraping ? 'Active' : 'Inactive'}}
+                </mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <!-- Last Scraped Column -->
+          <ng-container matColumnDef="lastScrapedAt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Scraped</th>
+            <td mat-cell *matCellDef="let mapping">
+              <div *ngIf="mapping.lastScrapedAt; else neverScraped">
+                {{mapping.lastScrapedAt | date:'short'}}
+              </div>
+              <ng-template #neverScraped>
+                <span class="never-scraped">Never</span>
+              </ng-template>
+            </td>
+          </ng-container>
+
+          <!-- Scrape Status Column -->
+          <ng-container matColumnDef="lastScrapeStatus">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let mapping">
+              <mat-chip-set>
+                <mat-chip [class]="'status-' + getStatusColor(mapping.lastScrapeStatus)">
+                  {{mapping.lastScrapeStatus || 'Unknown'}}
+                </mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let mapping">
+              <button mat-icon-button 
+                      color="primary" 
+                      (click)="editMapping(mapping)"
+                      matTooltip="Edit mapping">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button 
+                      color="warn" 
+                      (click)="deleteMapping(mapping)"
+                      matTooltip="Delete mapping">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <!-- No data row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+              <div class="no-data">
+                <mat-icon>link</mat-icon>
+                <p>No mappings found</p>
+                <button mat-raised-button color="primary" (click)="createMapping()">
+                  Create First Mapping
+                </button>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]" 
+                       showFirstLastButtons 
+                       aria-label="Select page of mappings">
+        </mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

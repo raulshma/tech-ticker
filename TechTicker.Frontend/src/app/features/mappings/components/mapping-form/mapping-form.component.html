@@ -1,0 +1,124 @@
+<div class="mapping-form-container">
+  <div class="header-section">
+    <h1>{{ isEditMode ? 'Edit Mapping' : 'Create Mapping' }}</h1>
+    <button mat-button (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Mappings
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEditMode ? 'Edit Mapping Details' : 'New Mapping Details' }}</mat-card-title>
+      <mat-card-subtitle>{{ isEditMode ? 'Update the mapping information below' : 'Fill in the details to create a new product-seller mapping' }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="mappingForm" (ngSubmit)="onSubmit()" class="mapping-form">
+        <div class="form-row">
+          <!-- Product Selection -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Product</mat-label>
+            <mat-select formControlName="canonicalProductId" [disabled]="isEditMode">
+              <mat-option value="">Select a product</mat-option>
+              <mat-option *ngFor="let product of products" [value]="product.productId">
+                {{getProductDisplayName(product)}}
+              </mat-option>
+            </mat-select>
+            <mat-hint>{{ isEditMode ? 'Product cannot be changed after creation' : 'Select the canonical product this mapping represents' }}</mat-hint>
+            <mat-error *ngIf="mappingForm.get('canonicalProductId')?.invalid && mappingForm.get('canonicalProductId')?.touched">
+              {{ getFieldErrorMessage('canonicalProductId') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row two-columns">
+          <!-- Seller Name -->
+          <mat-form-field appearance="outline">
+            <mat-label>Seller Name</mat-label>
+            <input matInput
+                   formControlName="sellerName"
+                   placeholder="Enter seller/retailer name"
+                   maxlength="200">
+            <mat-hint>Name of the seller or retailer</mat-hint>
+            <mat-error *ngIf="mappingForm.get('sellerName')?.invalid && mappingForm.get('sellerName')?.touched">
+              {{ getFieldErrorMessage('sellerName') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Site Configuration -->
+          <mat-form-field appearance="outline">
+            <mat-label>Site Configuration</mat-label>
+            <mat-select formControlName="siteConfigId">
+              <mat-option value="">Auto-detect or manual</mat-option>
+              <mat-option *ngFor="let config of siteConfigurations" [value]="config.siteConfigId">
+                {{config.siteDomain}}
+              </mat-option>
+            </mat-select>
+            <mat-hint>Optional: Use specific scraping configuration</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <!-- Product URL -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Product URL</mat-label>
+            <input matInput
+                   formControlName="exactProductUrl"
+                   placeholder="https://example.com/product/123"
+                   type="url">
+            <mat-hint>Direct URL to the product page on the seller's website</mat-hint>
+            <mat-error *ngIf="mappingForm.get('exactProductUrl')?.invalid && mappingForm.get('exactProductUrl')?.touched">
+              {{ getFieldErrorMessage('exactProductUrl') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row two-columns">
+          <!-- Scraping Frequency Override -->
+          <mat-form-field appearance="outline">
+            <mat-label>Scraping Frequency Override</mat-label>
+            <mat-select formControlName="scrapingFrequencyOverride">
+              <mat-option value="">Use default frequency</mat-option>
+              <mat-option value="hourly">Hourly</mat-option>
+              <mat-option value="daily">Daily</mat-option>
+              <mat-option value="weekly">Weekly</mat-option>
+              <mat-option value="monthly">Monthly</mat-option>
+            </mat-select>
+            <mat-hint>Override default scraping frequency for this mapping</mat-hint>
+          </mat-form-field>
+
+          <!-- Active Status -->
+          <div class="status-field">
+            <label class="status-label">Scraping Status</label>
+            <mat-slide-toggle formControlName="isActiveForScraping" class="status-toggle">
+              {{ mappingForm.get('isActiveForScraping')?.value ? 'Active' : 'Inactive' }}
+            </mat-slide-toggle>
+            <div class="status-hint">
+              {{ mappingForm.get('isActiveForScraping')?.value ? 'This mapping will be scraped regularly' : 'This mapping is paused and will not be scraped' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button mat-button
+                  type="button"
+                  (click)="onCancel()"
+                  [disabled]="isLoading">
+            Cancel
+          </button>
+
+          <button mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="mappingForm.invalid || isLoading">
+            <mat-spinner *ngIf="isLoading" diameter="20" class="form-spinner"></mat-spinner>
+            <span *ngIf="!isLoading">{{ isEditMode ? 'Update Mapping' : 'Create Mapping' }}</span>
+            <span *ngIf="isLoading">{{ isEditMode ? 'Updating...' : 'Creating...' }}</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

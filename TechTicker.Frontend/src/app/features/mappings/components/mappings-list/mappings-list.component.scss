@@ -1,0 +1,192 @@
+.mappings-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 400;
+    color: #333;
+  }
+}
+
+.filters-section {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+
+  .product-filter {
+    min-width: 250px;
+  }
+
+  .clear-filters-btn {
+    height: 56px;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  
+  p {
+    margin-top: 16px;
+    color: #666;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.mappings-table {
+  width: 100%;
+  
+  .mat-column-product {
+    min-width: 200px;
+  }
+  
+  .mat-column-sellerName {
+    min-width: 120px;
+  }
+  
+  .mat-column-exactProductUrl {
+    min-width: 150px;
+  }
+  
+  .mat-column-isActiveForScraping {
+    min-width: 120px;
+  }
+  
+  .mat-column-lastScrapedAt {
+    min-width: 140px;
+  }
+  
+  .mat-column-lastScrapeStatus {
+    min-width: 100px;
+  }
+  
+  .mat-column-actions {
+    width: 120px;
+    text-align: center;
+  }
+}
+
+.product-info {
+  .product-details {
+    display: block;
+    color: #666;
+    font-size: 0.75rem;
+    margin-top: 2px;
+  }
+}
+
+.product-url {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #1976d2;
+  text-decoration: none;
+  font-size: 0.875rem;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+  
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.status-active {
+  background-color: #e8f5e8 !important;
+  color: #2e7d32 !important;
+}
+
+.status-inactive {
+  background-color: #ffebee !important;
+  color: #c62828 !important;
+}
+
+.status-success {
+  background-color: #e8f5e8 !important;
+  color: #2e7d32 !important;
+}
+
+.status-error {
+  background-color: #ffebee !important;
+  color: #c62828 !important;
+}
+
+.status-pending {
+  background-color: #fff3e0 !important;
+  color: #f57c00 !important;
+}
+
+.status-unknown {
+  background-color: #f5f5f5 !important;
+  color: #666 !important;
+}
+
+.never-scraped {
+  color: #999;
+  font-style: italic;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    color: #ccc;
+  }
+  
+  p {
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .mappings-container {
+    padding: 10px;
+  }
+  
+  .header-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    
+    h1 {
+      text-align: center;
+    }
+  }
+  
+  .filters-section {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .product-filter {
+      min-width: auto;
+    }
+  }
+}

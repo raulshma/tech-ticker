@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>Delete Mapping</h2>
+
+<mat-dialog-content>
+  <div class="delete-confirmation">
+    <mat-icon class="warning-icon">warning</mat-icon>
+    <p>Are you sure you want to delete this product mapping?</p>
+    <div class="mapping-details">
+      <p><strong>Seller:</strong> {{ data.sellerName || 'N/A' }}</p>
+      <p><strong>Product URL:</strong> {{ data.exactProductUrl || 'N/A' }}</p>
+      <p><strong>Status:</strong> {{ data.isActiveForScraping ? 'Active' : 'Inactive' }}</p>
+    </div>
+    <p class="warning-text">This action cannot be undone. All historical price data and scraping history for this mapping will be lost.</p>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="warn" (click)="onConfirm()">Delete</button>
+</mat-dialog-actions>
