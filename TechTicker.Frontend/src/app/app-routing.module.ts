@@ -34,11 +34,11 @@ const routes: Routes = [
     loadChildren: () => import('./features/site-configs/site-configs.module').then(m => m.SiteConfigsModule),
     canActivate: [AuthGuard, AdminGuard]
   },
-  // {
-  //   path: 'users',
-  //   loadChildren: () => import('./features/users/users.module').then(m => m.UsersModule),
-  //   canActivate: [AuthGuard, AdminGuard]
-  // },
+  {
+    path: 'users',
+    loadChildren: () => import('./features/users/users.module').then(m => m.UsersModule),
+    canActivate: [AuthGuard, AdminGuard]
+  },
   // {
   //   path: 'alerts',
   //   loadChildren: () => import('./features/alerts/alerts.module').then(m => m.AlertsModule),

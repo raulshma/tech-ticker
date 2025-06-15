@@ -1,0 +1,165 @@
+<div class="users-container">
+  <div class="header-section">
+    <h1>User Management</h1>
+    <button mat-raised-button color="primary" (click)="createUser()">
+      <mat-icon>person_add</mat-icon>
+      Add User
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Manage System Users</mat-card-title>
+      <mat-card-subtitle>View and manage user accounts and permissions</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Filters -->
+      <div class="filters-section">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search users</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="Search by name or email">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <button mat-button (click)="clearFilters()" class="clear-filters-btn">
+          <mat-icon>clear</mat-icon>
+          Clear Filters
+        </button>
+      </div>
+
+      <!-- Loading spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading users...</p>
+      </div>
+
+      <!-- Users table -->
+      <div *ngIf="!isLoading" class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="users-table">
+          <!-- Full Name Column -->
+          <ng-container matColumnDef="fullName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="user-info">
+                <strong>{{user.fullName || (user.firstName + ' ' + user.lastName) || 'No name'}}</strong>
+                <small class="user-id">ID: {{user.userId}}</small>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+            <td mat-cell *matCellDef="let user">
+              <a [href]="'mailto:' + user.email" class="email-link">
+                {{user.email || 'No email'}}
+              </a>
+            </td>
+          </ng-container>
+
+          <!-- Roles Column -->
+          <ng-container matColumnDef="roles">
+            <th mat-header-cell *matHeaderCellDef>Roles</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="roles-container">
+                <mat-chip-set>
+                  <mat-chip *ngFor="let role of user.roles" class="role-chip">
+                    {{role}}
+                  </mat-chip>
+                </mat-chip-set>
+                <span *ngIf="!user.roles || user.roles.length === 0" class="no-roles">
+                  No roles assigned
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Active Status Column -->
+          <ng-container matColumnDef="isActive">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let user">
+              <mat-chip-set>
+                <mat-chip [class]="getStatusColor(user.isActive)">
+                  {{getStatusText(user.isActive)}}
+                </mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <!-- Created At Column -->
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Created</th>
+            <td mat-cell *matCellDef="let user">
+              <div class="date-info">
+                {{user.createdAt | date:'short'}}
+                <small *ngIf="user.updatedAt && user.updatedAt !== user.createdAt" class="updated-date">
+                  Updated: {{user.updatedAt | date:'short'}}
+                </small>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let user">
+              <button mat-icon-button [matMenuTriggerFor]="userMenu" matTooltip="User actions">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              
+              <mat-menu #userMenu="matMenu">
+                <button mat-menu-item (click)="editUser(user)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Edit User</span>
+                </button>
+                
+                <button mat-menu-item (click)="toggleUserStatus(user)">
+                  <mat-icon>{{user.isActive ? 'block' : 'check_circle'}}</mat-icon>
+                  <span>{{user.isActive ? 'Deactivate' : 'Activate'}}</span>
+                </button>
+                
+                <mat-divider></mat-divider>
+                
+                <button mat-menu-item (click)="deleteUser(user)" class="delete-action">
+                  <mat-icon>delete</mat-icon>
+                  <span>Delete User</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <!-- No data row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+              <div class="no-data">
+                <mat-icon>people</mat-icon>
+                <p>No users found</p>
+                <p class="no-data-description">
+                  {{searchControl.value ? 'Try adjusting your search criteria' : 'Create your first user to get started'}}
+                </p>
+                <button *ngIf="!searchControl.value" mat-raised-button color="primary" (click)="createUser()">
+                  Create First User
+                </button>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Pagination -->
+        <mat-paginator 
+          [length]="totalCount"
+          [pageSize]="pageSize"
+          [pageIndex]="pageIndex"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="onPageChange($event)"
+          showFirstLastButtons 
+          aria-label="Select page of users">
+        </mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
