@@ -1,6 +1,12 @@
-# TechTickerFrontend
+# TechTicker Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.5.
+Angular 20 admin interface for TechTicker price tracking system.
+
+## Prerequisites
+
+- Node.js 18+
+- Angular CLI
+- .NET 8 SDK (for running the backend API)
 
 ## Development server
 

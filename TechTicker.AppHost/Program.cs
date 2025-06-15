@@ -34,7 +34,7 @@ var notificationWorker = builder.AddProject<Projects.TechTicker_NotificationWork
 builder.AddNpmApp("angular", "../TechTicker.Frontend")
     .WithReference(apiService)
     .WaitFor(apiService)
-    .WithHttpEndpoint(port: 4200, targetPort: 4200, name: "http", env: "PORT")
+    .WithHttpEndpoint(port: 4200, name: "http", env: "PORT")
     .WithExternalHttpEndpoints();
 
 builder.Build().Run();
