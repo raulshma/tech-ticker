@@ -9,10 +9,10 @@
       <p>Welcome back! Please sign in to your account.</p>
     </div>
 
-    <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" nzLayout="vertical">
       <nz-form-item>
-        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="email">Email</nz-form-label>
-        <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="isFieldInvalid('email') ? 'error' : ''" [nzErrorTip]="getFieldError('email')">
+        <nz-form-label nzRequired nzFor="email">Email</nz-form-label>
+        <nz-form-control [nzValidateStatus]="isFieldInvalid('email') ? 'error' : ''" [nzErrorTip]="getFieldError('email')">
           <input
             nz-input
             formControlName="email"
@@ -25,8 +25,8 @@
       </nz-form-item>
 
       <nz-form-item>
-        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="password">Password</nz-form-label>
-        <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="isFieldInvalid('password') ? 'error' : ''" [nzErrorTip]="getFieldError('password')">
+        <nz-form-label nzRequired nzFor="password">Password</nz-form-label>
+        <nz-form-control [nzValidateStatus]="isFieldInvalid('password') ? 'error' : ''" [nzErrorTip]="getFieldError('password')">
           <nz-input-group nzSuffix>
             <input
               [type]="passwordVisible ? 'text' : 'password'"
@@ -46,19 +46,19 @@
         </nz-form-control>
       </nz-form-item>
 
-      <nz-form-item nz-row class="login-form-margin">
-        <nz-form-control [nzSpan]="12">
-          <label nz-checkbox formControlName="remember">
-            <span>Remember me</span>
-          </label>
-        </nz-form-control>
-        <nz-form-control [nzSpan]="12" class="login-form-forgot">
-          <a class="login-form-forgot">Forgot password?</a>
+      <nz-form-item class="login-form-margin">
+        <nz-form-control>
+          <div class="login-form-options">
+            <label nz-checkbox formControlName="remember">
+              <span>Remember me</span>
+            </label>
+            <a class="login-form-forgot">Forgot password?</a>
+          </div>
         </nz-form-control>
       </nz-form-item>
 
       <nz-form-item>
-        <nz-form-control [nzSpan]="24">
+        <nz-form-control>
           <button
             nz-button
             class="login-form-button"

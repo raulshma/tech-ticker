@@ -11,9 +11,9 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  padding: 40px;
+  padding: 48px;
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
 }
 
 .login-header {
@@ -66,18 +66,49 @@
   margin-top: 32px;
 }
 
+.login-form .ant-form-item {
+  margin-bottom: 24px;
+}
+
+.login-form .ant-form-item-label {
+  padding-bottom: 8px;
+}
+
+.login-form .ant-form-item-label > label {
+  font-weight: 500;
+  color: #262626;
+  font-size: 14px;
+}
+
+.login-form .ant-form-item-control {
+  line-height: 1.5715;
+}
+
 .login-form-margin {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.login-form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
 }
 
 .login-form-forgot {
   text-align: right;
 }
 
+.login-form-options .ant-checkbox-wrapper {
+  font-size: 14px;
+  color: #595959;
+}
+
 .login-form-forgot a {
   color: #1890ff;
   text-decoration: none;
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .login-form-forgot a:hover {
@@ -86,15 +117,47 @@
 
 .login-form-button {
   width: 100%;
-  height: 44px;
+  height: 48px;
   font-size: 16px;
-  margin-top: 16px;
+  font-weight: 500;
+  margin-top: 24px;
+  border-radius: 8px;
+}
+
+.login-form .ant-input {
+  height: 44px;
+  border-radius: 8px;
+  font-size: 14px;
+  padding: 12px 16px;
+  border: 1px solid #d9d9d9;
+  transition: all 0.3s;
+}
+
+.login-form .ant-input:focus,
+.login-form .ant-input-focused {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.login-form .ant-input-group {
+  border-radius: 8px;
+}
+
+.login-form .ant-input-group .ant-input {
+  border-radius: 8px 0 0 8px;
+}
+
+.login-form .ant-input-group-addon {
+  border-radius: 0 8px 8px 0;
+  border: 1px solid #d9d9d9;
+  border-left: none;
 }
 
 .password-toggle {
   cursor: pointer;
   color: #8c8c8c;
   transition: color 0.3s;
+  padding: 0 8px;
 }
 
 .password-toggle:hover {
@@ -125,13 +188,20 @@
 }
 
 /* Form field error states */
-.ant-input-status-error {
+.login-form .ant-form-item-has-error .ant-input,
+.login-form .ant-input-status-error {
   border-color: #ff4d4f;
 }
 
-.ant-input-status-error:focus {
+.login-form .ant-form-item-has-error .ant-input:focus,
+.login-form .ant-input-status-error:focus {
   border-color: #ff4d4f;
   box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
+
+.login-form .ant-form-item-explain-error {
+  font-size: 12px;
+  margin-top: 4px;
 }
 
 /* Responsive design */
@@ -141,7 +211,8 @@
   }
 
   .login-card {
-    padding: 24px;
+    padding: 32px 24px;
+    max-width: 100%;
   }
 
   .login-header h2 {
@@ -150,5 +221,15 @@
 
   .logo h1 {
     font-size: 20px;
+  }
+
+  .login-form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .login-form-forgot {
+    text-align: left;
   }
 }

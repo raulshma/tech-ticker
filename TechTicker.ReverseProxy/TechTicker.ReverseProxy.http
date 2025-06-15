@@ -122,6 +122,26 @@ Content-Type: application/json
 ### 7. Users API (via Gateway)
 ###
 
+### Register a new user via Gateway
+POST {{baseUrl}}/api/v1/users/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "testuser@example.com",
+  "password": "TestPassword123!"
+}
+
+### Login user via Gateway
+POST {{baseUrl}}/api/v1/users/login
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "password": "TestPassword123!"
+}
+
 ### Get current user info via Gateway
 GET {{baseUrl}}/api/v1/users/me
 Authorization: Bearer {{auth_token}}

@@ -73,7 +73,7 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<ApiResponse<AuthResponse>> {
-    return this.apiService.post<ApiResponse<AuthResponse>>('/users/login', credentials)
+    return this.apiService.post<ApiResponse<AuthResponse>>('/v1/users/login', credentials)
       .pipe(
         tap(response => {
           if (response.success && response.data) {
@@ -86,7 +86,7 @@ export class AuthService {
   }
 
   register(userData: RegisterRequest): Observable<ApiResponse<AuthResponse>> {
-    return this.apiService.post<ApiResponse<AuthResponse>>('/users/register', userData)
+    return this.apiService.post<ApiResponse<AuthResponse>>('/v1/users/register', userData)
       .pipe(
         tap(response => {
           if (response.success && response.data) {
@@ -99,11 +99,11 @@ export class AuthService {
   }
 
   getCurrentUser(): Observable<ApiResponse<User>> {
-    return this.apiService.get<ApiResponse<User>>('/users/me');
+    return this.apiService.get<ApiResponse<User>>('/v1/users/me');
   }
 
   updateProfile(profileData: UpdateProfileRequest): Observable<ApiResponse<User>> {
-    return this.apiService.put<ApiResponse<User>>('/users/me', profileData)
+    return this.apiService.put<ApiResponse<User>>('/v1/users/me', profileData)
       .pipe(
         tap(response => {
           if (response.success && response.data) {
@@ -114,7 +114,7 @@ export class AuthService {
   }
 
   changePassword(passwordData: ChangePasswordRequest): Observable<ApiResponse<any>> {
-    return this.apiService.put<ApiResponse<any>>('/users/me/password', passwordData);
+    return this.apiService.post<ApiResponse<any>>('/v1/users/me/change-password', passwordData);
   }
 
   logout(): void {

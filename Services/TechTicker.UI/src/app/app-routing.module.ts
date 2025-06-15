@@ -35,6 +35,10 @@ const routes: Routes = [
     path: 'mappings',
     loadChildren: () => import('./features/mappings/mappings.module').then(m => m.MappingsModule),
     canActivate: [AuthGuard]
+  },
+  {
+    path: '**',
+    redirectTo: '/auth/login'
   }
 ];
 
