@@ -26,9 +26,7 @@
             "outputPath": "dist/tech-ticker.frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -36,9 +34,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "styles": ["src/styles.css"],
             "scripts": []
           },
           "configurations": {
@@ -72,12 +68,14 @@
               "buildTarget": "TechTicker.Frontend:build:production"
             },
             "development": {
-              "buildTarget": "TechTicker.Frontend:build:development"
+              "buildTarget": "TechTicker.Frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development",
           "options": {
-            "port": 57256
+            "port": 57256,
+            "proxyConfig": "proxy.conf.json"
           }
         },
         "extract-i18n": {
@@ -86,10 +84,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
               {
@@ -97,9 +92,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "styles": ["src/styles.css"],
             "scripts": [],
             "karmaConfig": "karma.conf.js"
           }

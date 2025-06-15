@@ -1,5 +1,4 @@
 # TechTicker: E-commerce Price Tracker & Alerter
-[![.NET](https://github.com/raulshma/tech-ticker/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/raulshma/tech-ticker/actions/workflows/dotnet.yml)
 
 TechTicker is a comprehensive system designed to track prices of specified computer hardware and related products across multiple e-commerce websites. It provides users with historical price data and alerts them to price changes based on user-defined rules. The system features an administration portal for managing products, categories, and system configurations.
 

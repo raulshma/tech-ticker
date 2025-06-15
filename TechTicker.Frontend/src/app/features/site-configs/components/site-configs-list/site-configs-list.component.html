@@ -1,0 +1,129 @@
+<div class="site-configs-container">
+  <div class="header-section">
+    <h1>Site Configurations</h1>
+    <button mat-raised-button color="primary" (click)="createSiteConfig()">
+      <mat-icon>add</mat-icon>
+      Add Site Config
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Manage Scraper Site Configurations</mat-card-title>
+      <mat-card-subtitle>Configure CSS selectors and settings for different e-commerce sites</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Search filter -->
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search configurations</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search by domain">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <!-- Loading spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading site configurations...</p>
+      </div>
+
+      <!-- Site configs table -->
+      <div *ngIf="!isLoading" class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="site-configs-table">
+          <!-- Site Domain Column -->
+          <ng-container matColumnDef="siteDomain">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Site Domain</th>
+            <td mat-cell *matCellDef="let config">
+              <div class="domain-info">
+                <strong>{{config.siteDomain || 'Not specified'}}</strong>
+                <small *ngIf="config.defaultUserAgent" class="user-agent">
+                  User Agent: {{config.defaultUserAgent.substring(0, 50)}}{{config.defaultUserAgent.length > 50 ? '...' : ''}}
+                </small>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Selectors Column -->
+          <ng-container matColumnDef="selectors">
+            <th mat-header-cell *matHeaderCellDef>CSS Selectors</th>
+            <td mat-cell *matCellDef="let config">
+              <div class="selectors-info">
+                <mat-chip-set>
+                  <mat-chip class="selector-count">
+                    {{getSelectorsCount(config)}} configured
+                  </mat-chip>
+                </mat-chip-set>
+                <small class="selectors-list">
+                  {{getSelectorsText(config)}}
+                </small>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Enabled Status Column -->
+          <ng-container matColumnDef="isEnabled">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let config">
+              <mat-chip-set>
+                <mat-chip [class]="config.isEnabled ? 'status-enabled' : 'status-disabled'">
+                  {{config.isEnabled ? 'Enabled' : 'Disabled'}}
+                </mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <!-- Created At Column -->
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Created</th>
+            <td mat-cell *matCellDef="let config">
+              {{config.createdAt | date:'short'}}
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let config">
+              <button mat-icon-button 
+                      color="primary" 
+                      (click)="editSiteConfig(config)"
+                      matTooltip="Edit configuration">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button 
+                      color="warn" 
+                      (click)="deleteSiteConfig(config)"
+                      matTooltip="Delete configuration">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <!-- No data row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+              <div class="no-data">
+                <mat-icon>settings</mat-icon>
+                <p>No site configurations found</p>
+                <p class="no-data-description">
+                  Site configurations define how to scrape product information from different e-commerce websites.
+                </p>
+                <button mat-raised-button color="primary" (click)="createSiteConfig()">
+                  Create First Configuration
+                </button>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]" 
+                       showFirstLastButtons 
+                       aria-label="Select page of site configurations">
+        </mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

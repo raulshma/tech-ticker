@@ -1,0 +1,11 @@
+{
+  "/api/*": {
+    "target": "http://localhost:5110",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "info",
+    "headers": {
+      "Connection": "Keep-Alive"
+    }
+  }
+}

@@ -1,0 +1,210 @@
+<div class="site-config-form-container">
+  <div class="header-section">
+    <h1>{{ isEditMode ? 'Edit Site Configuration' : 'Create Site Configuration' }}</h1>
+    <button mat-button (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Site Configs
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEditMode ? 'Edit Configuration Details' : 'New Configuration Details' }}</mat-card-title>
+      <mat-card-subtitle>{{ isEditMode ? 'Update the site configuration below' : 'Configure CSS selectors and settings for web scraping' }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="siteConfigForm" (ngSubmit)="onSubmit()" class="site-config-form">
+
+        <!-- Basic Information -->
+        <mat-expansion-panel expanded="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Basic Information</mat-panel-title>
+            <mat-panel-description>Site domain and general settings</mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="form-section">
+            <div class="form-row">
+              <!-- Site Domain -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Site Domain</mat-label>
+                <input matInput
+                       formControlName="siteDomain"
+                       placeholder="example.com"
+                       maxlength="200">
+                <mat-hint>Domain name of the e-commerce site (without protocol)</mat-hint>
+                <mat-error *ngIf="siteConfigForm.get('siteDomain')?.invalid && siteConfigForm.get('siteDomain')?.touched">
+                  {{ getFieldErrorMessage('siteDomain') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <!-- Default User Agent -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Default User Agent</mat-label>
+                <textarea matInput
+                          formControlName="defaultUserAgent"
+                          placeholder="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36..."
+                          rows="3"
+                          maxlength="1000"></textarea>
+                <mat-hint>User agent string to use when scraping this site</mat-hint>
+                <mat-error *ngIf="siteConfigForm.get('defaultUserAgent')?.invalid && siteConfigForm.get('defaultUserAgent')?.touched">
+                  {{ getFieldErrorMessage('defaultUserAgent') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <!-- Enabled Status -->
+              <div class="status-field">
+                <label class="status-label">Configuration Status</label>
+                <mat-slide-toggle formControlName="isEnabled" class="status-toggle">
+                  {{ siteConfigForm.get('isEnabled')?.value ? 'Enabled' : 'Disabled' }}
+                </mat-slide-toggle>
+                <div class="status-hint">
+                  {{ siteConfigForm.get('isEnabled')?.value ? 'This configuration is active and can be used for scraping' : 'This configuration is disabled and will not be used' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <!-- CSS Selectors -->
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>CSS Selectors</mat-panel-title>
+            <mat-panel-description>Define how to extract product information</mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="form-section">
+            <div class="form-row two-columns">
+              <!-- Product Name Selector -->
+              <mat-form-field appearance="outline">
+                <mat-label>Product Name Selector</mat-label>
+                <input matInput
+                       formControlName="productNameSelector"
+                       placeholder=".product-title, h1.name"
+                       maxlength="500">
+                <mat-hint>CSS selector for product name/title</mat-hint>
+                <mat-error *ngIf="siteConfigForm.get('productNameSelector')?.invalid && siteConfigForm.get('productNameSelector')?.touched">
+                  {{ getFieldErrorMessage('productNameSelector') }}
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Price Selector -->
+              <mat-form-field appearance="outline">
+                <mat-label>Price Selector</mat-label>
+                <input matInput
+                       formControlName="priceSelector"
+                       placeholder=".price, .current-price"
+                       maxlength="500">
+                <mat-hint>CSS selector for product price</mat-hint>
+                <mat-error *ngIf="siteConfigForm.get('priceSelector')?.invalid && siteConfigForm.get('priceSelector')?.touched">
+                  {{ getFieldErrorMessage('priceSelector') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row two-columns">
+              <!-- Stock Selector -->
+              <mat-form-field appearance="outline">
+                <mat-label>Stock Selector</mat-label>
+                <input matInput
+                       formControlName="stockSelector"
+                       placeholder=".stock-status, .availability"
+                       maxlength="500">
+                <mat-hint>CSS selector for stock/availability status</mat-hint>
+                <mat-error *ngIf="siteConfigForm.get('stockSelector')?.invalid && siteConfigForm.get('stockSelector')?.touched">
+                  {{ getFieldErrorMessage('stockSelector') }}
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Seller Name Selector -->
+              <mat-form-field appearance="outline">
+                <mat-label>Seller Name Selector</mat-label>
+                <input matInput
+                       formControlName="sellerNameOnPageSelector"
+                       placeholder=".seller-name, .merchant"
+                       maxlength="500">
+                <mat-hint>CSS selector for seller/merchant name</mat-hint>
+                <mat-error *ngIf="siteConfigForm.get('sellerNameOnPageSelector')?.invalid && siteConfigForm.get('sellerNameOnPageSelector')?.touched">
+                  {{ getFieldErrorMessage('sellerNameOnPageSelector') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <!-- Additional Headers -->
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Additional HTTP Headers</mat-panel-title>
+            <mat-panel-description>Custom headers to send with requests</mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="form-section">
+            <div class="headers-section">
+              <div class="headers-header">
+                <h4>HTTP Headers</h4>
+                <button mat-raised-button
+                        type="button"
+                        color="primary"
+                        (click)="addHeader()"
+                        class="add-header-btn">
+                  <mat-icon>add</mat-icon>
+                  Add Header
+                </button>
+              </div>
+
+              <div *ngIf="additionalHeaders.length === 0" class="no-headers">
+                <p>No additional headers configured. Click "Add Header" to add custom HTTP headers.</p>
+              </div>
+
+              <div *ngFor="let header of additionalHeaders.controls; let i = index"
+                   class="header-row"
+                   [formGroup]="$any(header)">
+                <mat-form-field appearance="outline" class="header-key">
+                  <mat-label>Header Name</mat-label>
+                  <input matInput formControlName="key" placeholder="X-Custom-Header">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="header-value">
+                  <mat-label>Header Value</mat-label>
+                  <input matInput formControlName="value" placeholder="header-value">
+                </mat-form-field>
+
+                <button mat-icon-button
+                        type="button"
+                        color="warn"
+                        (click)="removeHeader(i)"
+                        matTooltip="Remove header">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button mat-button
+                  type="button"
+                  (click)="onCancel()"
+                  [disabled]="isLoading">
+            Cancel
+          </button>
+
+          <button mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="siteConfigForm.invalid || isLoading">
+            <mat-spinner *ngIf="isLoading" diameter="20" class="form-spinner"></mat-spinner>
+            <span *ngIf="!isLoading">{{ isEditMode ? 'Update Configuration' : 'Create Configuration' }}</span>
+            <span *ngIf="isLoading">{{ isEditMode ? 'Updating...' : 'Creating...' }}</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
