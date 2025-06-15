@@ -1,45 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
-import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
-import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import { finalize } from 'rxjs/operators';
 import { SiteConfiguration, SiteConfigurationService, SiteConfigurationSearchParams } from '../../services/site-configuration.service';
 
 @Component({
   selector: 'app-site-config-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    NzTableModule,
-    NzButtonModule,
-    NzInputModule,
-    NzSelectModule,
-    NzFormModule,
-    NzCardModule,
-    NzTagModule,
-    NzMessageModule,
-    NzModalModule,
-    NzIconModule,
-    NzGridModule,
-    NzEmptyModule,
-    NzToolTipModule
-  ],
   templateUrl: './site-config-list.component.html',
-  styleUrls: ['./site-config-list.component.css']
+  styleUrls: ['./site-config-list.component.css'],
+  standalone: false
 })
 export class SiteConfigListComponent implements OnInit {
   siteConfigs: SiteConfiguration[] = [];

@@ -8,7 +8,8 @@ import { UserManagementService, UserDetails, UpdateUserRequest } from '../../ser
 @Component({
   selector: 'app-user-edit',
   templateUrl: './user-edit.component.html',
-  styleUrls: ['./user-edit.component.css']
+  styleUrls: ['./user-edit.component.css'],
+  standalone: false
 })
 export class UserEditComponent implements OnInit {
   editForm!: FormGroup;

@@ -75,13 +75,14 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [],
-  imports: [
+  declarations: [
     UserListComponent,
     UserDetailsComponent,
     UserEditComponent,
     UserRolesComponent,
-    UserCreateComponent,
+    UserCreateComponent
+  ],
+  imports: [
     CommonModule,
     ReactiveFormsModule,
     FormsModule,

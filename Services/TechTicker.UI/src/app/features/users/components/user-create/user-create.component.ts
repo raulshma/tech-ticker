@@ -8,7 +8,8 @@ import { UserManagementService, CreateUserRequest } from '../../services/user-ma
 @Component({
   selector: 'app-user-create',
   templateUrl: './user-create.component.html',
-  styleUrls: ['./user-create.component.css']
+  styleUrls: ['./user-create.component.css'],
+  standalone: false
 })
 export class UserCreateComponent implements OnInit {
   createForm!: FormGroup;

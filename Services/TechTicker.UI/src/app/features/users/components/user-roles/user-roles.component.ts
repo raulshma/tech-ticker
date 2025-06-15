@@ -8,7 +8,8 @@ import { UserManagementService, UserDetails, RoleInfo, AssignRoleRequest } from 
 @Component({
   selector: 'app-user-roles',
   templateUrl: './user-roles.component.html',
-  styleUrls: ['./user-roles.component.css']
+  styleUrls: ['./user-roles.component.css'],
+  standalone: false
 })
 export class UserRolesComponent implements OnInit {
   user: UserDetails | null = null;
@@ -225,7 +226,7 @@ export class UserRolesComponent implements OnInit {
 
   canRemoveRole(roleName: string): boolean {
     // Prevent removing the last admin role, etc.
-    if (roleName === 'Admin' && this.user?.roles.filter(r => r === 'Admin').length === 1) {
+    if (roleName === 'Admin' && (this.user?.roles?.filter(r => r === 'Admin').length ?? 0) === 1) {
       // Additional logic to check if this is the last admin in the system
       // For now, allow removal
     }

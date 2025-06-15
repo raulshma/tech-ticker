@@ -51,7 +51,7 @@
           <div class="role-summary">
             <div class="summary-item">
               <span class="label">Total Roles:</span>
-              <span class="value">{{ user.roles.length }}</span>
+              <span class="value">{{ user.roles?.length ?? 0 }}</span>
             </div>
             <div class="summary-item">
               <span class="label">Last Updated:</span>
@@ -123,7 +123,7 @@
       </div>
 
       <div *ngIf="!rolesLoading">
-        <div *ngIf="user.roles.length === 0" class="no-roles">
+        <div *ngIf="(user?.roles?.length ?? 0) === 0" class="no-roles">
           <nz-empty nzNotFoundContent="No roles assigned">
             <div nz-empty-footer>
               <span>Assign a role using the form above to get started.</span>
@@ -131,8 +131,8 @@
           </nz-empty>
         </div>
 
-        <div *ngIf="user.roles.length > 0" class="roles-list">
-          <div *ngFor="let roleName of user.roles" class="role-item">
+        <div *ngIf="(user?.roles?.length ?? 0) > 0" class="roles-list">
+          <div *ngFor="let roleName of user?.roles || []" class="role-item">
             <nz-card nzSize="small" class="role-card">
               <div class="role-header">
                 <div class="role-info">
@@ -207,7 +207,7 @@
 
 <!-- Templates -->
 <ng-template #rolesExtraTemplate>
-  <span class="roles-count">{{ user?.roles.length || 0 }} role(s)</span>
+  <span class="roles-count">{{ user?.roles?.length ?? 0 }} role(s)</span>
 </ng-template>
 
 <ng-template #roleGuidelinesTemplate>

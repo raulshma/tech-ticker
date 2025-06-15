@@ -33,6 +33,7 @@ import { ProductFormComponent } from './components/product-form/product-form.com
 import { CategoryListComponent } from './components/category-list/category-list.component';
 import { CategoryDetailsComponent } from './components/category-details/category-details.component';
 import { CategoryFormComponent } from './components/category-form/category-form.component';
+import { PriceHistoryComponent } from './components/price-history/price-history.component';
 
 const routes: Routes = [
   {
@@ -89,14 +90,15 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    CategoryFormComponent
-  ],
-  imports: [
     ProductListComponent,
     ProductDetailsComponent,
     CategoryListComponent,
     CategoryDetailsComponent,
     ProductFormComponent,
+    CategoryFormComponent,
+    PriceHistoryComponent
+  ],
+  imports: [
     CommonModule,
     ReactiveFormsModule,
     FormsModule,

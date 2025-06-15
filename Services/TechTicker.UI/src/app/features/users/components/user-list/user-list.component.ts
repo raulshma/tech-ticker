@@ -8,7 +8,8 @@ import { UserManagementService, UserListItem, UserQueryParams } from '../../serv
 @Component({
   selector: 'app-user-list',
   templateUrl: './user-list.component.html',
-  styleUrls: ['./user-list.component.css']
+  styleUrls: ['./user-list.component.css'],
+  standalone: false
 })
 export class UserListComponent implements OnInit {
   users: UserListItem[] = [];
@@ -31,7 +32,7 @@ export class UserListComponent implements OnInit {
 
   constructor(
     private userManagementService: UserManagementService,
-    private router: Router,
+    public router: Router,
     private message: NzMessageService,
     private modal: NzModalService
   ) {}
@@ -94,7 +95,7 @@ export class UserListComponent implements OnInit {
     this.loadUsers();
   }
 
-  onSort(sort: { key: string; value: string | null }): void {
+  onSort(sort: { key: string; value: any }): void {
     this.sortField = sort.key;
     this.sortOrder = sort.value;
     // Note: Implement server-side sorting if needed

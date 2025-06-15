@@ -1,39 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
-import { NzSwitchModule } from 'ng-zorro-antd/switch';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { finalize } from 'rxjs/operators';
 import { SiteConfiguration, SiteConfigurationService, CreateSiteConfigurationDto, UpdateSiteConfigurationDto } from '../../services/site-configuration.service';
 
 @Component({
   selector: 'app-site-config-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    NzFormModule,
-    NzInputModule,
-    NzButtonModule,
-    NzCardModule,
-    NzMessageModule,
-    NzSwitchModule,
-    NzGridModule,
-    NzSpinModule,
-    NzAlertModule,
-    NzDescriptionsModule
-  ],
   templateUrl: './site-config-form.component.html',
-  styleUrls: ['./site-config-form.component.css']
+  styleUrls: ['./site-config-form.component.css'],
+  standalone: false
 })
 export class SiteConfigFormComponent implements OnInit {
   form!: FormGroup;

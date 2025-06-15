@@ -12,7 +12,8 @@ import {
 @Component({
   selector: 'app-price-history',
   templateUrl: './price-history.component.html',
-  styleUrls: ['./price-history.component.css']
+  styleUrls: ['./price-history.component.css'],
+  standalone: false
 })
 export class PriceHistoryComponent implements OnInit {
   @Input() canonicalProductId!: string;

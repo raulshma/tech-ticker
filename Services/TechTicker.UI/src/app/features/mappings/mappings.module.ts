@@ -71,11 +71,12 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [],
-  imports: [
+  declarations: [
     SiteConfigListComponent,
     SiteConfigFormComponent,
-    MappingListComponent,
+    MappingListComponent
+  ],
+  imports: [
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
