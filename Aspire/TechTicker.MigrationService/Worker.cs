@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using OpenTelemetry.Trace;
 using TechTicker.PriceHistoryService.Data;
 using TechTicker.ProductSellerMappingService.Data;
@@ -80,9 +83,63 @@ public class Worker(
         });
     }
 
-    private static Task SeedDataAsync(IServiceScope scope, CancellationToken cancellationToken)
+    private static async Task SeedDataAsync(IServiceScope scope, CancellationToken cancellationToken)
     {
-        // for future
-        return Task.CompletedTask;
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Worker>>();
+
+        // Seed test users for development
+        await SeedTestUsersAsync(scope, logger, cancellationToken);
+    }
+
+    private static async Task SeedTestUsersAsync(IServiceScope scope, ILogger<Worker> logger, CancellationToken cancellationToken)
+    {
+        var userContext = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+
+        // Check if we're in development environment
+        var environment = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
+        if (!environment.IsDevelopment())
+        {
+            logger.LogInformation("Skipping test user seeding - not in development environment");
+            return;
+        }
+
+        // Test users to create
+        var testUsers = new[]
+        {
+            new { Email = "test@techticker.com", Password = "Test123!", FirstName = "Test", LastName = "User" },
+            new { Email = "admin@techticker.com", Password = "Admin123!", FirstName = "Admin", LastName = "User" },
+            new { Email = "demo@techticker.com", Password = "Demo123!", FirstName = "Demo", LastName = "User" }
+        };
+
+        foreach (var testUser in testUsers)
+        {
+            // Check if user already exists
+            if (await userContext.Users.AnyAsync(u => u.Email == testUser.Email, cancellationToken))
+            {
+                logger.LogInformation("Test user {Email} already exists, skipping", testUser.Email);
+                continue;
+            }
+
+            // Create new test user
+            var user = new TechTicker.Shared.Models.User
+            {
+                UserId = Guid.NewGuid(),
+                Email = testUser.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(testUser.Password),
+                FirstName = testUser.FirstName,
+                LastName = testUser.LastName,
+                IsActive = true,
+                EmailConfirmed = true, // Auto-confirm for test users
+                EmailConfirmedAt = DateTimeOffset.UtcNow,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+
+            userContext.Users.Add(user);
+            logger.LogInformation("Created test user: {Email}", testUser.Email);
+        }
+
+        await userContext.SaveChangesAsync(cancellationToken);
+        logger.LogInformation("Test user seeding completed");
     }
 }

@@ -119,4 +119,27 @@ export class ApiService {
   search<T>(endpoint: string, searchParams: any): Observable<T> {
     return this.get<T>(`${endpoint}/search`, searchParams);
   }
+
+  // Method for OAuth2 token requests (form-encoded)
+  postFormEncoded<T>(endpoint: string, body: any): Observable<T> {
+    const url = `${this.baseUrl}${endpoint}`;
+
+    // Convert object to URLSearchParams for form encoding
+    const formData = new URLSearchParams();
+    Object.keys(body).forEach(key => {
+      if (body[key] !== null && body[key] !== undefined) {
+        formData.append(key, body[key]);
+      }
+    });
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded'
+    });
+
+    return this.http.post<T>(url, formData.toString(), {
+      headers
+    }).pipe(
+      catchError(this.handleError)
+    );
+  }
 }

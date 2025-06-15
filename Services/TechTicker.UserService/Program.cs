@@ -11,8 +11,10 @@ namespace TechTicker.UserService;
 public class Program
 {
     public static void Main(string[] args)
-    {        var builder = WebApplication.CreateBuilder(args);        // Add database
+    {
+        var builder = WebApplication.CreateBuilder(args);        // Add database
         builder.AddServiceDefaults();
+
         builder.AddNpgsqlDbContext<UserDbContext>("user", configureDbContextOptions: options =>
         {
             options.UseOpenIddict();
@@ -47,7 +49,8 @@ public class Program
                 // the other flows if you need to support implicit, password or client credentials.
                 options.AllowAuthorizationCodeFlow()
                        .AllowRefreshTokenFlow()
-                       .AllowClientCredentialsFlow();
+                       .AllowClientCredentialsFlow()
+                       .AllowPasswordFlow(); // Enable password grant for direct login
 
                 // Register the signing and encryption credentials.
                 options.AddDevelopmentEncryptionCertificate()

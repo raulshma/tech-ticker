@@ -32,11 +32,29 @@ public class RequestValidationMiddleware
 
     private async Task<bool> ValidateRequest(HttpContext context)
     {
-        // Validate content type for POST/PUT requests
+        var path = context.Request.Path.Value?.ToLowerInvariant();
+
+        // Skip validation for OAuth2 endpoints to avoid consuming request body
+        var isOAuth2Endpoint = path?.Contains("/connect/token") == true ||
+                               path?.Contains("/auth/connect/token") == true;
+
+        if (isOAuth2Endpoint)
+        {
+            // For OAuth2 endpoints, only validate basic requirements without reading the body
+            if (context.Request.ContentLength > 10 * 1024 * 1024) // 10MB limit
+            {
+                await WriteErrorResponse(context, 413, "Request payload too large. Maximum size is 10MB");
+                return false;
+            }
+            return true;
+        }
+
+        // Validate content type for POST/PUT requests (non-OAuth2)
         if (IsContentRequest(context.Request.Method))
         {
             var contentType = context.Request.ContentType;
-            if (string.IsNullOrEmpty(contentType) || 
+
+            if (string.IsNullOrEmpty(contentType) ||
                 (!contentType.Contains("application/json") && !contentType.Contains("multipart/form-data")))
             {
                 await WriteErrorResponse(context, 400, "Invalid content type. Expected application/json or multipart/form-data");

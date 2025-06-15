@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap, map } from 'rxjs';
 import { ApiService, ApiResponse } from './api.service';
 
 export interface LoginRequest {
@@ -16,8 +16,10 @@ export interface RegisterRequest {
 }
 
 export interface AuthResponse {
-  token: string;
-  user: User;
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  scope?: string;
 }
 
 export interface User {
@@ -73,37 +75,70 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<ApiResponse<AuthResponse>> {
-    return this.apiService.post<ApiResponse<AuthResponse>>('/v1/users/login', credentials)
+    // Use OAuth2 password grant with OpenIddict
+    const tokenRequest = {
+      grant_type: 'password',
+      username: credentials.email,
+      password: credentials.password,
+      client_id: 'TechTicker.Client',
+      client_secret: 'TechTicker.Secret',
+      scope: 'email profile roles'
+    };
+
+    return this.apiService.postFormEncoded<AuthResponse>('/auth/connect/token', tokenRequest)
       .pipe(
         tap(response => {
-          if (response.success && response.data) {
-            this.setToken(response.data.token);
-            this.currentUserSubject.next(response.data.user);
+          if (response.access_token) {
+            this.setToken(response.access_token);
             this.isAuthenticatedSubject.next(true);
+            // Get user info after successful token exchange
+            this.getCurrentUser().subscribe({
+              next: (userResponse) => {
+                this.currentUserSubject.next(userResponse.data);
+              },
+              error: () => {
+                this.logout();
+              }
+            });
           }
-        })
+        }),
+        // Transform the OAuth2 response to match our ApiResponse format
+        map(response => ({
+          success: !!response.access_token,
+          data: response,
+          message: response.access_token ? 'Login successful' : 'Login failed'
+        }))
       );
   }
 
   register(userData: RegisterRequest): Observable<ApiResponse<AuthResponse>> {
-    return this.apiService.post<ApiResponse<AuthResponse>>('/v1/users/register', userData)
+    // First register the user, then login
+    return this.apiService.post<any>('/users/register', userData)
       .pipe(
         tap(response => {
-          if (response.success && response.data) {
-            this.setToken(response.data.token);
-            this.currentUserSubject.next(response.data.user);
-            this.isAuthenticatedSubject.next(true);
+          if (response.success) {
+            // After successful registration, automatically login
+            this.login({
+              email: userData.email,
+              password: userData.password
+            }).subscribe();
           }
-        })
+        }),
+        // Transform to match our expected format
+        map(response => ({
+          success: response.success || false,
+          data: { access_token: '', token_type: 'Bearer', expires_in: 0 } as AuthResponse,
+          message: response.message || 'Registration completed'
+        }))
       );
   }
 
   getCurrentUser(): Observable<ApiResponse<User>> {
-    return this.apiService.get<ApiResponse<User>>('/v1/users/me');
+    return this.apiService.get<ApiResponse<User>>('/users/me');
   }
 
   updateProfile(profileData: UpdateProfileRequest): Observable<ApiResponse<User>> {
-    return this.apiService.put<ApiResponse<User>>('/v1/users/me', profileData)
+    return this.apiService.put<ApiResponse<User>>('/users/me', profileData)
       .pipe(
         tap(response => {
           if (response.success && response.data) {
@@ -114,7 +149,7 @@ export class AuthService {
   }
 
   changePassword(passwordData: ChangePasswordRequest): Observable<ApiResponse<any>> {
-    return this.apiService.post<ApiResponse<any>>('/v1/users/me/change-password', passwordData);
+    return this.apiService.post<ApiResponse<any>>('/users/me/change-password', passwordData);
   }
 
   logout(): void {

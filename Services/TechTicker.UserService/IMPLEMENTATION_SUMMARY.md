@@ -15,10 +15,14 @@ The TechTicker User Service has been successfully implemented with OpenIddict fo
 - **Password Management**: Change password, reset functionality
 
 ### 2. Authentication & Authorization (OpenIddict)
-- **OAuth2/OpenID Connect Endpoints**:
-  - `/connect/token` - Token endpoint for various grant types
-  - `/connect/userinfo` - User information endpoint
-  - `/connect/register` - User registration via OpenIddict flow
+- **OAuth2/OpenID Connect Endpoints** (accessed via API Gateway):
+  - `/api/v1/auth/connect/token` - Token endpoint for various grant types
+  - `/api/v1/auth/connect/userinfo` - User information endpoint
+  - `/api/v1/auth/connect/register` - User registration via OpenIddict flow
+- **Direct Service Endpoints** (internal use only):
+  - `/connect/token` - Direct token endpoint
+  - `/connect/userinfo` - Direct userinfo endpoint
+  - `/connect/register` - Direct registration endpoint
 - **Supported Grant Types**:
   - Authorization Code
   - Password (Resource Owner)
@@ -55,26 +59,37 @@ The TechTicker User Service has been successfully implemented with OpenIddict fo
 
 ## API Endpoints
 
-### User Management
+### User Management (via API Gateway)
 ```
-POST   /api/users/register          - Register new user
-POST   /api/users/login             - User login
-GET    /api/users/me                - Get current user profile
-GET    /api/users/{id}              - Get user by ID
-PUT    /api/users/{id}              - Update user profile
-DELETE /api/users/{id}              - Delete user
-GET    /api/users/search            - Search users (paginated)
-POST   /api/users/{id}/roles        - Assign role to user
-DELETE /api/users/{id}/roles/{roleId} - Remove role from user
-PUT    /api/users/{id}/status       - Change user status
-PUT    /api/users/{id}/password     - Change user password
+POST   /api/v1/users/register       - Register new user
+POST   /api/v1/users/login          - User login (legacy, use OAuth2 instead)
+GET    /api/v1/users/me             - Get current user profile
+GET    /api/v1/users/{id}           - Get user by ID
+PUT    /api/v1/users/{id}           - Update user profile
+DELETE /api/v1/users/{id}           - Delete user
+GET    /api/v1/users/search         - Search users (paginated)
+POST   /api/v1/users/{id}/roles     - Assign role to user
+DELETE /api/v1/users/{id}/roles/{roleId} - Remove role from user
+PUT    /api/v1/users/{id}/status    - Change user status
+PUT    /api/v1/users/{id}/password  - Change user password
 ```
 
-### OAuth2/OpenID Connect
+### OAuth2/OpenID Connect (via API Gateway)
+```
+POST   /api/v1/auth/connect/token   - OAuth2 token endpoint (recommended)
+GET    /api/v1/auth/connect/userinfo - User information endpoint
+POST   /api/v1/auth/connect/register - Register via OpenIddict
+```
+
+### Direct Service Endpoints (Internal Use Only)
 ```
 POST   /connect/token               - OAuth2 token endpoint
 GET    /connect/userinfo            - User information endpoint
 POST   /connect/register            - Register via OpenIddict
+POST   /api/users/register          - Register new user
+POST   /api/users/login             - User login
+GET    /api/users/me                - Get current user profile
+... (other user management endpoints)
 ```
 
 ## Configuration

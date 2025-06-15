@@ -39,7 +39,7 @@ namespace TechTicker.UserService.Workers
                 {
                     ClientId = "TechTicker.Client",
                     ClientSecret = "TechTicker.Secret", // In production, use a secure secret
-                    ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
+                    ConsentType = OpenIddictConstants.ConsentTypes.Implicit, // Changed from Explicit to Implicit for password grant
                     DisplayName = "TechTicker Client",
                     ClientType = OpenIddictConstants.ClientTypes.Confidential,
                     Permissions =
