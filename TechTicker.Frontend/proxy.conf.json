@@ -1,7 +1,7 @@
 {
   "/api/*": {
     "target": "https://localhost:7001",
-    "secure": true,
+    "secure": false,
     "changeOrigin": true,
     "logLevel": "info",
     "headers": {

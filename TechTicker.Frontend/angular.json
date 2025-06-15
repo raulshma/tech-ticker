@@ -71,10 +71,9 @@
               "buildTarget": "TechTicker.Frontend:build:development",
               "proxyConfig": "proxy.conf.json"
             }
-          },
-          "defaultConfiguration": "development",
+          },          "defaultConfiguration": "development",
           "options": {
-            "port": 57256,
+            "port": 4200,
             "proxyConfig": "proxy.conf.json"
           }
         },
