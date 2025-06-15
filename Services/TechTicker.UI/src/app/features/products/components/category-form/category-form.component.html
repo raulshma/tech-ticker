@@ -8,8 +8,12 @@
 
 <nz-card>
   <nz-spin [nzSpinning]="loading">
-    <form nz-form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" nzLayout="vertical">
-
+    <form
+      nz-form
+      [formGroup]="categoryForm"
+      (ngSubmit)="onSubmit()"
+      nzLayout="vertical"
+    >
       <!-- Category Name -->
       <nz-form-item>
         <nz-form-label nzRequired nzFor="name">Category Name</nz-form-label>
@@ -26,7 +30,8 @@
             maxlength="100"
           />
           <div class="field-hint">
-            This will be displayed as the category name throughout the application.
+            This will be displayed as the category name throughout the
+            application.
           </div>
         </nz-form-control>
       </nz-form-item>
@@ -50,7 +55,15 @@
         </nz-form-label>
         <nz-form-control
           nzHasFeedback
-          [nzValidateStatus]="isFieldInvalid('slug') ? 'error' : slugCheckLoading ? 'validating' : slugAvailable ? 'success' : 'error'"
+          [nzValidateStatus]="
+            isFieldInvalid('slug')
+              ? 'error'
+              : slugCheckLoading
+              ? 'validating'
+              : slugAvailable
+              ? 'success'
+              : 'error'
+          "
           [nzErrorTip]="getFieldError('slug')"
         >
           <nz-input-group [nzSuffix]="slugSuffix">
@@ -66,9 +79,21 @@
           <ng-template #slugSuffix>
             <i
               nz-icon
-              [nzType]="slugCheckLoading ? 'loading' : slugAvailable ? 'check-circle' : 'close-circle'"
+              [nzType]="
+                slugCheckLoading
+                  ? 'loading'
+                  : slugAvailable
+                  ? 'check-circle'
+                  : 'close-circle'
+              "
               [nzTheme]="slugCheckLoading ? 'outline' : 'fill'"
-              [style.color]="slugCheckLoading ? '#1890ff' : slugAvailable ? '#52c41a' : '#ff4d4f'"
+              [style.color]="
+                slugCheckLoading
+                  ? '#1890ff'
+                  : slugAvailable
+                  ? '#52c41a'
+                  : '#ff4d4f'
+              "
             ></i>
           </ng-template>
           <div class="field-hint">
@@ -97,7 +122,8 @@
             maxlength="500"
           ></textarea>
           <div class="field-hint">
-            Optional description to help users understand what products belong in this category.
+            Optional description to help users understand what products belong
+            in this category.
           </div>
         </nz-form-control>
       </nz-form-item>
@@ -114,7 +140,7 @@
             type="submit"
           >
             <i nz-icon [nzType]="isEditMode ? 'save' : 'plus'"></i>
-            {{ isEditMode ? 'Update Category' : 'Create Category' }}
+            {{ isEditMode ? "Update Category" : "Create Category" }}
           </button>
 
           <button
@@ -130,22 +156,26 @@
           </button>
         </nz-form-control>
       </nz-form-item>
-
     </form>
   </nz-spin>
 </nz-card>
 
 <!-- Form Validation Summary -->
-<nz-card *ngIf="categoryForm.invalid && categoryForm.touched" class="validation-summary">
+<nz-card
+  *ngIf="categoryForm.invalid && categoryForm.touched"
+  class="validation-summary"
+>
   <nz-alert
     nzType="error"
     nzMessage="Please fix the following errors:"
     nzShowIcon
   >
     <ul class="error-list">
-      <li *ngIf="getFieldError('name')">{{ getFieldError('name') }}</li>
-      <li *ngIf="getFieldError('slug')">{{ getFieldError('slug') }}</li>
-      <li *ngIf="getFieldError('description')">{{ getFieldError('description') }}</li>
+      <li *ngIf="getFieldError('name')">{{ getFieldError("name") }}</li>
+      <li *ngIf="getFieldError('slug')">{{ getFieldError("slug") }}</li>
+      <li *ngIf="getFieldError('description')">
+        {{ getFieldError("description") }}
+      </li>
     </ul>
   </nz-alert>
 </nz-card>

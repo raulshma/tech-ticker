@@ -8,7 +8,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 @Component({
   selector: 'app-category-form',
   templateUrl: './category-form.component.html',
-  styleUrls: ['./category-form.component.css']
+  styleUrls: ['./category-form.component.css'],
+  standalone: false
 })
 export class CategoryFormComponent implements OnInit {
   categoryForm: FormGroup;

@@ -88,15 +88,14 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [
+  declarations: [],
+  imports: [
     ProductListComponent,
     ProductDetailsComponent,
     ProductFormComponent,
     CategoryListComponent,
     CategoryDetailsComponent,
-    CategoryFormComponent
-  ],
-  imports: [
+    CategoryFormComponent,
     CommonModule,
     ReactiveFormsModule,
     FormsModule,

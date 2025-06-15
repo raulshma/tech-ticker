@@ -1,12 +1,47 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzModalService } from 'ng-zorro-antd/modal';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzBadgeModule } from 'ng-zorro-antd/badge';
+import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 import { finalize } from 'rxjs/operators';
 import { ProductSellerMapping, ProductSellerMappingService, ProductSellerMappingSearchParams } from '../../services/product-seller-mapping.service';
 
 @Component({
   selector: 'app-mapping-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzTableModule,
+    NzButtonModule,
+    NzInputModule,
+    NzSelectModule,
+    NzFormModule,
+    NzCardModule,
+    NzTagModule,
+    NzMessageModule,
+    NzModalModule,
+    NzIconModule,
+    NzGridModule,
+    NzEmptyModule,
+    NzToolTipModule,
+    NzBadgeModule,
+    NzStatisticModule
+  ],
   templateUrl: './mapping-list.component.html',
   styleUrls: ['./mapping-list.component.css']
 })

@@ -12,24 +12,26 @@ import { LayoutModule } from './layout/layout.module';
 import { NzConfigService } from 'ng-zorro-antd/core/config';
 import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
+import { IconsProviderModule } from './icons-provider.module';
+import { NzLayoutModule } from 'ng-zorro-antd/layout';
+import { NzMenuModule } from 'ng-zorro-antd/menu';
 
 registerLocaleData(en);
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
     CoreModule,
-    LayoutModule
+    LayoutModule,
+    IconsProviderModule,
+    NzLayoutModule,
+    NzMenuModule,
   ],
-  providers: [
-    NzConfigService
-  ],
-  bootstrap: [AppComponent]
+  providers: [NzConfigService],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
