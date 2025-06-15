@@ -20,6 +20,9 @@ builder.AddServiceDefaults();
 // Add database context
 builder.AddNpgsqlDbContext<TechTickerDbContext>("techticker-db");
 
+// Add RabbitMQ client
+builder.AddRabbitMQClient("messaging");
+
 // Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
 {

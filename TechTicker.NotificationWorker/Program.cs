@@ -16,6 +16,9 @@ builder.AddServiceDefaults();
 // Add database context
 builder.AddNpgsqlDbContext<TechTickerDbContext>("techticker-db");
 
+// Add RabbitMQ client
+builder.AddRabbitMQClient("messaging");
+
 // Configure messaging
 builder.Services.Configure<MessagingConfiguration>(
     builder.Configuration.GetSection(MessagingConfiguration.SectionName));

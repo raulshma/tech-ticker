@@ -1,16 +1,12 @@
 namespace TechTicker.Application.Configuration;
 
 /// <summary>
-/// Configuration for RabbitMQ messaging
+/// Configuration for RabbitMQ messaging topology (exchanges, queues, routing keys)
+/// Connection details are handled by Aspire RabbitMQ integration
 /// </summary>
 public class MessagingConfiguration
 {
     public const string SectionName = "Messaging";
-
-    public string ConnectionString { get; set; } = "amqp://localhost:5672";
-    public string Username { get; set; } = "guest";
-    public string Password { get; set; } = "guest";
-    public string VirtualHost { get; set; } = "/";
 
     // Exchange names
     public string ScrapingExchange { get; set; } = "techticker.scraping";

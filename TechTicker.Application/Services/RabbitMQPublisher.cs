@@ -9,53 +9,44 @@ using TechTicker.Application.Services.Interfaces;
 namespace TechTicker.Application.Services;
 
 /// <summary>
-/// RabbitMQ message publisher implementation
+/// RabbitMQ message publisher implementation using Aspire RabbitMQ integration
 /// </summary>
 public class RabbitMQPublisher : IMessagePublisher, IDisposable
 {
     private readonly MessagingConfiguration _config;
     private readonly ILogger<RabbitMQPublisher> _logger;
     private readonly IConnection _connection;
-    private readonly IChannel _channel;
+    private readonly IModel _channel;
 
     public RabbitMQPublisher(
+        IConnection connection,
         IOptions<MessagingConfiguration> config,
         ILogger<RabbitMQPublisher> logger)
     {
+        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _config = config.Value;
         _logger = logger;
 
-        var factory = new ConnectionFactory
-        {
-            Uri = new Uri(_config.ConnectionString),
-            UserName = _config.Username,
-            Password = _config.Password,
-            VirtualHost = _config.VirtualHost
-        };
-
-        _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
-        _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
+        _channel = _connection.CreateModel();
 
         // Declare exchanges
-        DeclareExchangesAsync().GetAwaiter().GetResult();
+        DeclareExchanges();
     }
 
-    public async Task PublishAsync<T>(T message, string exchange, string routingKey) where T : class
+    public Task PublishAsync<T>(T message, string exchange, string routingKey) where T : class
     {
         try
         {
             var messageBody = JsonSerializer.Serialize(message);
             var body = Encoding.UTF8.GetBytes(messageBody);
 
-            var properties = new BasicProperties
-            {
-                Persistent = true,
-                Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
-                MessageId = Guid.NewGuid().ToString(),
-                Type = typeof(T).Name
-            };
+            var properties = _channel.CreateBasicProperties();
+            properties.Persistent = true;
+            properties.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            properties.MessageId = Guid.NewGuid().ToString();
+            properties.Type = typeof(T).Name;
 
-            await _channel.BasicPublishAsync(
+            _channel.BasicPublish(
                 exchange: exchange,
                 routingKey: routingKey,
                 mandatory: false,
@@ -71,24 +62,24 @@ public class RabbitMQPublisher : IMessagePublisher, IDisposable
                 typeof(T).Name, exchange);
             throw;
         }
+
+        return Task.CompletedTask;
     }
 
-    public async Task PublishAsync<T>(T message, string queueName) where T : class
+    public Task PublishAsync<T>(T message, string queueName) where T : class
     {
         try
         {
             var messageBody = JsonSerializer.Serialize(message);
             var body = Encoding.UTF8.GetBytes(messageBody);
 
-            var properties = new BasicProperties
-            {
-                Persistent = true,
-                Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
-                MessageId = Guid.NewGuid().ToString(),
-                Type = typeof(T).Name
-            };
+            var properties = _channel.CreateBasicProperties();
+            properties.Persistent = true;
+            properties.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            properties.MessageId = Guid.NewGuid().ToString();
+            properties.Type = typeof(T).Name;
 
-            await _channel.BasicPublishAsync(
+            _channel.BasicPublish(
                 exchange: string.Empty,
                 routingKey: queueName,
                 mandatory: false,
@@ -104,37 +95,39 @@ public class RabbitMQPublisher : IMessagePublisher, IDisposable
                 typeof(T).Name, queueName);
             throw;
         }
+
+        return Task.CompletedTask;
     }
 
-    private async Task DeclareExchangesAsync()
+    private void DeclareExchanges()
     {
-        await _channel.ExchangeDeclareAsync(_config.ScrapingExchange, ExchangeType.Topic, durable: true);
-        await _channel.ExchangeDeclareAsync(_config.AlertsExchange, ExchangeType.Topic, durable: true);
-        await _channel.ExchangeDeclareAsync(_config.PriceDataExchange, ExchangeType.Topic, durable: true);
+        _channel.ExchangeDeclare(_config.ScrapingExchange, ExchangeType.Topic, durable: true);
+        _channel.ExchangeDeclare(_config.AlertsExchange, ExchangeType.Topic, durable: true);
+        _channel.ExchangeDeclare(_config.PriceDataExchange, ExchangeType.Topic, durable: true);
 
         // Declare queues and bind them
-        await DeclareQueuesAsync();
+        DeclareQueues();
     }
 
-    private async Task DeclareQueuesAsync()
+    private void DeclareQueues()
     {
         // Scraping queues
-        await _channel.QueueDeclareAsync(_config.ScrapeCommandQueue, durable: true, exclusive: false, autoDelete: false);
-        await _channel.QueueBindAsync(_config.ScrapeCommandQueue, _config.ScrapingExchange, _config.ScrapeCommandRoutingKey);
+        _channel.QueueDeclare(_config.ScrapeCommandQueue, durable: true, exclusive: false, autoDelete: false);
+        _channel.QueueBind(_config.ScrapeCommandQueue, _config.ScrapingExchange, _config.ScrapeCommandRoutingKey);
 
-        await _channel.QueueDeclareAsync(_config.ScrapingResultQueue, durable: true, exclusive: false, autoDelete: false);
-        await _channel.QueueBindAsync(_config.ScrapingResultQueue, _config.ScrapingExchange, _config.ScrapingResultRoutingKey);
+        _channel.QueueDeclare(_config.ScrapingResultQueue, durable: true, exclusive: false, autoDelete: false);
+        _channel.QueueBind(_config.ScrapingResultQueue, _config.ScrapingExchange, _config.ScrapingResultRoutingKey);
 
         // Price data queues
-        await _channel.QueueDeclareAsync(_config.RawPriceDataQueue, durable: true, exclusive: false, autoDelete: false);
-        await _channel.QueueBindAsync(_config.RawPriceDataQueue, _config.PriceDataExchange, _config.RawPriceDataRoutingKey);
+        _channel.QueueDeclare(_config.RawPriceDataQueue, durable: true, exclusive: false, autoDelete: false);
+        _channel.QueueBind(_config.RawPriceDataQueue, _config.PriceDataExchange, _config.RawPriceDataRoutingKey);
 
-        await _channel.QueueDeclareAsync(_config.PricePointRecordedQueue, durable: true, exclusive: false, autoDelete: false);
-        await _channel.QueueBindAsync(_config.PricePointRecordedQueue, _config.PriceDataExchange, _config.PricePointRecordedRoutingKey);
+        _channel.QueueDeclare(_config.PricePointRecordedQueue, durable: true, exclusive: false, autoDelete: false);
+        _channel.QueueBind(_config.PricePointRecordedQueue, _config.PriceDataExchange, _config.PricePointRecordedRoutingKey);
 
         // Alert queues
-        await _channel.QueueDeclareAsync(_config.AlertTriggeredQueue, durable: true, exclusive: false, autoDelete: false);
-        await _channel.QueueBindAsync(_config.AlertTriggeredQueue, _config.AlertsExchange, _config.AlertTriggeredRoutingKey);
+        _channel.QueueDeclare(_config.AlertTriggeredQueue, durable: true, exclusive: false, autoDelete: false);
+        _channel.QueueBind(_config.AlertTriggeredQueue, _config.AlertsExchange, _config.AlertTriggeredRoutingKey);
     }
 
     public void Dispose()
