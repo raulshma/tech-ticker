@@ -40,38 +40,33 @@ import { MappingListComponent } from './components/mapping-list/mapping-list.com
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'site-configs',
-    pathMatch: 'full'
+    component: MappingListComponent,
+    canActivate: [AdminGuard],
+    data: { title: 'Product Mappings' }
   },
   {
-    path: 'site-configs',
+    path: 'sites',
     component: SiteConfigListComponent,
     canActivate: [AdminGuard],
     data: { title: 'Site Configurations' }
   },
   {
-    path: 'site-configs/create',
+    path: 'sites/create',
     component: SiteConfigFormComponent,
     canActivate: [AdminGuard],
     data: { title: 'Create Site Configuration' }
   },
   {
-    path: 'site-configs/:id',
+    path: 'sites/:id',
     component: SiteConfigFormComponent,
     canActivate: [AdminGuard],
     data: { title: 'View Site Configuration' }
   },
   {
-    path: 'site-configs/:id/edit',
+    path: 'sites/:id/edit',
     component: SiteConfigFormComponent,
     canActivate: [AdminGuard],
     data: { title: 'Edit Site Configuration' }
-  },
-  {
-    path: 'product-seller',
-    component: MappingListComponent,
-    canActivate: [AdminGuard],
-    data: { title: 'Product-Seller Mappings' }
   }
 ];
 

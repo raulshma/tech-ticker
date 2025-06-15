@@ -49,6 +49,12 @@ const routes: Routes = [
     data: { title: 'Create User' }
   },
   {
+    path: 'roles',
+    component: UserRolesComponent,
+    canActivate: [AdminGuard],
+    data: { title: 'User Roles Management' }
+  },
+  {
     path: ':id',
     component: UserDetailsComponent,
     canActivate: [AdminGuard],

@@ -37,8 +37,8 @@ import { CategoryFormComponent } from './components/category-form/category-form.
 const routes: Routes = [
   {
     path: '',
-    redirectTo: '/products/list',
-    pathMatch: 'full'
+    component: ProductListComponent,
+    canActivate: [AdminGuard]
   },
   {
     path: 'list',
@@ -88,14 +88,15 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    CategoryFormComponent
+  ],
   imports: [
     ProductListComponent,
     ProductDetailsComponent,
-    ProductFormComponent,
     CategoryListComponent,
     CategoryDetailsComponent,
-    CategoryFormComponent,
+    ProductFormComponent,
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
