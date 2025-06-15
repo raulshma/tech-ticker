@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TechTicker.ApiService.Services;
+using TechTicker.Application.Configuration;
 using TechTicker.Application.Services;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess;
@@ -58,6 +59,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Configure messaging
+builder.Services.Configure<MessagingConfiguration>(
+    builder.Configuration.GetSection(MessagingConfiguration.SectionName));
+
 // Add repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IMappingService, MappingService>();
@@ -69,8 +74,10 @@ builder.Services.AddScoped<IPriceHistoryService, PriceHistoryService>();
 builder.Services.AddScoped<IAlertRuleService, AlertRuleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-// Add TechTicker shared services
-builder.Services.AddTechTickerShared();
+// Add messaging services
+builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
+
+
 
 // Add controllers
 builder.Services.AddControllers();
@@ -128,8 +135,9 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowAngularApp");
 
-// Use TechTicker shared middleware pipeline
-app.UseTechTickerPipeline(enableAuthentication: true);
+// Use authentication and authorization
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

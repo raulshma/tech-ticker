@@ -1,7 +1,10 @@
+using Microsoft.Extensions.Logging;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
+using TechTicker.Domain.Entities;
 using TechTicker.Shared.Common;
+using TechTicker.Shared.Utilities;
 
 namespace TechTicker.ApiService.Services;
 
@@ -32,7 +35,7 @@ public class ProductService : IProductService
             var category = await _unitOfWork.Categories.GetByIdAsync(createDto.CategoryId);
             if (category == null)
             {
-                return Result<ProductDto>.FailureResult("Category not found.", "CATEGORY_NOT_FOUND");
+                return Result<ProductDto>.Failure("Category not found.", "CATEGORY_NOT_FOUND");
             }
 
             // Check if SKU already exists (if provided)
@@ -41,7 +44,7 @@ public class ProductService : IProductService
                 var existingProduct = await _unitOfWork.Products.FirstOrDefaultAsync(p => p.SKU == createDto.SKU);
                 if (existingProduct != null)
                 {
-                    return Result<ProductDto>.FailureResult("A product with this SKU already exists.", "SKU_EXISTS");
+                    return Result<ProductDto>.Failure("A product with this SKU already exists.", "SKU_EXISTS");
                 }
             }
 
@@ -54,12 +57,12 @@ public class ProductService : IProductService
             var productDto = _mappingService.MapToDto(productWithCategory!);
 
             _logger.LogInformation("Created product {ProductId} with name {Name}", product.ProductId, product.Name);
-            return Result<ProductDto>.SuccessResult(productDto);
+            return Result<ProductDto>.Success(productDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating product with name {Name}", createDto.Name);
-            return Result<ProductDto>.FailureResult("An error occurred while creating the product.", "INTERNAL_ERROR");
+            return Result<ProductDto>.Failure("An error occurred while creating the product.", "INTERNAL_ERROR");
         }
     }
 
@@ -77,7 +80,7 @@ public class ProductService : IProductService
                 var categoryExists = await _unitOfWork.Categories.ExistsAsync(c => c.CategoryId == categoryId.Value);
                 if (!categoryExists)
                 {
-                    return Result<PagedResponse<ProductDto>>.FailureResult("Category not found.", "CATEGORY_NOT_FOUND");
+                    return Result<PagedResponse<ProductDto>>.Failure("Category not found.", "CATEGORY_NOT_FOUND");
                 }
             }
 
@@ -89,12 +92,12 @@ public class ProductService : IProductService
             var pagedResponse = PagedResponse<ProductDto>.SuccessResult(
                 productDtos, pageNumber, pageSize, totalCount);
 
-            return Result<PagedResponse<ProductDto>>.SuccessResult(pagedResponse);
+            return Result<PagedResponse<ProductDto>>.Success(pagedResponse);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving products with categoryId {CategoryId}, search {Search}", categoryId, search);
-            return Result<PagedResponse<ProductDto>>.FailureResult("An error occurred while retrieving products.", "INTERNAL_ERROR");
+            return Result<PagedResponse<ProductDto>>.Failure("An error occurred while retrieving products.", "INTERNAL_ERROR");
         }
     }
 
@@ -105,16 +108,16 @@ public class ProductService : IProductService
             var product = await _unitOfWork.Products.GetByIdWithCategoryAsync(productId);
             if (product == null)
             {
-                return Result<ProductDto>.FailureResult("Product not found.", "RESOURCE_NOT_FOUND");
+                return Result<ProductDto>.Failure("Product not found.", "RESOURCE_NOT_FOUND");
             }
 
             var productDto = _mappingService.MapToDto(product);
-            return Result<ProductDto>.SuccessResult(productDto);
+            return Result<ProductDto>.Success(productDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving product {ProductId}", productId);
-            return Result<ProductDto>.FailureResult("An error occurred while retrieving the product.", "INTERNAL_ERROR");
+            return Result<ProductDto>.Failure("An error occurred while retrieving the product.", "INTERNAL_ERROR");
         }
     }
 
@@ -125,7 +128,7 @@ public class ProductService : IProductService
             var product = await _unitOfWork.Products.GetByIdAsync(productId);
             if (product == null)
             {
-                return Result<ProductDto>.FailureResult("Product not found.", "RESOURCE_NOT_FOUND");
+                return Result<ProductDto>.Failure("Product not found.", "RESOURCE_NOT_FOUND");
             }
 
             // Validate category exists if being updated
@@ -134,7 +137,7 @@ public class ProductService : IProductService
                 var categoryExists = await _unitOfWork.Categories.ExistsAsync(c => c.CategoryId == updateDto.CategoryId.Value);
                 if (!categoryExists)
                 {
-                    return Result<ProductDto>.FailureResult("Category not found.", "CATEGORY_NOT_FOUND");
+                    return Result<ProductDto>.Failure("Category not found.", "CATEGORY_NOT_FOUND");
                 }
             }
 
@@ -144,7 +147,7 @@ public class ProductService : IProductService
                 var existingProduct = await _unitOfWork.Products.FirstOrDefaultAsync(p => p.SKU == updateDto.SKU);
                 if (existingProduct != null)
                 {
-                    return Result<ProductDto>.FailureResult("A product with this SKU already exists.", "SKU_EXISTS");
+                    return Result<ProductDto>.Failure("A product with this SKU already exists.", "SKU_EXISTS");
                 }
             }
 
@@ -157,12 +160,12 @@ public class ProductService : IProductService
             var productDto = _mappingService.MapToDto(productWithCategory!);
 
             _logger.LogInformation("Updated product {ProductId}", productId);
-            return Result<ProductDto>.SuccessResult(productDto);
+            return Result<ProductDto>.Success(productDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating product {ProductId}", productId);
-            return Result<ProductDto>.FailureResult("An error occurred while updating the product.", "INTERNAL_ERROR");
+            return Result<ProductDto>.Failure("An error occurred while updating the product.", "INTERNAL_ERROR");
         }
     }
 
@@ -173,7 +176,7 @@ public class ProductService : IProductService
             var product = await _unitOfWork.Products.GetByIdAsync(productId);
             if (product == null)
             {
-                return Result.FailureResult("Product not found.", "RESOURCE_NOT_FOUND");
+                return Result.Failure("Product not found.", "RESOURCE_NOT_FOUND");
             }
 
             // Soft delete by setting IsActive to false
@@ -182,12 +185,12 @@ public class ProductService : IProductService
             await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("Soft deleted product {ProductId}", productId);
-            return Result.SuccessResult();
+            return Result.Success();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting product {ProductId}", productId);
-            return Result.FailureResult("An error occurred while deleting the product.", "INTERNAL_ERROR");
+            return Result.Failure("An error occurred while deleting the product.", "INTERNAL_ERROR");
         }
     }
 }

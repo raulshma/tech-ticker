@@ -1,7 +1,10 @@
+using Microsoft.Extensions.Logging;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
+using TechTicker.Domain.Entities;
 using TechTicker.Shared.Common;
+using TechTicker.Shared.Utilities;
 
 namespace TechTicker.ApiService.Services;
 
@@ -32,7 +35,7 @@ public class ProductSellerMappingService : IProductSellerMappingService
             var productExists = await _unitOfWork.Products.ExistsAsync(p => p.ProductId == createDto.CanonicalProductId);
             if (!productExists)
             {
-                return Result<ProductSellerMappingDto>.FailureResult("Product not found.", "PRODUCT_NOT_FOUND");
+                return Result<ProductSellerMappingDto>.Failure("Product not found.", "PRODUCT_NOT_FOUND");
             }
 
             // Validate site configuration exists if provided
@@ -41,7 +44,7 @@ public class ProductSellerMappingService : IProductSellerMappingService
                 var configExists = await _unitOfWork.ScraperSiteConfigurations.ExistsAsync(s => s.SiteConfigId == createDto.SiteConfigId.Value);
                 if (!configExists)
                 {
-                    return Result<ProductSellerMappingDto>.FailureResult("Site configuration not found.", "SITE_CONFIG_NOT_FOUND");
+                    return Result<ProductSellerMappingDto>.Failure("Site configuration not found.", "SITE_CONFIG_NOT_FOUND");
                 }
             }
 
@@ -53,7 +56,7 @@ public class ProductSellerMappingService : IProductSellerMappingService
 
             if (existingMapping != null)
             {
-                return Result<ProductSellerMappingDto>.FailureResult("A mapping with this product, seller, and URL already exists.", "MAPPING_EXISTS");
+                return Result<ProductSellerMappingDto>.Failure("A mapping with this product, seller, and URL already exists.", "MAPPING_EXISTS");
             }
 
             var mapping = _mappingService.MapToEntity(createDto);
@@ -65,12 +68,12 @@ public class ProductSellerMappingService : IProductSellerMappingService
             var mappingDto = _mappingService.MapToDto(mappingWithRelated!);
 
             _logger.LogInformation("Created product seller mapping {MappingId} for product {ProductId}", mapping.MappingId, createDto.CanonicalProductId);
-            return Result<ProductSellerMappingDto>.SuccessResult(mappingDto);
+            return Result<ProductSellerMappingDto>.Success(mappingDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating product seller mapping for product {ProductId}", createDto.CanonicalProductId);
-            return Result<ProductSellerMappingDto>.FailureResult("An error occurred while creating the mapping.", "INTERNAL_ERROR");
+            return Result<ProductSellerMappingDto>.Failure("An error occurred while creating the mapping.", "INTERNAL_ERROR");
         }
     }
 
@@ -81,12 +84,12 @@ public class ProductSellerMappingService : IProductSellerMappingService
             var mappings = await _unitOfWork.ProductSellerMappings.GetByProductIdAsync(productId);
             var mappingDtos = mappings.Select(_mappingService.MapToDto);
 
-            return Result<IEnumerable<ProductSellerMappingDto>>.SuccessResult(mappingDtos);
+            return Result<IEnumerable<ProductSellerMappingDto>>.Success(mappingDtos);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving mappings for product {ProductId}", productId);
-            return Result<IEnumerable<ProductSellerMappingDto>>.FailureResult("An error occurred while retrieving mappings.", "INTERNAL_ERROR");
+            return Result<IEnumerable<ProductSellerMappingDto>>.Failure("An error occurred while retrieving mappings.", "INTERNAL_ERROR");
         }
     }
 
@@ -97,12 +100,12 @@ public class ProductSellerMappingService : IProductSellerMappingService
             var mappings = await _unitOfWork.ProductSellerMappings.GetActiveMappingsAsync();
             var mappingDtos = mappings.Select(_mappingService.MapToDto);
 
-            return Result<IEnumerable<ProductSellerMappingDto>>.SuccessResult(mappingDtos);
+            return Result<IEnumerable<ProductSellerMappingDto>>.Success(mappingDtos);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving active mappings");
-            return Result<IEnumerable<ProductSellerMappingDto>>.FailureResult("An error occurred while retrieving active mappings.", "INTERNAL_ERROR");
+            return Result<IEnumerable<ProductSellerMappingDto>>.Failure("An error occurred while retrieving active mappings.", "INTERNAL_ERROR");
         }
     }
 
@@ -113,7 +116,7 @@ public class ProductSellerMappingService : IProductSellerMappingService
             var mapping = await _unitOfWork.ProductSellerMappings.GetByIdAsync(mappingId);
             if (mapping == null)
             {
-                return Result<ProductSellerMappingDto>.FailureResult("Mapping not found.", "RESOURCE_NOT_FOUND");
+                return Result<ProductSellerMappingDto>.Failure("Mapping not found.", "RESOURCE_NOT_FOUND");
             }
 
             // Validate site configuration exists if being updated
@@ -122,7 +125,7 @@ public class ProductSellerMappingService : IProductSellerMappingService
                 var configExists = await _unitOfWork.ScraperSiteConfigurations.ExistsAsync(s => s.SiteConfigId == updateDto.SiteConfigId.Value);
                 if (!configExists)
                 {
-                    return Result<ProductSellerMappingDto>.FailureResult("Site configuration not found.", "SITE_CONFIG_NOT_FOUND");
+                    return Result<ProductSellerMappingDto>.Failure("Site configuration not found.", "SITE_CONFIG_NOT_FOUND");
                 }
             }
 
@@ -135,12 +138,12 @@ public class ProductSellerMappingService : IProductSellerMappingService
             var mappingDto = _mappingService.MapToDto(mappingWithRelated!);
 
             _logger.LogInformation("Updated product seller mapping {MappingId}", mappingId);
-            return Result<ProductSellerMappingDto>.SuccessResult(mappingDto);
+            return Result<ProductSellerMappingDto>.Success(mappingDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating product seller mapping {MappingId}", mappingId);
-            return Result<ProductSellerMappingDto>.FailureResult("An error occurred while updating the mapping.", "INTERNAL_ERROR");
+            return Result<ProductSellerMappingDto>.Failure("An error occurred while updating the mapping.", "INTERNAL_ERROR");
         }
     }
 
@@ -151,19 +154,19 @@ public class ProductSellerMappingService : IProductSellerMappingService
             var mapping = await _unitOfWork.ProductSellerMappings.GetByIdAsync(mappingId);
             if (mapping == null)
             {
-                return Result.FailureResult("Mapping not found.", "RESOURCE_NOT_FOUND");
+                return Result.Failure("Mapping not found.", "RESOURCE_NOT_FOUND");
             }
 
             _unitOfWork.ProductSellerMappings.Remove(mapping);
             await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("Deleted product seller mapping {MappingId}", mappingId);
-            return Result.SuccessResult();
+            return Result.Success();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting product seller mapping {MappingId}", mappingId);
-            return Result.FailureResult("An error occurred while deleting the mapping.", "INTERNAL_ERROR");
+            return Result.Failure("An error occurred while deleting the mapping.", "INTERNAL_ERROR");
         }
     }
 }

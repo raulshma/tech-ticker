@@ -2,6 +2,7 @@ using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
 using TechTicker.Shared.Common;
+using TechTicker.Shared.Utilities;
 
 namespace TechTicker.ApiService.Services;
 
@@ -35,7 +36,7 @@ public class CategoryService : ICategoryService
 
             if (await _unitOfWork.Categories.SlugExistsAsync(slug))
             {
-                return Result<CategoryDto>.FailureResult("A category with this slug already exists.", "SLUG_EXISTS");
+                return Result<CategoryDto>.Failure("A category with this slug already exists.", "SLUG_EXISTS");
             }
 
             var category = _mappingService.MapToEntity(createDto);
@@ -47,12 +48,12 @@ public class CategoryService : ICategoryService
             var categoryDto = _mappingService.MapToDto(category);
             _logger.LogInformation("Created category {CategoryId} with name {Name}", category.CategoryId, category.Name);
 
-            return Result<CategoryDto>.SuccessResult(categoryDto);
+            return Result<CategoryDto>.Success(categoryDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating category with name {Name}", createDto.Name);
-            return Result<CategoryDto>.FailureResult("An error occurred while creating the category.", "INTERNAL_ERROR");
+            return Result<CategoryDto>.Failure("An error occurred while creating the category.", "INTERNAL_ERROR");
         }
     }
 
@@ -63,12 +64,12 @@ public class CategoryService : ICategoryService
             var categories = await _unitOfWork.Categories.GetAllAsync();
             var categoryDtos = categories.Select(_mappingService.MapToDto);
 
-            return Result<IEnumerable<CategoryDto>>.SuccessResult(categoryDtos);
+            return Result<IEnumerable<CategoryDto>>.Success(categoryDtos);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving all categories");
-            return Result<IEnumerable<CategoryDto>>.FailureResult("An error occurred while retrieving categories.", "INTERNAL_ERROR");
+            return Result<IEnumerable<CategoryDto>>.Failure("An error occurred while retrieving categories.", "INTERNAL_ERROR");
         }
     }
 
@@ -79,16 +80,16 @@ public class CategoryService : ICategoryService
             var category = await _unitOfWork.Categories.GetByIdOrSlugAsync(idOrSlug);
             if (category == null)
             {
-                return Result<CategoryDto>.FailureResult("Category not found.", "RESOURCE_NOT_FOUND");
+                return Result<CategoryDto>.Failure("Category not found.", "RESOURCE_NOT_FOUND");
             }
 
             var categoryDto = _mappingService.MapToDto(category);
-            return Result<CategoryDto>.SuccessResult(categoryDto);
+            return Result<CategoryDto>.Success(categoryDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving category with ID or slug {IdOrSlug}", idOrSlug);
-            return Result<CategoryDto>.FailureResult("An error occurred while retrieving the category.", "INTERNAL_ERROR");
+            return Result<CategoryDto>.Failure("An error occurred while retrieving the category.", "INTERNAL_ERROR");
         }
     }
 
@@ -99,7 +100,7 @@ public class CategoryService : ICategoryService
             var category = await _unitOfWork.Categories.GetByIdAsync(categoryId);
             if (category == null)
             {
-                return Result<CategoryDto>.FailureResult("Category not found.", "RESOURCE_NOT_FOUND");
+                return Result<CategoryDto>.Failure("Category not found.", "RESOURCE_NOT_FOUND");
             }
 
             // Check if new slug conflicts with existing categories
@@ -107,7 +108,7 @@ public class CategoryService : ICategoryService
             {
                 if (await _unitOfWork.Categories.SlugExistsAsync(updateDto.Slug, categoryId))
                 {
-                    return Result<CategoryDto>.FailureResult("A category with this slug already exists.", "SLUG_EXISTS");
+                    return Result<CategoryDto>.Failure("A category with this slug already exists.", "SLUG_EXISTS");
                 }
             }
 
@@ -118,12 +119,12 @@ public class CategoryService : ICategoryService
             var categoryDto = _mappingService.MapToDto(category);
             _logger.LogInformation("Updated category {CategoryId}", categoryId);
 
-            return Result<CategoryDto>.SuccessResult(categoryDto);
+            return Result<CategoryDto>.Success(categoryDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating category {CategoryId}", categoryId);
-            return Result<CategoryDto>.FailureResult("An error occurred while updating the category.", "INTERNAL_ERROR");
+            return Result<CategoryDto>.Failure("An error occurred while updating the category.", "INTERNAL_ERROR");
         }
     }
 
@@ -134,26 +135,26 @@ public class CategoryService : ICategoryService
             var category = await _unitOfWork.Categories.GetByIdAsync(categoryId);
             if (category == null)
             {
-                return Result.FailureResult("Category not found.", "RESOURCE_NOT_FOUND");
+                return Result.Failure("Category not found.", "RESOURCE_NOT_FOUND");
             }
 
             // Check if category has products
             var products = await _unitOfWork.Products.GetByCategoryIdAsync(categoryId);
             if (products.Any())
             {
-                return Result.FailureResult("Cannot delete category that contains products.", "CATEGORY_HAS_PRODUCTS");
+                return Result.Failure("Cannot delete category that contains products.", "CATEGORY_HAS_PRODUCTS");
             }
 
             _unitOfWork.Categories.Remove(category);
             await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("Deleted category {CategoryId}", categoryId);
-            return Result.SuccessResult();
+            return Result.Success();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting category {CategoryId}", categoryId);
-            return Result.FailureResult("An error occurred while deleting the category.", "INTERNAL_ERROR");
+            return Result.Failure("An error occurred while deleting the category.", "INTERNAL_ERROR");
         }
     }
 }

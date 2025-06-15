@@ -1,5 +1,6 @@
 using TechTicker.Application.DTOs;
 using TechTicker.Shared.Common;
+using TechTicker.Shared.Utilities;
 
 namespace TechTicker.Application.Services.Interfaces;
 

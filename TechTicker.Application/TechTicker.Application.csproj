@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TechTicker.Domain\TechTicker.Domain.csproj" />
+    <ProjectReference Include="..\TechTicker.Shared\TechTicker.Shared.csproj" />
+    <ProjectReference Include="..\TechTicker.DataAccess\TechTicker.DataAccess.csproj" />
   </ItemGroup>
 
   <ItemGroup>

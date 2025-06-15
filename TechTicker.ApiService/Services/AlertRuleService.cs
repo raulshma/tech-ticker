@@ -1,7 +1,10 @@
+using Microsoft.Extensions.Logging;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
+using TechTicker.Domain.Entities;
 using TechTicker.Shared.Common;
+using TechTicker.Shared.Utilities;
 
 namespace TechTicker.ApiService.Services;
 
@@ -32,14 +35,14 @@ public class AlertRuleService : IAlertRuleService
             var productExists = await _unitOfWork.Products.ExistsAsync(p => p.ProductId == createDto.CanonicalProductId);
             if (!productExists)
             {
-                return Result<AlertRuleDto>.FailureResult("Product not found.", "PRODUCT_NOT_FOUND");
+                return Result<AlertRuleDto>.Failure("Product not found.", "PRODUCT_NOT_FOUND");
             }
 
             // Validate condition type and required fields
             var validationResult = ValidateAlertRule(createDto);
             if (!validationResult.IsSuccess)
             {
-                return Result<AlertRuleDto>.FailureResult(validationResult.ErrorMessage!, validationResult.ErrorCode!);
+                return Result<AlertRuleDto>.Failure(validationResult.ErrorMessage!, validationResult.ErrorCode!);
             }
 
             var alertRule = _mappingService.MapToEntity(createDto, userId);
@@ -49,12 +52,12 @@ public class AlertRuleService : IAlertRuleService
             var alertRuleDto = _mappingService.MapToDto(alertRule);
             _logger.LogInformation("Created alert rule {AlertRuleId} for user {UserId}", alertRule.AlertRuleId, userId);
 
-            return Result<AlertRuleDto>.SuccessResult(alertRuleDto);
+            return Result<AlertRuleDto>.Success(alertRuleDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating alert rule for user {UserId}", userId);
-            return Result<AlertRuleDto>.FailureResult("An error occurred while creating the alert rule.", "INTERNAL_ERROR");
+            return Result<AlertRuleDto>.Failure("An error occurred while creating the alert rule.", "INTERNAL_ERROR");
         }
     }
 
@@ -65,12 +68,12 @@ public class AlertRuleService : IAlertRuleService
             var alertRules = await _unitOfWork.AlertRules.GetByUserIdAsync(userId);
             var alertRuleDtos = alertRules.Select(_mappingService.MapToDto);
 
-            return Result<IEnumerable<AlertRuleDto>>.SuccessResult(alertRuleDtos);
+            return Result<IEnumerable<AlertRuleDto>>.Success(alertRuleDtos);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving alert rules for user {UserId}", userId);
-            return Result<IEnumerable<AlertRuleDto>>.FailureResult("An error occurred while retrieving alert rules.", "INTERNAL_ERROR");
+            return Result<IEnumerable<AlertRuleDto>>.Failure("An error occurred while retrieving alert rules.", "INTERNAL_ERROR");
         }
     }
 
@@ -78,16 +81,16 @@ public class AlertRuleService : IAlertRuleService
     {
         try
         {
-            var alertRules = await _unitOfWork.AlertRules.FindAsync(ar => 
+            var alertRules = await _unitOfWork.AlertRules.FindAsync(ar =>
                 ar.UserId == userId && ar.CanonicalProductId == productId);
             var alertRuleDtos = alertRules.Select(_mappingService.MapToDto);
 
-            return Result<IEnumerable<AlertRuleDto>>.SuccessResult(alertRuleDtos);
+            return Result<IEnumerable<AlertRuleDto>>.Success(alertRuleDtos);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving alert rules for user {UserId} and product {ProductId}", userId, productId);
-            return Result<IEnumerable<AlertRuleDto>>.FailureResult("An error occurred while retrieving alert rules.", "INTERNAL_ERROR");
+            return Result<IEnumerable<AlertRuleDto>>.Failure("An error occurred while retrieving alert rules.", "INTERNAL_ERROR");
         }
     }
 
@@ -100,7 +103,7 @@ public class AlertRuleService : IAlertRuleService
             
             if (alertRule == null)
             {
-                return Result<AlertRuleDto>.FailureResult("Alert rule not found.", "RESOURCE_NOT_FOUND");
+                return Result<AlertRuleDto>.Failure("Alert rule not found.", "RESOURCE_NOT_FOUND");
             }
 
             _mappingService.MapToEntity(updateDto, alertRule);
@@ -110,12 +113,12 @@ public class AlertRuleService : IAlertRuleService
             var alertRuleDto = _mappingService.MapToDto(alertRule);
             _logger.LogInformation("Updated alert rule {AlertRuleId} for user {UserId}", alertRuleId, userId);
 
-            return Result<AlertRuleDto>.SuccessResult(alertRuleDto);
+            return Result<AlertRuleDto>.Success(alertRuleDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating alert rule {AlertRuleId} for user {UserId}", alertRuleId, userId);
-            return Result<AlertRuleDto>.FailureResult("An error occurred while updating the alert rule.", "INTERNAL_ERROR");
+            return Result<AlertRuleDto>.Failure("An error occurred while updating the alert rule.", "INTERNAL_ERROR");
         }
     }
 
@@ -128,19 +131,19 @@ public class AlertRuleService : IAlertRuleService
             
             if (alertRule == null)
             {
-                return Result.FailureResult("Alert rule not found.", "RESOURCE_NOT_FOUND");
+                return Result.Failure("Alert rule not found.", "RESOURCE_NOT_FOUND");
             }
 
             _unitOfWork.AlertRules.Remove(alertRule);
             await _unitOfWork.SaveChangesAsync();
 
             _logger.LogInformation("Deleted alert rule {AlertRuleId} for user {UserId}", alertRuleId, userId);
-            return Result.SuccessResult();
+            return Result.Success();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting alert rule {AlertRuleId} for user {UserId}", alertRuleId, userId);
-            return Result.FailureResult("An error occurred while deleting the alert rule.", "INTERNAL_ERROR");
+            return Result.Failure("An error occurred while deleting the alert rule.", "INTERNAL_ERROR");
         }
     }
 
@@ -160,12 +163,12 @@ public class AlertRuleService : IAlertRuleService
             var pagedResponse = PagedResponse<AlertRuleDto>.SuccessResult(
                 alertRuleDtos, pageNumber, pageSize, totalCount);
 
-            return Result<PagedResponse<AlertRuleDto>>.SuccessResult(pagedResponse);
+            return Result<PagedResponse<AlertRuleDto>>.Success(pagedResponse);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving all alert rules");
-            return Result<PagedResponse<AlertRuleDto>>.FailureResult("An error occurred while retrieving alert rules.", "INTERNAL_ERROR");
+            return Result<PagedResponse<AlertRuleDto>>.Failure("An error occurred while retrieving alert rules.", "INTERNAL_ERROR");
         }
     }
 
@@ -173,12 +176,12 @@ public class AlertRuleService : IAlertRuleService
     {
         return createDto.ConditionType switch
         {
-            "PRICE_BELOW" when !createDto.ThresholdValue.HasValue => 
-                Result.FailureResult("ThresholdValue is required for PRICE_BELOW condition.", "VALIDATION_ERROR"),
-            "PERCENT_DROP_FROM_LAST" when !createDto.PercentageValue.HasValue => 
-                Result.FailureResult("PercentageValue is required for PERCENT_DROP_FROM_LAST condition.", "VALIDATION_ERROR"),
-            "PRICE_BELOW" or "PERCENT_DROP_FROM_LAST" or "BACK_IN_STOCK" => Result.SuccessResult(),
-            _ => Result.FailureResult("Invalid condition type.", "VALIDATION_ERROR")
+            "PRICE_BELOW" when !createDto.ThresholdValue.HasValue =>
+                Result.Failure("ThresholdValue is required for PRICE_BELOW condition.", "VALIDATION_ERROR"),
+            "PERCENT_DROP_FROM_LAST" when !createDto.PercentageValue.HasValue =>
+                Result.Failure("PercentageValue is required for PERCENT_DROP_FROM_LAST condition.", "VALIDATION_ERROR"),
+            "PRICE_BELOW" or "PERCENT_DROP_FROM_LAST" or "BACK_IN_STOCK" => Result.Success(),
+            _ => Result.Failure("Invalid condition type.", "VALIDATION_ERROR")
         };
     }
 }

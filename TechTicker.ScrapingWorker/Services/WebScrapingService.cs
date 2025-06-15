@@ -65,10 +65,21 @@ public class WebScrapingService
             }
 
             // Extract product data
-            var productName = ExtractProductName(document, command.Selectors.ProductNameSelector);
-            var price = ExtractPrice(document, command.Selectors.PriceSelector);
-            var stockStatus = ExtractStockStatus(document, command.Selectors.StockSelector);
-            var sellerNameOnPage = ExtractSellerName(document, command.Selectors.SellerNameOnPageSelector);
+            var htmlDocument = document as IHtmlDocument;
+            if (htmlDocument == null)
+            {
+                return new ScrapingResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "Failed to cast document to HTML document",
+                    ErrorCode = "DOCUMENT_CAST_FAILED"
+                };
+            }
+
+            var productName = ExtractProductName(htmlDocument, command.Selectors.ProductNameSelector);
+            var price = ExtractPrice(htmlDocument, command.Selectors.PriceSelector);
+            var stockStatus = ExtractStockStatus(htmlDocument, command.Selectors.StockSelector);
+            var sellerNameOnPage = ExtractSellerName(htmlDocument, command.Selectors.SellerNameOnPageSelector);
 
             if (price == null)
             {

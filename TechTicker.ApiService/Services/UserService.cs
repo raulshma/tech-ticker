@@ -1,12 +1,16 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
+using TechTicker.DataAccess.Repositories.Interfaces;
 using TechTicker.Domain.Entities;
 using TechTicker.Shared.Common;
+using TechTicker.Shared.Utilities;
 
 namespace TechTicker.ApiService.Services;
 
@@ -48,7 +52,7 @@ public class UserService : IUserService
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return Result<UserDto>.FailureResult($"Registration failed: {errors}", "REGISTRATION_FAILED");
+                return Result<UserDto>.Failure($"Registration failed: {errors}", "REGISTRATION_FAILED");
             }
 
             // Add default User role
@@ -58,12 +62,12 @@ public class UserService : IUserService
             var userDto = _mappingService.MapToDto(user, roles);
 
             _logger.LogInformation("User {UserId} registered successfully", user.Id);
-            return Result<UserDto>.SuccessResult(userDto);
+            return Result<UserDto>.Success(userDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error registering user with email {Email}", registerDto.Email);
-            return Result<UserDto>.FailureResult("An error occurred during registration.", "INTERNAL_ERROR");
+            return Result<UserDto>.Failure("An error occurred during registration.", "INTERNAL_ERROR");
         }
     }
 
@@ -74,13 +78,13 @@ public class UserService : IUserService
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user == null || !user.IsActive)
             {
-                return Result<LoginResponseDto>.FailureResult("Invalid email or password.", "INVALID_CREDENTIALS");
+                return Result<LoginResponseDto>.Failure("Invalid email or password.", "INVALID_CREDENTIALS");
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
             if (!result.Succeeded)
             {
-                return Result<LoginResponseDto>.FailureResult("Invalid email or password.", "INVALID_CREDENTIALS");
+                return Result<LoginResponseDto>.Failure("Invalid email or password.", "INVALID_CREDENTIALS");
             }
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -97,12 +101,12 @@ public class UserService : IUserService
             };
 
             _logger.LogInformation("User {UserId} logged in successfully", user.Id);
-            return Result<LoginResponseDto>.SuccessResult(loginResponse);
+            return Result<LoginResponseDto>.Success(loginResponse);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during login for email {Email}", loginDto.Email);
-            return Result<LoginResponseDto>.FailureResult("An error occurred during login.", "INTERNAL_ERROR");
+            return Result<LoginResponseDto>.Failure("An error occurred during login.", "INTERNAL_ERROR");
         }
     }
 
@@ -113,18 +117,18 @@ public class UserService : IUserService
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
-                return Result<UserDto>.FailureResult("User not found.", "RESOURCE_NOT_FOUND");
+                return Result<UserDto>.Failure("User not found.", "RESOURCE_NOT_FOUND");
             }
 
             var roles = await _userManager.GetRolesAsync(user);
             var userDto = _mappingService.MapToDto(user, roles);
 
-            return Result<UserDto>.SuccessResult(userDto);
+            return Result<UserDto>.Success(userDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving current user {UserId}", userId);
-            return Result<UserDto>.FailureResult("An error occurred while retrieving user information.", "INTERNAL_ERROR");
+            return Result<UserDto>.Failure("An error occurred while retrieving user information.", "INTERNAL_ERROR");
         }
     }
 
@@ -149,12 +153,12 @@ public class UserService : IUserService
             var pagedResponse = PagedResponse<UserDto>.SuccessResult(
                 userDtos, pageNumber, pageSize, totalCount);
 
-            return Result<PagedResponse<UserDto>>.SuccessResult(pagedResponse);
+            return Result<PagedResponse<UserDto>>.Success(pagedResponse);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving all users");
-            return Result<PagedResponse<UserDto>>.FailureResult("An error occurred while retrieving users.", "INTERNAL_ERROR");
+            return Result<PagedResponse<UserDto>>.Failure("An error occurred while retrieving users.", "INTERNAL_ERROR");
         }
     }
 
@@ -165,18 +169,18 @@ public class UserService : IUserService
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
-                return Result<UserDto>.FailureResult("User not found.", "RESOURCE_NOT_FOUND");
+                return Result<UserDto>.Failure("User not found.", "RESOURCE_NOT_FOUND");
             }
 
             var roles = await _userManager.GetRolesAsync(user);
             var userDto = _mappingService.MapToDto(user, roles);
 
-            return Result<UserDto>.SuccessResult(userDto);
+            return Result<UserDto>.Success(userDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving user {UserId}", userId);
-            return Result<UserDto>.FailureResult("An error occurred while retrieving the user.", "INTERNAL_ERROR");
+            return Result<UserDto>.Failure("An error occurred while retrieving the user.", "INTERNAL_ERROR");
         }
     }
 
@@ -190,7 +194,7 @@ public class UserService : IUserService
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return Result<UserDto>.FailureResult($"User creation failed: {errors}", "USER_CREATION_FAILED");
+                return Result<UserDto>.Failure($"User creation failed: {errors}", "USER_CREATION_FAILED");
             }
 
             // Add specified roles
@@ -206,12 +210,12 @@ public class UserService : IUserService
             var userDto = _mappingService.MapToDto(user, roles);
 
             _logger.LogInformation("Admin created user {UserId}", user.Id);
-            return Result<UserDto>.SuccessResult(userDto);
+            return Result<UserDto>.Success(userDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating user with email {Email}", createDto.Email);
-            return Result<UserDto>.FailureResult("An error occurred while creating the user.", "INTERNAL_ERROR");
+            return Result<UserDto>.Failure("An error occurred while creating the user.", "INTERNAL_ERROR");
         }
     }
 
@@ -222,7 +226,7 @@ public class UserService : IUserService
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
-                return Result<UserDto>.FailureResult("User not found.", "RESOURCE_NOT_FOUND");
+                return Result<UserDto>.Failure("User not found.", "RESOURCE_NOT_FOUND");
             }
 
             _mappingService.MapToEntity(updateDto, user);
@@ -231,7 +235,7 @@ public class UserService : IUserService
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return Result<UserDto>.FailureResult($"User update failed: {errors}", "USER_UPDATE_FAILED");
+                return Result<UserDto>.Failure($"User update failed: {errors}", "USER_UPDATE_FAILED");
             }
 
             // Update roles if specified
@@ -253,12 +257,12 @@ public class UserService : IUserService
             var userDto = _mappingService.MapToDto(user, roles);
 
             _logger.LogInformation("Updated user {UserId}", userId);
-            return Result<UserDto>.SuccessResult(userDto);
+            return Result<UserDto>.Success(userDto);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating user {UserId}", userId);
-            return Result<UserDto>.FailureResult("An error occurred while updating the user.", "INTERNAL_ERROR");
+            return Result<UserDto>.Failure("An error occurred while updating the user.", "INTERNAL_ERROR");
         }
     }
 
@@ -269,7 +273,7 @@ public class UserService : IUserService
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
-                return Result.FailureResult("User not found.", "RESOURCE_NOT_FOUND");
+                return Result.Failure("User not found.", "RESOURCE_NOT_FOUND");
             }
 
             // Soft delete by setting IsActive to false
@@ -277,12 +281,12 @@ public class UserService : IUserService
             await _userManager.UpdateAsync(user);
 
             _logger.LogInformation("Soft deleted user {UserId}", userId);
-            return Result.SuccessResult();
+            return Result.Success();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting user {UserId}", userId);
-            return Result.FailureResult("An error occurred while deleting the user.", "INTERNAL_ERROR");
+            return Result.Failure("An error occurred while deleting the user.", "INTERNAL_ERROR");
         }
     }
 

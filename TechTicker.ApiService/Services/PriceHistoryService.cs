@@ -1,7 +1,10 @@
+using Microsoft.Extensions.Logging;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
+using TechTicker.Domain.Entities;
 using TechTicker.Shared.Common;
+using TechTicker.Shared.Utilities;
 
 namespace TechTicker.ApiService.Services;
 
@@ -34,7 +37,7 @@ public class PriceHistoryService : IPriceHistoryService
             var productExists = await _unitOfWork.Products.ExistsAsync(p => p.ProductId == productId);
             if (!productExists)
             {
-                return Result<IEnumerable<PriceHistoryDto>>.FailureResult("Product not found.", "PRODUCT_NOT_FOUND");
+                return Result<IEnumerable<PriceHistoryDto>>.Failure("Product not found.", "PRODUCT_NOT_FOUND");
             }
 
             var priceHistory = await _unitOfWork.PriceHistory.GetPriceHistoryAsync(
@@ -46,12 +49,12 @@ public class PriceHistoryService : IPriceHistoryService
 
             var priceHistoryDtos = priceHistory.Select(_mappingService.MapToDto);
 
-            return Result<IEnumerable<PriceHistoryDto>>.SuccessResult(priceHistoryDtos);
+            return Result<IEnumerable<PriceHistoryDto>>.Success(priceHistoryDtos);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving price history for product {ProductId}", productId);
-            return Result<IEnumerable<PriceHistoryDto>>.FailureResult("An error occurred while retrieving price history.", "INTERNAL_ERROR");
+            return Result<IEnumerable<PriceHistoryDto>>.Failure("An error occurred while retrieving price history.", "INTERNAL_ERROR");
         }
     }
 }
