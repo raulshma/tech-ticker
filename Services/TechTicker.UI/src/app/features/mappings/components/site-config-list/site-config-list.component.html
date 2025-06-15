@@ -71,12 +71,12 @@
   >
     <thead>
       <tr>
-        <th nzColumnKey="domain" nzSortFn>Domain</th>
-        <th nzColumnKey="name" nzSortFn>Name</th>
+        <th nzColumnKey="domain" [nzSortFn]="true">Domain</th>
+        <th nzColumnKey="name" [nzSortFn]="true">Name</th>
         <th>Description</th>
-        <th nzColumnKey="isActive" nzSortFn>Status</th>
+        <th nzColumnKey="isActive" [nzSortFn]="true">Status</th>
         <th>Selectors</th>
-        <th nzColumnKey="createdAt" nzSortFn>Created</th>
+        <th nzColumnKey="createdAt" [nzSortFn]="true">Created</th>
         <th nzWidth="200px">Actions</th>
       </tr>
     </thead>

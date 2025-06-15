@@ -139,10 +139,15 @@ export class ProductDetailsComponent implements OnInit {
     }
   }
 
-  formatSpecifications(specs: string): any {
+  formatSpecifications(specs: string): Record<string, any> {
     if (this.isJsonString(specs)) {
-      return JSON.parse(specs);
+      const parsed = JSON.parse(specs);
+      return typeof parsed === 'object' && parsed !== null ? parsed : {};
     }
-    return specs;
+    return {};
+  }
+
+  getKeyAsString(key: unknown): string {
+    return String(key || '');
   }
 }

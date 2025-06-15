@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { finalize } from 'rxjs/operators';
-import { SiteConfiguration, SiteConfigurationService, CreateSiteConfigurationDto, UpdateSiteConfigurationDto } from '../../services/site-configuration.service';
+import { SiteConfigurationService, CreateSiteConfigurationDto, UpdateSiteConfigurationDto } from '../../services/site-configuration.service';
 
 @Component({
   selector: 'app-site-config-form',
@@ -186,7 +186,7 @@ export class SiteConfigFormComponent implements OnInit {
     });
   }
 
-  getFieldError(fieldName: string): string | null {
+  getFieldError(fieldName: string): string | undefined {
     const field = this.form.get(fieldName);
     if (field && field.invalid && field.touched) {
       if (field.errors?.['required']) {
@@ -202,7 +202,7 @@ export class SiteConfigFormComponent implements OnInit {
         return `${this.getFieldLabel(fieldName)} must not exceed ${field.errors['maxlength'].requiredLength} characters`;
       }
     }
-    return null;
+    return undefined;
   }
 
   private getFieldLabel(fieldName: string): string {
@@ -214,11 +214,15 @@ export class SiteConfigFormComponent implements OnInit {
     return labels[fieldName] || fieldName;
   }
 
-  getSelectorFieldError(selectorName: string): string | null {
+  getSelectorFieldError(selectorName: string): string | undefined {
     const field = this.form.get(`selectors.${selectorName}`);
     if (field && field.invalid && field.touched) {
       return `Invalid CSS selector`;
     }
-    return null;
+    return undefined;
+  }
+
+  getKeyAsString(key: unknown): string {
+    return String(key || '');
   }
 }

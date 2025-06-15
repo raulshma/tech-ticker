@@ -81,11 +81,11 @@
   >
     <thead>
       <tr>
-        <th nzColumnKey="canonicalProduct" nzSortFn>Product</th>
-        <th nzColumnKey="sellerName" nzSortFn>Seller</th>
+        <th nzColumnKey="canonicalProduct" [nzSortFn]="true">Product</th>
+        <th nzColumnKey="sellerName" [nzSortFn]="true">Seller</th>
         <th>Product URL</th>
-        <th nzColumnKey="siteConfig" nzSortFn>Site Config</th>
-        <th nzColumnKey="isActiveForScraping" nzSortFn>Scraping Status</th>
+        <th nzColumnKey="siteConfig" [nzSortFn]="true">Site Config</th>
+        <th nzColumnKey="isActiveForScraping" [nzSortFn]="true">Scraping Status</th>
         <th>Last Scraped</th>
         <th>Next Scrape</th>
         <th nzWidth="220px">Actions</th>
@@ -99,7 +99,7 @@
             <br>
             <small class="text-muted">{{ mapping.canonicalProduct?.sku }}</small>
             <nz-tag *ngIf="mapping.canonicalProduct?.category" nzColor="blue" nzSize="small">
-              {{ mapping.canonicalProduct.category.name }}
+              {{ mapping.canonicalProduct?.category?.name }}
             </nz-tag>
           </div>
         </td>

@@ -26,30 +26,26 @@
         <nz-statistic
           [nzValue]="priceStats.currentPrice"
           [nzTitle]="'Current Price'"
-          [nzFormatter]="formatCurrency">
+          [nzTitle]="'Current Price'">
         </nz-statistic>
       </div>
       <div nz-col [nzSpan]="6">
         <nz-statistic
-          [nzValue]="priceStats.lowestPrice"
-          [nzTitle]="'Lowest Price'"
-          [nzFormatter]="formatCurrency"
-          [nzValueStyle]="{ color: '#52c41a' }">
+          [nzValue]="priceStats.minPrice"
+          [nzTitle]="'Lowest Price'">
         </nz-statistic>
       </div>
       <div nz-col [nzSpan]="6">
         <nz-statistic
-          [nzValue]="priceStats.highestPrice"
-          [nzTitle]="'Highest Price'"
-          [nzFormatter]="formatCurrency"
-          [nzValueStyle]="{ color: '#f5222d' }">
+          [nzValue]="priceStats.maxPrice"
+          [nzTitle]="'Highest Price'">
         </nz-statistic>
       </div>
       <div nz-col [nzSpan]="6">
         <nz-statistic
           [nzValue]="priceStats.averagePrice"
           [nzTitle]="'Average Price'"
-          [nzFormatter]="formatCurrency">
+          [nzTitle]="'Average Price'">
         </nz-statistic>
       </div>
     </div>
@@ -165,7 +161,7 @@
       [nzPageSize]="pageSize"
       [nzPageIndex]="pageIndex"
       [nzShowSizeChanger]="true"
-      [nzPageSizeOptions]="['10', '20', '50', '100']"
+      [nzPageSizeOptions]="[10, 20, 50, 100]"
       (nzQueryParams)="onPageChange($event.pageIndex)"
       nzSize="small">
 
@@ -190,13 +186,7 @@
             <strong>{{ formatCurrency(entry.price) }}</strong>
           </td>
           <td>
-            <span
-              *ngIf="entry.priceChange !== undefined"
-              [ngClass]="getPriceChangeClass(entry.priceChange)">
-              <nz-icon [nzType]="getPriceChangeIcon(entry.priceChange)" nzTheme="outline"></nz-icon>
-              {{ entry.priceChange > 0 ? '+' : '' }}{{ formatCurrency(entry.priceChange) }}
-            </span>
-            <span *ngIf="entry.priceChange === undefined">-</span>
+            <span>-</span>
           </td>
           <td>{{ entry.currency }}</td>
           <td>

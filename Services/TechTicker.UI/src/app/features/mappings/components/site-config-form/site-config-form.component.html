@@ -181,7 +181,7 @@
             <nz-descriptions nzBordered [nzColumn]="1">
               <nz-descriptions-item
                 *ngFor="let item of testResults.results | keyvalue"
-                [nzTitle]="item.key | titlecase"
+                [nzTitle]="getKeyAsString(item.key) | titlecase"
               >
                 {{ item.value || 'Not found' }}
               </nz-descriptions-item>

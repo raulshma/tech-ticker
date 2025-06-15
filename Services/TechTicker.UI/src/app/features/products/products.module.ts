@@ -22,6 +22,9 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzStatisticModule } from 'ng-zorro-antd/statistic';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzGridModule } from 'ng-zorro-antd/grid';
 
 // Guards
 import { AdminGuard } from '../../core/guards/admin.guard';
@@ -122,7 +125,10 @@ const routes: Routes = [
     NzToolTipModule,
     NzDescriptionsModule,
     NzSwitchModule,
-    NzAlertModule
+    NzAlertModule,
+    NzStatisticModule,
+    NzDatePickerModule,
+    NzGridModule
   ]
 })
 export class ProductsModule { }
