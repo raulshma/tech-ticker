@@ -31,4 +31,10 @@ var notificationWorker = builder.AddProject<Projects.TechTicker_NotificationWork
     .WithEnvironment("Email__UseSsl", "true")
     .WithEnvironment("Email__EnableEmailSending", "false"); // Disabled by default for development
 
+builder.AddNpmApp("angular", "../TechTicker.Frontend")
+    .WithReference(apiService)
+    .WaitFor(apiService)
+    .WithHttpEndpoint(port: 4200, targetPort: 4200, name: "http", env: "PORT")
+    .WithExternalHttpEndpoints();
+
 builder.Build().Run();
