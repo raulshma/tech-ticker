@@ -1,0 +1,80 @@
+<div class="category-form-container">
+  <div class="header-section">
+    <h1>{{ isEditMode ? 'Edit Category' : 'Create Category' }}</h1>
+    <button mat-button (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Categories
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEditMode ? 'Edit Category Details' : 'New Category Details' }}</mat-card-title>
+      <mat-card-subtitle>{{ isEditMode ? 'Update the category information below' : 'Fill in the details to create a new category' }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="category-form">
+        <!-- Name Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Category Name</mat-label>
+          <input matInput 
+                 formControlName="name" 
+                 placeholder="Enter category name"
+                 maxlength="100">
+          <mat-hint>A descriptive name for the category</mat-hint>
+          <mat-error *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched">
+            {{ getFieldErrorMessage('name') }}
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Slug Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Slug</mat-label>
+          <input matInput 
+                 formControlName="slug" 
+                 placeholder="category-slug"
+                 maxlength="100">
+          <mat-hint>URL-friendly identifier (auto-generated from name if left empty)</mat-hint>
+          <mat-error *ngIf="categoryForm.get('slug')?.invalid && categoryForm.get('slug')?.touched">
+            {{ getFieldErrorMessage('slug') }}
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Description Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput 
+                    formControlName="description" 
+                    placeholder="Enter category description"
+                    rows="4"
+                    maxlength="500">
+          </textarea>
+          <mat-hint>Optional description of the category</mat-hint>
+          <mat-error *ngIf="categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched">
+            {{ getFieldErrorMessage('description') }}
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button mat-button 
+                  type="button" 
+                  (click)="onCancel()"
+                  [disabled]="isLoading">
+            Cancel
+          </button>
+          
+          <button mat-raised-button 
+                  color="primary" 
+                  type="submit"
+                  [disabled]="categoryForm.invalid || isLoading">
+            <mat-spinner *ngIf="isLoading" diameter="20" class="form-spinner"></mat-spinner>
+            <span *ngIf="!isLoading">{{ isEditMode ? 'Update Category' : 'Create Category' }}</span>
+            <span *ngIf="isLoading">{{ isEditMode ? 'Updating...' : 'Creating...' }}</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

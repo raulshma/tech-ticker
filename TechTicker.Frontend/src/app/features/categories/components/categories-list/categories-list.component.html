@@ -1,0 +1,108 @@
+<div class="categories-container">
+  <div class="header-section">
+    <h1>Categories</h1>
+    <button mat-raised-button color="primary" (click)="createCategory()">
+      <mat-icon>add</mat-icon>
+      Add Category
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Manage Categories</mat-card-title>
+      <mat-card-subtitle>Create and manage product categories</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Search filter -->
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search categories</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search by name, slug, or description">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <!-- Loading spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading categories...</p>
+      </div>
+
+      <!-- Categories table -->
+      <div *ngIf="!isLoading" class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="categories-table">
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell *matCellDef="let category">
+              <strong>{{category.name}}</strong>
+            </td>
+          </ng-container>
+
+          <!-- Slug Column -->
+          <ng-container matColumnDef="slug">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Slug</th>
+            <td mat-cell *matCellDef="let category">
+              <code class="slug-code">{{category.slug}}</code>
+            </td>
+          </ng-container>
+
+          <!-- Description Column -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <td mat-cell *matCellDef="let category">
+              <span class="description-text">{{category.description || 'No description'}}</span>
+            </td>
+          </ng-container>
+
+          <!-- Created At Column -->
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Created</th>
+            <td mat-cell *matCellDef="let category">
+              {{category.createdAt | date:'short'}}
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let category">
+              <button mat-icon-button 
+                      color="primary" 
+                      (click)="editCategory(category)"
+                      matTooltip="Edit category">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button 
+                      color="warn" 
+                      (click)="deleteCategory(category)"
+                      matTooltip="Delete category">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <!-- No data row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+              <div class="no-data">
+                <mat-icon>category</mat-icon>
+                <p>No categories found</p>
+                <button mat-raised-button color="primary" (click)="createCategory()">
+                  Create First Category
+                </button>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]" 
+                       showFirstLastButtons 
+                       aria-label="Select page of categories">
+        </mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

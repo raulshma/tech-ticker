@@ -14,11 +14,11 @@ const routes: Routes = [
     loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule),
     canActivate: [AuthGuard]
   },
-  // {
-  //   path: 'categories',
-  //   loadChildren: () => import('./features/categories/categories.module').then(m => m.CategoriesModule),
-  //   canActivate: [AuthGuard, AdminGuard]
-  // },
+  {
+    path: 'categories',
+    loadChildren: () => import('./features/categories/categories.module').then(m => m.CategoriesModule),
+    canActivate: [AuthGuard, AdminGuard]
+  },
   // {
   //   path: 'products',
   //   loadChildren: () => import('./features/products/products.module').then(m => m.ProductsModule),
