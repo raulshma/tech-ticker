@@ -11,26 +11,20 @@ public class Worker : BackgroundService
     private readonly ILogger<Worker> _logger;
     private readonly IMessageConsumer _messageConsumer;
     private readonly IMessagePublisher _messagePublisher;
-    private readonly WebScrapingService _webScrapingService;
-    private readonly PriceDataProcessingService _priceDataProcessingService;
-    private readonly IScrapingOrchestrationService _orchestrationService;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly MessagingConfiguration _messagingConfig;
 
     public Worker(
         ILogger<Worker> logger,
         IMessageConsumer messageConsumer,
         IMessagePublisher messagePublisher,
-        WebScrapingService webScrapingService,
-        PriceDataProcessingService priceDataProcessingService,
-        IScrapingOrchestrationService orchestrationService,
+        IServiceScopeFactory serviceScopeFactory,
         IOptions<MessagingConfiguration> messagingConfig)
     {
         _logger = logger;
         _messageConsumer = messageConsumer;
         _messagePublisher = messagePublisher;
-        _webScrapingService = webScrapingService;
-        _priceDataProcessingService = priceDataProcessingService;
-        _orchestrationService = orchestrationService;
+        _serviceScopeFactory = serviceScopeFactory;
         _messagingConfig = messagingConfig.Value;
     }
 
@@ -53,12 +47,13 @@ public class Worker : BackgroundService
             // Start periodic orchestration (every 5 minutes)
             var orchestrationTimer = new PeriodicTimer(TimeSpan.FromMinutes(5));
 
-            while (!stoppingToken.IsCancellationRequested)
-            {
+            while (!stoppingToken.IsCancellationRequested)            {
                 try
                 {
                     await orchestrationTimer.WaitForNextTickAsync(stoppingToken);
-                    await _orchestrationService.ScheduleScrapingJobsAsync();
+                    using var scope = _serviceScopeFactory.CreateScope();
+                    var orchestrationService = scope.ServiceProvider.GetRequiredService<IScrapingOrchestrationService>();
+                    await orchestrationService.ScheduleScrapingJobsAsync();
                 }
                 catch (OperationCanceledException)
                 {
@@ -80,16 +75,19 @@ public class Worker : BackgroundService
             await _messageConsumer.StopConsumingAsync();
             _logger.LogInformation("TechTicker Scraping Worker stopped");
         }
-    }
-
-    private async Task HandleScrapeCommandAsync(ScrapeProductPageCommand command)
+    }    private async Task HandleScrapeCommandAsync(ScrapeProductPageCommand command)
     {
         try
         {
             _logger.LogInformation("Processing scrape command for mapping {MappingId}", command.MappingId);
 
+            // Create scope for scoped services
+            using var scope = _serviceScopeFactory.CreateScope();
+            var webScrapingService = scope.ServiceProvider.GetRequiredService<WebScrapingService>();
+            var orchestrationService = scope.ServiceProvider.GetRequiredService<IScrapingOrchestrationService>();
+
             // Perform the scraping
-            var scrapingResult = await _webScrapingService.ScrapeProductPageAsync(command);
+            var scrapingResult = await webScrapingService.ScrapeProductPageAsync(command);
 
             // Publish scraping result
             var resultEvent = new ScrapingResultEvent
@@ -127,7 +125,7 @@ public class Worker : BackgroundService
             }
 
             // Update mapping status
-            await _orchestrationService.ProcessScrapingResultAsync(
+            await orchestrationService.ProcessScrapingResultAsync(
                 command.MappingId,
                 scrapingResult.IsSuccess,
                 scrapingResult.ErrorMessage);
@@ -154,7 +152,9 @@ public class Worker : BackgroundService
                 _messagingConfig.ScrapingExchange,
                 _messagingConfig.ScrapingResultRoutingKey);
 
-            await _orchestrationService.ProcessScrapingResultAsync(command.MappingId, false, ex.Message);
+            using var scope = _serviceScopeFactory.CreateScope();
+            var orchestrationService = scope.ServiceProvider.GetRequiredService<IScrapingOrchestrationService>();
+            await orchestrationService.ProcessScrapingResultAsync(command.MappingId, false, ex.Message);
         }
     }
 
@@ -162,7 +162,9 @@ public class Worker : BackgroundService
     {
         try
         {
-            await _priceDataProcessingService.ProcessRawPriceDataAsync(rawPriceData);
+            using var scope = _serviceScopeFactory.CreateScope();
+            var priceDataProcessingService = scope.ServiceProvider.GetRequiredService<PriceDataProcessingService>();
+            await priceDataProcessingService.ProcessRawPriceDataAsync(rawPriceData);
         }
         catch (Exception ex)
         {

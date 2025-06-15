@@ -10,21 +10,18 @@ public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
     private readonly IMessageConsumer _messageConsumer;
-    private readonly EmailService _emailService;
-    private readonly IAlertProcessingService _alertProcessingService;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly MessagingConfiguration _messagingConfig;
 
     public Worker(
         ILogger<Worker> logger,
         IMessageConsumer messageConsumer,
-        EmailService emailService,
-        IAlertProcessingService alertProcessingService,
+        IServiceScopeFactory serviceScopeFactory,
         IOptions<MessagingConfiguration> messagingConfig)
     {
         _logger = logger;
         _messageConsumer = messageConsumer;
-        _emailService = emailService;
-        _alertProcessingService = alertProcessingService;
+        _serviceScopeFactory = serviceScopeFactory;
         _messagingConfig = messagingConfig.Value;
     }
 
@@ -66,16 +63,16 @@ public class Worker : BackgroundService
             await _messageConsumer.StopConsumingAsync();
             _logger.LogInformation("TechTicker Notification Worker stopped");
         }
-    }
-
-    private async Task HandlePricePointRecordedAsync(PricePointRecordedEvent pricePoint)
+    }    private async Task HandlePricePointRecordedAsync(PricePointRecordedEvent pricePoint)
     {
         try
         {
             _logger.LogDebug("Processing price point for alert evaluation: Product {ProductId}, Price ${Price}",
                 pricePoint.CanonicalProductId, pricePoint.Price);
 
-            await _alertProcessingService.ProcessPricePointAsync(pricePoint);
+            using var scope = _serviceScopeFactory.CreateScope();
+            var alertProcessingService = scope.ServiceProvider.GetRequiredService<IAlertProcessingService>();
+            await alertProcessingService.ProcessPricePointAsync(pricePoint);
         }
         catch (Exception ex)
         {
@@ -90,7 +87,9 @@ public class Worker : BackgroundService
             _logger.LogInformation("Processing alert notification for user {UserId}, product {ProductName}",
                 alertEvent.UserId, alertEvent.ProductName);
 
-            await _emailService.SendAlertNotificationAsync(alertEvent);
+            using var scope = _serviceScopeFactory.CreateScope();
+            var emailService = scope.ServiceProvider.GetRequiredService<EmailService>();
+            await emailService.SendAlertNotificationAsync(alertEvent);
 
             _logger.LogInformation("Successfully sent alert notification for alert rule {AlertRuleId}",
                 alertEvent.AlertRuleId);
