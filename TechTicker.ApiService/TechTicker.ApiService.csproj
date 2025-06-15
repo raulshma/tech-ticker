@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TechTicker.Domain\TechTicker.Domain.csproj" />
+    <ProjectReference Include="..\TechTicker.DataAccess\TechTicker.DataAccess.csproj" />
+    <ProjectReference Include="..\TechTicker.Application\TechTicker.Application.csproj" />
+    <ProjectReference Include="..\TechTicker.ServiceDefaults\TechTicker.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\TechTicker.Shared\TechTicker.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

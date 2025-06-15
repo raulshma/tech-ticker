@@ -1,0 +1,6 @@
+@TechTicker.ApiService_HostAddress = http://localhost:5119
+
+GET {{TechTicker.ApiService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
