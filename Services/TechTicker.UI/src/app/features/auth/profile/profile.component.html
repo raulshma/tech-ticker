@@ -1,0 +1,202 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="user-avatar">
+      <nz-avatar [nzSize]="64" [nzText]="getUserInitials()" [style.background-color]="'#1890ff'"></nz-avatar>
+    </div>
+    <div class="user-info" *ngIf="currentUser">
+      <h2>{{ currentUser.firstName }} {{ currentUser.lastName }}</h2>
+      <p class="user-email">{{ currentUser.email }}</p>
+      <div class="user-roles">
+        <nz-tag
+          *ngFor="let role of currentUser.roles"
+          [nzColor]="role === 'admin' ? 'red' : 'blue'"
+        >
+          {{ getRoleDisplayName(role) }}
+        </nz-tag>
+      </div>
+    </div>
+  </div>
+
+  <nz-card>
+    <nz-tabset [(nzSelectedIndex)]="activeTab">
+      <!-- Profile Information Tab -->
+      <nz-tab nzTitle="Profile Information">
+        <div class="tab-content">
+          <form nz-form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()">
+            <div nz-row [nzGutter]="16">
+              <div nz-col nzXs="24" nzSm="12">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzFor="firstName">First Name</nz-form-label>
+                  <nz-form-control [nzValidateStatus]="isFieldInvalid(profileForm, 'firstName') ? 'error' : ''" [nzErrorTip]="getFieldError(profileForm, 'firstName')">
+                    <input
+                      nz-input
+                      formControlName="firstName"
+                      id="firstName"
+                      placeholder="Enter your first name"
+                      [class.ant-input-status-error]="isFieldInvalid(profileForm, 'firstName')"
+                    />
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+
+              <div nz-col nzXs="24" nzSm="12">
+                <nz-form-item>
+                  <nz-form-label nzRequired nzFor="lastName">Last Name</nz-form-label>
+                  <nz-form-control [nzValidateStatus]="isFieldInvalid(profileForm, 'lastName') ? 'error' : ''" [nzErrorTip]="getFieldError(profileForm, 'lastName')">
+                    <input
+                      nz-input
+                      formControlName="lastName"
+                      id="lastName"
+                      placeholder="Enter your last name"
+                      [class.ant-input-status-error]="isFieldInvalid(profileForm, 'lastName')"
+                    />
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+            </div>
+
+            <nz-form-item>
+              <nz-form-label nzRequired nzFor="email">Email Address</nz-form-label>
+              <nz-form-control [nzValidateStatus]="isFieldInvalid(profileForm, 'email') ? 'error' : ''" [nzErrorTip]="getFieldError(profileForm, 'email')">
+                <input
+                  nz-input
+                  formControlName="email"
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  [class.ant-input-status-error]="isFieldInvalid(profileForm, 'email')"
+                />
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-control>
+                <div class="form-actions">
+                  <button
+                    nz-button
+                    nzType="primary"
+                    [nzLoading]="isProfileLoading"
+                    [disabled]="!profileForm.valid || !profileForm.dirty"
+                  >
+                    {{ isProfileLoading ? 'Updating...' : 'Update Profile' }}
+                  </button>
+                  <button
+                    nz-button
+                    type="button"
+                    (click)="resetProfileForm()"
+                    [disabled]="!profileForm.dirty"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </nz-form-control>
+            </nz-form-item>
+          </form>
+        </div>
+      </nz-tab>
+
+      <!-- Change Password Tab -->
+      <nz-tab nzTitle="Change Password">
+        <div class="tab-content">
+          <form nz-form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
+            <nz-form-item>
+              <nz-form-label nzRequired nzFor="currentPassword">Current Password</nz-form-label>
+              <nz-form-control [nzValidateStatus]="isFieldInvalid(passwordForm, 'currentPassword') ? 'error' : ''" [nzErrorTip]="getFieldError(passwordForm, 'currentPassword')">
+                <nz-input-group nzSuffix>
+                  <input
+                    [type]="passwordVisible ? 'text' : 'password'"
+                    nz-input
+                    formControlName="currentPassword"
+                    id="currentPassword"
+                    placeholder="Enter your current password"
+                    [class.ant-input-status-error]="isFieldInvalid(passwordForm, 'currentPassword')"
+                  />
+                  <span
+                    nz-icon
+                    [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+                    (click)="passwordVisible = !passwordVisible"
+                    class="password-toggle"
+                  ></span>
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-label nzRequired nzFor="newPassword">New Password</nz-form-label>
+              <nz-form-control [nzValidateStatus]="isFieldInvalid(passwordForm, 'newPassword') ? 'error' : ''" [nzErrorTip]="getFieldError(passwordForm, 'newPassword')">
+                <nz-input-group nzSuffix>
+                  <input
+                    [type]="newPasswordVisible ? 'text' : 'password'"
+                    nz-input
+                    formControlName="newPassword"
+                    id="newPassword"
+                    placeholder="Enter your new password"
+                    [class.ant-input-status-error]="isFieldInvalid(passwordForm, 'newPassword')"
+                  />
+                  <span
+                    nz-icon
+                    [nzType]="newPasswordVisible ? 'eye-invisible' : 'eye'"
+                    (click)="newPasswordVisible = !newPasswordVisible"
+                    class="password-toggle"
+                  ></span>
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-label nzRequired nzFor="confirmPassword">Confirm New Password</nz-form-label>
+              <nz-form-control [nzValidateStatus]="isFieldInvalid(passwordForm, 'confirmPassword') ? 'error' : ''" [nzErrorTip]="getFieldError(passwordForm, 'confirmPassword')">
+                <nz-input-group nzSuffix>
+                  <input
+                    [type]="confirmPasswordVisible ? 'text' : 'password'"
+                    nz-input
+                    formControlName="confirmPassword"
+                    id="confirmPassword"
+                    placeholder="Confirm your new password"
+                    [class.ant-input-status-error]="isFieldInvalid(passwordForm, 'confirmPassword')"
+                  />
+                  <span
+                    nz-icon
+                    [nzType]="confirmPasswordVisible ? 'eye-invisible' : 'eye'"
+                    (click)="confirmPasswordVisible = !confirmPasswordVisible"
+                    class="password-toggle"
+                  ></span>
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-control>
+                <div class="form-actions">
+                  <button
+                    nz-button
+                    nzType="primary"
+                    [nzLoading]="isPasswordLoading"
+                    [disabled]="!passwordForm.valid"
+                  >
+                    {{ isPasswordLoading ? 'Changing...' : 'Change Password' }}
+                  </button>
+                  <button
+                    nz-button
+                    type="button"
+                    (click)="resetPasswordForm()"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </nz-form-control>
+            </nz-form-item>
+          </form>
+
+          <nz-alert
+            nzType="info"
+            nzMessage="Password Requirements"
+            nzDescription="Your password must be at least 6 characters long. Consider using a mix of letters, numbers, and special characters for better security."
+            nzShowIcon
+            class="password-requirements"
+          ></nz-alert>
+        </div>
+      </nz-tab>
+    </nz-tabset>
+  </nz-card>
+</div>

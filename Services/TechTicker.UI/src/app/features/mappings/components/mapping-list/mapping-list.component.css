@@ -1,0 +1,283 @@
+.mapping-list-container {
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.title h2 {
+  margin: 0 0 8px 0;
+  color: #262626;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.title p {
+  margin: 0;
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+.filters {
+  background: #fafafa;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.filters nz-input-group {
+  width: 100%;
+}
+
+.filters nz-select {
+  width: 100%;
+}
+
+.product-info {
+  max-width: 200px;
+}
+
+.product-info strong {
+  display: block;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.site-config-info {
+  max-width: 150px;
+}
+
+.site-config-info strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.frequency-info {
+  margin-top: 4px;
+}
+
+.text-muted {
+  color: #8c8c8c;
+  font-style: italic;
+}
+
+.text-danger {
+  color: #ff4d4f;
+  font-weight: 500;
+}
+
+.empty-state {
+  margin-top: 40px;
+  text-align: center;
+}
+
+nz-table {
+  background: white;
+  border-radius: 6px;
+}
+
+nz-button-group button {
+  margin-right: 0;
+}
+
+nz-button-group button:not(:last-child) {
+  border-right: 1px solid #d9d9d9;
+}
+
+nz-tag {
+  margin: 2px;
+  font-size: 11px;
+}
+
+/* URL link styling */
+a {
+  color: #1890ff;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+a:hover {
+  color: #40a9ff;
+  text-decoration: underline;
+}
+
+/* Status tags */
+.status-active {
+  color: #52c41a;
+}
+
+.status-inactive {
+  color: #f5222d;
+}
+
+.status-pending {
+  color: #1890ff;
+}
+
+.status-stale {
+  color: #fa8c16;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .filters nz-row {
+    flex-direction: column;
+  }
+
+  .filters nz-col {
+    margin-bottom: 8px;
+  }
+
+  nz-table {
+    font-size: 12px;
+  }
+
+  .product-info,
+  .site-config-info {
+    max-width: none;
+  }
+
+  nz-button-group {
+    flex-direction: column;
+  }
+
+  nz-button-group button {
+    margin-bottom: 4px;
+    border-radius: 4px !important;
+    border-right: 1px solid #d9d9d9 !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .mapping-list-container {
+    padding: 16px;
+  }
+
+  .title h2 {
+    font-size: 20px;
+  }
+
+  nz-table {
+    overflow-x: auto;
+  }
+
+  .product-info strong,
+  .site-config-info strong {
+    font-size: 12px;
+  }
+}
+
+/* Loading state */
+.ant-table-tbody > tr.ant-table-placeholder > td {
+  text-align: center;
+  padding: 40px;
+}
+
+/* Button hover effects */
+button[nz-button]:hover {
+  transform: translateY(-1px);
+  transition: transform 0.2s ease;
+}
+
+/* Table row hover */
+nz-table tbody tr:hover {
+  background-color: #fafafa;
+}
+
+/* Custom scrollbar for table */
+.ant-table-body::-webkit-scrollbar {
+  height: 8px;
+}
+
+.ant-table-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Scraping status indicators */
+.scraping-active {
+  color: #52c41a;
+}
+
+.scraping-inactive {
+  color: #f5222d;
+}
+
+.scraping-pending {
+  color: #1890ff;
+}
+
+.scraping-error {
+  color: #ff7875;
+}
+
+/* Action button spacing */
+.ant-btn-group .ant-btn {
+  margin-left: -1px;
+}
+
+.ant-btn-group .ant-btn:first-child {
+  margin-left: 0;
+}
+
+/* Tag spacing */
+nz-tag + nz-tag {
+  margin-left: 4px;
+}
+
+/* Frequency badge */
+.frequency-badge {
+  background: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: #586069;
+}
+
+/* URL truncation */
+.url-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Next scrape urgency indicators */
+.next-scrape-due {
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+.next-scrape-soon {
+  color: #fa8c16;
+  font-weight: 500;
+}
+
+.next-scrape-normal {
+  color: #52c41a;
+}
+
+.next-scrape-disabled {
+  color: #bfbfbf;
+}

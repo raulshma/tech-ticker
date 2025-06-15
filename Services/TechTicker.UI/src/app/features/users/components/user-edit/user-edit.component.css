@@ -1,0 +1,312 @@
+.user-edit-container {
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.breadcrumb-section {
+  flex: 1;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.content-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.edit-card .ant-card-head-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 32px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 24px;
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.section-title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+  border-left: 4px solid #1890ff;
+  padding-left: 12px;
+}
+
+/* Form Controls */
+.readonly-input {
+  background-color: #f5f5f5 !important;
+  color: #8c8c8c !important;
+  cursor: not-allowed;
+}
+
+.readonly-input:hover,
+.readonly-input:focus {
+  border-color: #d9d9d9 !important;
+  box-shadow: none !important;
+}
+
+/* Status Information */
+.status-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.status-label {
+  font-weight: 500;
+  color: #595959;
+  min-width: 100px;
+}
+
+.status-value {
+  color: #262626;
+}
+
+.status-alert {
+  margin-top: 16px;
+}
+
+/* Date Information */
+.date-info {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  gap: 4px;
+}
+
+.date-label {
+  font-weight: 500;
+  color: #595959;
+  font-size: 14px;
+}
+
+.date-value {
+  color: #262626;
+  font-size: 14px;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Error State */
+.error-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+/* Form Validation */
+.ant-form-item-has-error .ant-input,
+.ant-form-item-has-error .ant-input:hover {
+  border-color: #ff4d4f;
+}
+
+.ant-form-item-has-error .ant-input:focus,
+.ant-form-item-has-error .ant-input-focused {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
+
+.ant-form-explain {
+  color: #8c8c8c;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.ant-form-item-explain-error {
+  color: #ff4d4f;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .user-edit-container {
+    padding: 16px;
+  }
+
+  .header-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+
+  .status-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .status-label {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .header-actions button {
+    width: 100%;
+  }
+
+  .section-title {
+    font-size: 14px;
+    padding-left: 8px;
+    border-left-width: 3px;
+  }
+}
+
+/* Button improvements */
+button[nz-button] {
+  transition: all 0.3s ease;
+}
+
+button[nz-button]:hover:not([disabled]) {
+  transform: translateY(-1px);
+}
+
+button[nz-button][disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Input focus improvements */
+.ant-input:focus,
+.ant-input-focused {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Breadcrumb styling */
+.ant-breadcrumb {
+  font-size: 14px;
+}
+
+.ant-breadcrumb a {
+  color: #1890ff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ant-breadcrumb a:hover {
+  color: #40a9ff;
+}
+
+/* Card improvements */
+.ant-card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+}
+
+.ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Form layout improvements */
+.ant-form-vertical .ant-form-item-label {
+  padding: 0;
+  margin-bottom: 4px;
+}
+
+.ant-form-vertical .ant-form-item-label > label {
+  color: #262626;
+  font-weight: 500;
+}
+
+.ant-form-item {
+  margin-bottom: 20px;
+}
+
+/* Alert styling */
+.ant-alert {
+  border-radius: 6px;
+}
+
+.ant-alert-info {
+  background-color: #e6f7ff;
+  border-color: #91d5ff;
+}
+
+/* Tag styling */
+nz-tag {
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Loading and saving states */
+.ant-btn-loading {
+  pointer-events: none;
+}
+
+/* Result component styling */
+.ant-result {
+  padding: 40px 32px;
+}
+
+/* Form disabled state */
+form[disabled] {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Smooth transitions */
+* {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}

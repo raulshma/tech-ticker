@@ -1,0 +1,157 @@
+.site-config-list-container {
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.title h2 {
+  margin: 0 0 8px 0;
+  color: #262626;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.title p {
+  margin: 0;
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+.filters {
+  background: #fafafa;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.filters nz-input-group {
+  width: 100%;
+}
+
+.filters nz-select {
+  width: 100%;
+}
+
+.text-muted {
+  color: #8c8c8c;
+  font-style: italic;
+}
+
+.empty-state {
+  margin-top: 40px;
+  text-align: center;
+}
+
+nz-table {
+  background: white;
+  border-radius: 6px;
+}
+
+nz-button-group button {
+  margin-right: 0;
+}
+
+nz-button-group button:not(:last-child) {
+  border-right: 1px solid #d9d9d9;
+}
+
+nz-tag {
+  margin: 2px;
+  font-size: 11px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .filters nz-row {
+    flex-direction: column;
+  }
+
+  .filters nz-col {
+    margin-bottom: 8px;
+  }
+
+  nz-table {
+    font-size: 12px;
+  }
+
+  nz-button-group {
+    flex-direction: column;
+  }
+
+  nz-button-group button {
+    margin-bottom: 4px;
+    border-radius: 4px !important;
+    border-right: 1px solid #d9d9d9 !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .site-config-list-container {
+    padding: 16px;
+  }
+
+  .title h2 {
+    font-size: 20px;
+  }
+
+  nz-table {
+    overflow-x: auto;
+  }
+}
+
+/* Loading state */
+.ant-table-tbody > tr.ant-table-placeholder > td {
+  text-align: center;
+  padding: 40px;
+}
+
+/* Status colors */
+.status-active {
+  color: #52c41a;
+}
+
+.status-inactive {
+  color: #f5222d;
+}
+
+/* Button hover effects */
+button[nz-button]:hover {
+  transform: translateY(-1px);
+  transition: transform 0.2s ease;
+}
+
+/* Table row hover */
+nz-table tbody tr:hover {
+  background-color: #fafafa;
+}
+
+/* Custom scrollbar for table */
+.ant-table-body::-webkit-scrollbar {
+  height: 8px;
+}
+
+.ant-table-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

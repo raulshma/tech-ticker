@@ -1,0 +1,84 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo">
+        <div class="login-logo-icon">TT</div>
+        <h1>TechTicker</h1>
+      </div>
+      <h2>Sign In</h2>
+      <p>Welcome back! Please sign in to your account.</p>
+    </div>
+
+    <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="email">Email</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="isFieldInvalid('email') ? 'error' : ''" [nzErrorTip]="getFieldError('email')">
+          <input
+            nz-input
+            formControlName="email"
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            [class.ant-input-status-error]="isFieldInvalid('email')"
+          />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="password">Password</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="isFieldInvalid('password') ? 'error' : ''" [nzErrorTip]="getFieldError('password')">
+          <nz-input-group nzSuffix>
+            <input
+              [type]="passwordVisible ? 'text' : 'password'"
+              nz-input
+              formControlName="password"
+              id="password"
+              placeholder="Enter your password"
+              [class.ant-input-status-error]="isFieldInvalid('password')"
+            />
+            <span
+              nz-icon
+              [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+              (click)="passwordVisible = !passwordVisible"
+              class="password-toggle"
+            ></span>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item nz-row class="login-form-margin">
+        <nz-form-control [nzSpan]="12">
+          <label nz-checkbox formControlName="remember">
+            <span>Remember me</span>
+          </label>
+        </nz-form-control>
+        <nz-form-control [nzSpan]="12" class="login-form-forgot">
+          <a class="login-form-forgot">Forgot password?</a>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control [nzSpan]="24">
+          <button
+            nz-button
+            class="login-form-button"
+            nzType="primary"
+            nzSize="large"
+            [nzLoading]="isLoading"
+            [disabled]="!loginForm.valid"
+            nzBlock
+          >
+            {{ isLoading ? 'Signing In...' : 'Sign In' }}
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+
+    <div class="login-footer">
+      <p>
+        Don't have an account?
+        <a routerLink="/auth/register" class="register-link">Sign up here</a>
+      </p>
+    </div>
+  </div>
+</div>

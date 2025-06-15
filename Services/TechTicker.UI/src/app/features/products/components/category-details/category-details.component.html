@@ -1,0 +1,136 @@
+<nz-page-header
+  class="site-page-header"
+  [nzTitle]="category?.name || 'Category Details'"
+  nzBackIcon
+  (nzBack)="goBack()"
+>
+  <nz-page-header-extra>
+    <nz-button-group>
+      <button
+        nz-button
+        nzType="default"
+        (click)="editCategory()"
+        [disabled]="!category"
+      >
+        <i nz-icon nzType="edit"></i>
+        Edit
+      </button>
+      <button
+        nz-button
+        nzType="primary"
+        nzDanger
+        (click)="deleteCategory()"
+        [disabled]="!category"
+      >
+        <i nz-icon nzType="delete"></i>
+        Delete
+      </button>
+    </nz-button-group>
+  </nz-page-header-extra>
+</nz-page-header>
+
+<nz-spin [nzSpinning]="loading">
+  <div class="category-details" *ngIf="category">
+
+    <!-- Basic Information Card -->
+    <nz-card nzTitle="Basic Information" class="info-card">
+      <nz-descriptions nzBordered [nzColumn]="2">
+        <nz-descriptions-item nzTitle="Name" [nzSpan]="1">
+          <strong>{{ category.name }}</strong>
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Slug" [nzSpan]="1">
+          <nz-tag nzColor="blue">{{ category.slug }}</nz-tag>
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Description" [nzSpan]="2">
+          <div *ngIf="category.description; else noDescription">
+            {{ category.description }}
+          </div>
+          <ng-template #noDescription>
+            <span class="text-muted">No description provided</span>
+          </ng-template>
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Product Count" [nzSpan]="1">
+          <nz-badge
+            [nzCount]="category.productCount || 0"
+            [nzShowZero]="true"
+            nzColor="#52c41a"
+          ></nz-badge>
+          <button
+            nz-button
+            nzType="link"
+            nzSize="small"
+            (click)="viewProducts()"
+            *ngIf="category.productCount && category.productCount > 0"
+          >
+            View Products
+          </button>
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Status" [nzSpan]="1">
+          <nz-tag nzColor="green">Active</nz-tag>
+        </nz-descriptions-item>
+      </nz-descriptions>
+    </nz-card>
+
+    <!-- Metadata Card -->
+    <nz-card nzTitle="Metadata" class="info-card">
+      <nz-descriptions nzBordered [nzColumn]="2">
+        <nz-descriptions-item nzTitle="Category ID" [nzSpan]="2">
+          <code>{{ category.categoryId }}</code>
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Created At" [nzSpan]="1">
+          {{ formatDate(category.createdAt) }}
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Last Updated" [nzSpan]="1">
+          {{ formatDate(category.updatedAt) }}
+        </nz-descriptions-item>
+      </nz-descriptions>
+    </nz-card>
+
+    <!-- Actions Card -->
+    <nz-card nzTitle="Quick Actions" class="actions-card">
+      <div class="action-buttons">
+        <button
+          nz-button
+          nzType="default"
+          nzSize="large"
+          (click)="viewProducts()"
+        >
+          <i nz-icon nzType="appstore"></i>
+          View Products in Category
+        </button>
+
+        <button
+          nz-button
+          nzType="primary"
+          nzSize="large"
+          (click)="editCategory()"
+        >
+          <i nz-icon nzType="edit"></i>
+          Edit Category
+        </button>
+
+        <button
+          nz-button
+          nzType="default"
+          nzSize="large"
+          nzDanger
+          (click)="deleteCategory()"
+        >
+          <i nz-icon nzType="delete"></i>
+          Delete Category
+        </button>
+      </div>
+    </nz-card>
+
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <nz-spin nzSize="large">
+      <ng-template #loadingTemplate>
+        <div class="loading-text">Loading category details...</div>
+      </ng-template>
+    </nz-spin>
+  </div>
+
+</nz-spin>

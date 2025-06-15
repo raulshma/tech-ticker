@@ -1,0 +1,202 @@
+<div class="user-create-container">
+  <div class="header-section">
+    <div class="breadcrumb-section">
+      <nz-breadcrumb>
+        <nz-breadcrumb-item>
+          <a (click)="onCancel()">Users</a>
+        </nz-breadcrumb-item>
+        <nz-breadcrumb-item>Create New User</nz-breadcrumb-item>
+      </nz-breadcrumb>
+    </div>
+
+    <div class="header-actions">
+      <button nz-button nzType="default" (click)="onCancel()" [disabled]="creating">
+        Cancel
+      </button>
+      <button
+        nz-button
+        nzType="primary"
+        [nzLoading]="creating"
+        (click)="onSubmit()"
+        [disabled]="!createForm.valid || creating"
+      >
+        <span *ngIf="!creating">Create User</span>
+        <span *ngIf="creating">Creating...</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <nz-card nzTitle="Create New User" class="create-card">
+      <form nz-form [formGroup]="createForm" [nzLayout]="'vertical'" (ngSubmit)="onSubmit()">
+
+        <!-- Account Information Section -->
+        <div class="form-section">
+          <h4 class="section-title">Account Information</h4>
+
+          <div nz-row [nzGutter]="24">
+            <div nz-col [nzSpan]="24">
+              <nz-form-item>
+                <nz-form-label nzRequired>Email Address</nz-form-label>
+                <nz-form-control [nzErrorTip]="getFieldError('email')">
+                  <input
+                    nz-input
+                    formControlName="email"
+                    placeholder="Enter email address"
+                    maxlength="255"
+                    type="email"
+                  />
+                  <nz-form-explain>This will be the user's login email address</nz-form-explain>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+
+          <div nz-row [nzGutter]="24">
+            <div nz-col [nzSpan]="24">
+              <nz-form-item>
+                <nz-form-label nzRequired>Password</nz-form-label>
+                <nz-form-control [nzErrorTip]="getFieldError('password')">
+                  <nz-input-group [nzSuffix]="passwordSuffixTemplate">
+                    <input
+                      nz-input
+                      formControlName="password"
+                      placeholder="Enter password"
+                      [type]="passwordVisible ? 'text' : 'password'"
+                      maxlength="100"
+                    />
+                  </nz-input-group>
+
+                  <!-- Password Strength Indicator -->
+                  <div class="password-strength" *ngIf="createForm.get('password')?.value">
+                    <div class="strength-bar">
+                      <div
+                        class="strength-fill"
+                        [style.width.%]="getPasswordStrength().percentage"
+                        [style.background-color]="getPasswordStrength().color"
+                      ></div>
+                    </div>
+                    <span class="strength-text" [style.color]="getPasswordStrength().color">
+                      {{ getPasswordStrength().strength }}
+                    </span>
+                  </div>
+
+                  <nz-form-explain>Password must be at least 8 characters long</nz-form-explain>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+
+          <div nz-row [nzGutter]="16">
+            <div nz-col [nzSpan]="24">
+              <button
+                nz-button
+                nzType="dashed"
+                (click)="generatePassword()"
+                [disabled]="creating"
+                class="generate-password-btn"
+              >
+                <span nz-icon nzType="reload"></span>
+                Generate Secure Password
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h4 class="section-title">Personal Information</h4>
+
+          <div nz-row [nzGutter]="24">
+            <div nz-col [nzSpan]="24" [nzMd]="12">
+              <nz-form-item>
+                <nz-form-label>First Name</nz-form-label>
+                <nz-form-control [nzErrorTip]="getFieldError('firstName')">
+                  <input
+                    nz-input
+                    formControlName="firstName"
+                    placeholder="Enter first name"
+                    maxlength="100"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+
+            <div nz-col [nzSpan]="24" [nzMd]="12">
+              <nz-form-item>
+                <nz-form-label>Last Name</nz-form-label>
+                <nz-form-control [nzErrorTip]="getFieldError('lastName')">
+                  <input
+                    nz-input
+                    formControlName="lastName"
+                    placeholder="Enter last name"
+                    maxlength="100"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Setup Information -->
+        <div class="form-section">
+          <h4 class="section-title">Account Setup Information</h4>
+
+          <nz-alert
+            nzType="info"
+            nzMessage="New User Account Setup"
+            [nzDescription]="accountSetupTemplate"
+            [nzShowIcon]="true"
+            class="setup-info"
+          ></nz-alert>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            nz-button
+            nzType="default"
+            nzSize="large"
+            (click)="onCancel()"
+            [disabled]="creating"
+          >
+            Cancel
+          </button>
+          <button
+            nz-button
+            nzType="primary"
+            nzSize="large"
+            [nzLoading]="creating"
+            [disabled]="!createForm.valid || creating"
+            type="submit"
+          >
+            <span *ngIf="!creating">Create User</span>
+            <span *ngIf="creating">Creating User...</span>
+          </button>
+        </div>
+      </form>
+    </nz-card>
+  </div>
+</div>
+
+<!-- Templates -->
+<ng-template #passwordSuffixTemplate>
+  <div class="password-actions">
+    <span
+      nz-icon
+      [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+      (click)="togglePasswordVisibility()"
+      class="password-toggle"
+    ></span>
+  </div>
+</ng-template>
+
+<ng-template #accountSetupTemplate>
+  <ul class="setup-list">
+    <li>The new user will be created with an "Active" status</li>
+    <li>Email verification will be marked as "Pending" until the user verifies their email</li>
+    <li>No roles will be assigned initially - you can assign roles after creation</li>
+    <li>The user will be able to log in immediately using their email and password</li>
+    <li>Consider sharing the login credentials securely with the new user</li>
+  </ul>
+</ng-template>

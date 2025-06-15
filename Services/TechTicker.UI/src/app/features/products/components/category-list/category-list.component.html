@@ -1,0 +1,136 @@
+<nz-page-header class="site-page-header" nzTitle="Category Management">
+  <nz-page-header-extra>
+    <button nz-button nzType="primary" (click)="createCategory()">
+      <i nz-icon nzType="plus"></i>
+      Add Category
+    </button>
+  </nz-page-header-extra>
+</nz-page-header>
+
+<nz-card>
+  <!-- Search Section -->
+  <div class="search-section">
+    <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton" class="search-input">
+      <input
+        type="text"
+        nz-input
+        placeholder="Search categories..."
+        [(ngModel)]="searchValue"
+        (keyup.enter)="onSearch()"
+      />
+    </nz-input-group>
+    <ng-template #suffixIconButton>
+      <button nz-button nzType="primary" nzSearch (click)="onSearch()">
+        <i nz-icon nzType="search"></i>
+      </button>
+    </ng-template>
+
+    <button
+      nz-button
+      *ngIf="searchValue"
+      class="clear-button"
+      (click)="onSearchClear()"
+    >
+      Clear
+    </button>
+  </div>
+
+  <!-- Table Section -->
+  <nz-table
+    #basicTable
+    [nzData]="categories"
+    [nzLoading]="loading"
+    [nzTotal]="total"
+    [nzPageSize]="pageSize"
+    [nzPageIndex]="pageIndex"
+    [nzShowPagination]="true"
+    [nzShowSizeChanger]="true"
+    [nzPageSizeOptions]="[10, 20, 50, 100]"
+    (nzPageIndexChange)="onPageIndexChange($event)"
+    (nzPageSizeChange)="onPageSizeChange($event)"
+    nzShowQuickJumper
+  >
+    <thead>
+      <tr>
+        <th
+          *ngFor="let column of listOfColumns"
+          [nzSortOrder]="column.sortOrder"
+          [nzSortFn]="column.sortFn"
+          [nzSortDirections]="column.sortDirections"
+        >
+          {{ column.name }}
+        </th>
+        <th nzWidth="180px">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let category of categories">
+        <td>
+          <strong>{{ category.name }}</strong>
+          <div class="text-muted" *ngIf="category.description">
+            {{ category.description | slice:0:50 }}{{ category.description && category.description.length > 50 ? '...' : '' }}
+          </div>
+        </td>
+        <td>
+          <nz-tag nzColor="blue">{{ category.slug }}</nz-tag>
+        </td>
+        <td>
+          <nz-badge
+            [nzCount]="category.productCount || 0"
+            [nzShowZero]="true"
+            nzColor="#52c41a"
+          ></nz-badge>
+        </td>
+        <td>{{ formatDate(category.createdAt) }}</td>
+        <td>
+          <nz-button-group>
+            <button
+              nz-button
+              nzType="default"
+              nzSize="small"
+              nz-tooltip="View Details"
+              (click)="viewCategory(category)"
+            >
+              <i nz-icon nzType="eye"></i>
+            </button>
+            <button
+              nz-button
+              nzType="default"
+              nzSize="small"
+              nz-tooltip="Edit Category"
+              (click)="editCategory(category)"
+            >
+              <i nz-icon nzType="edit"></i>
+            </button>
+            <button
+              nz-button
+              nzType="default"
+              nzSize="small"
+              nzDanger
+              nz-tooltip="Delete Category"
+              (click)="deleteCategory(category)"
+            >
+              <i nz-icon nzType="delete"></i>
+            </button>
+          </nz-button-group>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+
+  <!-- Empty State -->
+  <nz-empty
+    *ngIf="!loading && categories.length === 0"
+    [nzNotFoundContent]="searchValue ? 'No categories found matching your search' : 'No categories available'"
+    [nzNotFoundFooter]="emptyFooter"
+  >
+    <ng-template #emptyFooter>
+      <button nz-button nzType="primary" (click)="createCategory()" *ngIf="!searchValue">
+        Create First Category
+      </button>
+      <button nz-button nzType="default" (click)="onSearchClear()" *ngIf="searchValue">
+        Clear Search
+      </button>
+    </ng-template>
+  </nz-empty>
+</nz-card>

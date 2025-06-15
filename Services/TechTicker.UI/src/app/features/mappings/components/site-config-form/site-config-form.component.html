@@ -1,0 +1,214 @@
+<div class="site-config-form-container">
+  <div class="header">
+    <h2>{{ isEdit ? 'Edit' : 'Create' }} Site Configuration</h2>
+    <p>Configure scraping settings for an e-commerce site</p>
+  </div>
+
+  <form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-content">
+      <!-- Basic Information -->
+      <nz-card nzTitle="Basic Information" [nzBordered]="false">
+        <nz-row [nzGutter]="16">
+          <nz-col [nzSpan]="12">
+            <nz-form-item>
+              <nz-form-label [nzRequired]="true">Domain</nz-form-label>
+              <nz-form-control [nzErrorTip]="getFieldError('domain')">
+                <input
+                  nz-input
+                  formControlName="domain"
+                  placeholder="example.com"
+                  [class.error]="getFieldError('domain')"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+          <nz-col [nzSpan]="12">
+            <nz-form-item>
+              <nz-form-label [nzRequired]="true">Name</nz-form-label>
+              <nz-form-control [nzErrorTip]="getFieldError('name')">
+                <input
+                  nz-input
+                  formControlName="name"
+                  placeholder="Friendly name for this configuration"
+                  [class.error]="getFieldError('name')"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </nz-col>
+        </nz-row>
+
+        <nz-form-item>
+          <nz-form-label>Description</nz-form-label>
+          <nz-form-control [nzErrorTip]="getFieldError('description')">
+            <textarea
+              nz-input
+              formControlName="description"
+              placeholder="Optional description of this site configuration"
+              [nzAutosize]="{ minRows: 2, maxRows: 4 }"
+            ></textarea>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-control>
+            <label nz-checkbox formControlName="isActive">
+              Active Configuration
+            </label>
+            <small class="help-text">
+              Only active configurations can be used for scraping
+            </small>
+          </nz-form-control>
+        </nz-form-item>
+      </nz-card>
+
+      <!-- CSS Selectors -->
+      <nz-card nzTitle="CSS Selectors" [nzBordered]="false">
+        <div formGroupName="selectors">
+          <p class="selector-description">
+            Define CSS selectors to extract product information from this site.
+            Leave fields empty if the site doesn't have that information.
+          </p>
+
+          <nz-row [nzGutter]="16">
+            <nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label>Product Name Selector</nz-form-label>
+                <nz-form-control [nzErrorTip]="getSelectorFieldError('productName')">
+                  <input
+                    nz-input
+                    formControlName="productName"
+                    placeholder=".product-title, h1.title"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label>Price Selector</nz-form-label>
+                <nz-form-control [nzErrorTip]="getSelectorFieldError('price')">
+                  <input
+                    nz-input
+                    formControlName="price"
+                    placeholder=".price, .current-price"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+
+          <nz-row [nzGutter]="16">
+            <nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label>Availability Selector</nz-form-label>
+                <nz-form-control [nzErrorTip]="getSelectorFieldError('availability')">
+                  <input
+                    nz-input
+                    formControlName="availability"
+                    placeholder=".stock-status, .availability"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label>Image Selector</nz-form-label>
+                <nz-form-control [nzErrorTip]="getSelectorFieldError('image')">
+                  <input
+                    nz-input
+                    formControlName="image"
+                    placeholder=".product-image img, .gallery img"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+
+          <nz-form-item>
+            <nz-form-label>Description Selector</nz-form-label>
+            <nz-form-control [nzErrorTip]="getSelectorFieldError('description')">
+              <input
+                nz-input
+                formControlName="description"
+                placeholder=".product-description, .description"
+              />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </nz-card>
+
+      <!-- Selector Testing -->
+      <nz-card nzTitle="Test Selectors" [nzBordered]="false">
+        <p>Test your CSS selectors against a real product page to verify they work correctly.</p>
+
+        <nz-form-item>
+          <nz-form-label>Test URL</nz-form-label>
+          <nz-form-control>
+            <nz-input-group nzSuffix>
+              <input
+                nz-input
+                [(ngModel)]="testUrl"
+                [ngModelOptions]="{standalone: true}"
+                placeholder="https://example.com/product-page"
+              />
+              <ng-template #nzSuffix>
+                <button
+                  nz-button
+                  nzType="primary"
+                  nzSize="small"
+                  (click)="testSelectors()"
+                  [nzLoading]="testingSelectors"
+                  [disabled]="!testUrl || !form.value.domain"
+                >
+                  Test
+                </button>
+              </ng-template>
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+
+        <div *ngIf="testResults" class="test-results">
+          <nz-alert
+            [nzType]="testResults.success ? 'success' : 'warning'"
+            [nzMessage]="testResults.success ? 'Selectors tested successfully' : 'Some selectors may need adjustment'"
+            [nzDescription]="testResults.errors?.join(', ')"
+            nzShowIcon
+            nzCloseable
+            (nzOnClose)="clearTestResults()"
+          ></nz-alert>
+
+          <div *ngIf="testResults.results" class="results-preview">
+            <h4>Extracted Data:</h4>
+            <nz-descriptions nzBordered [nzColumn]="1">
+              <nz-descriptions-item
+                *ngFor="let item of testResults.results | keyvalue"
+                [nzTitle]="item.key | titlecase"
+              >
+                {{ item.value || 'Not found' }}
+              </nz-descriptions-item>
+            </nz-descriptions>
+          </div>
+        </div>
+      </nz-card>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        nz-button
+        nzType="primary"
+        nzHtmlType="submit"
+        [nzLoading]="loading"
+      >
+        {{ isEdit ? 'Update' : 'Create' }} Configuration
+      </button>
+      <button
+        nz-button
+        nzType="default"
+        (click)="onCancel()"
+        [disabled]="loading"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>

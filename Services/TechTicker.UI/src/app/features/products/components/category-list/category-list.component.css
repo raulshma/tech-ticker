@@ -1,0 +1,68 @@
+.site-page-header {
+  border: 1px solid #e8e8e8;
+  background-color: #fafafa;
+  margin-bottom: 16px;
+}
+
+.search-section {
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.search-input {
+  max-width: 300px;
+}
+
+.clear-button {
+  margin-left: 8px;
+}
+
+.text-muted {
+  color: #8c8c8c;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+nz-table {
+  background: white;
+}
+
+nz-button-group button {
+  margin-right: 0;
+}
+
+nz-badge {
+  margin-left: 8px;
+}
+
+.ant-empty {
+  margin: 40px 0;
+}
+
+@media (max-width: 768px) {
+  .search-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    max-width: 100%;
+  }
+
+  .clear-button {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  nz-button-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  nz-button-group button {
+    margin-bottom: 4px;
+    border-radius: 4px !important;
+  }
+}

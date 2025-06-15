@@ -1,0 +1,322 @@
+.user-details-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.content-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Profile Card Styles */
+.profile-card {
+  margin-bottom: 0;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+}
+
+.profile-avatar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-name h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.profile-name .email {
+  margin: 4px 0 0 0;
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+.status-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-item .label {
+  font-weight: 500;
+  min-width: 100px;
+}
+
+.status-tag {
+  font-weight: 500;
+}
+
+/* Details Card Styles */
+.details-card {
+  margin-bottom: 0;
+}
+
+.detail-group h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+
+.detail-item {
+  display: flex;
+  margin-bottom: 12px;
+  align-items: flex-start;
+}
+
+.detail-item .label {
+  font-weight: 500;
+  min-width: 120px;
+  color: #595959;
+}
+
+.detail-item .value {
+  color: #262626;
+  word-break: break-all;
+}
+
+/* Roles Card Styles */
+.roles-card {
+  margin-bottom: 0;
+}
+
+.roles-loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.roles-section {
+  margin-bottom: 24px;
+}
+
+.roles-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.roles-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.role-tag {
+  font-weight: 500;
+}
+
+.no-data {
+  color: #8c8c8c;
+  font-style: italic;
+}
+
+.detailed-roles-section {
+  margin-bottom: 24px;
+}
+
+.detailed-roles-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.role-details {
+  padding: 16px 0;
+}
+
+.role-description {
+  margin-bottom: 16px;
+  color: #595959;
+}
+
+.role-permissions {
+  margin-bottom: 16px;
+}
+
+.permissions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.permission-tag {
+  font-size: 12px;
+}
+
+.no-permissions {
+  color: #8c8c8c;
+  font-style: italic;
+}
+
+.permissions-summary h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.permissions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Error State */
+.error-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .user-details-container {
+    padding: 16px;
+  }
+
+  .header-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profile-avatar {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .status-section {
+    margin-top: 16px;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .detail-item .label {
+    min-width: auto;
+    font-weight: 600;
+  }
+
+  .permissions-list,
+  .permissions-grid,
+  .roles-list {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .header-actions button {
+    width: 100%;
+  }
+}
+
+/* Card spacing adjustments */
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ant-card-head-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Collapse panel styling */
+.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+  padding: 12px 16px;
+  font-weight: 500;
+}
+
+.ant-collapse-content > .ant-collapse-content-box {
+  padding: 16px;
+}
+
+/* Avatar styling */
+.ant-avatar {
+  background-color: #1890ff;
+  border: 2px solid #f0f0f0;
+}
+
+/* Button improvements */
+button[nz-button] {
+  transition: all 0.3s ease;
+}
+
+button[nz-button]:hover {
+  transform: translateY(-1px);
+}
+
+/* Tag improvements */
+nz-tag {
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Result component styling */
+.ant-result {
+  padding: 40px 32px;
+}

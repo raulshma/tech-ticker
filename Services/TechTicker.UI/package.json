@@ -13,6 +13,7 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^19.1.0",
+    "@angular/cdk": "^20.0.3",
     "@angular/common": "^19.1.0",
     "@angular/compiler": "^19.1.0",
     "@angular/core": "^19.1.0",
@@ -20,10 +21,11 @@
     "@angular/platform-browser": "^19.1.0",
     "@angular/platform-browser-dynamic": "^19.1.0",
     "@angular/router": "^19.1.0",
+    "jest-editor-support": "*",
+    "ng-zorro-antd": "^19.3.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0",
-    "jest-editor-support": "*"
+    "zone.js": "~0.15.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^19.1.5",
@@ -36,7 +38,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.7.2",
-    "run-script-os": "^1.1.6"
+    "run-script-os": "^1.1.6",
+    "typescript": "~5.7.2"
   }
 }

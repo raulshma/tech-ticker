@@ -1,0 +1,210 @@
+<div class="mapping-list-container">
+  <div class="header">
+    <div class="title">
+      <h2>Product-Seller Mappings</h2>
+      <p>Manage product-seller mappings and scraping configurations</p>
+    </div>
+    <button nz-button nzType="primary" (click)="createMapping()">
+      <i nz-icon nzType="plus"></i>
+      New Mapping
+    </button>
+  </div>
+
+  <div class="filters">
+    <nz-row [nzGutter]="16">
+      <nz-col [nzSpan]="5">
+        <nz-input-group nzPrefixIcon="search">
+          <input
+            nz-input
+            placeholder="Search seller..."
+            [(ngModel)]="sellerFilter"
+            (keyup.enter)="onSearch()"
+          />
+        </nz-input-group>
+      </nz-col>
+      <nz-col [nzSpan]="5">
+        <nz-input-group nzPrefixIcon="shopping">
+          <input
+            nz-input
+            placeholder="Product ID..."
+            [(ngModel)]="canonicalProductFilter"
+            (keyup.enter)="onSearch()"
+          />
+        </nz-input-group>
+      </nz-col>
+      <nz-col [nzSpan]="4">
+        <nz-select
+          nzPlaceHolder="Site Config"
+          [(ngModel)]="siteConfigFilter"
+          (ngModelChange)="onSearch()"
+          nzAllowClear
+        >
+          <!-- Site config options would be loaded dynamically -->
+        </nz-select>
+      </nz-col>
+      <nz-col [nzSpan]="4">
+        <nz-select
+          nzPlaceHolder="Scraping Status"
+          [(ngModel)]="activeFilter"
+          (ngModelChange)="onSearch()"
+          nzAllowClear
+        >
+          <nz-option nzValue="true" nzLabel="Active"></nz-option>
+          <nz-option nzValue="false" nzLabel="Inactive"></nz-option>
+        </nz-select>
+      </nz-col>
+      <nz-col [nzSpan]="6">
+        <button nz-button nzType="primary" (click)="onSearch()">
+          <i nz-icon nzType="search"></i>
+          Search
+        </button>
+        <button nz-button nzType="default" (click)="onResetFilters()" style="margin-left: 8px;">
+          <i nz-icon nzType="reload"></i>
+          Reset
+        </button>
+      </nz-col>
+    </nz-row>
+  </div>
+
+  <nz-table
+    #table
+    nzShowSizeChanger
+    [nzData]="mappings"
+    [nzFrontPagination]="false"
+    [nzLoading]="loading"
+    [nzTotal]="total"
+    [nzPageSize]="pageSize"
+    [nzPageIndex]="pageIndex"
+    (nzQueryParams)="onQueryParamsChange($event)"
+    nzShowQuickJumper
+    [nzPageSizeOptions]="[10, 20, 50, 100]"
+  >
+    <thead>
+      <tr>
+        <th nzColumnKey="canonicalProduct" nzSortFn>Product</th>
+        <th nzColumnKey="sellerName" nzSortFn>Seller</th>
+        <th>Product URL</th>
+        <th nzColumnKey="siteConfig" nzSortFn>Site Config</th>
+        <th nzColumnKey="isActiveForScraping" nzSortFn>Scraping Status</th>
+        <th>Last Scraped</th>
+        <th>Next Scrape</th>
+        <th nzWidth="220px">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let mapping of mappings">
+        <td>
+          <div class="product-info">
+            <strong>{{ mapping.canonicalProduct?.name || 'Unknown Product' }}</strong>
+            <br>
+            <small class="text-muted">{{ mapping.canonicalProduct?.sku }}</small>
+            <nz-tag *ngIf="mapping.canonicalProduct?.category" nzColor="blue" nzSize="small">
+              {{ mapping.canonicalProduct.category.name }}
+            </nz-tag>
+          </div>
+        </td>
+        <td>
+          <strong>{{ mapping.sellerName }}</strong>
+        </td>
+        <td>
+          <a [href]="mapping.sellerProductUrl" target="_blank" rel="noopener noreferrer">
+            {{ formatUrl(mapping.sellerProductUrl) }}
+            <i nz-icon nzType="link" style="margin-left: 4px;"></i>
+          </a>
+        </td>
+        <td>
+          <div class="site-config-info">
+            <strong>{{ mapping.siteConfig?.name || 'Unknown Config' }}</strong>
+            <br>
+            <small class="text-muted">{{ mapping.siteConfig?.domain }}</small>
+          </div>
+        </td>
+        <td>
+          <nz-tag [nzColor]="getScrapingStatusTag(mapping).color">
+            {{ getScrapingStatusTag(mapping).text }}
+          </nz-tag>
+          <div *ngIf="mapping.scrapingFrequencyMinutes" class="frequency-info">
+            <small class="text-muted">Every {{ mapping.scrapingFrequencyMinutes }}min</small>
+          </div>
+        </td>
+        <td>
+          <span *ngIf="mapping.lastScrapedAt; else neverScraped">
+            {{ mapping.lastScrapedAt | date:'short' }}
+          </span>
+          <ng-template #neverScraped>
+            <span class="text-muted">Never</span>
+          </ng-template>
+        </td>
+        <td>
+          <span [class]="getNextScrapeInfo(mapping) === 'Due now' ? 'text-danger' : 'text-muted'">
+            {{ getNextScrapeInfo(mapping) }}
+          </span>
+        </td>
+        <td>
+          <nz-button-group>
+            <button
+              nz-button
+              nzType="primary"
+              nzSize="small"
+              (click)="viewMapping(mapping.id)"
+              nz-tooltip="View Details"
+            >
+              <i nz-icon nzType="eye"></i>
+            </button>
+            <button
+              nz-button
+              nzType="default"
+              nzSize="small"
+              (click)="editMapping(mapping.id)"
+              nz-tooltip="Edit"
+            >
+              <i nz-icon nzType="edit"></i>
+            </button>
+            <button
+              nz-button
+              [nzType]="mapping.isActiveForScraping ? 'default' : 'primary'"
+              nzSize="small"
+              (click)="toggleScrapingStatus(mapping)"
+              [nz-tooltip]="mapping.isActiveForScraping ? 'Disable Scraping' : 'Enable Scraping'"
+            >
+              <i nz-icon [nzType]="mapping.isActiveForScraping ? 'pause-circle' : 'play-circle'"></i>
+            </button>
+            <button
+              nz-button
+              nzType="default"
+              nzSize="small"
+              (click)="triggerScraping(mapping)"
+              [disabled]="!mapping.isActiveForScraping"
+              nz-tooltip="Trigger Immediate Scraping"
+            >
+              <i nz-icon nzType="thunderbolt"></i>
+            </button>
+            <button
+              nz-button
+              nzType="primary"
+              nzDanger
+              nzSize="small"
+              (click)="deleteMapping(mapping)"
+              nz-tooltip="Delete"
+            >
+              <i nz-icon nzType="delete"></i>
+            </button>
+          </nz-button-group>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+
+  <div *ngIf="!loading && mappings.length === 0" class="empty-state">
+    <nz-empty
+      nzNotFoundImage="simple"
+      nzNotFoundContent="No product-seller mappings found"
+    >
+      <span nz-empty-footer>
+        <button nz-button nzType="primary" (click)="createMapping()">
+          Create Product-Seller Mapping
+        </button>
+      </span>
+    </nz-empty>
+  </div>
+</div>

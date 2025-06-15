@@ -1,0 +1,210 @@
+<nz-page-header class="site-page-header" nzTitle="Product Management">
+  <nz-page-header-extra>
+    <nz-button-group>
+      <button nz-button nzType="default" (click)="exportProducts()">
+        <i nz-icon nzType="download"></i>
+        Export
+      </button>
+      <button nz-button nzType="primary" (click)="createProduct()">
+        <i nz-icon nzType="plus"></i>
+        Add Product
+      </button>
+    </nz-button-group>
+  </nz-page-header-extra>
+</nz-page-header>
+
+<nz-card>
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filter-row">
+      <!-- Search -->
+      <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton" class="search-input">
+        <input
+          type="text"
+          nz-input
+          placeholder="Search products..."
+          [(ngModel)]="searchValue"
+          (keyup.enter)="onSearch()"
+        />
+      </nz-input-group>
+      <ng-template #suffixIconButton>
+        <button nz-button nzType="primary" nzSearch (click)="onSearch()">
+          <i nz-icon nzType="search"></i>
+        </button>
+      </ng-template>
+
+      <!-- Category Filter -->
+      <nz-select
+        nzPlaceHolder="All Categories"
+        [(ngModel)]="selectedCategoryId"
+        (ngModelChange)="onFilterChange()"
+        nzAllowClear
+        class="filter-select"
+      >
+        <nz-option nzValue="" nzLabel="All Categories"></nz-option>
+        <nz-option
+          *ngFor="let category of categories"
+          [nzValue]="category.categoryId"
+          [nzLabel]="category.name"
+        ></nz-option>
+      </nz-select>
+
+      <!-- Manufacturer Filter -->
+      <nz-select
+        nzPlaceHolder="All Manufacturers"
+        [(ngModel)]="selectedManufacturer"
+        (ngModelChange)="onFilterChange()"
+        nzAllowClear
+        class="filter-select"
+      >
+        <nz-option nzValue="" nzLabel="All Manufacturers"></nz-option>
+        <nz-option
+          *ngFor="let manufacturer of manufacturers"
+          [nzValue]="manufacturer"
+          [nzLabel]="manufacturer"
+        ></nz-option>
+      </nz-select>
+
+      <!-- Status Filter -->
+      <nz-select
+        nzPlaceHolder="All Status"
+        [(ngModel)]="activeFilter"
+        (ngModelChange)="onFilterChange()"
+        nzAllowClear
+        class="filter-select"
+      >
+        <nz-option [nzValue]="undefined" nzLabel="All Status"></nz-option>
+        <nz-option [nzValue]="true" nzLabel="Active"></nz-option>
+        <nz-option [nzValue]="false" nzLabel="Inactive"></nz-option>
+      </nz-select>
+
+      <button nz-button nzType="default" (click)="clearFilters()">
+        Clear Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Bulk Actions -->
+  <div class="bulk-actions" *ngIf="setOfCheckedId.size > 0">
+    <span class="selection-info">{{ setOfCheckedId.size }} items selected</span>
+    <button nz-button nzType="primary" nzDanger (click)="bulkDelete()">
+      <i nz-icon nzType="delete"></i>
+      Delete Selected
+    </button>
+  </div>
+
+  <!-- Table Section -->
+  <nz-table
+    #basicTable
+    [nzData]="products"
+    [nzLoading]="loading"
+    [nzTotal]="total"
+    [nzPageSize]="pageSize"
+    [nzPageIndex]="pageIndex"
+    [nzShowPagination]="true"
+    [nzShowSizeChanger]="true"
+    [nzPageSizeOptions]="[10, 20, 50, 100]"
+    (nzPageIndexChange)="onPageIndexChange($event)"
+    (nzPageSizeChange)="onPageSizeChange($event)"
+    nzShowQuickJumper
+  >
+    <thead>
+      <tr>
+        <th
+          [nzChecked]="checked"
+          [nzIndeterminate]="indeterminate"
+          (nzCheckedChange)="onAllChecked($event)"
+          nzWidth="60px"
+        ></th>
+        <th
+          *ngFor="let column of listOfColumns"
+          [nzSortOrder]="column.sortOrder"
+          [nzSortFn]="column.sortFn"
+          [nzSortDirections]="column.sortDirections"
+        >
+          {{ column.name }}
+        </th>
+        <th nzWidth="200px">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products">
+        <td
+          [nzChecked]="setOfCheckedId.has(product.productId)"
+          (nzCheckedChange)="onItemChecked(product.productId, $event)"
+        ></td>
+        <td>
+          <div class="product-info">
+            <strong>{{ product.name }}</strong>
+            <div class="product-details">
+              <span *ngIf="product.manufacturer" class="manufacturer">{{ product.manufacturer }}</span>
+              <span *ngIf="product.modelNumber" class="model">Model: {{ product.modelNumber }}</span>
+            </div>
+          </div>
+        </td>
+        <td>
+          <nz-tag *ngIf="product.sku" nzColor="blue">{{ product.sku }}</nz-tag>
+          <span *ngIf="!product.sku" class="text-muted">No SKU</span>
+        </td>
+        <td>
+          <nz-tag nzColor="green">{{ product.categoryName }}</nz-tag>
+        </td>
+        <td>{{ product.manufacturer || '-' }}</td>
+        <td>
+          <nz-tag [nzColor]="product.isActive ? 'success' : 'default'">
+            {{ product.isActive ? 'Active' : 'Inactive' }}
+          </nz-tag>
+        </td>
+        <td>{{ formatDate(product.createdAt) }}</td>
+        <td>
+          <nz-button-group>
+            <button
+              nz-button
+              nzType="default"
+              nzSize="small"
+              nz-tooltip="View Details"
+              (click)="viewProduct(product)"
+            >
+              <i nz-icon nzType="eye"></i>
+            </button>
+            <button
+              nz-button
+              nzType="default"
+              nzSize="small"
+              nz-tooltip="Edit Product"
+              (click)="editProduct(product)"
+            >
+              <i nz-icon nzType="edit"></i>
+            </button>
+            <button
+              nz-button
+              nzType="default"
+              nzSize="small"
+              nzDanger
+              nz-tooltip="Delete Product"
+              (click)="deleteProduct(product)"
+            >
+              <i nz-icon nzType="delete"></i>
+            </button>
+          </nz-button-group>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+
+  <!-- Empty State -->
+  <nz-empty
+    *ngIf="!loading && products.length === 0"
+    [nzNotFoundContent]="getEmptyStateContent()"
+    [nzNotFoundFooter]="emptyFooter"
+  >
+    <ng-template #emptyFooter>
+      <button nz-button nzType="primary" (click)="createProduct()" *ngIf="!hasActiveFilters()">
+        Create First Product
+      </button>
+      <button nz-button nzType="default" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+        Clear Filters
+      </button>
+    </ng-template>
+  </nz-empty>
+</nz-card>
