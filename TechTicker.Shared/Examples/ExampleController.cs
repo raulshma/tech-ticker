@@ -16,23 +16,23 @@ namespace TechTicker.Shared.Examples
         /// Example of successful response with data
         /// </summary>
         [HttpGet("success")]
-        public IActionResult GetSuccessExample()
+        public ActionResult<ApiResponse<object>> GetSuccessExample()
         {
             var data = new { Message = "Hello from TechTicker.Shared!", Timestamp = DateTime.UtcNow };
-            return Ok(data, "Request processed successfully");
+            return Ok((object)data, "Request processed successfully");
         }
 
         /// <summary>
         /// Example of paginated response
         /// </summary>
         [HttpGet("paginated")]
-        public IActionResult GetPaginatedExample([FromQuery] PaginationRequest request)
+        public ActionResult<PagedResponse<object>> GetPaginatedExample([FromQuery] PaginationRequest request)
         {
             // Simulate data
             var items = Enumerable.Range(1, 100)
                 .Skip(request.Skip)
                 .Take(request.Take)
-                .Select(i => new { Id = i, Name = $"Item {i}" })
+                .Select(i => (object)new { Id = i, Name = $"Item {i}" })
                 .ToList();
 
             return OkPaged(items, request.PageNumber, request.PageSize, 100);
@@ -42,7 +42,7 @@ namespace TechTicker.Shared.Examples
         /// Example of using Result pattern
         /// </summary>
         [HttpGet("result/{id}")]
-        public IActionResult GetResultExample(int id)
+        public ActionResult<ApiResponse<object>> GetResultExample(int id)
         {
             var result = ProcessItem(id);
             return HandleResult(result);
@@ -73,7 +73,7 @@ namespace TechTicker.Shared.Examples
         /// Example of using validation utilities
         /// </summary>
         [HttpPost("validate")]
-        public IActionResult ValidateExample([FromBody] ValidationExampleRequest request)
+        public ActionResult<ApiResponse<string>> ValidateExample([FromBody] ValidationExampleRequest request)
         {
             var errors = new List<string>();
 
@@ -87,16 +87,22 @@ namespace TechTicker.Shared.Examples
                 errors.Add("Invalid website URL format");
 
             if (errors.Any())
-                return BadRequest(errors, "Validation failed");
+            {
+                var errorResponse = ApiResponse<string>.FailureResult(errors, "Validation failed", 400);
+                errorResponse.CorrelationId = CorrelationId;
+                return StatusCode(400, errorResponse);
+            }
 
-            return Ok("All validations passed");
+            var response = ApiResponse<string>.SuccessResult("All validations passed", null, 200);
+            response.CorrelationId = CorrelationId;
+            return StatusCode(200, response);
         }
 
         /// <summary>
         /// Example of using string utilities
         /// </summary>
         [HttpPost("utilities")]
-        public IActionResult UtilitiesExample([FromBody] UtilitiesExampleRequest request)
+        public ActionResult<ApiResponse<object>> UtilitiesExample([FromBody] UtilitiesExampleRequest request)
         {
             var result = new
             {
@@ -107,7 +113,7 @@ namespace TechTicker.Shared.Examples
                 RandomString = StringUtilities.GenerateRandomString(10)
             };
 
-            return Ok(result);
+            return Ok((object)result);
         }
 
         private Result<object> ProcessItem(int id)

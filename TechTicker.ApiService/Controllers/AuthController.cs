@@ -4,6 +4,7 @@ using System.Security.Claims;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Shared.Controllers;
+using TechTicker.Shared.Common;
 
 namespace TechTicker.ApiService.Controllers;
 
@@ -27,7 +28,7 @@ public class AuthController : BaseApiController
     /// <param name="registerDto">User registration data</param>
     /// <returns>Created user information</returns>
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserDto registerDto)
+    public async Task<ActionResult<ApiResponse<UserDto>>> Register([FromBody] RegisterUserDto registerDto)
     {
         var result = await _userService.RegisterUserAsync(registerDto);
         return HandleResult(result);
@@ -39,7 +40,7 @@ public class AuthController : BaseApiController
     /// <param name="loginDto">User login credentials</param>
     /// <returns>JWT token and user information</returns>
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginUserDto loginDto)
+    public async Task<ActionResult<ApiResponse<LoginResponseDto>>> Login([FromBody] LoginUserDto loginDto)
     {
         var result = await _userService.LoginUserAsync(loginDto);
         return HandleResult(result);
@@ -51,7 +52,7 @@ public class AuthController : BaseApiController
     /// <returns>Current user details</returns>
     [HttpGet("me")]
     [Authorize]
-    public async Task<IActionResult> GetCurrentUser()
+    public async Task<ActionResult<ApiResponse<UserDto>>> GetCurrentUser()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))

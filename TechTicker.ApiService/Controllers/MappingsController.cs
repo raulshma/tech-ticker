@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Shared.Controllers;
+using TechTicker.Shared.Common;
 
 namespace TechTicker.ApiService.Controllers;
 
@@ -27,7 +28,7 @@ public class MappingsController : BaseApiController
     /// <param name="createDto">Mapping creation data</param>
     /// <returns>Created mapping</returns>
     [HttpPost]
-    public async Task<IActionResult> CreateMapping([FromBody] CreateProductSellerMappingDto createDto)
+    public async Task<ActionResult<ApiResponse<ProductSellerMappingDto>>> CreateMapping([FromBody] CreateProductSellerMappingDto createDto)
     {
         var result = await _mappingService.CreateMappingAsync(createDto);
         return HandleResult(result);
@@ -39,7 +40,7 @@ public class MappingsController : BaseApiController
     /// <param name="canonicalProductId">Product ID</param>
     /// <returns>List of mappings for the product</returns>
     [HttpGet]
-    public async Task<IActionResult> GetMappings([FromQuery] Guid? canonicalProductId = null)
+    public async Task<ActionResult<ApiResponse<IEnumerable<ProductSellerMappingDto>>>> GetMappings([FromQuery] Guid? canonicalProductId = null)
     {
         if (canonicalProductId.HasValue)
         {
@@ -57,7 +58,7 @@ public class MappingsController : BaseApiController
     /// </summary>
     /// <returns>List of active mappings</returns>
     [HttpGet("active")]
-    public async Task<IActionResult> GetActiveMappings()
+    public async Task<ActionResult<ApiResponse<IEnumerable<ProductSellerMappingDto>>>> GetActiveMappings()
     {
         var result = await _mappingService.GetActiveMappingsAsync();
         return HandleResult(result);
@@ -70,7 +71,7 @@ public class MappingsController : BaseApiController
     /// <param name="updateDto">Mapping update data</param>
     /// <returns>Updated mapping</returns>
     [HttpPut("{mappingId:guid}")]
-    public async Task<IActionResult> UpdateMapping(Guid mappingId, [FromBody] UpdateProductSellerMappingDto updateDto)
+    public async Task<ActionResult<ApiResponse<ProductSellerMappingDto>>> UpdateMapping(Guid mappingId, [FromBody] UpdateProductSellerMappingDto updateDto)
     {
         var result = await _mappingService.UpdateMappingAsync(mappingId, updateDto);
         return HandleResult(result);
@@ -82,7 +83,7 @@ public class MappingsController : BaseApiController
     /// <param name="mappingId">Mapping ID</param>
     /// <returns>Success or error</returns>
     [HttpDelete("{mappingId:guid}")]
-    public async Task<IActionResult> DeleteMapping(Guid mappingId)
+    public async Task<ActionResult<ApiResponse>> DeleteMapping(Guid mappingId)
     {
         var result = await _mappingService.DeleteMappingAsync(mappingId);
         return HandleResult(result);

@@ -33,7 +33,7 @@ export class TechTickerApiClient {
      * @param pageSize (optional) 
      * @return OK
      */
-    usersGET(page: number | undefined, pageSize: number | undefined): Observable<void> {
+    usersGET(page: number | undefined, pageSize: number | undefined): Observable<UserDtoPagedResponse> {
         let url_ = this.baseUrl + "/api/Admin/users?";
         if (page === null)
             throw new Error("The parameter 'page' cannot be null.");
@@ -49,6 +49,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -59,14 +60,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processUsersGET(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<UserDtoPagedResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<UserDtoPagedResponse>;
         }));
     }
 
-    protected processUsersGET(response: HttpResponseBase): Observable<void> {
+    protected processUsersGET(response: HttpResponseBase): Observable<UserDtoPagedResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -75,7 +76,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserDtoPagedResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -89,7 +93,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    usersPOST(body: CreateUserDto | undefined): Observable<void> {
+    usersPOST(body: CreateUserDto | undefined): Observable<UserDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Admin/users";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -101,6 +105,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -111,14 +116,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processUsersPOST(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<UserDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<UserDtoApiResponse>;
         }));
     }
 
-    protected processUsersPOST(response: HttpResponseBase): Observable<void> {
+    protected processUsersPOST(response: HttpResponseBase): Observable<UserDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -127,7 +132,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -140,7 +148,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    usersGET2(userId: string): Observable<void> {
+    usersGET2(userId: string): Observable<UserDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Admin/users/{userId}";
         if (userId === undefined || userId === null)
             throw new Error("The parameter 'userId' must be defined.");
@@ -151,6 +159,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -161,14 +170,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processUsersGET2(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<UserDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<UserDtoApiResponse>;
         }));
     }
 
-    protected processUsersGET2(response: HttpResponseBase): Observable<void> {
+    protected processUsersGET2(response: HttpResponseBase): Observable<UserDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -177,7 +186,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -191,7 +203,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    usersPUT(userId: string, body: UpdateUserDto | undefined): Observable<void> {
+    usersPUT(userId: string, body: UpdateUserDto | undefined): Observable<UserDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Admin/users/{userId}";
         if (userId === undefined || userId === null)
             throw new Error("The parameter 'userId' must be defined.");
@@ -206,6 +218,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -216,14 +229,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processUsersPUT(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<UserDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<UserDtoApiResponse>;
         }));
     }
 
-    protected processUsersPUT(response: HttpResponseBase): Observable<void> {
+    protected processUsersPUT(response: HttpResponseBase): Observable<UserDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -232,7 +245,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -245,7 +261,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    usersDELETE(userId: string): Observable<void> {
+    usersDELETE(userId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/Admin/users/{userId}";
         if (userId === undefined || userId === null)
             throw new Error("The parameter 'userId' must be defined.");
@@ -256,6 +272,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -266,14 +283,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processUsersDELETE(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
         }));
     }
 
-    protected processUsersDELETE(response: HttpResponseBase): Observable<void> {
+    protected processUsersDELETE(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -282,7 +299,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -299,7 +319,7 @@ export class TechTickerApiClient {
      * @param pageSize (optional) 
      * @return OK
      */
-    alerts(userId: string | undefined, productId: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<void> {
+    alerts(userId: string | undefined, productId: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<AlertRuleDtoPagedResponse> {
         let url_ = this.baseUrl + "/api/Admin/alerts?";
         if (userId === null)
             throw new Error("The parameter 'userId' cannot be null.");
@@ -323,6 +343,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -333,14 +354,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processAlerts(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<AlertRuleDtoPagedResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<AlertRuleDtoPagedResponse>;
         }));
     }
 
-    protected processAlerts(response: HttpResponseBase): Observable<void> {
+    protected processAlerts(response: HttpResponseBase): Observable<AlertRuleDtoPagedResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -349,7 +370,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRuleDtoPagedResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -363,7 +387,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    alertsPOST(body: CreateAlertRuleDto | undefined): Observable<void> {
+    alertsPOST(body: CreateAlertRuleDto | undefined): Observable<AlertRuleDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Alerts";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -375,6 +399,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -385,14 +410,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processAlertsPOST(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<AlertRuleDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<AlertRuleDtoApiResponse>;
         }));
     }
 
-    protected processAlertsPOST(response: HttpResponseBase): Observable<void> {
+    protected processAlertsPOST(response: HttpResponseBase): Observable<AlertRuleDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -401,7 +426,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRuleDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -414,7 +442,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    alertsGET(): Observable<void> {
+    alertsGET(): Observable<AlertRuleDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Alerts";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -422,6 +450,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -432,14 +461,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processAlertsGET(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<AlertRuleDtoIEnumerableApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<AlertRuleDtoIEnumerableApiResponse>;
         }));
     }
 
-    protected processAlertsGET(response: HttpResponseBase): Observable<void> {
+    protected processAlertsGET(response: HttpResponseBase): Observable<AlertRuleDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -448,7 +477,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRuleDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -461,7 +493,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    product(productId: string): Observable<void> {
+    product(productId: string): Observable<AlertRuleDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Alerts/product/{productId}";
         if (productId === undefined || productId === null)
             throw new Error("The parameter 'productId' must be defined.");
@@ -472,6 +504,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -482,14 +515,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processProduct(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<AlertRuleDtoIEnumerableApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<AlertRuleDtoIEnumerableApiResponse>;
         }));
     }
 
-    protected processProduct(response: HttpResponseBase): Observable<void> {
+    protected processProduct(response: HttpResponseBase): Observable<AlertRuleDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -498,7 +531,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRuleDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -512,7 +548,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    alertsPUT(alertRuleId: string, body: UpdateAlertRuleDto | undefined): Observable<void> {
+    alertsPUT(alertRuleId: string, body: UpdateAlertRuleDto | undefined): Observable<AlertRuleDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Alerts/{alertRuleId}";
         if (alertRuleId === undefined || alertRuleId === null)
             throw new Error("The parameter 'alertRuleId' must be defined.");
@@ -527,6 +563,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -537,14 +574,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processAlertsPUT(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<AlertRuleDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<AlertRuleDtoApiResponse>;
         }));
     }
 
-    protected processAlertsPUT(response: HttpResponseBase): Observable<void> {
+    protected processAlertsPUT(response: HttpResponseBase): Observable<AlertRuleDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -553,7 +590,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRuleDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -566,7 +606,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    alertsDELETE(alertRuleId: string): Observable<void> {
+    alertsDELETE(alertRuleId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/Alerts/{alertRuleId}";
         if (alertRuleId === undefined || alertRuleId === null)
             throw new Error("The parameter 'alertRuleId' must be defined.");
@@ -577,6 +617,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -587,14 +628,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processAlertsDELETE(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
         }));
     }
 
-    protected processAlertsDELETE(response: HttpResponseBase): Observable<void> {
+    protected processAlertsDELETE(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -603,7 +644,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -617,7 +661,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    register(body: RegisterUserDto | undefined): Observable<void> {
+    register(body: RegisterUserDto | undefined): Observable<UserDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Auth/register";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -629,6 +673,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -639,14 +684,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processRegister(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<UserDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<UserDtoApiResponse>;
         }));
     }
 
-    protected processRegister(response: HttpResponseBase): Observable<void> {
+    protected processRegister(response: HttpResponseBase): Observable<UserDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -655,7 +700,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -669,7 +717,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    login(body: LoginUserDto | undefined): Observable<void> {
+    login(body: LoginUserDto | undefined): Observable<LoginResponseDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Auth/login";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -681,6 +729,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -691,14 +740,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processLogin(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<LoginResponseDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<LoginResponseDtoApiResponse>;
         }));
     }
 
-    protected processLogin(response: HttpResponseBase): Observable<void> {
+    protected processLogin(response: HttpResponseBase): Observable<LoginResponseDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -707,7 +756,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = LoginResponseDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -720,7 +772,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    me(): Observable<void> {
+    me(): Observable<UserDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Auth/me";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -728,6 +780,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -738,14 +791,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processMe(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<UserDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<UserDtoApiResponse>;
         }));
     }
 
-    protected processMe(response: HttpResponseBase): Observable<void> {
+    protected processMe(response: HttpResponseBase): Observable<UserDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -754,7 +807,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -768,7 +824,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    categoriesPOST(body: CreateCategoryDto | undefined): Observable<void> {
+    categoriesPOST(body: CreateCategoryDto | undefined): Observable<CategoryDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Categories";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -780,6 +836,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -790,14 +847,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processCategoriesPOST(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<CategoryDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<CategoryDtoApiResponse>;
         }));
     }
 
-    protected processCategoriesPOST(response: HttpResponseBase): Observable<void> {
+    protected processCategoriesPOST(response: HttpResponseBase): Observable<CategoryDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -806,7 +863,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CategoryDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -819,7 +879,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    categoriesGET(): Observable<void> {
+    categoriesGET(): Observable<CategoryDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Categories";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -827,6 +887,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -837,14 +898,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processCategoriesGET(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<CategoryDtoIEnumerableApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<CategoryDtoIEnumerableApiResponse>;
         }));
     }
 
-    protected processCategoriesGET(response: HttpResponseBase): Observable<void> {
+    protected processCategoriesGET(response: HttpResponseBase): Observable<CategoryDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -853,7 +914,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CategoryDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -866,7 +930,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    categoriesGET2(categoryIdOrSlug: string): Observable<void> {
+    categoriesGET2(categoryIdOrSlug: string): Observable<CategoryDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Categories/{categoryIdOrSlug}";
         if (categoryIdOrSlug === undefined || categoryIdOrSlug === null)
             throw new Error("The parameter 'categoryIdOrSlug' must be defined.");
@@ -877,6 +941,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -887,14 +952,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processCategoriesGET2(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<CategoryDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<CategoryDtoApiResponse>;
         }));
     }
 
-    protected processCategoriesGET2(response: HttpResponseBase): Observable<void> {
+    protected processCategoriesGET2(response: HttpResponseBase): Observable<CategoryDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -903,7 +968,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CategoryDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -917,7 +985,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    categoriesPUT(categoryId: string, body: UpdateCategoryDto | undefined): Observable<void> {
+    categoriesPUT(categoryId: string, body: UpdateCategoryDto | undefined): Observable<CategoryDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Categories/{categoryId}";
         if (categoryId === undefined || categoryId === null)
             throw new Error("The parameter 'categoryId' must be defined.");
@@ -932,6 +1000,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -942,14 +1011,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processCategoriesPUT(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<CategoryDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<CategoryDtoApiResponse>;
         }));
     }
 
-    protected processCategoriesPUT(response: HttpResponseBase): Observable<void> {
+    protected processCategoriesPUT(response: HttpResponseBase): Observable<CategoryDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -958,7 +1027,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CategoryDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -971,7 +1043,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    categoriesDELETE(categoryId: string): Observable<void> {
+    categoriesDELETE(categoryId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/Categories/{categoryId}";
         if (categoryId === undefined || categoryId === null)
             throw new Error("The parameter 'categoryId' must be defined.");
@@ -982,6 +1054,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -992,14 +1065,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processCategoriesDELETE(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
         }));
     }
 
-    protected processCategoriesDELETE(response: HttpResponseBase): Observable<void> {
+    protected processCategoriesDELETE(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1008,7 +1081,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1021,7 +1097,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    success(): Observable<void> {
+    success(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Example/success";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1029,6 +1105,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -1039,14 +1116,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processSuccess(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
         }));
     }
 
-    protected processSuccess(response: HttpResponseBase): Observable<void> {
+    protected processSuccess(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1055,7 +1132,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1072,7 +1152,7 @@ export class TechTickerApiClient {
      * @param take (optional) 
      * @return OK
      */
-    paginated(pageNumber: number | undefined, pageSize: number | undefined, skip: number | undefined, take: number | undefined): Observable<void> {
+    paginated(pageNumber: number | undefined, pageSize: number | undefined, skip: number | undefined, take: number | undefined): Observable<ObjectPagedResponse> {
         let url_ = this.baseUrl + "/api/Example/paginated?";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
@@ -1096,6 +1176,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -1106,14 +1187,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processPaginated(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectPagedResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectPagedResponse>;
         }));
     }
 
-    protected processPaginated(response: HttpResponseBase): Observable<void> {
+    protected processPaginated(response: HttpResponseBase): Observable<ObjectPagedResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1122,7 +1203,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectPagedResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1135,7 +1219,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    result(id: number): Observable<void> {
+    result(id: number): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Example/result/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1146,6 +1230,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -1156,14 +1241,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processResult(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
         }));
     }
 
-    protected processResult(response: HttpResponseBase): Observable<void> {
+    protected processResult(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1172,7 +1257,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1236,7 +1324,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    validate(body: ValidationExampleRequest | undefined): Observable<void> {
+    validate(body: ValidationExampleRequest | undefined): Observable<StringApiResponse> {
         let url_ = this.baseUrl + "/api/Example/validate";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1248,6 +1336,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -1258,14 +1347,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processValidate(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<StringApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<StringApiResponse>;
         }));
     }
 
-    protected processValidate(response: HttpResponseBase): Observable<void> {
+    protected processValidate(response: HttpResponseBase): Observable<StringApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1274,7 +1363,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StringApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1288,7 +1380,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    utilities(body: UtilitiesExampleRequest | undefined): Observable<void> {
+    utilities(body: UtilitiesExampleRequest | undefined): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Example/utilities";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1300,6 +1392,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -1310,14 +1403,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processUtilities(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
         }));
     }
 
-    protected processUtilities(response: HttpResponseBase): Observable<void> {
+    protected processUtilities(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1326,7 +1419,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1340,7 +1436,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    mappingsPOST(body: CreateProductSellerMappingDto | undefined): Observable<void> {
+    mappingsPOST(body: CreateProductSellerMappingDto | undefined): Observable<ProductSellerMappingDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Mappings";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1352,6 +1448,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -1362,14 +1459,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processMappingsPOST(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ProductSellerMappingDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ProductSellerMappingDtoApiResponse>;
         }));
     }
 
-    protected processMappingsPOST(response: HttpResponseBase): Observable<void> {
+    protected processMappingsPOST(response: HttpResponseBase): Observable<ProductSellerMappingDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1378,7 +1475,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductSellerMappingDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1392,7 +1492,7 @@ export class TechTickerApiClient {
      * @param canonicalProductId (optional) 
      * @return OK
      */
-    mappingsGET(canonicalProductId: string | undefined): Observable<void> {
+    mappingsGET(canonicalProductId: string | undefined): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Mappings?";
         if (canonicalProductId === null)
             throw new Error("The parameter 'canonicalProductId' cannot be null.");
@@ -1404,6 +1504,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -1414,14 +1515,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processMappingsGET(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ProductSellerMappingDtoIEnumerableApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ProductSellerMappingDtoIEnumerableApiResponse>;
         }));
     }
 
-    protected processMappingsGET(response: HttpResponseBase): Observable<void> {
+    protected processMappingsGET(response: HttpResponseBase): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1430,7 +1531,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductSellerMappingDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1443,7 +1547,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    active(): Observable<void> {
+    active(): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Mappings/active";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1451,6 +1555,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -1461,14 +1566,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processActive(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ProductSellerMappingDtoIEnumerableApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ProductSellerMappingDtoIEnumerableApiResponse>;
         }));
     }
 
-    protected processActive(response: HttpResponseBase): Observable<void> {
+    protected processActive(response: HttpResponseBase): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1477,7 +1582,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductSellerMappingDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1491,7 +1599,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    mappingsPUT(mappingId: string, body: UpdateProductSellerMappingDto | undefined): Observable<void> {
+    mappingsPUT(mappingId: string, body: UpdateProductSellerMappingDto | undefined): Observable<ProductSellerMappingDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Mappings/{mappingId}";
         if (mappingId === undefined || mappingId === null)
             throw new Error("The parameter 'mappingId' must be defined.");
@@ -1506,6 +1614,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -1516,14 +1625,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processMappingsPUT(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ProductSellerMappingDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ProductSellerMappingDtoApiResponse>;
         }));
     }
 
-    protected processMappingsPUT(response: HttpResponseBase): Observable<void> {
+    protected processMappingsPUT(response: HttpResponseBase): Observable<ProductSellerMappingDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1532,7 +1641,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductSellerMappingDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1545,7 +1657,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    mappingsDELETE(mappingId: string): Observable<void> {
+    mappingsDELETE(mappingId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/Mappings/{mappingId}";
         if (mappingId === undefined || mappingId === null)
             throw new Error("The parameter 'mappingId' must be defined.");
@@ -1556,6 +1668,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -1566,14 +1679,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processMappingsDELETE(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
         }));
     }
 
-    protected processMappingsDELETE(response: HttpResponseBase): Observable<void> {
+    protected processMappingsDELETE(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1582,7 +1695,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1596,7 +1712,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    productsPOST(body: CreateProductDto | undefined): Observable<void> {
+    productsPOST(body: CreateProductDto | undefined): Observable<ProductDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Products";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1608,6 +1724,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -1618,14 +1735,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processProductsPOST(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ProductDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ProductDtoApiResponse>;
         }));
     }
 
-    protected processProductsPOST(response: HttpResponseBase): Observable<void> {
+    protected processProductsPOST(response: HttpResponseBase): Observable<ProductDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1634,7 +1751,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1651,7 +1771,7 @@ export class TechTickerApiClient {
      * @param pageSize (optional) 
      * @return OK
      */
-    productsGET(categoryId: string | undefined, search: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<void> {
+    productsGET(categoryId: string | undefined, search: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<ProductDtoPagedResponse> {
         let url_ = this.baseUrl + "/api/Products?";
         if (categoryId === null)
             throw new Error("The parameter 'categoryId' cannot be null.");
@@ -1675,6 +1795,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -1685,14 +1806,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processProductsGET(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ProductDtoPagedResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ProductDtoPagedResponse>;
         }));
     }
 
-    protected processProductsGET(response: HttpResponseBase): Observable<void> {
+    protected processProductsGET(response: HttpResponseBase): Observable<ProductDtoPagedResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1701,7 +1822,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductDtoPagedResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1714,7 +1838,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    productsGET2(productId: string): Observable<void> {
+    productsGET2(productId: string): Observable<ProductDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Products/{productId}";
         if (productId === undefined || productId === null)
             throw new Error("The parameter 'productId' must be defined.");
@@ -1725,6 +1849,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -1735,14 +1860,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processProductsGET2(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ProductDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ProductDtoApiResponse>;
         }));
     }
 
-    protected processProductsGET2(response: HttpResponseBase): Observable<void> {
+    protected processProductsGET2(response: HttpResponseBase): Observable<ProductDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1751,7 +1876,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1765,7 +1893,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    productsPUT(productId: string, body: UpdateProductDto | undefined): Observable<void> {
+    productsPUT(productId: string, body: UpdateProductDto | undefined): Observable<ProductDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Products/{productId}";
         if (productId === undefined || productId === null)
             throw new Error("The parameter 'productId' must be defined.");
@@ -1780,6 +1908,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -1790,14 +1919,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processProductsPUT(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ProductDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ProductDtoApiResponse>;
         }));
     }
 
-    protected processProductsPUT(response: HttpResponseBase): Observable<void> {
+    protected processProductsPUT(response: HttpResponseBase): Observable<ProductDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1806,7 +1935,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1819,7 +1951,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    productsDELETE(productId: string): Observable<void> {
+    productsDELETE(productId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/Products/{productId}";
         if (productId === undefined || productId === null)
             throw new Error("The parameter 'productId' must be defined.");
@@ -1830,6 +1962,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -1840,14 +1973,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processProductsDELETE(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
         }));
     }
 
-    protected processProductsDELETE(response: HttpResponseBase): Observable<void> {
+    protected processProductsDELETE(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1856,7 +1989,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1873,7 +2009,7 @@ export class TechTickerApiClient {
      * @param limit (optional) 
      * @return OK
      */
-    priceHistory(productId: string, sellerName: string | undefined, startDate: Date | undefined, endDate: Date | undefined, limit: number | undefined): Observable<void> {
+    priceHistory(productId: string, sellerName: string | undefined, startDate: Date | undefined, endDate: Date | undefined, limit: number | undefined): Observable<PriceHistoryDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Products/{productId}/price-history?";
         if (productId === undefined || productId === null)
             throw new Error("The parameter 'productId' must be defined.");
@@ -1900,6 +2036,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -1910,14 +2047,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processPriceHistory(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<PriceHistoryDtoIEnumerableApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<PriceHistoryDtoIEnumerableApiResponse>;
         }));
     }
 
-    protected processPriceHistory(response: HttpResponseBase): Observable<void> {
+    protected processPriceHistory(response: HttpResponseBase): Observable<PriceHistoryDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1926,7 +2063,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PriceHistoryDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1939,7 +2079,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    public(): Observable<void> {
+    public(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/public";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1947,6 +2087,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -1957,14 +2098,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processPublic(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
         }));
     }
 
-    protected processPublic(response: HttpResponseBase): Observable<void> {
+    protected processPublic(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1973,7 +2114,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1986,7 +2130,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    dataGET(): Observable<void> {
+    dataGET(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/data";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1994,6 +2138,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -2004,14 +2149,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processDataGET(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
         }));
     }
 
-    protected processDataGET(response: HttpResponseBase): Observable<void> {
+    protected processDataGET(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2020,7 +2165,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2034,7 +2182,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    dataPOST(body: any | undefined): Observable<void> {
+    dataPOST(body: any | undefined): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/data";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2046,6 +2194,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -2056,14 +2205,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processDataPOST(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
         }));
     }
 
-    protected processDataPOST(response: HttpResponseBase): Observable<void> {
+    protected processDataPOST(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2072,7 +2221,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2085,7 +2237,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    admin(): Observable<void> {
+    admin(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/admin";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2093,6 +2245,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -2103,14 +2256,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processAdmin(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
         }));
     }
 
-    protected processAdmin(response: HttpResponseBase): Observable<void> {
+    protected processAdmin(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2119,7 +2272,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2132,7 +2288,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    dataGET2(userId: string): Observable<void> {
+    dataGET2(userId: string): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/users/{userId}/data";
         if (userId === undefined || userId === null)
             throw new Error("The parameter 'userId' must be defined.");
@@ -2143,6 +2299,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -2153,14 +2310,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processDataGET2(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
         }));
     }
 
-    protected processDataGET2(response: HttpResponseBase): Observable<void> {
+    protected processDataGET2(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2169,7 +2326,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2182,7 +2342,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    internal(): Observable<void> {
+    internal(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/internal";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2190,6 +2350,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -2200,14 +2361,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processInternal(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
         }));
     }
 
-    protected processInternal(response: HttpResponseBase): Observable<void> {
+    protected processInternal(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2216,7 +2377,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2229,7 +2393,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    custom(): Observable<void> {
+    custom(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/custom";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2237,6 +2401,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -2247,14 +2412,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processCustom(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
         }));
     }
 
-    protected processCustom(response: HttpResponseBase): Observable<void> {
+    protected processCustom(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2263,7 +2428,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2276,7 +2444,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    manualAuth(): Observable<void> {
+    manualAuth(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/manual-auth";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2284,6 +2452,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -2294,14 +2463,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processManualAuth(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
         }));
     }
 
-    protected processManualAuth(response: HttpResponseBase): Observable<void> {
+    protected processManualAuth(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2310,7 +2479,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2324,7 +2496,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    siteConfigsPOST(body: CreateScraperSiteConfigurationDto | undefined): Observable<void> {
+    siteConfigsPOST(body: CreateScraperSiteConfigurationDto | undefined): Observable<ScraperSiteConfigurationDtoApiResponse> {
         let url_ = this.baseUrl + "/api/site-configs";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2336,6 +2508,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -2346,14 +2519,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processSiteConfigsPOST(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
         }));
     }
 
-    protected processSiteConfigsPOST(response: HttpResponseBase): Observable<void> {
+    protected processSiteConfigsPOST(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2362,7 +2535,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperSiteConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2376,7 +2552,7 @@ export class TechTickerApiClient {
      * @param domain (optional) 
      * @return OK
      */
-    siteConfigsGET(domain: string | undefined): Observable<void> {
+    siteConfigsGET(domain: string | undefined): Observable<ScraperSiteConfigurationDtoApiResponse> {
         let url_ = this.baseUrl + "/api/site-configs?";
         if (domain === null)
             throw new Error("The parameter 'domain' cannot be null.");
@@ -2388,6 +2564,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -2398,14 +2575,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processSiteConfigsGET(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
         }));
     }
 
-    protected processSiteConfigsGET(response: HttpResponseBase): Observable<void> {
+    protected processSiteConfigsGET(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2414,7 +2591,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperSiteConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2427,7 +2607,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    siteConfigsGET2(siteConfigId: string): Observable<void> {
+    siteConfigsGET2(siteConfigId: string): Observable<ScraperSiteConfigurationDtoApiResponse> {
         let url_ = this.baseUrl + "/api/site-configs/{siteConfigId}";
         if (siteConfigId === undefined || siteConfigId === null)
             throw new Error("The parameter 'siteConfigId' must be defined.");
@@ -2438,6 +2618,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -2448,14 +2629,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processSiteConfigsGET2(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
         }));
     }
 
-    protected processSiteConfigsGET2(response: HttpResponseBase): Observable<void> {
+    protected processSiteConfigsGET2(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2464,7 +2645,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperSiteConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2478,7 +2662,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    siteConfigsPUT(siteConfigId: string, body: UpdateScraperSiteConfigurationDto | undefined): Observable<void> {
+    siteConfigsPUT(siteConfigId: string, body: UpdateScraperSiteConfigurationDto | undefined): Observable<ScraperSiteConfigurationDtoApiResponse> {
         let url_ = this.baseUrl + "/api/site-configs/{siteConfigId}";
         if (siteConfigId === undefined || siteConfigId === null)
             throw new Error("The parameter 'siteConfigId' must be defined.");
@@ -2493,6 +2677,7 @@ export class TechTickerApiClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -2503,14 +2688,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processSiteConfigsPUT(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
         }));
     }
 
-    protected processSiteConfigsPUT(response: HttpResponseBase): Observable<void> {
+    protected processSiteConfigsPUT(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2519,7 +2704,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperSiteConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2532,7 +2720,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    siteConfigsDELETE(siteConfigId: string): Observable<void> {
+    siteConfigsDELETE(siteConfigId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/site-configs/{siteConfigId}";
         if (siteConfigId === undefined || siteConfigId === null)
             throw new Error("The parameter 'siteConfigId' must be defined.");
@@ -2543,6 +2731,7 @@ export class TechTickerApiClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -2553,14 +2742,14 @@ export class TechTickerApiClient {
                 try {
                     return this.processSiteConfigsDELETE(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
         }));
     }
 
-    protected processSiteConfigsDELETE(response: HttpResponseBase): Observable<void> {
+    protected processSiteConfigsDELETE(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2569,7 +2758,10 @@ export class TechTickerApiClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2578,6 +2770,686 @@ export class TechTickerApiClient {
         }
         return _observableOf(null as any);
     }
+}
+
+export class AlertRuleDto implements IAlertRuleDto {
+    alertRuleId?: string;
+    userId?: string;
+    canonicalProductId?: string;
+    conditionType?: string | undefined;
+    thresholdValue?: number | undefined;
+    percentageValue?: number | undefined;
+    specificSellerName?: string | undefined;
+    notificationFrequencyMinutes?: number;
+    isActive?: boolean;
+    lastNotifiedAt?: Date | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+    ruleDescription?: string | undefined;
+    user?: UserDto;
+    product?: ProductDto;
+
+    constructor(data?: IAlertRuleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.alertRuleId = _data["alertRuleId"];
+            this.userId = _data["userId"];
+            this.canonicalProductId = _data["canonicalProductId"];
+            this.conditionType = _data["conditionType"];
+            this.thresholdValue = _data["thresholdValue"];
+            this.percentageValue = _data["percentageValue"];
+            this.specificSellerName = _data["specificSellerName"];
+            this.notificationFrequencyMinutes = _data["notificationFrequencyMinutes"];
+            this.isActive = _data["isActive"];
+            this.lastNotifiedAt = _data["lastNotifiedAt"] ? new Date(_data["lastNotifiedAt"].toString()) : <any>undefined;
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.ruleDescription = _data["ruleDescription"];
+            this.user = _data["user"] ? UserDto.fromJS(_data["user"]) : <any>undefined;
+            this.product = _data["product"] ? ProductDto.fromJS(_data["product"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): AlertRuleDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertRuleDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["alertRuleId"] = this.alertRuleId;
+        data["userId"] = this.userId;
+        data["canonicalProductId"] = this.canonicalProductId;
+        data["conditionType"] = this.conditionType;
+        data["thresholdValue"] = this.thresholdValue;
+        data["percentageValue"] = this.percentageValue;
+        data["specificSellerName"] = this.specificSellerName;
+        data["notificationFrequencyMinutes"] = this.notificationFrequencyMinutes;
+        data["isActive"] = this.isActive;
+        data["lastNotifiedAt"] = this.lastNotifiedAt ? this.lastNotifiedAt.toISOString() : <any>undefined;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["ruleDescription"] = this.ruleDescription;
+        data["user"] = this.user ? this.user.toJSON() : <any>undefined;
+        data["product"] = this.product ? this.product.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IAlertRuleDto {
+    alertRuleId?: string;
+    userId?: string;
+    canonicalProductId?: string;
+    conditionType?: string | undefined;
+    thresholdValue?: number | undefined;
+    percentageValue?: number | undefined;
+    specificSellerName?: string | undefined;
+    notificationFrequencyMinutes?: number;
+    isActive?: boolean;
+    lastNotifiedAt?: Date | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+    ruleDescription?: string | undefined;
+    user?: UserDto;
+    product?: ProductDto;
+}
+
+export class AlertRuleDtoApiResponse implements IAlertRuleDtoApiResponse {
+    success?: boolean;
+    data?: AlertRuleDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertRuleDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertRuleDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertRuleDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertRuleDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertRuleDtoApiResponse {
+    success?: boolean;
+    data?: AlertRuleDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertRuleDtoIEnumerableApiResponse implements IAlertRuleDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: AlertRuleDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertRuleDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(AlertRuleDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertRuleDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertRuleDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertRuleDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: AlertRuleDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertRuleDtoPagedResponse implements IAlertRuleDtoPagedResponse {
+    success?: boolean;
+    data?: AlertRuleDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+
+    constructor(data?: IAlertRuleDtoPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(AlertRuleDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+            this.pagination = _data["pagination"] ? PaginationMeta.fromJS(_data["pagination"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): AlertRuleDtoPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertRuleDtoPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        data["pagination"] = this.pagination ? this.pagination.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IAlertRuleDtoPagedResponse {
+    success?: boolean;
+    data?: AlertRuleDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+}
+
+export class ApiResponse implements IApiResponse {
+    success?: boolean;
+    data?: any | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IApiResponse {
+    success?: boolean;
+    data?: any | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class CategoryDto implements ICategoryDto {
+    categoryId?: string;
+    name?: string | undefined;
+    slug?: string | undefined;
+    description?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+
+    constructor(data?: ICategoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.categoryId = _data["categoryId"];
+            this.name = _data["name"];
+            this.slug = _data["slug"];
+            this.description = _data["description"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): CategoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CategoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["categoryId"] = this.categoryId;
+        data["name"] = this.name;
+        data["slug"] = this.slug;
+        data["description"] = this.description;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ICategoryDto {
+    categoryId?: string;
+    name?: string | undefined;
+    slug?: string | undefined;
+    description?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+export class CategoryDtoApiResponse implements ICategoryDtoApiResponse {
+    success?: boolean;
+    data?: CategoryDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ICategoryDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? CategoryDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): CategoryDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new CategoryDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ICategoryDtoApiResponse {
+    success?: boolean;
+    data?: CategoryDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class CategoryDtoIEnumerableApiResponse implements ICategoryDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: CategoryDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ICategoryDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(CategoryDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): CategoryDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new CategoryDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ICategoryDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: CategoryDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class CreateAlertRuleDto implements ICreateAlertRuleDto {
@@ -2944,6 +3816,154 @@ export interface ICreateUserDto {
     roles?: string[] | undefined;
 }
 
+export class LoginResponseDto implements ILoginResponseDto {
+    token?: string | undefined;
+    userId?: string;
+    email?: string | undefined;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    roles?: string[] | undefined;
+
+    constructor(data?: ILoginResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.token = _data["token"];
+            this.userId = _data["userId"];
+            this.email = _data["email"];
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            if (Array.isArray(_data["roles"])) {
+                this.roles = [] as any;
+                for (let item of _data["roles"])
+                    this.roles!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): LoginResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LoginResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["token"] = this.token;
+        data["userId"] = this.userId;
+        data["email"] = this.email;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        if (Array.isArray(this.roles)) {
+            data["roles"] = [];
+            for (let item of this.roles)
+                data["roles"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ILoginResponseDto {
+    token?: string | undefined;
+    userId?: string;
+    email?: string | undefined;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    roles?: string[] | undefined;
+}
+
+export class LoginResponseDtoApiResponse implements ILoginResponseDtoApiResponse {
+    success?: boolean;
+    data?: LoginResponseDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ILoginResponseDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? LoginResponseDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): LoginResponseDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new LoginResponseDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ILoginResponseDtoApiResponse {
+    success?: boolean;
+    data?: LoginResponseDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class LoginUserDto implements ILoginUserDto {
     email!: string;
     password!: string;
@@ -2982,6 +4002,938 @@ export class LoginUserDto implements ILoginUserDto {
 export interface ILoginUserDto {
     email: string;
     password: string;
+}
+
+export class ObjectApiResponse implements IObjectApiResponse {
+    success?: boolean;
+    data?: any | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IObjectApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ObjectApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ObjectApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IObjectApiResponse {
+    success?: boolean;
+    data?: any | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ObjectPagedResponse implements IObjectPagedResponse {
+    success?: boolean;
+    data?: any[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+
+    constructor(data?: IObjectPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(item);
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+            this.pagination = _data["pagination"] ? PaginationMeta.fromJS(_data["pagination"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ObjectPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ObjectPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        data["pagination"] = this.pagination ? this.pagination.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IObjectPagedResponse {
+    success?: boolean;
+    data?: any[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+}
+
+export class PaginationMeta implements IPaginationMeta {
+    pageNumber?: number;
+    pageSize?: number;
+    totalCount?: number;
+    readonly totalPages?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+    readonly firstItemOnPage?: number;
+    readonly lastItemOnPage?: number;
+
+    constructor(data?: IPaginationMeta) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalCount = _data["totalCount"];
+            (<any>this).totalPages = _data["totalPages"];
+            (<any>this).hasPreviousPage = _data["hasPreviousPage"];
+            (<any>this).hasNextPage = _data["hasNextPage"];
+            (<any>this).firstItemOnPage = _data["firstItemOnPage"];
+            (<any>this).lastItemOnPage = _data["lastItemOnPage"];
+        }
+    }
+
+    static fromJS(data: any): PaginationMeta {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaginationMeta();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalCount"] = this.totalCount;
+        data["totalPages"] = this.totalPages;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        data["firstItemOnPage"] = this.firstItemOnPage;
+        data["lastItemOnPage"] = this.lastItemOnPage;
+        return data;
+    }
+}
+
+export interface IPaginationMeta {
+    pageNumber?: number;
+    pageSize?: number;
+    totalCount?: number;
+    totalPages?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+    firstItemOnPage?: number;
+    lastItemOnPage?: number;
+}
+
+export class PriceHistoryDto implements IPriceHistoryDto {
+    timestamp?: Date;
+    price?: number;
+    stockStatus?: string | undefined;
+    sourceUrl?: string | undefined;
+    scrapedProductNameOnPage?: string | undefined;
+
+    constructor(data?: IPriceHistoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.price = _data["price"];
+            this.stockStatus = _data["stockStatus"];
+            this.sourceUrl = _data["sourceUrl"];
+            this.scrapedProductNameOnPage = _data["scrapedProductNameOnPage"];
+        }
+    }
+
+    static fromJS(data: any): PriceHistoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PriceHistoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["price"] = this.price;
+        data["stockStatus"] = this.stockStatus;
+        data["sourceUrl"] = this.sourceUrl;
+        data["scrapedProductNameOnPage"] = this.scrapedProductNameOnPage;
+        return data;
+    }
+}
+
+export interface IPriceHistoryDto {
+    timestamp?: Date;
+    price?: number;
+    stockStatus?: string | undefined;
+    sourceUrl?: string | undefined;
+    scrapedProductNameOnPage?: string | undefined;
+}
+
+export class PriceHistoryDtoIEnumerableApiResponse implements IPriceHistoryDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: PriceHistoryDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IPriceHistoryDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(PriceHistoryDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): PriceHistoryDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new PriceHistoryDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IPriceHistoryDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: PriceHistoryDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProductDto implements IProductDto {
+    productId?: string;
+    name?: string | undefined;
+    manufacturer?: string | undefined;
+    modelNumber?: string | undefined;
+    sku?: string | undefined;
+    categoryId?: string;
+    description?: string | undefined;
+    specifications?: { [key: string]: any; } | undefined;
+    isActive?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+    category?: CategoryDto;
+
+    constructor(data?: IProductDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productId = _data["productId"];
+            this.name = _data["name"];
+            this.manufacturer = _data["manufacturer"];
+            this.modelNumber = _data["modelNumber"];
+            this.sku = _data["sku"];
+            this.categoryId = _data["categoryId"];
+            this.description = _data["description"];
+            if (_data["specifications"]) {
+                this.specifications = {} as any;
+                for (let key in _data["specifications"]) {
+                    if (_data["specifications"].hasOwnProperty(key))
+                        (<any>this.specifications)![key] = _data["specifications"][key];
+                }
+            }
+            this.isActive = _data["isActive"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.category = _data["category"] ? CategoryDto.fromJS(_data["category"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProductDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productId"] = this.productId;
+        data["name"] = this.name;
+        data["manufacturer"] = this.manufacturer;
+        data["modelNumber"] = this.modelNumber;
+        data["sku"] = this.sku;
+        data["categoryId"] = this.categoryId;
+        data["description"] = this.description;
+        if (this.specifications) {
+            data["specifications"] = {};
+            for (let key in this.specifications) {
+                if (this.specifications.hasOwnProperty(key))
+                    (<any>data["specifications"])[key] = (<any>this.specifications)[key];
+            }
+        }
+        data["isActive"] = this.isActive;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["category"] = this.category ? this.category.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProductDto {
+    productId?: string;
+    name?: string | undefined;
+    manufacturer?: string | undefined;
+    modelNumber?: string | undefined;
+    sku?: string | undefined;
+    categoryId?: string;
+    description?: string | undefined;
+    specifications?: { [key: string]: any; } | undefined;
+    isActive?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+    category?: CategoryDto;
+}
+
+export class ProductDtoApiResponse implements IProductDtoApiResponse {
+    success?: boolean;
+    data?: ProductDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProductDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ProductDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProductDtoApiResponse {
+    success?: boolean;
+    data?: ProductDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProductDtoPagedResponse implements IProductDtoPagedResponse {
+    success?: boolean;
+    data?: ProductDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+
+    constructor(data?: IProductDtoPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ProductDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+            this.pagination = _data["pagination"] ? PaginationMeta.fromJS(_data["pagination"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProductDtoPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductDtoPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        data["pagination"] = this.pagination ? this.pagination.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProductDtoPagedResponse {
+    success?: boolean;
+    data?: ProductDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+}
+
+export class ProductSellerMappingDto implements IProductSellerMappingDto {
+    mappingId?: string;
+    canonicalProductId?: string;
+    sellerName?: string | undefined;
+    exactProductUrl?: string | undefined;
+    isActiveForScraping?: boolean;
+    scrapingFrequencyOverride?: string | undefined;
+    siteConfigId?: string | undefined;
+    lastScrapedAt?: Date | undefined;
+    nextScrapeAt?: Date | undefined;
+    lastScrapeStatus?: string | undefined;
+    lastScrapeErrorCode?: string | undefined;
+    consecutiveFailureCount?: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+    product?: ProductDto;
+    siteConfiguration?: ScraperSiteConfigurationDto;
+
+    constructor(data?: IProductSellerMappingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.mappingId = _data["mappingId"];
+            this.canonicalProductId = _data["canonicalProductId"];
+            this.sellerName = _data["sellerName"];
+            this.exactProductUrl = _data["exactProductUrl"];
+            this.isActiveForScraping = _data["isActiveForScraping"];
+            this.scrapingFrequencyOverride = _data["scrapingFrequencyOverride"];
+            this.siteConfigId = _data["siteConfigId"];
+            this.lastScrapedAt = _data["lastScrapedAt"] ? new Date(_data["lastScrapedAt"].toString()) : <any>undefined;
+            this.nextScrapeAt = _data["nextScrapeAt"] ? new Date(_data["nextScrapeAt"].toString()) : <any>undefined;
+            this.lastScrapeStatus = _data["lastScrapeStatus"];
+            this.lastScrapeErrorCode = _data["lastScrapeErrorCode"];
+            this.consecutiveFailureCount = _data["consecutiveFailureCount"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.product = _data["product"] ? ProductDto.fromJS(_data["product"]) : <any>undefined;
+            this.siteConfiguration = _data["siteConfiguration"] ? ScraperSiteConfigurationDto.fromJS(_data["siteConfiguration"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProductSellerMappingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductSellerMappingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["mappingId"] = this.mappingId;
+        data["canonicalProductId"] = this.canonicalProductId;
+        data["sellerName"] = this.sellerName;
+        data["exactProductUrl"] = this.exactProductUrl;
+        data["isActiveForScraping"] = this.isActiveForScraping;
+        data["scrapingFrequencyOverride"] = this.scrapingFrequencyOverride;
+        data["siteConfigId"] = this.siteConfigId;
+        data["lastScrapedAt"] = this.lastScrapedAt ? this.lastScrapedAt.toISOString() : <any>undefined;
+        data["nextScrapeAt"] = this.nextScrapeAt ? this.nextScrapeAt.toISOString() : <any>undefined;
+        data["lastScrapeStatus"] = this.lastScrapeStatus;
+        data["lastScrapeErrorCode"] = this.lastScrapeErrorCode;
+        data["consecutiveFailureCount"] = this.consecutiveFailureCount;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["product"] = this.product ? this.product.toJSON() : <any>undefined;
+        data["siteConfiguration"] = this.siteConfiguration ? this.siteConfiguration.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProductSellerMappingDto {
+    mappingId?: string;
+    canonicalProductId?: string;
+    sellerName?: string | undefined;
+    exactProductUrl?: string | undefined;
+    isActiveForScraping?: boolean;
+    scrapingFrequencyOverride?: string | undefined;
+    siteConfigId?: string | undefined;
+    lastScrapedAt?: Date | undefined;
+    nextScrapeAt?: Date | undefined;
+    lastScrapeStatus?: string | undefined;
+    lastScrapeErrorCode?: string | undefined;
+    consecutiveFailureCount?: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+    product?: ProductDto;
+    siteConfiguration?: ScraperSiteConfigurationDto;
+}
+
+export class ProductSellerMappingDtoApiResponse implements IProductSellerMappingDtoApiResponse {
+    success?: boolean;
+    data?: ProductSellerMappingDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProductSellerMappingDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ProductSellerMappingDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductSellerMappingDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductSellerMappingDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProductSellerMappingDtoApiResponse {
+    success?: boolean;
+    data?: ProductSellerMappingDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProductSellerMappingDtoIEnumerableApiResponse implements IProductSellerMappingDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ProductSellerMappingDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProductSellerMappingDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ProductSellerMappingDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductSellerMappingDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductSellerMappingDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProductSellerMappingDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ProductSellerMappingDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class RegisterUserDto implements IRegisterUserDto {
@@ -3030,6 +4982,262 @@ export interface IRegisterUserDto {
     password: string;
     firstName?: string | undefined;
     lastName?: string | undefined;
+}
+
+export class ScraperSiteConfigurationDto implements IScraperSiteConfigurationDto {
+    siteConfigId?: string;
+    siteDomain?: string | undefined;
+    productNameSelector?: string | undefined;
+    priceSelector?: string | undefined;
+    stockSelector?: string | undefined;
+    sellerNameOnPageSelector?: string | undefined;
+    defaultUserAgent?: string | undefined;
+    additionalHeaders?: { [key: string]: string; } | undefined;
+    isEnabled?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+
+    constructor(data?: IScraperSiteConfigurationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.siteConfigId = _data["siteConfigId"];
+            this.siteDomain = _data["siteDomain"];
+            this.productNameSelector = _data["productNameSelector"];
+            this.priceSelector = _data["priceSelector"];
+            this.stockSelector = _data["stockSelector"];
+            this.sellerNameOnPageSelector = _data["sellerNameOnPageSelector"];
+            this.defaultUserAgent = _data["defaultUserAgent"];
+            if (_data["additionalHeaders"]) {
+                this.additionalHeaders = {} as any;
+                for (let key in _data["additionalHeaders"]) {
+                    if (_data["additionalHeaders"].hasOwnProperty(key))
+                        (<any>this.additionalHeaders)![key] = _data["additionalHeaders"][key];
+                }
+            }
+            this.isEnabled = _data["isEnabled"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ScraperSiteConfigurationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperSiteConfigurationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["siteConfigId"] = this.siteConfigId;
+        data["siteDomain"] = this.siteDomain;
+        data["productNameSelector"] = this.productNameSelector;
+        data["priceSelector"] = this.priceSelector;
+        data["stockSelector"] = this.stockSelector;
+        data["sellerNameOnPageSelector"] = this.sellerNameOnPageSelector;
+        data["defaultUserAgent"] = this.defaultUserAgent;
+        if (this.additionalHeaders) {
+            data["additionalHeaders"] = {};
+            for (let key in this.additionalHeaders) {
+                if (this.additionalHeaders.hasOwnProperty(key))
+                    (<any>data["additionalHeaders"])[key] = (<any>this.additionalHeaders)[key];
+            }
+        }
+        data["isEnabled"] = this.isEnabled;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IScraperSiteConfigurationDto {
+    siteConfigId?: string;
+    siteDomain?: string | undefined;
+    productNameSelector?: string | undefined;
+    priceSelector?: string | undefined;
+    stockSelector?: string | undefined;
+    sellerNameOnPageSelector?: string | undefined;
+    defaultUserAgent?: string | undefined;
+    additionalHeaders?: { [key: string]: string; } | undefined;
+    isEnabled?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+export class ScraperSiteConfigurationDtoApiResponse implements IScraperSiteConfigurationDtoApiResponse {
+    success?: boolean;
+    data?: ScraperSiteConfigurationDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IScraperSiteConfigurationDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ScraperSiteConfigurationDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ScraperSiteConfigurationDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperSiteConfigurationDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IScraperSiteConfigurationDtoApiResponse {
+    success?: boolean;
+    data?: ScraperSiteConfigurationDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class StringApiResponse implements IStringApiResponse {
+    success?: boolean;
+    data?: string | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IStringApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): StringApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new StringApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IStringApiResponse {
+    success?: boolean;
+    data?: string | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class UpdateAlertRuleDto implements IUpdateAlertRuleDto {
@@ -3394,6 +5602,262 @@ export interface IUpdateUserDto {
     lastName?: string | undefined;
     roles?: string[] | undefined;
     isActive?: boolean | undefined;
+}
+
+export class UserDto implements IUserDto {
+    userId?: string;
+    email?: string | undefined;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    fullName?: string | undefined;
+    isActive?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+    roles?: string[] | undefined;
+
+    constructor(data?: IUserDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.userId = _data["userId"];
+            this.email = _data["email"];
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.fullName = _data["fullName"];
+            this.isActive = _data["isActive"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            if (Array.isArray(_data["roles"])) {
+                this.roles = [] as any;
+                for (let item of _data["roles"])
+                    this.roles!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): UserDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["userId"] = this.userId;
+        data["email"] = this.email;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["fullName"] = this.fullName;
+        data["isActive"] = this.isActive;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        if (Array.isArray(this.roles)) {
+            data["roles"] = [];
+            for (let item of this.roles)
+                data["roles"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IUserDto {
+    userId?: string;
+    email?: string | undefined;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    fullName?: string | undefined;
+    isActive?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+    roles?: string[] | undefined;
+}
+
+export class UserDtoApiResponse implements IUserDtoApiResponse {
+    success?: boolean;
+    data?: UserDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IUserDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? UserDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): UserDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IUserDtoApiResponse {
+    success?: boolean;
+    data?: UserDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class UserDtoPagedResponse implements IUserDtoPagedResponse {
+    success?: boolean;
+    data?: UserDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+
+    constructor(data?: IUserDtoPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(UserDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+            this.pagination = _data["pagination"] ? PaginationMeta.fromJS(_data["pagination"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): UserDtoPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserDtoPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        data["pagination"] = this.pagination ? this.pagination.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IUserDtoPagedResponse {
+    success?: boolean;
+    data?: UserDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
 }
 
 export class UtilitiesExampleRequest implements IUtilitiesExampleRequest {

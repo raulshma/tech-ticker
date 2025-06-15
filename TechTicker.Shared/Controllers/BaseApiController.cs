@@ -111,7 +111,7 @@ namespace TechTicker.Shared.Controllers
         /// <summary>
         /// Creates an OK response with the specified data
         /// </summary>
-        protected IActionResult Ok<T>(T data, string? message = null)
+        protected ActionResult<ApiResponse<T>> Ok<T>(T data, string? message = null)
         {
             var response = ApiResponse<T>.SuccessResult(data, message);
             response.CorrelationId = CorrelationId;
@@ -121,7 +121,7 @@ namespace TechTicker.Shared.Controllers
         /// <summary>
         /// Creates an OK response without data
         /// </summary>
-        protected IActionResult Ok(string? message = null)
+        protected ActionResult<ApiResponse> Ok(string? message = null)
         {
             var response = ApiResponse.SuccessResult(message);
             response.CorrelationId = CorrelationId;
@@ -131,7 +131,7 @@ namespace TechTicker.Shared.Controllers
         /// <summary>
         /// Creates a Created response with the specified data
         /// </summary>
-        protected IActionResult Created<T>(T data, string? message = null)
+        protected ActionResult<ApiResponse<T>> Created<T>(T data, string? message = null)
         {
             var response = ApiResponse<T>.SuccessResult(data, message, 201);
             response.CorrelationId = CorrelationId;
@@ -141,7 +141,7 @@ namespace TechTicker.Shared.Controllers
         /// <summary>
         /// Creates a Created response without data
         /// </summary>
-        protected IActionResult Created(string? message = null)
+        protected ActionResult<ApiResponse> Created(string? message = null)
         {
             var response = ApiResponse.SuccessResult(message, 201);
             response.CorrelationId = CorrelationId;
@@ -151,7 +151,7 @@ namespace TechTicker.Shared.Controllers
         /// <summary>
         /// Creates a BadRequest response with error message
         /// </summary>
-        protected IActionResult BadRequest(string message)
+        protected ActionResult<ApiResponse> BadRequest(string message)
         {
             var response = ApiResponse.FailureResult(message, 400);
             response.CorrelationId = CorrelationId;
@@ -161,7 +161,7 @@ namespace TechTicker.Shared.Controllers
         /// <summary>
         /// Creates a BadRequest response with validation errors
         /// </summary>
-        protected IActionResult BadRequest(List<string> errors, string? message = null)
+        protected ActionResult<ApiResponse> BadRequest(List<string> errors, string? message = null)
         {
             var response = ApiResponse.FailureResult(errors, message, 400);
             response.CorrelationId = CorrelationId;
@@ -171,7 +171,7 @@ namespace TechTicker.Shared.Controllers
         /// <summary>
         /// Creates a NotFound response with error message
         /// </summary>
-        protected IActionResult NotFound(string message)
+        protected ActionResult<ApiResponse> NotFound(string message)
         {
             var response = ApiResponse.FailureResult(message, 404);
             response.CorrelationId = CorrelationId;
@@ -181,7 +181,7 @@ namespace TechTicker.Shared.Controllers
         /// <summary>
         /// Creates a Conflict response with error message
         /// </summary>
-        protected IActionResult Conflict(string message)
+        protected ActionResult<ApiResponse> Conflict(string message)
         {
             var response = ApiResponse.FailureResult(message, 409);
             response.CorrelationId = CorrelationId;
@@ -191,15 +191,55 @@ namespace TechTicker.Shared.Controllers
         /// <summary>
         /// Creates an UnprocessableEntity response with error message
         /// </summary>
-        protected IActionResult UnprocessableEntity(string message)
+        protected ActionResult<ApiResponse> UnprocessableEntity(string message)
         {
             var response = ApiResponse.FailureResult(message, 422);
+            response.CorrelationId = CorrelationId;
+            return StatusCode(422, response);
+        }
+
+        /// <summary>
+        /// Creates a generic BadRequest response with error message
+        /// </summary>
+        protected ActionResult<ApiResponse<T>> BadRequestGeneric<T>(string message)
+        {
+            var response = ApiResponse<T>.FailureResult(message, 400);
+            response.CorrelationId = CorrelationId;
+            return StatusCode(400, response);
+        }
+
+        /// <summary>
+        /// Creates a generic NotFound response with error message
+        /// </summary>
+        protected ActionResult<ApiResponse<T>> NotFoundGeneric<T>(string message)
+        {
+            var response = ApiResponse<T>.FailureResult(message, 404);
+            response.CorrelationId = CorrelationId;
+            return StatusCode(404, response);
+        }
+
+        /// <summary>
+        /// Creates a generic Conflict response with error message
+        /// </summary>
+        protected ActionResult<ApiResponse<T>> ConflictGeneric<T>(string message)
+        {
+            var response = ApiResponse<T>.FailureResult(message, 409);
+            response.CorrelationId = CorrelationId;
+            return StatusCode(409, response);
+        }
+
+        /// <summary>
+        /// Creates a generic UnprocessableEntity response with error message
+        /// </summary>
+        protected ActionResult<ApiResponse<T>> UnprocessableEntityGeneric<T>(string message)
+        {
+            var response = ApiResponse<T>.FailureResult(message, 422);
             response.CorrelationId = CorrelationId;
             return StatusCode(422, response);
         }        /// <summary>
         /// Returns a PagedResponse directly without double wrapping
         /// </summary>
-        protected IActionResult OkPaged<T>(IEnumerable<T> data, int pageNumber, int pageSize, long totalCount, string? message = null)
+        protected ActionResult<PagedResponse<T>> OkPaged<T>(IEnumerable<T> data, int pageNumber, int pageSize, long totalCount, string? message = null)
         {
             var response = PagedResponse<T>.SuccessResult(data, pageNumber, pageSize, totalCount, message);
             response.CorrelationId = CorrelationId;
@@ -209,7 +249,7 @@ namespace TechTicker.Shared.Controllers
         /// <summary>
         /// Returns a PagedResponse directly without double wrapping
         /// </summary>
-        protected IActionResult OkPagedDirect<T>(PagedResponse<T> pagedResponse)
+        protected ActionResult<PagedResponse<T>> OkPagedDirect<T>(PagedResponse<T> pagedResponse)
         {
             pagedResponse.CorrelationId = CorrelationId;
             return StatusCode(200, pagedResponse);
@@ -218,7 +258,7 @@ namespace TechTicker.Shared.Controllers
         /// <summary>
         /// Converts a Result to an appropriate HTTP response
         /// </summary>
-        protected IActionResult HandleResult<T>(Result<T> result)
+        protected ActionResult<ApiResponse<T>> HandleResult<T>(Result<T> result)
         {
             if (result.IsSuccess)
             {
@@ -227,18 +267,18 @@ namespace TechTicker.Shared.Controllers
 
             return result.ErrorCode switch
             {
-                "RESOURCE_NOT_FOUND" => NotFound(result.ErrorMessage!),
-                "VALIDATION_FAILED" => BadRequest(result.ErrorMessage!),
-                "CONFLICT" => Conflict(result.ErrorMessage!),
-                "BUSINESS_RULE_VIOLATION" => UnprocessableEntity(result.ErrorMessage!),
-                _ => BadRequest(result.ErrorMessage!)
+                "RESOURCE_NOT_FOUND" => NotFoundGeneric<T>(result.ErrorMessage!),
+                "VALIDATION_FAILED" => BadRequestGeneric<T>(result.ErrorMessage!),
+                "CONFLICT" => ConflictGeneric<T>(result.ErrorMessage!),
+                "BUSINESS_RULE_VIOLATION" => UnprocessableEntityGeneric<T>(result.ErrorMessage!),
+                _ => BadRequestGeneric<T>(result.ErrorMessage!)
             };
         }
 
         /// <summary>
         /// Converts a non-generic Result to an appropriate HTTP response
         /// </summary>
-        protected IActionResult HandleResult(Result result)
+        protected ActionResult<ApiResponse> HandleResult(Result result)
         {
             if (result.IsSuccess)
             {
@@ -253,6 +293,29 @@ namespace TechTicker.Shared.Controllers
                 "BUSINESS_RULE_VIOLATION" => UnprocessableEntity(result.ErrorMessage!),
                 _ => BadRequest(result.ErrorMessage!)
             };
+        }
+
+        /// <summary>
+        /// Converts a Result containing PagedResponse to an appropriate HTTP response
+        /// </summary>
+        protected ActionResult<PagedResponse<T>> HandlePagedResult<T>(Result<PagedResponse<T>> result)
+        {
+            if (result.IsSuccess)
+            {
+                result.Data!.CorrelationId = CorrelationId;
+                return StatusCode(200, result.Data);
+            }
+
+            var errorResponse = PagedResponse<T>.FailureResult(result.ErrorMessage!, result.ErrorCode switch
+            {
+                "RESOURCE_NOT_FOUND" => 404,
+                "VALIDATION_FAILED" => 400,
+                "CONFLICT" => 409,
+                "BUSINESS_RULE_VIOLATION" => 422,
+                _ => 400
+            });
+            errorResponse.CorrelationId = CorrelationId;
+            return StatusCode(errorResponse.StatusCode, errorResponse);
         }
     }
 }

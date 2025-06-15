@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Shared.Controllers;
+using TechTicker.Shared.Common;
 
 namespace TechTicker.ApiService.Controllers;
 
@@ -27,7 +28,7 @@ public class CategoriesController : BaseApiController
     /// <returns>Created category</returns>
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto createDto)
+    public async Task<ActionResult<ApiResponse<CategoryDto>>> CreateCategory([FromBody] CreateCategoryDto createDto)
     {
         var result = await _categoryService.CreateCategoryAsync(createDto);
         return HandleResult(result);
@@ -38,7 +39,7 @@ public class CategoriesController : BaseApiController
     /// </summary>
     /// <returns>List of categories</returns>
     [HttpGet]
-    public async Task<IActionResult> GetCategories()
+    public async Task<ActionResult<ApiResponse<IEnumerable<CategoryDto>>>> GetCategories()
     {
         var result = await _categoryService.GetAllCategoriesAsync();
         return HandleResult(result);
@@ -50,7 +51,7 @@ public class CategoriesController : BaseApiController
     /// <param name="categoryIdOrSlug">Category ID or slug</param>
     /// <returns>Category details</returns>
     [HttpGet("{categoryIdOrSlug}")]
-    public async Task<IActionResult> GetCategory(string categoryIdOrSlug)
+    public async Task<ActionResult<ApiResponse<CategoryDto>>> GetCategory(string categoryIdOrSlug)
     {
         var result = await _categoryService.GetCategoryByIdOrSlugAsync(categoryIdOrSlug);
         return HandleResult(result);
@@ -64,7 +65,7 @@ public class CategoriesController : BaseApiController
     /// <returns>Updated category</returns>
     [HttpPut("{categoryId:guid}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> UpdateCategory(Guid categoryId, [FromBody] UpdateCategoryDto updateDto)
+    public async Task<ActionResult<ApiResponse<CategoryDto>>> UpdateCategory(Guid categoryId, [FromBody] UpdateCategoryDto updateDto)
     {
         var result = await _categoryService.UpdateCategoryAsync(categoryId, updateDto);
         return HandleResult(result);
@@ -77,7 +78,7 @@ public class CategoriesController : BaseApiController
     /// <returns>Success or error</returns>
     [HttpDelete("{categoryId:guid}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> DeleteCategory(Guid categoryId)
+    public async Task<ActionResult<ApiResponse>> DeleteCategory(Guid categoryId)
     {
         var result = await _categoryService.DeleteCategoryAsync(categoryId);
         return HandleResult(result);

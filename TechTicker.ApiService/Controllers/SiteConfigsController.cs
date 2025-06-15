@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Shared.Controllers;
+using TechTicker.Shared.Common;
 
 namespace TechTicker.ApiService.Controllers;
 
@@ -27,7 +28,7 @@ public class SiteConfigsController : BaseApiController
     /// <param name="createDto">Site configuration creation data</param>
     /// <returns>Created site configuration</returns>
     [HttpPost]
-    public async Task<IActionResult> CreateSiteConfig([FromBody] CreateScraperSiteConfigurationDto createDto)
+    public async Task<ActionResult<ApiResponse<ScraperSiteConfigurationDto>>> CreateSiteConfig([FromBody] CreateScraperSiteConfigurationDto createDto)
     {
         var result = await _siteConfigService.CreateConfigurationAsync(createDto);
         return HandleResult(result);
@@ -39,11 +40,13 @@ public class SiteConfigsController : BaseApiController
     /// <param name="domain">Domain name</param>
     /// <returns>Site configuration</returns>
     [HttpGet]
-    public async Task<IActionResult> GetSiteConfigByDomain([FromQuery] string? domain = null)
+    public async Task<ActionResult<ApiResponse<ScraperSiteConfigurationDto>>> GetSiteConfigByDomain([FromQuery] string? domain = null)
     {
         if (string.IsNullOrWhiteSpace(domain))
         {
-            return BadRequest("Domain parameter is required.");
+            var errorResponse = ApiResponse<ScraperSiteConfigurationDto>.FailureResult("Domain parameter is required.", 400);
+            errorResponse.CorrelationId = CorrelationId;
+            return BadRequest(errorResponse);
         }
 
         var result = await _siteConfigService.GetConfigurationByDomainAsync(domain);
@@ -56,7 +59,7 @@ public class SiteConfigsController : BaseApiController
     /// <param name="siteConfigId">Site configuration ID</param>
     /// <returns>Site configuration</returns>
     [HttpGet("{siteConfigId:guid}")]
-    public async Task<IActionResult> GetSiteConfig(Guid siteConfigId)
+    public async Task<ActionResult<ApiResponse<ScraperSiteConfigurationDto>>> GetSiteConfig(Guid siteConfigId)
     {
         var result = await _siteConfigService.GetConfigurationByIdAsync(siteConfigId);
         return HandleResult(result);
@@ -69,7 +72,7 @@ public class SiteConfigsController : BaseApiController
     /// <param name="updateDto">Site configuration update data</param>
     /// <returns>Updated site configuration</returns>
     [HttpPut("{siteConfigId:guid}")]
-    public async Task<IActionResult> UpdateSiteConfig(Guid siteConfigId, [FromBody] UpdateScraperSiteConfigurationDto updateDto)
+    public async Task<ActionResult<ApiResponse<ScraperSiteConfigurationDto>>> UpdateSiteConfig(Guid siteConfigId, [FromBody] UpdateScraperSiteConfigurationDto updateDto)
     {
         var result = await _siteConfigService.UpdateConfigurationAsync(siteConfigId, updateDto);
         return HandleResult(result);
@@ -81,7 +84,7 @@ public class SiteConfigsController : BaseApiController
     /// <param name="siteConfigId">Site configuration ID</param>
     /// <returns>Success or error</returns>
     [HttpDelete("{siteConfigId:guid}")]
-    public async Task<IActionResult> DeleteSiteConfig(Guid siteConfigId)
+    public async Task<ActionResult<ApiResponse>> DeleteSiteConfig(Guid siteConfigId)
     {
         var result = await _siteConfigService.DeleteConfigurationAsync(siteConfigId);
         return HandleResult(result);
