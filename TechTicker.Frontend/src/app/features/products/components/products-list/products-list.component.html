@@ -1,0 +1,158 @@
+<div class="products-container">
+  <div class="header-section">
+    <h1>Products</h1>
+    <button mat-raised-button color="primary" (click)="createProduct()">
+      <mat-icon>add</mat-icon>
+      Add Product
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Manage Products</mat-card-title>
+      <mat-card-subtitle>Create and manage product catalog</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Filters -->
+      <div class="filters-section">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search products</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="Search by name, brand, or model">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="category-filter">
+          <mat-label>Filter by Category</mat-label>
+          <mat-select [formControl]="categoryControl">
+            <mat-option value="">All Categories</mat-option>
+            <mat-option *ngFor="let category of categories" [value]="category.categoryId">
+              {{category.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-button (click)="clearFilters()" class="clear-filters-btn">
+          <mat-icon>clear</mat-icon>
+          Clear Filters
+        </button>
+      </div>
+
+      <!-- Loading spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading products...</p>
+      </div>
+
+      <!-- Products table -->
+      <div *ngIf="!isLoading" class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="products-table">
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell *matCellDef="let product">
+              <div class="product-name">
+                <strong>{{product.name}}</strong>
+                <small *ngIf="product.description" class="product-description">
+                  {{product.description}}
+                </small>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Category Column -->
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef>Category</th>
+            <td mat-cell *matCellDef="let product">
+              <mat-chip-set>
+                <mat-chip>{{getCategoryName(product.categoryId)}}</mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <!-- Manufacturer Column -->
+          <ng-container matColumnDef="manufacturer">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Manufacturer</th>
+            <td mat-cell *matCellDef="let product">
+              {{product.manufacturer || 'N/A'}}
+            </td>
+          </ng-container>
+
+          <!-- Model Number Column -->
+          <ng-container matColumnDef="modelNumber">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Model</th>
+            <td mat-cell *matCellDef="let product">
+              {{product.modelNumber || 'N/A'}}
+            </td>
+          </ng-container>
+
+          <!-- Active Status Column -->
+          <ng-container matColumnDef="isActive">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let product">
+              <mat-chip-set>
+                <mat-chip [class]="product.isActive ? 'status-active' : 'status-inactive'">
+                  {{product.isActive ? 'Active' : 'Inactive'}}
+                </mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <!-- Created At Column -->
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Created</th>
+            <td mat-cell *matCellDef="let product">
+              {{product.createdAt | date:'short'}}
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let product">
+              <button mat-icon-button
+                      color="primary"
+                      (click)="editProduct(product)"
+                      matTooltip="Edit product">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button
+                      color="warn"
+                      (click)="deleteProduct(product)"
+                      matTooltip="Delete product">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <!-- No data row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+              <div class="no-data">
+                <mat-icon>inventory</mat-icon>
+                <p>No products found</p>
+                <button mat-raised-button color="primary" (click)="createProduct()">
+                  Create First Product
+                </button>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Pagination -->
+        <mat-paginator
+          [length]="totalCount"
+          [pageSize]="pageSize"
+          [pageIndex]="currentPage"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="onPageChange($event)"
+          showFirstLastButtons
+          aria-label="Select page of products">
+        </mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

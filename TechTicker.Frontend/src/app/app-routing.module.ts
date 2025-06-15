@@ -19,11 +19,11 @@ const routes: Routes = [
     loadChildren: () => import('./features/categories/categories.module').then(m => m.CategoriesModule),
     canActivate: [AuthGuard, AdminGuard]
   },
-  // {
-  //   path: 'products',
-  //   loadChildren: () => import('./features/products/products.module').then(m => m.ProductsModule),
-  //   canActivate: [AuthGuard, AdminGuard]
-  // },
+  {
+    path: 'products',
+    loadChildren: () => import('./features/products/products.module').then(m => m.ProductsModule),
+    canActivate: [AuthGuard, AdminGuard]
+  },
   // {
   //   path: 'mappings',
   //   loadChildren: () => import('./features/mappings/mappings.module').then(m => m.MappingsModule),

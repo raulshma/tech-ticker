@@ -1,0 +1,127 @@
+<div class="product-form-container">
+  <div class="header-section">
+    <h1>{{ isEditMode ? 'Edit Product' : 'Create Product' }}</h1>
+    <button mat-button (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Products
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEditMode ? 'Edit Product Details' : 'New Product Details' }}</mat-card-title>
+      <mat-card-subtitle>{{ isEditMode ? 'Update the product information below' : 'Fill in the details to create a new product' }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+        <div class="form-row">
+          <!-- Name Field -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Product Name</mat-label>
+            <input matInput
+                   formControlName="name"
+                   placeholder="Enter product name"
+                   maxlength="200">
+            <mat-hint>A descriptive name for the product</mat-hint>
+            <mat-error *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched">
+              {{ getFieldErrorMessage('name') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <!-- Description Field -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput
+                      formControlName="description"
+                      placeholder="Enter product description"
+                      rows="4"
+                      maxlength="1000">
+            </textarea>
+            <mat-hint>Optional detailed description of the product</mat-hint>
+            <mat-error *ngIf="productForm.get('description')?.invalid && productForm.get('description')?.touched">
+              {{ getFieldErrorMessage('description') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row two-columns">
+          <!-- Manufacturer Field -->
+          <mat-form-field appearance="outline">
+            <mat-label>Manufacturer</mat-label>
+            <input matInput
+                   formControlName="manufacturer"
+                   placeholder="Enter manufacturer name"
+                   maxlength="100">
+            <mat-hint>Product manufacturer or brand</mat-hint>
+            <mat-error *ngIf="productForm.get('manufacturer')?.invalid && productForm.get('manufacturer')?.touched">
+              {{ getFieldErrorMessage('manufacturer') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Model Number Field -->
+          <mat-form-field appearance="outline">
+            <mat-label>Model Number</mat-label>
+            <input matInput
+                   formControlName="modelNumber"
+                   placeholder="Enter model number"
+                   maxlength="100">
+            <mat-hint>Product model number or SKU</mat-hint>
+            <mat-error *ngIf="productForm.get('modelNumber')?.invalid && productForm.get('modelNumber')?.touched">
+              {{ getFieldErrorMessage('modelNumber') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row two-columns">
+          <!-- Category Field -->
+          <mat-form-field appearance="outline">
+            <mat-label>Category</mat-label>
+            <mat-select formControlName="categoryId">
+              <mat-option value="">Select a category</mat-option>
+              <mat-option *ngFor="let category of categories" [value]="category.categoryId">
+                {{category.name}}
+              </mat-option>
+            </mat-select>
+            <mat-hint>Product category classification</mat-hint>
+            <mat-error *ngIf="productForm.get('categoryId')?.invalid && productForm.get('categoryId')?.touched">
+              {{ getFieldErrorMessage('categoryId') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Active Status Field -->
+          <div class="status-field">
+            <label class="status-label">Status</label>
+            <mat-slide-toggle formControlName="isActive" class="status-toggle">
+              {{ productForm.get('isActive')?.value ? 'Active' : 'Inactive' }}
+            </mat-slide-toggle>
+            <div class="status-hint">
+              {{ productForm.get('isActive')?.value ? 'Product is active and visible' : 'Product is inactive and hidden' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button mat-button
+                  type="button"
+                  (click)="onCancel()"
+                  [disabled]="isLoading">
+            Cancel
+          </button>
+
+          <button mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="productForm.invalid || isLoading">
+            <mat-spinner *ngIf="isLoading" diameter="20" class="form-spinner"></mat-spinner>
+            <span *ngIf="!isLoading">{{ isEditMode ? 'Update Product' : 'Create Product' }}</span>
+            <span *ngIf="isLoading">{{ isEditMode ? 'Updating...' : 'Creating...' }}</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
