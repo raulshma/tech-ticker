@@ -1,23 +1,103 @@
+using Microsoft.Extensions.Options;
+using TechTicker.Application.Configuration;
+using TechTicker.Application.Messages;
+using TechTicker.Application.Services.Interfaces;
+using TechTicker.NotificationWorker.Services;
+
 namespace TechTicker.NotificationWorker;
 
 public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
+    private readonly IMessageConsumer _messageConsumer;
+    private readonly EmailService _emailService;
+    private readonly IAlertProcessingService _alertProcessingService;
+    private readonly MessagingConfiguration _messagingConfig;
 
-    public Worker(ILogger<Worker> logger)
+    public Worker(
+        ILogger<Worker> logger,
+        IMessageConsumer messageConsumer,
+        EmailService emailService,
+        IAlertProcessingService alertProcessingService,
+        IOptions<MessagingConfiguration> messagingConfig)
     {
         _logger = logger;
+        _messageConsumer = messageConsumer;
+        _emailService = emailService;
+        _alertProcessingService = alertProcessingService;
+        _messagingConfig = messagingConfig.Value;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        _logger.LogInformation("TechTicker Notification Worker started");
+
+        try
         {
-            if (_logger.IsEnabled(LogLevel.Information))
+            // Start consuming price point recorded events for alert processing
+            await _messageConsumer.StartConsumingAsync<PricePointRecordedEvent>(
+                _messagingConfig.PricePointRecordedQueue,
+                HandlePricePointRecordedAsync);
+
+            // Start consuming alert triggered events for email notifications
+            await _messageConsumer.StartConsumingAsync<AlertTriggeredEvent>(
+                _messagingConfig.AlertTriggeredQueue,
+                HandleAlertTriggeredAsync);
+
+            _logger.LogInformation("Started consuming notification messages");
+
+            // Keep the worker running
+            while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
-            await Task.Delay(1000, stoppingToken);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation("Notification worker cancellation requested");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Fatal error in notification worker");
+            throw;
+        }
+        finally
+        {
+            await _messageConsumer.StopConsumingAsync();
+            _logger.LogInformation("TechTicker Notification Worker stopped");
+        }
+    }
+
+    private async Task HandlePricePointRecordedAsync(PricePointRecordedEvent pricePoint)
+    {
+        try
+        {
+            _logger.LogDebug("Processing price point for alert evaluation: Product {ProductId}, Price ${Price}",
+                pricePoint.CanonicalProductId, pricePoint.Price);
+
+            await _alertProcessingService.ProcessPricePointAsync(pricePoint);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing price point for product {ProductId}", pricePoint.CanonicalProductId);
+        }
+    }
+
+    private async Task HandleAlertTriggeredAsync(AlertTriggeredEvent alertEvent)
+    {
+        try
+        {
+            _logger.LogInformation("Processing alert notification for user {UserId}, product {ProductName}",
+                alertEvent.UserId, alertEvent.ProductName);
+
+            await _emailService.SendAlertNotificationAsync(alertEvent);
+
+            _logger.LogInformation("Successfully sent alert notification for alert rule {AlertRuleId}",
+                alertEvent.AlertRuleId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending alert notification for alert rule {AlertRuleId}", alertEvent.AlertRuleId);
         }
     }
 }
