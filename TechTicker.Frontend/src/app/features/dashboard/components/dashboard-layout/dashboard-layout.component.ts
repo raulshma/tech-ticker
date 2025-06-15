@@ -1,0 +1,44 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+import {
+  AuthService,
+  CurrentUser,
+} from '../../../../shared/services/auth.service';
+
+@Component({
+  selector: 'app-dashboard-layout',
+  templateUrl: './dashboard-layout.component.html',
+  styleUrls: ['./dashboard-layout.component.scss'],
+  standalone: false,
+})
+export class DashboardLayoutComponent implements OnInit, OnDestroy {
+  currentUser: CurrentUser | null = null;
+  isAdmin = false;
+  private destroy$ = new Subject<void>();
+
+  constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit(): void {
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((user) => {
+        this.currentUser = user;
+        this.isAdmin = this.authService.isAdmin();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  navigateTo(route: string): void {
+    this.router.navigate([route]);
+  }
+}

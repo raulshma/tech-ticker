@@ -1,0 +1,128 @@
+<div class="dashboard-container">
+  <!-- Welcome section -->
+  <div class="welcome-section">
+    <h1>Welcome back, {{currentUser?.firstName || 'User'}}!</h1>
+    <p class="welcome-subtitle">Here's an overview of your TechTicker system</p>
+  </div>
+
+  <!-- Statistics cards -->
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>inventory</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{dashboardStats.totalProducts}}</h3>
+            <p>Total Products</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>category</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{dashboardStats.totalCategories}}</h3>
+            <p>Categories</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>link</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{dashboardStats.activeMappings}}</h3>
+            <p>Active Mappings</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>notifications</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{dashboardStats.activeAlerts}}</h3>
+            <p>Active Alerts</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card" *ngIf="isAdmin">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{dashboardStats.totalUsers}}</h3>
+            <p>Total Users</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="quick-actions-section" *ngIf="isAdmin">
+    <h2>Quick Actions</h2>
+    <div class="actions-grid">
+      <mat-card class="action-card" routerLink="/products">
+        <mat-card-content>
+          <mat-icon>add_box</mat-icon>
+          <h3>Add Product</h3>
+          <p>Create a new product entry</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/categories">
+        <mat-card-content>
+          <mat-icon>create_new_folder</mat-icon>
+          <h3>Manage Categories</h3>
+          <p>Organize product categories</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/mappings">
+        <mat-card-content>
+          <mat-icon>link</mat-icon>
+          <h3>Configure Mappings</h3>
+          <p>Set up product-seller mappings</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/site-configs">
+        <mat-card-content>
+          <mat-icon>settings</mat-icon>
+          <h3>Site Configurations</h3>
+          <p>Configure scraper settings</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Recent activity placeholder -->
+  <div class="recent-activity-section">
+    <h2>Recent Activity</h2>
+    <mat-card>
+      <mat-card-content>
+        <p class="placeholder-text">Recent activity will be displayed here once the system is fully operational.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -9,12 +9,11 @@ const routes: Routes = [
     path: 'login',
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
   },
-  // TODO: Uncomment these routes as the modules are implemented
-  // {
-  //   path: 'dashboard',
-  //   loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule),
-  //   canActivate: [AuthGuard]
-  // },
+  {
+    path: 'dashboard',
+    loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule),
+    canActivate: [AuthGuard]
+  },
   // {
   //   path: 'categories',
   //   loadChildren: () => import('./features/categories/categories.module').then(m => m.CategoriesModule),
