@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, map, catchError, throwError, BehaviorSubject, of } from 'rxjs';
-import { 
-  TechTickerApiClient, 
-  ScraperSiteConfigurationDto, 
-  CreateScraperSiteConfigurationDto, 
+import {
+  TechTickerApiClient,
+  ScraperSiteConfigurationDto,
+  CreateScraperSiteConfigurationDto,
   UpdateScraperSiteConfigurationDto,
   ScraperSiteConfigurationDtoApiResponse,
   ApiResponse
@@ -18,10 +18,22 @@ export class SiteConfigsService {
 
   constructor(private apiClient: TechTickerApiClient) {}
 
-  // Since there's no "get all" endpoint, we'll maintain a local list
-  // In a real application, you might want to implement a backend endpoint for this
   getSiteConfigs(): Observable<ScraperSiteConfigurationDto[]> {
-    return this.siteConfigs$;
+    return this.apiClient.all()
+      .pipe(
+        map((response) => {
+          if (!response.success || !response.data) {
+            throw new Error(response.message || 'Failed to fetch site configurations');
+          }
+          // Update the local subject with the fetched data
+          this.siteConfigsSubject.next(response.data);
+          return response.data;
+        }),
+        catchError(error => {
+          console.error('Error fetching site configurations:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
   getSiteConfig(id: string): Observable<ScraperSiteConfigurationDto> {
@@ -47,11 +59,11 @@ export class SiteConfigsService {
           if (!response.success || !response.data) {
             throw new Error(response.message || 'Failed to create site configuration');
           }
-          
+
           // Add to local list
           const currentConfigs = this.siteConfigsSubject.value;
           this.siteConfigsSubject.next([...currentConfigs, response.data]);
-          
+
           return response.data;
         }),
         catchError(error => {
@@ -68,14 +80,14 @@ export class SiteConfigsService {
           if (!response.success || !response.data) {
             throw new Error(response.message || 'Failed to update site configuration');
           }
-          
+
           // Update in local list
           const currentConfigs = this.siteConfigsSubject.value;
-          const updatedConfigs = currentConfigs.map(config => 
+          const updatedConfigs = currentConfigs.map(config =>
             config.siteConfigId === id ? response.data! : config
           );
           this.siteConfigsSubject.next(updatedConfigs);
-          
+
           return response.data;
         }),
         catchError(error => {
@@ -93,7 +105,7 @@ export class SiteConfigsService {
           const currentConfigs = this.siteConfigsSubject.value;
           const filteredConfigs = currentConfigs.filter(config => config.siteConfigId !== id);
           this.siteConfigsSubject.next(filteredConfigs);
-          
+
           return void 0;
         }),
         catchError(error => {
@@ -107,7 +119,7 @@ export class SiteConfigsService {
   addToLocalList(siteConfig: ScraperSiteConfigurationDto): void {
     const currentConfigs = this.siteConfigsSubject.value;
     const exists = currentConfigs.some(config => config.siteConfigId === siteConfig.siteConfigId);
-    
+
     if (!exists) {
       this.siteConfigsSubject.next([...currentConfigs, siteConfig]);
     }

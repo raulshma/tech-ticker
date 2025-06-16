@@ -23,6 +23,17 @@ public class SiteConfigsController : BaseApiController
     }
 
     /// <summary>
+    /// Get all scraper site configurations
+    /// </summary>
+    /// <returns>List of all site configurations</returns>
+    [HttpGet("all")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<ScraperSiteConfigurationDto>>>> GetAllSiteConfigs()
+    {
+        var result = await _siteConfigService.GetAllConfigurationsAsync();
+        return HandleResult(result);
+    }
+
+    /// <summary>
     /// Create a new scraper site configuration
     /// </summary>
     /// <param name="createDto">Site configuration creation data</param>

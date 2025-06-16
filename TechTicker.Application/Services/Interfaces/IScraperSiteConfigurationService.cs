@@ -8,6 +8,7 @@ namespace TechTicker.Application.Services.Interfaces;
 /// </summary>
 public interface IScraperSiteConfigurationService
 {
+    Task<Result<IEnumerable<ScraperSiteConfigurationDto>>> GetAllConfigurationsAsync();
     Task<Result<ScraperSiteConfigurationDto>> CreateConfigurationAsync(CreateScraperSiteConfigurationDto createDto);
     Task<Result<ScraperSiteConfigurationDto>> GetConfigurationByIdAsync(Guid configId);
     Task<Result<ScraperSiteConfigurationDto>> GetConfigurationByDomainAsync(string domain);

@@ -27,6 +27,23 @@ public class ScraperSiteConfigurationService : IScraperSiteConfigurationService
         _logger = logger;
     }
 
+    public async Task<Result<IEnumerable<ScraperSiteConfigurationDto>>> GetAllConfigurationsAsync()
+    {
+        try
+        {
+            var configs = await _unitOfWork.ScraperSiteConfigurations.GetAllAsync();
+            var configDtos = configs.Select(config => _mappingService.MapToDto(config));
+
+            _logger.LogInformation("Retrieved {Count} scraper site configurations", configDtos.Count());
+            return Result<IEnumerable<ScraperSiteConfigurationDto>>.Success(configDtos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving all scraper site configurations");
+            return Result<IEnumerable<ScraperSiteConfigurationDto>>.Failure("An error occurred while retrieving configurations.", "INTERNAL_ERROR");
+        }
+    }
+
     public async Task<Result<ScraperSiteConfigurationDto>> CreateConfigurationAsync(CreateScraperSiteConfigurationDto createDto)
     {
         try
