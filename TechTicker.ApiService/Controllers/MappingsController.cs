@@ -4,6 +4,7 @@ using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Shared.Controllers;
 using TechTicker.Shared.Common;
+using TechTicker.Shared.Utilities;
 
 namespace TechTicker.ApiService.Controllers;
 
@@ -16,10 +17,14 @@ namespace TechTicker.ApiService.Controllers;
 public class MappingsController : BaseApiController
 {
     private readonly IProductSellerMappingService _mappingService;
+    private readonly IScrapingOrchestrationService _scrapingOrchestrationService;
 
-    public MappingsController(IProductSellerMappingService mappingService)
+    public MappingsController(
+        IProductSellerMappingService mappingService,
+        IScrapingOrchestrationService scrapingOrchestrationService)
     {
         _mappingService = mappingService;
+        _scrapingOrchestrationService = scrapingOrchestrationService;
     }
 
     /// <summary>
@@ -87,5 +92,27 @@ public class MappingsController : BaseApiController
     {
         var result = await _mappingService.DeleteMappingAsync(mappingId);
         return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Trigger manual scraping for a specific mapping
+    /// </summary>
+    /// <param name="mappingId">Mapping ID to scrape</param>
+    /// <returns>Success or error response</returns>
+    [HttpPost("{mappingId:guid}/scrape-now")]
+    public async Task<ActionResult<ApiResponse>> TriggerManualScraping(Guid mappingId)
+    {
+        var success = await _scrapingOrchestrationService.TriggerManualScrapingAsync(mappingId);
+
+        if (success)
+        {
+            var result = Result.Success();
+            return HandleResult(result);
+        }
+        else
+        {
+            var result = Result.Failure("Failed to trigger scraping. The mapping may not exist or may be inactive.", "SCRAPING_TRIGGER_FAILED");
+            return HandleResult(result);
+        }
     }
 }

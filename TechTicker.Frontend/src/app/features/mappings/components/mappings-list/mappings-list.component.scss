@@ -39,7 +39,7 @@
   flex-direction: column;
   align-items: center;
   padding: 40px;
-  
+
   p {
     margin-top: 16px;
     color: #666;
@@ -52,33 +52,33 @@
 
 .mappings-table {
   width: 100%;
-  
+
   .mat-column-product {
     min-width: 200px;
   }
-  
+
   .mat-column-sellerName {
     min-width: 120px;
   }
-  
+
   .mat-column-exactProductUrl {
     min-width: 150px;
   }
-  
+
   .mat-column-isActiveForScraping {
     min-width: 120px;
   }
-  
+
   .mat-column-lastScrapedAt {
     min-width: 140px;
   }
-  
+
   .mat-column-lastScrapeStatus {
     min-width: 100px;
   }
-  
+
   .mat-column-actions {
-    width: 120px;
+    width: 160px;
     text-align: center;
   }
 }
@@ -99,11 +99,11 @@
   color: #1976d2;
   text-decoration: none;
   font-size: 0.875rem;
-  
+
   &:hover {
     text-decoration: underline;
   }
-  
+
   mat-icon {
     font-size: 16px;
     width: 16px;
@@ -150,7 +150,7 @@
   text-align: center;
   padding: 40px;
   color: #666;
-  
+
   mat-icon {
     font-size: 48px;
     width: 48px;
@@ -158,7 +158,7 @@
     margin-bottom: 16px;
     color: #ccc;
   }
-  
+
   p {
     margin: 0 0 16px 0;
     font-size: 1.1rem;
@@ -170,21 +170,21 @@
   .mappings-container {
     padding: 10px;
   }
-  
+
   .header-section {
     flex-direction: column;
     align-items: stretch;
     gap: 16px;
-    
+
     h1 {
       text-align: center;
     }
   }
-  
+
   .filters-section {
     flex-direction: column;
     align-items: stretch;
-    
+
     .product-filter {
       min-width: auto;
     }

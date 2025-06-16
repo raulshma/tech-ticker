@@ -66,9 +66,9 @@
           <ng-container matColumnDef="exactProductUrl">
             <th mat-header-cell *matHeaderCellDef>Product URL</th>
             <td mat-cell *matCellDef="let mapping">
-              <a *ngIf="mapping.exactProductUrl" 
-                 [href]="mapping.exactProductUrl" 
-                 target="_blank" 
+              <a *ngIf="mapping.exactProductUrl"
+                 [href]="mapping.exactProductUrl"
+                 target="_blank"
                  class="product-url"
                  matTooltip="Open product page">
                 <mat-icon>open_in_new</mat-icon>
@@ -119,14 +119,21 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let mapping">
-              <button mat-icon-button 
-                      color="primary" 
+              <button mat-icon-button
+                      color="accent"
+                      (click)="triggerScraping(mapping)"
+                      [disabled]="!mapping.isActiveForScraping || isScrapingInProgress(mapping.mappingId)"
+                      matTooltip="Scrape now">
+                <mat-icon>refresh</mat-icon>
+              </button>
+              <button mat-icon-button
+                      color="primary"
                       (click)="editMapping(mapping)"
                       matTooltip="Edit mapping">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button 
-                      color="warn" 
+              <button mat-icon-button
+                      color="warn"
                       (click)="deleteMapping(mapping)"
                       matTooltip="Delete mapping">
                 <mat-icon>delete</mat-icon>
@@ -151,8 +158,8 @@
           </tr>
         </table>
 
-        <mat-paginator [pageSizeOptions]="[5, 10, 20]" 
-                       showFirstLastButtons 
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                       showFirstLastButtons
                        aria-label="Select page of mappings">
         </mat-paginator>
       </div>

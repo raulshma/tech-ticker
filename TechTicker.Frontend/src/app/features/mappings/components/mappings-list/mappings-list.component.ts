@@ -27,6 +27,9 @@ export class MappingsListComponent implements OnInit {
   productControl = new FormControl('');
   products: ProductDto[] = [];
 
+  // Track scraping progress
+  scrapingInProgress = new Set<string>();
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -76,7 +79,7 @@ export class MappingsListComponent implements OnInit {
   loadMappings(): void {
     this.isLoading = true;
     const productId = this.productControl.value || undefined;
-    
+
     this.mappingsService.getMappings(productId).subscribe({
       next: (mappings) => {
         this.dataSource.data = mappings;
@@ -143,5 +146,31 @@ export class MappingsListComponent implements OnInit {
       default:
         return 'unknown';
     }
+  }
+
+  triggerScraping(mapping: ProductSellerMappingDto): void {
+    if (!mapping.mappingId || !mapping.isActiveForScraping) {
+      return;
+    }
+
+    this.scrapingInProgress.add(mapping.mappingId);
+
+    this.mappingsService.triggerManualScraping(mapping.mappingId).subscribe({
+      next: (message) => {
+        this.snackBar.open(message, 'Close', { duration: 5000 });
+        this.scrapingInProgress.delete(mapping.mappingId!);
+        // Optionally reload mappings to show updated status
+        // this.loadMappings();
+      },
+      error: (error) => {
+        console.error('Error triggering scraping:', error);
+        this.snackBar.open('Failed to trigger scraping', 'Close', { duration: 5000 });
+        this.scrapingInProgress.delete(mapping.mappingId!);
+      }
+    });
+  }
+
+  isScrapingInProgress(mappingId: string | undefined): boolean {
+    return mappingId ? this.scrapingInProgress.has(mappingId) : false;
   }
 }

@@ -78,6 +78,7 @@ builder.Services.AddScoped<IAlertRuleService, AlertRuleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
+builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
 
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();

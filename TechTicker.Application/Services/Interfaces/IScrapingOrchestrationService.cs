@@ -7,4 +7,5 @@ public interface IScrapingOrchestrationService
 {
     Task ScheduleScrapingJobsAsync();
     Task ProcessScrapingResultAsync(Guid mappingId, bool wasSuccessful, string? errorMessage = null);
+    Task<bool> TriggerManualScrapingAsync(Guid mappingId);
 }

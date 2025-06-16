@@ -133,6 +133,63 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
         }
     }
 
+    public async Task<bool> TriggerManualScrapingAsync(Guid mappingId)
+    {
+        try
+        {
+            _logger.LogInformation("Triggering manual scraping for mapping {MappingId}", mappingId);
+
+            // Get the mapping with its configuration
+            var mapping = await _unitOfWork.ProductSellerMappings.GetByIdWithConfigurationAsync(mappingId);
+            if (mapping == null)
+            {
+                _logger.LogWarning("Mapping {MappingId} not found for manual scraping", mappingId);
+                return false;
+            }
+
+            if (!mapping.IsActiveForScraping)
+            {
+                _logger.LogWarning("Mapping {MappingId} is not active for scraping", mappingId);
+                return false;
+            }
+
+            // Create and publish the scrape command
+            var command = new ScrapeProductPageCommand
+            {
+                MappingId = mapping.MappingId,
+                CanonicalProductId = mapping.CanonicalProductId,
+                SellerName = mapping.SellerName,
+                ExactProductUrl = mapping.ExactProductUrl,
+                Selectors = new ScrapingSelectors
+                {
+                    ProductNameSelector = mapping.SiteConfiguration?.ProductNameSelector ?? "h1",
+                    PriceSelector = mapping.SiteConfiguration?.PriceSelector ?? ".price",
+                    StockSelector = mapping.SiteConfiguration?.StockSelector ?? ".stock",
+                    SellerNameOnPageSelector = mapping.SiteConfiguration?.SellerNameOnPageSelector
+                },
+                ScrapingProfile = new ScrapingProfile
+                {
+                    UserAgent = mapping.SiteConfiguration?.DefaultUserAgent ??
+                               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                    Headers = mapping.SiteConfiguration?.AdditionalHeadersDict
+                }
+            };
+
+            await _messagePublisher.PublishAsync(
+                command,
+                _messagingConfig.ScrapingExchange,
+                _messagingConfig.ScrapeCommandRoutingKey);
+
+            _logger.LogInformation("Successfully triggered manual scraping for mapping {MappingId}", mappingId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error triggering manual scraping for mapping {MappingId}", mappingId);
+            return false;
+        }
+    }
+
     private static DateTimeOffset CalculateNextScrapeTime(string? frequencyOverride)
     {
         // Default to 1 hour if no override specified
