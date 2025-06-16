@@ -37,6 +37,13 @@ public class RabbitMQConsumer : IMessageConsumer, IDisposable
 
     public Task StartConsumingAsync<T>(string queueName, Func<T, Task> messageHandler) where T : class
     {
+        // Validate parameters
+        if (string.IsNullOrWhiteSpace(queueName))
+            throw new ArgumentException("Queue name cannot be null or empty", nameof(queueName));
+
+        if (messageHandler == null)
+            throw new ArgumentNullException(nameof(messageHandler));
+
         try
         {
             // Ensure queue exists
