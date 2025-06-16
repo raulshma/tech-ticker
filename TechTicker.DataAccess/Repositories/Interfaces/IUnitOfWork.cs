@@ -11,6 +11,7 @@ public interface IUnitOfWork : IDisposable
     IScraperSiteConfigurationRepository ScraperSiteConfigurations { get; }
     IPriceHistoryRepository PriceHistory { get; }
     IAlertRuleRepository AlertRules { get; }
+    IScraperRunLogRepository ScraperRunLogs { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync();

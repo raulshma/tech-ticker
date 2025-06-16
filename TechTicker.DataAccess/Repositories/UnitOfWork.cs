@@ -17,6 +17,7 @@ public class UnitOfWork : IUnitOfWork
     private IScraperSiteConfigurationRepository? _scraperSiteConfigurations;
     private IPriceHistoryRepository? _priceHistory;
     private IAlertRuleRepository? _alertRules;
+    private IScraperRunLogRepository? _scraperRunLogs;
 
     public UnitOfWork(TechTickerDbContext context)
     {
@@ -40,6 +41,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IAlertRuleRepository AlertRules =>
         _alertRules ??= new AlertRuleRepository(_context);
+
+    public IScraperRunLogRepository ScraperRunLogs =>
+        _scraperRunLogs ??= new ScraperRunLogRepository(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

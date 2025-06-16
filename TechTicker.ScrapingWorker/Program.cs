@@ -26,6 +26,7 @@ builder.Services.Configure<MessagingConfiguration>(
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IMappingService, MappingService>();
 builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
+builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
 
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();

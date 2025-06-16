@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 
 namespace TechTicker.Domain.Entities;
@@ -45,6 +46,7 @@ public class ScraperSiteConfiguration
     public ICollection<ProductSellerMapping> ProductSellerMappings { get; set; } = new List<ProductSellerMapping>();
 
     // Helper property for working with additional headers as dictionary
+    [NotMapped]
     public Dictionary<string, string>? AdditionalHeadersDict
     {
         get => string.IsNullOrEmpty(AdditionalHeaders) 

@@ -58,4 +58,6 @@ public class ProductSellerMapping
     public ScraperSiteConfiguration? SiteConfiguration { get; set; }
 
     public ICollection<PriceHistory> PriceHistory { get; set; } = new List<PriceHistory>();
+
+    public ICollection<ScraperRunLog> ScraperRunLogs { get; set; } = new List<ScraperRunLog>();
 }

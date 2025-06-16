@@ -1,6 +1,12 @@
 using Microsoft.Extensions.Logging;
+using Moq;
+using FluentAssertions;
+using Xunit;
 using TechTicker.Application.Messages;
+using TechTicker.Application.Services.Interfaces;
+using TechTicker.Application.DTOs;
 using TechTicker.ScrapingWorker.Services;
+using TechTicker.Shared.Utilities;
 
 namespace TechTicker.ScrapingWorker.Tests.Services;
 
@@ -8,11 +14,31 @@ public class WebScrapingServiceTests
 {
     private readonly WebScrapingService _webScrapingService;
     private readonly Mock<ILogger<WebScrapingService>> _mockLogger;
+    private readonly Mock<IScraperRunLogService> _mockScraperRunLogService;
 
     public WebScrapingServiceTests()
     {
         _mockLogger = new Mock<ILogger<WebScrapingService>>();
-        _webScrapingService = new WebScrapingService(_mockLogger.Object);
+        _mockScraperRunLogService = new Mock<IScraperRunLogService>();
+
+        // Setup default mock responses
+        _mockScraperRunLogService
+            .Setup(x => x.CreateRunLogAsync(It.IsAny<CreateScraperRunLogDto>()))
+            .ReturnsAsync(Result<Guid>.Success(Guid.NewGuid()));
+
+        _mockScraperRunLogService
+            .Setup(x => x.UpdateRunLogAsync(It.IsAny<Guid>(), It.IsAny<UpdateScraperRunLogDto>()))
+            .ReturnsAsync(Result<bool>.Success(true));
+
+        _mockScraperRunLogService
+            .Setup(x => x.CompleteRunAsync(It.IsAny<Guid>(), It.IsAny<CompleteScraperRunDto>()))
+            .ReturnsAsync(Result<bool>.Success(true));
+
+        _mockScraperRunLogService
+            .Setup(x => x.FailRunAsync(It.IsAny<Guid>(), It.IsAny<FailScraperRunDto>()))
+            .ReturnsAsync(Result<bool>.Success(true));
+
+        _webScrapingService = new WebScrapingService(_mockLogger.Object, _mockScraperRunLogService.Object);
     }
 
     [Fact]

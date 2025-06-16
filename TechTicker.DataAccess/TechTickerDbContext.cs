@@ -21,6 +21,7 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<ScraperSiteConfiguration> ScraperSiteConfigurations { get; set; } = null!;
     public DbSet<PriceHistory> PriceHistory { get; set; } = null!;
     public DbSet<AlertRule> AlertRules { get; set; } = null!;
+    public DbSet<ScraperRunLog> ScraperRunLogs { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -183,6 +184,51 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
+        // Configure ScraperRunLog entity
+        modelBuilder.Entity<ScraperRunLog>(entity =>
+        {
+            entity.HasKey(e => e.RunId);
+            entity.Property(e => e.MappingId).IsRequired();
+            entity.Property(e => e.StartedAt).IsRequired();
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.TargetUrl).IsRequired().HasMaxLength(2048);
+            entity.Property(e => e.UserAgent).HasMaxLength(500);
+            entity.Property(e => e.ExtractedProductName).HasMaxLength(500);
+            entity.Property(e => e.ExtractedPrice).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.ExtractedStockStatus).HasMaxLength(100);
+            entity.Property(e => e.ExtractedSellerName).HasMaxLength(200);
+            entity.Property(e => e.ErrorCode).HasMaxLength(100);
+            entity.Property(e => e.ErrorCategory).HasMaxLength(50);
+            entity.Property(e => e.AttemptNumber).IsRequired().HasDefaultValue(1);
+            entity.Property(e => e.RawHtmlSnippet).HasMaxLength(2000);
+            entity.Property(e => e.DebugNotes).HasMaxLength(1000);
+            entity.Property(e => e.CreatedAt).IsRequired();
+
+            // Configure JSON columns for PostgreSQL
+            entity.Property(e => e.AdditionalHeaders).HasColumnType("jsonb");
+            entity.Property(e => e.Selectors).HasColumnType("jsonb");
+
+            // Indexes for performance
+            entity.HasIndex(e => e.MappingId);
+            entity.HasIndex(e => e.StartedAt);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.ErrorCategory);
+            entity.HasIndex(e => e.ParentRunId);
+            entity.HasIndex(e => new { e.MappingId, e.StartedAt });
+            entity.HasIndex(e => new { e.Status, e.StartedAt });
+
+            // Relationships
+            entity.HasOne(e => e.Mapping)
+                  .WithMany(m => m.ScraperRunLogs)
+                  .HasForeignKey(e => e.MappingId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.ParentRun)
+                  .WithMany(p => p.RetryAttempts)
+                  .HasForeignKey(e => e.ParentRunId)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
         // Configure ApplicationUser entity
         modelBuilder.Entity<ApplicationUser>(entity =>
         {
@@ -248,6 +294,11 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
                 if (entry.State == EntityState.Added)
                     user.CreatedAt = DateTimeOffset.UtcNow;
                 user.UpdatedAt = DateTimeOffset.UtcNow;
+            }
+            else if (entry.Entity is ScraperRunLog runLog)
+            {
+                if (entry.State == EntityState.Added)
+                    runLog.CreatedAt = DateTimeOffset.UtcNow;
             }
         }
     }
