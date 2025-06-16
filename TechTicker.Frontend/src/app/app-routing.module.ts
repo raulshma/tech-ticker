@@ -43,6 +43,11 @@ const routes: Routes = [
         path: 'users',
         loadChildren: () => import('./features/users/users.module').then(m => m.UsersModule),
         canActivate: [AdminGuard]
+      },
+      {
+        path: 'scraper-logs',
+        loadChildren: () => import('./features/scraper-logs/scraper-logs.module').then(m => m.ScraperLogsModule),
+        canActivate: [AdminGuard]
       }
       // {
       //   path: 'alerts',

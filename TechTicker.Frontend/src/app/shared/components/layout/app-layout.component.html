@@ -4,53 +4,62 @@
     <mat-toolbar class="sidenav-header">
       <span>TechTicker Admin</span>
     </mat-toolbar>
-    
+
     <mat-nav-list>
       <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon matListItemIcon>dashboard</mat-icon>
         <span matListItemTitle>Dashboard</span>
       </a>
-      
+
       <mat-divider></mat-divider>
-      
+
       <!-- Admin-only sections -->
       <ng-container *ngIf="isAdmin">
         <h3 matSubheader>Product Management</h3>
-        
+
         <a mat-list-item routerLink="/categories" routerLinkActive="active-link">
           <mat-icon matListItemIcon>category</mat-icon>
           <span matListItemTitle>Categories</span>
         </a>
-        
+
         <a mat-list-item routerLink="/products" routerLinkActive="active-link">
           <mat-icon matListItemIcon>inventory</mat-icon>
           <span matListItemTitle>Products</span>
         </a>
-        
+
         <a mat-list-item routerLink="/mappings" routerLinkActive="active-link">
           <mat-icon matListItemIcon>link</mat-icon>
           <span matListItemTitle>Product Mappings</span>
         </a>
-        
+
         <a mat-list-item routerLink="/site-configs" routerLinkActive="active-link">
           <mat-icon matListItemIcon>settings</mat-icon>
           <span matListItemTitle>Site Configurations</span>
         </a>
-        
+
         <mat-divider></mat-divider>
-        
+
+        <h3 matSubheader>Monitoring</h3>
+
+        <a mat-list-item routerLink="/scraper-logs" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>history</mat-icon>
+          <span matListItemTitle>Scraper Logs</span>
+        </a>
+
+        <mat-divider></mat-divider>
+
         <h3 matSubheader>User Management</h3>
-        
+
         <a mat-list-item routerLink="/users" routerLinkActive="active-link">
           <mat-icon matListItemIcon>people</mat-icon>
           <span matListItemTitle>Users</span>
         </a>
       </ng-container>
-      
+
       <mat-divider></mat-divider>
-      
+
       <h3 matSubheader>Alerts</h3>
-      
+
       <a mat-list-item routerLink="/alerts" routerLinkActive="active-link">
         <mat-icon matListItemIcon>notifications</mat-icon>
         <span matListItemTitle>Alert Rules</span>
@@ -63,9 +72,9 @@
     <!-- Top toolbar -->
     <mat-toolbar color="primary" class="main-toolbar">
       <span>TechTicker</span>
-      
+
       <span class="spacer"></span>
-      
+
       <!-- User menu -->
       <button mat-icon-button [matMenuTriggerFor]="userMenu" *ngIf="currentUser">
         <mat-icon>account_circle</mat-icon>

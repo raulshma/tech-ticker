@@ -2544,6 +2544,618 @@ export class TechTickerApiClient {
     }
 
     /**
+     * @param page (optional) 
+     * @param pageSize (optional) 
+     * @param mappingId (optional) 
+     * @param status (optional) 
+     * @param errorCategory (optional) 
+     * @param dateFrom (optional) 
+     * @param dateTo (optional) 
+     * @param sellerName (optional) 
+     * @return OK
+     */
+    scraperLogs(page: number | undefined, pageSize: number | undefined, mappingId: string | undefined, status: string | undefined, errorCategory: string | undefined, dateFrom: Date | undefined, dateTo: Date | undefined, sellerName: string | undefined): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/scraper-logs?";
+        if (page === null)
+            throw new Error("The parameter 'page' cannot be null.");
+        else if (page !== undefined)
+            url_ += "page=" + encodeURIComponent("" + page) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "pageSize=" + encodeURIComponent("" + pageSize) + "&";
+        if (mappingId === null)
+            throw new Error("The parameter 'mappingId' cannot be null.");
+        else if (mappingId !== undefined)
+            url_ += "mappingId=" + encodeURIComponent("" + mappingId) + "&";
+        if (status === null)
+            throw new Error("The parameter 'status' cannot be null.");
+        else if (status !== undefined)
+            url_ += "status=" + encodeURIComponent("" + status) + "&";
+        if (errorCategory === null)
+            throw new Error("The parameter 'errorCategory' cannot be null.");
+        else if (errorCategory !== undefined)
+            url_ += "errorCategory=" + encodeURIComponent("" + errorCategory) + "&";
+        if (dateFrom === null)
+            throw new Error("The parameter 'dateFrom' cannot be null.");
+        else if (dateFrom !== undefined)
+            url_ += "dateFrom=" + encodeURIComponent(dateFrom ? "" + dateFrom.toISOString() : "") + "&";
+        if (dateTo === null)
+            throw new Error("The parameter 'dateTo' cannot be null.");
+        else if (dateTo !== undefined)
+            url_ += "dateTo=" + encodeURIComponent(dateTo ? "" + dateTo.toISOString() : "") + "&";
+        if (sellerName === null)
+            throw new Error("The parameter 'sellerName' cannot be null.");
+        else if (sellerName !== undefined)
+            url_ += "sellerName=" + encodeURIComponent("" + sellerName) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processScraperLogs(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processScraperLogs(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse>;
+        }));
+    }
+
+    protected processScraperLogs(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperRunLogSummaryDtoPagedResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    scraperLogs2(runId: string): Observable<ScraperRunLogDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/scraper-logs/{runId}";
+        if (runId === undefined || runId === null)
+            throw new Error("The parameter 'runId' must be defined.");
+        url_ = url_.replace("{runId}", encodeURIComponent("" + runId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processScraperLogs2(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processScraperLogs2(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ScraperRunLogDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ScraperRunLogDtoApiResponse>;
+        }));
+    }
+
+    protected processScraperLogs2(response: HttpResponseBase): Observable<ScraperRunLogDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperRunLogDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param page (optional) 
+     * @param pageSize (optional) 
+     * @return OK
+     */
+    mapping(mappingId: string, page: number | undefined, pageSize: number | undefined): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/scraper-logs/mapping/{mappingId}?";
+        if (mappingId === undefined || mappingId === null)
+            throw new Error("The parameter 'mappingId' must be defined.");
+        url_ = url_.replace("{mappingId}", encodeURIComponent("" + mappingId));
+        if (page === null)
+            throw new Error("The parameter 'page' cannot be null.");
+        else if (page !== undefined)
+            url_ += "page=" + encodeURIComponent("" + page) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "pageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processMapping(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processMapping(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse>;
+        }));
+    }
+
+    protected processMapping(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperRunLogSummaryDtoPagedResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param count (optional) 
+     * @return OK
+     */
+    recentFailures(count: number | undefined): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/scraper-logs/recent-failures?";
+        if (count === null)
+            throw new Error("The parameter 'count' cannot be null.");
+        else if (count !== undefined)
+            url_ += "count=" + encodeURIComponent("" + count) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRecentFailures(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRecentFailures(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processRecentFailures(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperRunLogSummaryDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param count (optional) 
+     * @return OK
+     */
+    recent(mappingId: string, count: number | undefined): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/scraper-logs/mapping/{mappingId}/recent?";
+        if (mappingId === undefined || mappingId === null)
+            throw new Error("The parameter 'mappingId' must be defined.");
+        url_ = url_.replace("{mappingId}", encodeURIComponent("" + mappingId));
+        if (count === null)
+            throw new Error("The parameter 'count' cannot be null.");
+        else if (count !== undefined)
+            url_ += "count=" + encodeURIComponent("" + count) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRecent(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRecent(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processRecent(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperRunLogSummaryDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dateFrom (optional) 
+     * @param dateTo (optional) 
+     * @param mappingId (optional) 
+     * @return OK
+     */
+    statistics(dateFrom: Date | undefined, dateTo: Date | undefined, mappingId: string | undefined): Observable<ScraperRunStatisticsDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/scraper-logs/statistics?";
+        if (dateFrom === null)
+            throw new Error("The parameter 'dateFrom' cannot be null.");
+        else if (dateFrom !== undefined)
+            url_ += "dateFrom=" + encodeURIComponent(dateFrom ? "" + dateFrom.toISOString() : "") + "&";
+        if (dateTo === null)
+            throw new Error("The parameter 'dateTo' cannot be null.");
+        else if (dateTo !== undefined)
+            url_ += "dateTo=" + encodeURIComponent(dateTo ? "" + dateTo.toISOString() : "") + "&";
+        if (mappingId === null)
+            throw new Error("The parameter 'mappingId' cannot be null.");
+        else if (mappingId !== undefined)
+            url_ += "mappingId=" + encodeURIComponent("" + mappingId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processStatistics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processStatistics(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ScraperRunStatisticsDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ScraperRunStatisticsDtoApiResponse>;
+        }));
+    }
+
+    protected processStatistics(response: HttpResponseBase): Observable<ScraperRunStatisticsDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperRunStatisticsDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    retryChain(runId: string): Observable<ScraperRunLogDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/scraper-logs/{runId}/retry-chain";
+        if (runId === undefined || runId === null)
+            throw new Error("The parameter 'runId' must be defined.");
+        url_ = url_.replace("{runId}", encodeURIComponent("" + runId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRetryChain(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRetryChain(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ScraperRunLogDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ScraperRunLogDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processRetryChain(response: HttpResponseBase): Observable<ScraperRunLogDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperRunLogDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dateFrom (optional) 
+     * @param dateTo (optional) 
+     * @return OK
+     */
+    performanceMetrics(dateFrom: Date | undefined, dateTo: Date | undefined): Observable<SellerPerformanceMetricDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/scraper-logs/performance-metrics?";
+        if (dateFrom === null)
+            throw new Error("The parameter 'dateFrom' cannot be null.");
+        else if (dateFrom !== undefined)
+            url_ += "dateFrom=" + encodeURIComponent(dateFrom ? "" + dateFrom.toISOString() : "") + "&";
+        if (dateTo === null)
+            throw new Error("The parameter 'dateTo' cannot be null.");
+        else if (dateTo !== undefined)
+            url_ += "dateTo=" + encodeURIComponent(dateTo ? "" + dateTo.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processPerformanceMetrics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processPerformanceMetrics(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SellerPerformanceMetricDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SellerPerformanceMetricDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processPerformanceMetrics(response: HttpResponseBase): Observable<SellerPerformanceMetricDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SellerPerformanceMetricDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    inProgress(): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/scraper-logs/in-progress";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processInProgress(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processInProgress(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processInProgress(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScraperRunLogSummaryDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param daysToKeep (optional) 
+     * @return OK
+     */
+    cleanup(daysToKeep: number | undefined): Observable<Int32ApiResponse> {
+        let url_ = this.baseUrl + "/api/scraper-logs/cleanup?";
+        if (daysToKeep === null)
+            throw new Error("The parameter 'daysToKeep' cannot be null.");
+        else if (daysToKeep !== undefined)
+            url_ += "daysToKeep=" + encodeURIComponent("" + daysToKeep) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCleanup(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCleanup(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Int32ApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Int32ApiResponse>;
+        }));
+    }
+
+    protected processCleanup(response: HttpResponseBase): Observable<Int32ApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Int32ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @return OK
      */
     all(): Observable<ScraperSiteConfigurationDtoIEnumerableApiResponse> {
@@ -4054,6 +4666,90 @@ export interface IDashboardStatsDtoApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class Int32ApiResponse implements IInt32ApiResponse {
+    success?: boolean;
+    data?: number;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IInt32ApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): Int32ApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new Int32ApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IInt32ApiResponse {
+    success?: boolean;
+    data?: number;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class LoginResponseDto implements ILoginResponseDto {
     token?: string | undefined;
     userId?: string;
@@ -5222,6 +5918,894 @@ export interface IRegisterUserDto {
     lastName?: string | undefined;
 }
 
+export class ScraperRunLogDto implements IScraperRunLogDto {
+    runId?: string;
+    mappingId?: string;
+    startedAt?: Date;
+    completedAt?: Date | undefined;
+    duration?: string | undefined;
+    status?: string | undefined;
+    statusDisplayName?: string | undefined;
+    targetUrl?: string | undefined;
+    userAgent?: string | undefined;
+    additionalHeaders?: { [key: string]: string; } | undefined;
+    selectors?: ScrapingSelectorsDto;
+    httpStatusCode?: number | undefined;
+    responseTime?: string | undefined;
+    responseSizeBytes?: number | undefined;
+    extractedProductName?: string | undefined;
+    extractedPrice?: number | undefined;
+    extractedStockStatus?: string | undefined;
+    extractedSellerName?: string | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errorStackTrace?: string | undefined;
+    errorCategory?: string | undefined;
+    errorCategoryDisplayName?: string | undefined;
+    attemptNumber?: number;
+    parentRunId?: string | undefined;
+    isRetry?: boolean;
+    pageLoadTime?: string | undefined;
+    parsingTime?: string | undefined;
+    rawHtmlSnippet?: string | undefined;
+    debugNotes?: string | undefined;
+    mapping?: ProductSellerMappingDto;
+    retryAttempts?: ScraperRunLogSummaryDto[] | undefined;
+    createdAt?: Date;
+
+    constructor(data?: IScraperRunLogDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.runId = _data["runId"];
+            this.mappingId = _data["mappingId"];
+            this.startedAt = _data["startedAt"] ? new Date(_data["startedAt"].toString()) : <any>undefined;
+            this.completedAt = _data["completedAt"] ? new Date(_data["completedAt"].toString()) : <any>undefined;
+            this.duration = _data["duration"];
+            this.status = _data["status"];
+            this.statusDisplayName = _data["statusDisplayName"];
+            this.targetUrl = _data["targetUrl"];
+            this.userAgent = _data["userAgent"];
+            if (_data["additionalHeaders"]) {
+                this.additionalHeaders = {} as any;
+                for (let key in _data["additionalHeaders"]) {
+                    if (_data["additionalHeaders"].hasOwnProperty(key))
+                        (<any>this.additionalHeaders)![key] = _data["additionalHeaders"][key];
+                }
+            }
+            this.selectors = _data["selectors"] ? ScrapingSelectorsDto.fromJS(_data["selectors"]) : <any>undefined;
+            this.httpStatusCode = _data["httpStatusCode"];
+            this.responseTime = _data["responseTime"];
+            this.responseSizeBytes = _data["responseSizeBytes"];
+            this.extractedProductName = _data["extractedProductName"];
+            this.extractedPrice = _data["extractedPrice"];
+            this.extractedStockStatus = _data["extractedStockStatus"];
+            this.extractedSellerName = _data["extractedSellerName"];
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            this.errorStackTrace = _data["errorStackTrace"];
+            this.errorCategory = _data["errorCategory"];
+            this.errorCategoryDisplayName = _data["errorCategoryDisplayName"];
+            this.attemptNumber = _data["attemptNumber"];
+            this.parentRunId = _data["parentRunId"];
+            this.isRetry = _data["isRetry"];
+            this.pageLoadTime = _data["pageLoadTime"];
+            this.parsingTime = _data["parsingTime"];
+            this.rawHtmlSnippet = _data["rawHtmlSnippet"];
+            this.debugNotes = _data["debugNotes"];
+            this.mapping = _data["mapping"] ? ProductSellerMappingDto.fromJS(_data["mapping"]) : <any>undefined;
+            if (Array.isArray(_data["retryAttempts"])) {
+                this.retryAttempts = [] as any;
+                for (let item of _data["retryAttempts"])
+                    this.retryAttempts!.push(ScraperRunLogSummaryDto.fromJS(item));
+            }
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ScraperRunLogDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperRunLogDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["runId"] = this.runId;
+        data["mappingId"] = this.mappingId;
+        data["startedAt"] = this.startedAt ? this.startedAt.toISOString() : <any>undefined;
+        data["completedAt"] = this.completedAt ? this.completedAt.toISOString() : <any>undefined;
+        data["duration"] = this.duration;
+        data["status"] = this.status;
+        data["statusDisplayName"] = this.statusDisplayName;
+        data["targetUrl"] = this.targetUrl;
+        data["userAgent"] = this.userAgent;
+        if (this.additionalHeaders) {
+            data["additionalHeaders"] = {};
+            for (let key in this.additionalHeaders) {
+                if (this.additionalHeaders.hasOwnProperty(key))
+                    (<any>data["additionalHeaders"])[key] = (<any>this.additionalHeaders)[key];
+            }
+        }
+        data["selectors"] = this.selectors ? this.selectors.toJSON() : <any>undefined;
+        data["httpStatusCode"] = this.httpStatusCode;
+        data["responseTime"] = this.responseTime;
+        data["responseSizeBytes"] = this.responseSizeBytes;
+        data["extractedProductName"] = this.extractedProductName;
+        data["extractedPrice"] = this.extractedPrice;
+        data["extractedStockStatus"] = this.extractedStockStatus;
+        data["extractedSellerName"] = this.extractedSellerName;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        data["errorStackTrace"] = this.errorStackTrace;
+        data["errorCategory"] = this.errorCategory;
+        data["errorCategoryDisplayName"] = this.errorCategoryDisplayName;
+        data["attemptNumber"] = this.attemptNumber;
+        data["parentRunId"] = this.parentRunId;
+        data["isRetry"] = this.isRetry;
+        data["pageLoadTime"] = this.pageLoadTime;
+        data["parsingTime"] = this.parsingTime;
+        data["rawHtmlSnippet"] = this.rawHtmlSnippet;
+        data["debugNotes"] = this.debugNotes;
+        data["mapping"] = this.mapping ? this.mapping.toJSON() : <any>undefined;
+        if (Array.isArray(this.retryAttempts)) {
+            data["retryAttempts"] = [];
+            for (let item of this.retryAttempts)
+                data["retryAttempts"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IScraperRunLogDto {
+    runId?: string;
+    mappingId?: string;
+    startedAt?: Date;
+    completedAt?: Date | undefined;
+    duration?: string | undefined;
+    status?: string | undefined;
+    statusDisplayName?: string | undefined;
+    targetUrl?: string | undefined;
+    userAgent?: string | undefined;
+    additionalHeaders?: { [key: string]: string; } | undefined;
+    selectors?: ScrapingSelectorsDto;
+    httpStatusCode?: number | undefined;
+    responseTime?: string | undefined;
+    responseSizeBytes?: number | undefined;
+    extractedProductName?: string | undefined;
+    extractedPrice?: number | undefined;
+    extractedStockStatus?: string | undefined;
+    extractedSellerName?: string | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errorStackTrace?: string | undefined;
+    errorCategory?: string | undefined;
+    errorCategoryDisplayName?: string | undefined;
+    attemptNumber?: number;
+    parentRunId?: string | undefined;
+    isRetry?: boolean;
+    pageLoadTime?: string | undefined;
+    parsingTime?: string | undefined;
+    rawHtmlSnippet?: string | undefined;
+    debugNotes?: string | undefined;
+    mapping?: ProductSellerMappingDto;
+    retryAttempts?: ScraperRunLogSummaryDto[] | undefined;
+    createdAt?: Date;
+}
+
+export class ScraperRunLogDtoApiResponse implements IScraperRunLogDtoApiResponse {
+    success?: boolean;
+    data?: ScraperRunLogDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IScraperRunLogDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ScraperRunLogDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ScraperRunLogDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperRunLogDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IScraperRunLogDtoApiResponse {
+    success?: boolean;
+    data?: ScraperRunLogDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ScraperRunLogDtoIEnumerableApiResponse implements IScraperRunLogDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ScraperRunLogDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IScraperRunLogDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ScraperRunLogDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ScraperRunLogDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperRunLogDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IScraperRunLogDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ScraperRunLogDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ScraperRunLogSummaryDto implements IScraperRunLogSummaryDto {
+    runId?: string;
+    mappingId?: string;
+    startedAt?: Date;
+    completedAt?: Date | undefined;
+    duration?: string | undefined;
+    status?: string | undefined;
+    statusDisplayName?: string | undefined;
+    targetUrl?: string | undefined;
+    extractedPrice?: number | undefined;
+    errorMessage?: string | undefined;
+    errorCategory?: string | undefined;
+    errorCategoryDisplayName?: string | undefined;
+    attemptNumber?: number;
+    isRetry?: boolean;
+    responseTime?: string | undefined;
+    sellerName?: string | undefined;
+    productName?: string | undefined;
+
+    constructor(data?: IScraperRunLogSummaryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.runId = _data["runId"];
+            this.mappingId = _data["mappingId"];
+            this.startedAt = _data["startedAt"] ? new Date(_data["startedAt"].toString()) : <any>undefined;
+            this.completedAt = _data["completedAt"] ? new Date(_data["completedAt"].toString()) : <any>undefined;
+            this.duration = _data["duration"];
+            this.status = _data["status"];
+            this.statusDisplayName = _data["statusDisplayName"];
+            this.targetUrl = _data["targetUrl"];
+            this.extractedPrice = _data["extractedPrice"];
+            this.errorMessage = _data["errorMessage"];
+            this.errorCategory = _data["errorCategory"];
+            this.errorCategoryDisplayName = _data["errorCategoryDisplayName"];
+            this.attemptNumber = _data["attemptNumber"];
+            this.isRetry = _data["isRetry"];
+            this.responseTime = _data["responseTime"];
+            this.sellerName = _data["sellerName"];
+            this.productName = _data["productName"];
+        }
+    }
+
+    static fromJS(data: any): ScraperRunLogSummaryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperRunLogSummaryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["runId"] = this.runId;
+        data["mappingId"] = this.mappingId;
+        data["startedAt"] = this.startedAt ? this.startedAt.toISOString() : <any>undefined;
+        data["completedAt"] = this.completedAt ? this.completedAt.toISOString() : <any>undefined;
+        data["duration"] = this.duration;
+        data["status"] = this.status;
+        data["statusDisplayName"] = this.statusDisplayName;
+        data["targetUrl"] = this.targetUrl;
+        data["extractedPrice"] = this.extractedPrice;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCategory"] = this.errorCategory;
+        data["errorCategoryDisplayName"] = this.errorCategoryDisplayName;
+        data["attemptNumber"] = this.attemptNumber;
+        data["isRetry"] = this.isRetry;
+        data["responseTime"] = this.responseTime;
+        data["sellerName"] = this.sellerName;
+        data["productName"] = this.productName;
+        return data;
+    }
+}
+
+export interface IScraperRunLogSummaryDto {
+    runId?: string;
+    mappingId?: string;
+    startedAt?: Date;
+    completedAt?: Date | undefined;
+    duration?: string | undefined;
+    status?: string | undefined;
+    statusDisplayName?: string | undefined;
+    targetUrl?: string | undefined;
+    extractedPrice?: number | undefined;
+    errorMessage?: string | undefined;
+    errorCategory?: string | undefined;
+    errorCategoryDisplayName?: string | undefined;
+    attemptNumber?: number;
+    isRetry?: boolean;
+    responseTime?: string | undefined;
+    sellerName?: string | undefined;
+    productName?: string | undefined;
+}
+
+export class ScraperRunLogSummaryDtoIEnumerableApiResponse implements IScraperRunLogSummaryDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ScraperRunLogSummaryDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IScraperRunLogSummaryDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ScraperRunLogSummaryDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ScraperRunLogSummaryDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperRunLogSummaryDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IScraperRunLogSummaryDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ScraperRunLogSummaryDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ScraperRunLogSummaryDtoPagedResultDto implements IScraperRunLogSummaryDtoPagedResultDto {
+    items?: ScraperRunLogSummaryDto[] | undefined;
+    totalCount?: number;
+    page?: number;
+    pageSize?: number;
+    readonly totalPages?: number;
+    readonly hasNextPage?: boolean;
+    readonly hasPreviousPage?: boolean;
+
+    constructor(data?: IScraperRunLogSummaryDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ScraperRunLogSummaryDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+            this.page = _data["page"];
+            this.pageSize = _data["pageSize"];
+            (<any>this).totalPages = _data["totalPages"];
+            (<any>this).hasNextPage = _data["hasNextPage"];
+            (<any>this).hasPreviousPage = _data["hasPreviousPage"];
+        }
+    }
+
+    static fromJS(data: any): ScraperRunLogSummaryDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperRunLogSummaryDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["totalCount"] = this.totalCount;
+        data["page"] = this.page;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["hasNextPage"] = this.hasNextPage;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        return data;
+    }
+}
+
+export interface IScraperRunLogSummaryDtoPagedResultDto {
+    items?: ScraperRunLogSummaryDto[] | undefined;
+    totalCount?: number;
+    page?: number;
+    pageSize?: number;
+    totalPages?: number;
+    hasNextPage?: boolean;
+    hasPreviousPage?: boolean;
+}
+
+export class ScraperRunLogSummaryDtoPagedResultDtoApiResponse implements IScraperRunLogSummaryDtoPagedResultDtoApiResponse {
+    success?: boolean;
+    data?: ScraperRunLogSummaryDtoPagedResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IScraperRunLogSummaryDtoPagedResultDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ScraperRunLogSummaryDtoPagedResultDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ScraperRunLogSummaryDtoPagedResultDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperRunLogSummaryDtoPagedResultDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IScraperRunLogSummaryDtoPagedResultDtoApiResponse {
+    success?: boolean;
+    data?: ScraperRunLogSummaryDtoPagedResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ScraperRunStatisticsDto implements IScraperRunStatisticsDto {
+    totalRuns?: number;
+    successfulRuns?: number;
+    failedRuns?: number;
+    inProgressRuns?: number;
+    successRate?: number;
+    averageResponseTime?: string | undefined;
+    averageDuration?: string | undefined;
+    errorCategoryCounts?: { [key: string]: number; } | undefined;
+    statusCounts?: { [key: string]: number; } | undefined;
+    dateFrom?: Date | undefined;
+    dateTo?: Date | undefined;
+
+    constructor(data?: IScraperRunStatisticsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalRuns = _data["totalRuns"];
+            this.successfulRuns = _data["successfulRuns"];
+            this.failedRuns = _data["failedRuns"];
+            this.inProgressRuns = _data["inProgressRuns"];
+            this.successRate = _data["successRate"];
+            this.averageResponseTime = _data["averageResponseTime"];
+            this.averageDuration = _data["averageDuration"];
+            if (_data["errorCategoryCounts"]) {
+                this.errorCategoryCounts = {} as any;
+                for (let key in _data["errorCategoryCounts"]) {
+                    if (_data["errorCategoryCounts"].hasOwnProperty(key))
+                        (<any>this.errorCategoryCounts)![key] = _data["errorCategoryCounts"][key];
+                }
+            }
+            if (_data["statusCounts"]) {
+                this.statusCounts = {} as any;
+                for (let key in _data["statusCounts"]) {
+                    if (_data["statusCounts"].hasOwnProperty(key))
+                        (<any>this.statusCounts)![key] = _data["statusCounts"][key];
+                }
+            }
+            this.dateFrom = _data["dateFrom"] ? new Date(_data["dateFrom"].toString()) : <any>undefined;
+            this.dateTo = _data["dateTo"] ? new Date(_data["dateTo"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ScraperRunStatisticsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperRunStatisticsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalRuns"] = this.totalRuns;
+        data["successfulRuns"] = this.successfulRuns;
+        data["failedRuns"] = this.failedRuns;
+        data["inProgressRuns"] = this.inProgressRuns;
+        data["successRate"] = this.successRate;
+        data["averageResponseTime"] = this.averageResponseTime;
+        data["averageDuration"] = this.averageDuration;
+        if (this.errorCategoryCounts) {
+            data["errorCategoryCounts"] = {};
+            for (let key in this.errorCategoryCounts) {
+                if (this.errorCategoryCounts.hasOwnProperty(key))
+                    (<any>data["errorCategoryCounts"])[key] = (<any>this.errorCategoryCounts)[key];
+            }
+        }
+        if (this.statusCounts) {
+            data["statusCounts"] = {};
+            for (let key in this.statusCounts) {
+                if (this.statusCounts.hasOwnProperty(key))
+                    (<any>data["statusCounts"])[key] = (<any>this.statusCounts)[key];
+            }
+        }
+        data["dateFrom"] = this.dateFrom ? this.dateFrom.toISOString() : <any>undefined;
+        data["dateTo"] = this.dateTo ? this.dateTo.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IScraperRunStatisticsDto {
+    totalRuns?: number;
+    successfulRuns?: number;
+    failedRuns?: number;
+    inProgressRuns?: number;
+    successRate?: number;
+    averageResponseTime?: string | undefined;
+    averageDuration?: string | undefined;
+    errorCategoryCounts?: { [key: string]: number; } | undefined;
+    statusCounts?: { [key: string]: number; } | undefined;
+    dateFrom?: Date | undefined;
+    dateTo?: Date | undefined;
+}
+
+export class ScraperRunStatisticsDtoApiResponse implements IScraperRunStatisticsDtoApiResponse {
+    success?: boolean;
+    data?: ScraperRunStatisticsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IScraperRunStatisticsDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ScraperRunStatisticsDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ScraperRunStatisticsDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperRunStatisticsDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IScraperRunStatisticsDtoApiResponse {
+    success?: boolean;
+    data?: ScraperRunStatisticsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class ScraperSiteConfigurationDto implements IScraperSiteConfigurationDto {
     siteConfigId?: string;
     siteDomain?: string | undefined;
@@ -5478,6 +7062,202 @@ export class ScraperSiteConfigurationDtoIEnumerableApiResponse implements IScrap
 export interface IScraperSiteConfigurationDtoIEnumerableApiResponse {
     success?: boolean;
     data?: ScraperSiteConfigurationDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ScrapingSelectorsDto implements IScrapingSelectorsDto {
+    productNameSelector?: string | undefined;
+    priceSelector?: string | undefined;
+    stockSelector?: string | undefined;
+    sellerNameOnPageSelector?: string | undefined;
+
+    constructor(data?: IScrapingSelectorsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productNameSelector = _data["productNameSelector"];
+            this.priceSelector = _data["priceSelector"];
+            this.stockSelector = _data["stockSelector"];
+            this.sellerNameOnPageSelector = _data["sellerNameOnPageSelector"];
+        }
+    }
+
+    static fromJS(data: any): ScrapingSelectorsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScrapingSelectorsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productNameSelector"] = this.productNameSelector;
+        data["priceSelector"] = this.priceSelector;
+        data["stockSelector"] = this.stockSelector;
+        data["sellerNameOnPageSelector"] = this.sellerNameOnPageSelector;
+        return data;
+    }
+}
+
+export interface IScrapingSelectorsDto {
+    productNameSelector?: string | undefined;
+    priceSelector?: string | undefined;
+    stockSelector?: string | undefined;
+    sellerNameOnPageSelector?: string | undefined;
+}
+
+export class SellerPerformanceMetricDto implements ISellerPerformanceMetricDto {
+    sellerName?: string | undefined;
+    totalRuns?: number;
+    successfulRuns?: number;
+    successRate?: number;
+    averageResponseTime?: string | undefined;
+    averageDuration?: string | undefined;
+
+    constructor(data?: ISellerPerformanceMetricDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.sellerName = _data["sellerName"];
+            this.totalRuns = _data["totalRuns"];
+            this.successfulRuns = _data["successfulRuns"];
+            this.successRate = _data["successRate"];
+            this.averageResponseTime = _data["averageResponseTime"];
+            this.averageDuration = _data["averageDuration"];
+        }
+    }
+
+    static fromJS(data: any): SellerPerformanceMetricDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SellerPerformanceMetricDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["sellerName"] = this.sellerName;
+        data["totalRuns"] = this.totalRuns;
+        data["successfulRuns"] = this.successfulRuns;
+        data["successRate"] = this.successRate;
+        data["averageResponseTime"] = this.averageResponseTime;
+        data["averageDuration"] = this.averageDuration;
+        return data;
+    }
+}
+
+export interface ISellerPerformanceMetricDto {
+    sellerName?: string | undefined;
+    totalRuns?: number;
+    successfulRuns?: number;
+    successRate?: number;
+    averageResponseTime?: string | undefined;
+    averageDuration?: string | undefined;
+}
+
+export class SellerPerformanceMetricDtoIEnumerableApiResponse implements ISellerPerformanceMetricDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: SellerPerformanceMetricDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISellerPerformanceMetricDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(SellerPerformanceMetricDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SellerPerformanceMetricDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SellerPerformanceMetricDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISellerPerformanceMetricDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: SellerPerformanceMetricDto[] | undefined;
     message?: string | undefined;
     errors?: string[] | undefined;
     timestamp?: Date;

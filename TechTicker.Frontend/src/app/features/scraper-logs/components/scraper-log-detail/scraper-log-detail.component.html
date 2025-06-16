@@ -1,0 +1,240 @@
+<div class="scraper-log-detail-container">
+  <!-- Header -->
+  <div class="header-section">
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Scraper Run Log Details</h1>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading scraper log details...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading && scraperLog" class="content-section">
+
+    <!-- Basic Information -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>Basic Information</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Run ID:</label>
+            <span class="value">{{scraperLog.runId}}</span>
+            <button mat-icon-button (click)="copyToClipboard(scraperLog.runId!)" matTooltip="Copy Run ID">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+          </div>
+
+          <div class="info-item">
+            <label>Mapping ID:</label>
+            <span class="value">{{scraperLog.mappingId}}</span>
+          </div>
+
+          <div class="info-item">
+            <label>Status:</label>
+            <mat-chip [color]="getStatusColor(scraperLog.status)" selected>
+              <mat-icon matChipAvatar>{{getStatusIcon(scraperLog.status)}}</mat-icon>
+              {{scraperLog.statusDisplayName || scraperLog.status}}
+            </mat-chip>
+          </div>
+
+          <div class="info-item">
+            <label>Started At:</label>
+            <span class="value">{{formatDate(scraperLog.startedAt)}}</span>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.completedAt">
+            <label>Completed At:</label>
+            <span class="value">{{formatDate(scraperLog.completedAt)}}</span>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.duration">
+            <label>Duration:</label>
+            <span class="value">{{formatDuration(scraperLog.duration)}}</span>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.attemptNumber">
+            <label>Attempt Number:</label>
+            <span class="value">{{scraperLog.attemptNumber}}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Target Information -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>Target Information</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item full-width">
+            <label>Target URL:</label>
+            <span class="value url-value">{{scraperLog.targetUrl}}</span>
+            <button mat-icon-button (click)="copyToClipboard(scraperLog.targetUrl!)" matTooltip="Copy URL">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.userAgent">
+            <label>User Agent:</label>
+            <span class="value">{{scraperLog.userAgent}}</span>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.httpStatusCode">
+            <label>HTTP Status:</label>
+            <span class="value">{{scraperLog.httpStatusCode}}</span>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.responseTime">
+            <label>Response Time:</label>
+            <span class="value">{{formatDuration(scraperLog.responseTime)}}</span>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.responseSizeBytes">
+            <label>Response Size:</label>
+            <span class="value">{{formatBytes(scraperLog.responseSizeBytes)}}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Extracted Data -->
+    <mat-card class="info-card" *ngIf="scraperLog.extractedProductName || scraperLog.extractedPrice || scraperLog.extractedStockStatus || scraperLog.extractedSellerName">
+      <mat-card-header>
+        <mat-card-title>Extracted Data</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item" *ngIf="scraperLog.extractedProductName">
+            <label>Product Name:</label>
+            <span class="value">{{scraperLog.extractedProductName}}</span>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.extractedPrice">
+            <label>Price:</label>
+            <span class="value">${{scraperLog.extractedPrice}}</span>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.extractedStockStatus">
+            <label>Stock Status:</label>
+            <span class="value">{{scraperLog.extractedStockStatus}}</span>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.extractedSellerName">
+            <label>Seller Name:</label>
+            <span class="value">{{scraperLog.extractedSellerName}}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Performance Metrics -->
+    <mat-card class="info-card" *ngIf="scraperLog.pageLoadTime || scraperLog.parsingTime">
+      <mat-card-header>
+        <mat-card-title>Performance Metrics</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item" *ngIf="scraperLog.pageLoadTime">
+            <label>Page Load Time:</label>
+            <span class="value">{{formatDuration(scraperLog.pageLoadTime)}}</span>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.parsingTime">
+            <label>Parsing Time:</label>
+            <span class="value">{{formatDuration(scraperLog.parsingTime)}}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Error Information -->
+    <mat-card class="info-card error-card" *ngIf="scraperLog.errorMessage || scraperLog.errorCode">
+      <mat-card-header>
+        <mat-card-title>Error Information</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item" *ngIf="scraperLog.errorCode">
+            <label>Error Code:</label>
+            <span class="value error-text">{{scraperLog.errorCode}}</span>
+          </div>
+
+          <div class="info-item full-width" *ngIf="scraperLog.errorMessage">
+            <label>Error Message:</label>
+            <span class="value error-text">{{scraperLog.errorMessage}}</span>
+          </div>
+
+          <div class="info-item full-width" *ngIf="scraperLog.errorStackTrace">
+            <label>Stack Trace:</label>
+            <pre class="stack-trace">{{scraperLog.errorStackTrace}}</pre>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Technical Details -->
+    <mat-expansion-panel class="technical-panel">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Technical Details</mat-panel-title>
+        <mat-panel-description>Additional headers, selectors, and debug information</mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="technical-content">
+        <div *ngIf="hasAdditionalHeaders()" class="technical-section">
+          <h4>Additional Headers</h4>
+          <pre class="json-content">{{getAdditionalHeadersJson()}}</pre>
+        </div>
+
+        <div *ngIf="hasSelectors()" class="technical-section">
+          <h4>Selectors</h4>
+          <pre class="json-content">{{getSelectorsJson()}}</pre>
+        </div>
+
+        <div *ngIf="scraperLog.rawHtmlSnippet" class="technical-section">
+          <h4>Raw HTML Snippet</h4>
+          <pre class="html-content">{{scraperLog.rawHtmlSnippet}}</pre>
+        </div>
+
+        <div *ngIf="scraperLog.debugNotes" class="technical-section">
+          <h4>Debug Notes</h4>
+          <p class="debug-notes">{{scraperLog.debugNotes}}</p>
+        </div>
+      </div>
+    </mat-expansion-panel>
+
+    <!-- Retry Chain -->
+    <mat-card class="info-card" *ngIf="retryChain.length > 0">
+      <mat-card-header>
+        <mat-card-title>Retry Chain</mat-card-title>
+        <mat-card-subtitle>{{retryChain.length}} retry attempt(s)</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="isLoadingRetryChain" class="loading-container">
+          <mat-spinner diameter="30"></mat-spinner>
+        </div>
+
+        <div *ngIf="!isLoadingRetryChain" class="retry-list">
+          <div *ngFor="let retry of retryChain" class="retry-item" (click)="viewRetryDetail(retry.runId!)">
+            <div class="retry-info">
+              <mat-chip [color]="getStatusColor(retry.status)" selected>
+                <mat-icon matChipAvatar>{{getStatusIcon(retry.status)}}</mat-icon>
+                {{retry.statusDisplayName || retry.status}}
+              </mat-chip>
+              <span class="retry-date">{{formatDate(retry.startedAt)}}</span>
+              <span class="retry-duration">{{formatDuration(retry.duration)}}</span>
+            </div>
+            <mat-icon class="retry-arrow">chevron_right</mat-icon>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
