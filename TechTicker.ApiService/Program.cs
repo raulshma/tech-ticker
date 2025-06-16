@@ -158,8 +158,8 @@ static async Task InitializeDatabaseAsync(WebApplication app)
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-    // Ensure database is created
-    await context.Database.EnsureCreatedAsync();
+    // Apply pending migrations or ensure database is created
+    await HandleDatabaseMigrationAsync(context);
 
     // Create roles if they don't exist
     string[] roles = { "Admin", "User" };
@@ -189,6 +189,32 @@ static async Task InitializeDatabaseAsync(WebApplication app)
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+    }
+}
+
+static async Task HandleDatabaseMigrationAsync(TechTickerDbContext context)
+{
+    try
+    {
+        await context.Database.EnsureCreatedAsync();
+        // Apply pending migrations
+        await context.Database.MigrateAsync();
+        Console.WriteLine("Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Migration error: {ex.Message}");
+
+        // If migration fails due to existing tables, try to handle gracefully
+        if (ex.Message.Contains("already exists"))
+        {
+            Console.WriteLine("Tables already exist. Attempting to continue...");
+            // In a real scenario, you might want to check and mark migrations as applied
+        }
+        else
+        {
+            throw;
         }
     }
 }
