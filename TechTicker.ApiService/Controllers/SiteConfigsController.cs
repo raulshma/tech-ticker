@@ -27,6 +27,7 @@ public class SiteConfigsController : BaseApiController
     /// </summary>
     /// <returns>List of all site configurations</returns>
     [HttpGet("all")]
+    [Authorize(Roles = "User,Admin")] // Allow both User and Admin roles for dropdown usage
     public async Task<ActionResult<ApiResponse<IEnumerable<ScraperSiteConfigurationDto>>>> GetAllSiteConfigs()
     {
         var result = await _siteConfigService.GetAllConfigurationsAsync();

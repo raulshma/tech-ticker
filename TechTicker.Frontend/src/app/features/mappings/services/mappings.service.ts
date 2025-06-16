@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, catchError, throwError } from 'rxjs';
+import { Observable, map, catchError, throwError, of } from 'rxjs';
 import {
   TechTickerApiClient,
   ProductSellerMappingDto,
@@ -9,7 +9,6 @@ import {
   ProductSellerMappingDtoApiResponse,
   ProductSellerMappingDtoIEnumerableApiResponse,
   ScraperSiteConfigurationDto,
-  ScraperSiteConfigurationDtoApiResponse,
   ApiResponse
 } from '../../../shared/api/api-client';
 import { environment } from '../../../../environments/environment';
@@ -117,19 +116,17 @@ export class MappingsService {
 
   // Helper method to get site configurations for dropdowns
   getSiteConfigurations(): Observable<ScraperSiteConfigurationDto[]> {
-    // Note: This might need to be updated based on actual API structure
-    // For now, we'll create a simple method that can be expanded later
-    return this.apiClient.siteConfigsGET(undefined)
+    return this.apiClient.all()
       .pipe(
-        map((response: ScraperSiteConfigurationDtoApiResponse) => {
+        map((response) => {
           if (!response.success || !response.data) {
             return [];
           }
-          return [response.data]; // Single item for now
+          return response.data;
         }),
         catchError(error => {
           console.error('Error fetching site configurations:', error);
-          return throwError(() => error);
+          return of([]); // Return empty array on error instead of throwing
         })
       );
   }

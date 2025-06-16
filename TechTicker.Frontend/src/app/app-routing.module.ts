@@ -31,8 +31,8 @@ const routes: Routes = [
       },
       {
         path: 'mappings',
-        loadChildren: () => import('./features/mappings/mappings.module').then(m => m.MappingsModule),
-        canActivate: [AdminGuard]
+        loadChildren: () => import('./features/mappings/mappings.module').then(m => m.MappingsModule)
+        // Removed AdminGuard - now accessible to all authenticated users
       },
       {
         path: 'site-configs',
