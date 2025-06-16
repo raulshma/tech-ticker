@@ -1,4 +1,55 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* Import Angular Material theme */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* Global styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #fafafa;
+}
+
+/* Fix for Material Design components */
+.mat-mdc-card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.mat-mdc-table {
+  background: white;
+}
+
+/* Ensure proper spacing and layout */
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+/* Fix button styling */
+.mat-mdc-raised-button {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Improve table styling */
+.mat-mdc-table .mat-mdc-header-cell {
+  font-weight: 600;
+  color: #333;
+}
+
+.mat-mdc-table .mat-mdc-cell {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Fix chip styling */
+.mat-mdc-chip-set {
+  margin: 0;
+}
+
+.mat-mdc-chip {
+  font-size: 0.75rem;
+}
