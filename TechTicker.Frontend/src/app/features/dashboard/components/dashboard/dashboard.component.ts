@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService, CurrentUser } from '../../../../shared/services/auth.service';
+import { DashboardService, DashboardStats } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,9 +11,11 @@ import { AuthService, CurrentUser } from '../../../../shared/services/auth.servi
 export class DashboardComponent implements OnInit {
   currentUser: CurrentUser | null = null;
   isAdmin = false;
+  isLoading = false;
+  error: string | null = null;
 
-  // Mock data for dashboard stats
-  dashboardStats = {
+  // Dashboard stats from API
+  dashboardStats: DashboardStats = {
     totalProducts: 0,
     totalCategories: 0,
     activeMappings: 0,
@@ -20,7 +23,10 @@ export class DashboardComponent implements OnInit {
     totalUsers: 0
   };
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private dashboardService: DashboardService
+  ) {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
@@ -28,18 +34,32 @@ export class DashboardComponent implements OnInit {
       this.isAdmin = this.authService.isAdmin();
     });
 
-    // TODO: Load actual dashboard statistics from API
     this.loadDashboardStats();
   }
 
-  private loadDashboardStats(): void {
-    // Mock data - replace with actual API calls when backend is ready
-    this.dashboardStats = {
-      totalProducts: 156,
-      totalCategories: 12,
-      activeMappings: 342,
-      activeAlerts: 28,
-      totalUsers: 15
-    };
+  loadDashboardStats(): void {
+    this.isLoading = true;
+    this.error = null;
+
+    this.dashboardService.getDashboardStats().subscribe({
+      next: (stats) => {
+        this.dashboardStats = stats;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading dashboard stats:', error);
+        this.error = 'Failed to load dashboard statistics. Please try again.';
+        this.isLoading = false;
+
+        // Set default values on error
+        this.dashboardStats = {
+          totalProducts: 0,
+          totalCategories: 0,
+          activeMappings: 0,
+          activeAlerts: 0,
+          totalUsers: 0
+        };
+      }
+    });
   }
 }

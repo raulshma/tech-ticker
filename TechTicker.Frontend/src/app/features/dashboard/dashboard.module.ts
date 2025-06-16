@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -28,7 +29,8 @@ import { DashboardLayoutComponent } from './components/dashboard-layout/dashboar
     MatButtonModule,
     MatCardModule,
     MatGridListModule,
-    MatMenuModule
+    MatMenuModule,
+    MatProgressSpinnerModule
   ]
 })
 export class DashboardModule { }

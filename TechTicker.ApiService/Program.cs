@@ -76,6 +76,7 @@ builder.Services.AddScoped<IScraperSiteConfigurationService, ScraperSiteConfigur
 builder.Services.AddScoped<IPriceHistoryService, PriceHistoryService>();
 builder.Services.AddScoped<IAlertRuleService, AlertRuleService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();

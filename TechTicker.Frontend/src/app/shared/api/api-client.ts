@@ -1097,6 +1097,57 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
+    stats(): Observable<DashboardStatsDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Dashboard/stats";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processStats(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processStats(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<DashboardStatsDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<DashboardStatsDtoApiResponse>;
+        }));
+    }
+
+    protected processStats(response: HttpResponseBase): Observable<DashboardStatsDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = DashboardStatsDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
     success(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Example/success";
         url_ = url_.replace(/[?&]$/, "");
@@ -3814,6 +3865,142 @@ export interface ICreateUserDto {
     firstName?: string | undefined;
     lastName?: string | undefined;
     roles?: string[] | undefined;
+}
+
+export class DashboardStatsDto implements IDashboardStatsDto {
+    totalProducts?: number;
+    totalCategories?: number;
+    activeMappings?: number;
+    activeAlerts?: number;
+    totalUsers?: number | undefined;
+
+    constructor(data?: IDashboardStatsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalProducts = _data["totalProducts"];
+            this.totalCategories = _data["totalCategories"];
+            this.activeMappings = _data["activeMappings"];
+            this.activeAlerts = _data["activeAlerts"];
+            this.totalUsers = _data["totalUsers"];
+        }
+    }
+
+    static fromJS(data: any): DashboardStatsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new DashboardStatsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalProducts"] = this.totalProducts;
+        data["totalCategories"] = this.totalCategories;
+        data["activeMappings"] = this.activeMappings;
+        data["activeAlerts"] = this.activeAlerts;
+        data["totalUsers"] = this.totalUsers;
+        return data;
+    }
+}
+
+export interface IDashboardStatsDto {
+    totalProducts?: number;
+    totalCategories?: number;
+    activeMappings?: number;
+    activeAlerts?: number;
+    totalUsers?: number | undefined;
+}
+
+export class DashboardStatsDtoApiResponse implements IDashboardStatsDtoApiResponse {
+    success?: boolean;
+    data?: DashboardStatsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IDashboardStatsDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? DashboardStatsDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): DashboardStatsDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new DashboardStatsDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IDashboardStatsDtoApiResponse {
+    success?: boolean;
+    data?: DashboardStatsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class LoginResponseDto implements ILoginResponseDto {

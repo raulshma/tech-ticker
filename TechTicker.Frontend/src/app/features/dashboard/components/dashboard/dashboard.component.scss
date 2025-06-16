@@ -142,3 +142,49 @@
     margin: 40px 0;
   }
 }
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+
+  p {
+    margin-top: 16px;
+    color: #666;
+    font-size: 1rem;
+  }
+}
+
+.error-message {
+  margin-bottom: 32px;
+
+  .error-card {
+    background-color: #ffebee;
+    border-left: 4px solid #f44336;
+  }
+
+  .error-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    p {
+      flex: 1;
+      margin: 0;
+      color: #d32f2f;
+    }
+
+    button {
+      margin-left: auto;
+    }
+  }
+}

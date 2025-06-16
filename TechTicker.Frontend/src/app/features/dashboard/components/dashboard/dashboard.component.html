@@ -5,8 +5,27 @@
     <p class="welcome-subtitle">Here's an overview of your TechTicker system</p>
   </div>
 
+  <!-- Error message -->
+  <div *ngIf="error" class="error-message">
+    <mat-card class="error-card">
+      <mat-card-content>
+        <div class="error-content">
+          <mat-icon color="warn">error</mat-icon>
+          <p>{{error}}</p>
+          <button mat-button color="primary" (click)="loadDashboardStats()">Retry</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading dashboard statistics...</p>
+  </div>
+
   <!-- Statistics cards -->
-  <div class="stats-grid">
+  <div class="stats-grid" *ngIf="!isLoading && !error">
     <mat-card class="stat-card">
       <mat-card-content>
         <div class="stat-content">
