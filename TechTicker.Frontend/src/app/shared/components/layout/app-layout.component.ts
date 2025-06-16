@@ -4,15 +4,15 @@ import { Subject, takeUntil } from 'rxjs';
 import {
   AuthService,
   CurrentUser,
-} from '../../../../shared/services/auth.service';
+} from '../../services/auth.service';
 
 @Component({
-  selector: 'app-dashboard-layout',
-  templateUrl: './dashboard-layout.component.html',
-  styleUrls: ['./dashboard-layout.component.scss'],
+  selector: 'app-layout',
+  templateUrl: './app-layout.component.html',
+  styleUrls: ['./app-layout.component.scss'],
   standalone: false,
 })
-export class DashboardLayoutComponent implements OnInit, OnDestroy {
+export class AppLayoutComponent implements OnInit, OnDestroy {
   currentUser: CurrentUser | null = null;
   isAdmin = false;
   private destroy$ = new Subject<void>();

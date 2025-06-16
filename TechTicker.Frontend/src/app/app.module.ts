@@ -7,6 +7,9 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
+// Shared Module
+import { SharedModule } from './shared/shared.module';
+
 // Interceptors
 import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
 import { ErrorInterceptor } from './shared/interceptors/error.interceptor';
@@ -25,6 +28,7 @@ import { environment } from '../environments/environment';
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
+    SharedModule,
     AppRoutingModule
   ],
   providers: [
