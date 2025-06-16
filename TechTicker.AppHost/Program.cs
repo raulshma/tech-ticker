@@ -7,8 +7,10 @@ var postgres = builder.AddPostgres("postgres")
 
 var techtickerDb = postgres.AddDatabase("techticker-db");
 
+var username = builder.AddParameter("username", "guest", secret: true);
+var password = builder.AddParameter("password", "guest",secret: true);
 // Add RabbitMQ messaging
-var rabbitmq = builder.AddRabbitMQ("messaging")
+var rabbitmq = builder.AddRabbitMQ("messaging", username, password)
     .WithDataVolume()
     .WithManagementPlugin();
 
