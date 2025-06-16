@@ -1,6 +1,5 @@
 using AngleSharp;
 using AngleSharp.Html.Dom;
-using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -13,11 +12,14 @@ namespace TechTicker.ScrapingWorker.Services;
 /// <summary>
 /// Service for scraping product data from web pages
 /// </summary>
-public class WebScrapingService
+public partial class WebScrapingService
 {
     private readonly ILogger<WebScrapingService> _logger;
     private readonly IBrowsingContext _browsingContext;
     private readonly IScraperRunLogService _scraperRunLogService;
+
+    [GeneratedRegex(@"[\d,]+\.?\d*")]
+    private static partial Regex PriceRegex();
 
     public WebScrapingService(ILogger<WebScrapingService> logger, IScraperRunLogService scraperRunLogService)
     {
@@ -62,12 +64,23 @@ public class WebScrapingService
                 runId = createResult.Data;
             }
 
-            // Configure request with custom headers and user agent
+            // Configure request with comprehensive headers
             var requestOptions = new Dictionary<string, string>
             {
-                ["User-Agent"] = command.ScrapingProfile.UserAgent
+                ["User-Agent"] = command.ScrapingProfile.UserAgent,
+                ["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                ["Accept-Language"] = "en-US,en;q=0.9",
+                ["Accept-Encoding"] = "gzip, deflate, br",
+                ["Cache-Control"] = "no-cache",
+                ["Pragma"] = "no-cache",
+                ["Sec-Fetch-Dest"] = "document",
+                ["Sec-Fetch-Mode"] = "navigate",
+                ["Sec-Fetch-Site"] = "none",
+                ["Sec-Fetch-User"] = "?1",
+                ["Upgrade-Insecure-Requests"] = "1"
             };
 
+            // Add custom headers from profile (these can override defaults)
             if (command.ScrapingProfile.Headers != null)
             {
                 foreach (var header in command.ScrapingProfile.Headers)
@@ -121,8 +134,7 @@ public class WebScrapingService
             }
 
             // Extract product data with timing
-            var htmlDocument = document as IHtmlDocument;
-            if (htmlDocument == null)
+            if (document is not IHtmlDocument htmlDocument)
             {
                 var errorMessage = "Failed to cast document to HTML document";
                 if (runId.HasValue)
@@ -152,21 +164,32 @@ public class WebScrapingService
             parsingStopwatch.Stop();
 
             // Get HTML snippet for debugging (first 1000 characters)
-            var htmlSnippet = htmlDocument.DocumentElement?.OuterHtml?.Substring(0, Math.Min(1000, htmlDocument.DocumentElement.OuterHtml.Length));
+            var outerHtml = htmlDocument.DocumentElement?.OuterHtml;
+            var htmlSnippet = outerHtml?[..Math.Min(1000, outerHtml.Length)];
+
+            // Check if we got a minimal/empty HTML response (likely JavaScript-rendered content)
+            var isMinimalHtml = IsMinimalHtmlResponse(htmlDocument);
 
             if (price == null)
             {
-                var errorMessage = "Could not extract price from the page";
+                var errorMessage = isMinimalHtml
+                    ? "Could not extract price from the page - content appears to be JavaScript-rendered"
+                    : "Could not extract price from the page";
+
+                var errorCode = isMinimalHtml ? "JAVASCRIPT_CONTENT_DETECTED" : "PRICE_EXTRACTION_FAILED";
+
                 if (runId.HasValue)
                 {
                     await _scraperRunLogService.FailRunAsync(runId.Value, new FailScraperRunDto
                     {
                         ErrorMessage = errorMessage,
-                        ErrorCode = "PRICE_EXTRACTION_FAILED",
-                        ErrorCategory = "SELECTOR",
+                        ErrorCode = errorCode,
+                        ErrorCategory = isMinimalHtml ? "JAVASCRIPT_RENDERING" : "SELECTOR",
                         ParsingTime = parsingStopwatch.Elapsed,
                         RawHtmlSnippet = htmlSnippet,
-                        DebugNotes = $"Price selector '{command.Selectors.PriceSelector}' did not match any elements"
+                        DebugNotes = isMinimalHtml
+                            ? $"Minimal HTML detected. Consider using browser automation for this site. Price selector: '{command.Selectors.PriceSelector}'"
+                            : $"Price selector '{command.Selectors.PriceSelector}' did not match any elements"
                     });
                 }
 
@@ -174,7 +197,7 @@ public class WebScrapingService
                 {
                     IsSuccess = false,
                     ErrorMessage = errorMessage,
-                    ErrorCode = "PRICE_EXTRACTION_FAILED"
+                    ErrorCode = errorCode
                 };
             }
 
@@ -264,6 +287,54 @@ public class WebScrapingService
         }
     }
 
+    /// <summary>
+    /// Detects if the HTML response is minimal/empty, indicating JavaScript-rendered content
+    /// </summary>
+    private bool IsMinimalHtmlResponse(IHtmlDocument document)
+    {
+        try
+        {
+            var html = document.DocumentElement?.OuterHtml ?? "";
+
+            // Check for common patterns of minimal HTML responses
+            var bodyContent = document.Body?.TextContent?.Trim() ?? "";
+            var bodyInnerHtml = document.Body?.InnerHtml?.Trim() ?? "";
+
+            // Indicators of minimal/empty content:
+            // 1. Very short HTML (less than 200 characters)
+            // 2. Empty body
+            // 3. Body with only whitespace or minimal content
+            // 4. Common empty HTML patterns
+
+            if (html.Length < 200)
+                return true;
+
+            if (string.IsNullOrWhiteSpace(bodyContent))
+                return true;
+
+            if (bodyInnerHtml.Length < 50)
+                return true;
+
+            // Check for common empty HTML patterns
+            var emptyPatterns = new[]
+            {
+                "<html><head></head><body></body></html>",
+                "<html><head></head><body> </body></html>",
+                "<html><body></body></html>"
+            };
+
+            if (emptyPatterns.Any(pattern => html.Replace(" ", "").Replace("\n", "").Replace("\r", "").Replace("\t", "").Contains(pattern.Replace(" ", ""))))
+                return true;
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error checking for minimal HTML response");
+            return false;
+        }
+    }
+
     private decimal? ExtractPrice(IHtmlDocument document, string selector)
     {
         try
@@ -277,7 +348,7 @@ public class WebScrapingService
                 return null;
 
             // Remove currency symbols and extract numeric value
-            var priceMatch = Regex.Match(priceText, @"[\d,]+\.?\d*");
+            var priceMatch = PriceRegex().Match(priceText);
             if (!priceMatch.Success)
                 return null;
 

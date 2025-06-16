@@ -236,7 +236,7 @@ public class MappingServiceTests
             ProductId = Guid.NewGuid(),
             Name = "Test Product",
             CategoryId = Guid.NewGuid(),
-            Category = null
+            Category = null!
         };
 
         // Act

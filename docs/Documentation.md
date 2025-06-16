@@ -1074,4 +1074,4 @@ The Angular application will be structured into modules for better organization 
 *   **Enhanced Admin Dashboard:** More detailed analytics, system health overview, scraper performance metrics, DLQ management interface.
 *   **Audit Logging:** Comprehensive logging of all admin actions performed through the frontend/API.
 *   **Internationalization (i18n) / Localization (l10n):** Support for multiple languages and regions in both frontend and backend (data, notifications).
-*   **Proxy Integration:** Allow configuration and use of proxy servers (rotating, residential) for scraping to improve stealth and avoid IP bans.
+*   **Proxy Integration:** Allow configuration and use of proxy servers (rotating, residential) for scraping to improve stealth and avoid IP bans. Also add functionality to test the proxy servers before use.

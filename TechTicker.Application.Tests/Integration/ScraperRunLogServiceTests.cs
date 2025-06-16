@@ -237,7 +237,7 @@ public class ScraperRunLogServiceTests : IDisposable
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(3, result.Data.TotalCount); // 3 successful runs (0, 2, 4)
+        Assert.Equal(3, result.Data!.TotalCount); // 3 successful runs (0, 2, 4)
         Assert.Equal(3, result.Data.Items.Count());
         Assert.All(result.Data.Items, item => Assert.Equal("SUCCESS", item.Status));
     }
@@ -283,7 +283,7 @@ public class ScraperRunLogServiceTests : IDisposable
 
         // Assert
         Assert.True(result.IsSuccess);
-        var stats = result.Data;
+        var stats = result.Data!;
         Assert.Equal(5, stats.TotalRuns);
         Assert.Equal(3, stats.SuccessfulRuns);
         Assert.Equal(2, stats.FailedRuns);

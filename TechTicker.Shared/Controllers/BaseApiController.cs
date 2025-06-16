@@ -262,7 +262,7 @@ namespace TechTicker.Shared.Controllers
         {
             if (result.IsSuccess)
             {
-                return Ok(result.Data);
+                return Ok(result.Data!);
             }
 
             return result.ErrorCode switch
