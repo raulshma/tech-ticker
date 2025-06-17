@@ -1,0 +1,139 @@
+<div class="candidate-detail-container">
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p>Loading candidate details...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle mr-2"></i>
+    {{ error }}
+  </div>
+
+  <div *ngIf="candidate" class="candidate-details">
+    <div class="detail-header">
+      <h2>{{ candidate.extractedProductName }}</h2>
+      <span class="badge badge-lg" [ngClass]="getStatusBadgeClass(candidate.status)">
+        {{ candidate.status }}
+      </span>
+    </div>
+
+    <div class="detail-content">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header">
+              <h5>Product Information</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="detail-group">
+                    <label>Product Name:</label>
+                    <span>{{ candidate.extractedProductName }}</span>
+                  </div>
+                  <div *ngIf="candidate.extractedManufacturer" class="detail-group">
+                    <label>Manufacturer:</label>
+                    <span>{{ candidate.extractedManufacturer }}</span>
+                  </div>
+                  <div *ngIf="candidate.extractedModelNumber" class="detail-group">
+                    <label>Model Number:</label>
+                    <span>{{ candidate.extractedModelNumber }}</span>
+                  </div>
+                  <div *ngIf="candidate.extractedPrice" class="detail-group">
+                    <label>Price:</label>
+                    <span class="price">${{ candidate.extractedPrice | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="detail-group">
+                    <label>Source URL:</label>
+                    <a [href]="candidate.sourceUrl" target="_blank" class="source-link">
+                      {{ candidate.sourceUrl }}
+                      <i class="fas fa-external-link-alt ml-1"></i>
+                    </a>
+                  </div>
+                  <div class="detail-group">
+                    <label>Discovery Method:</label>
+                    <span>{{ candidate.discoveryMethod }}</span>
+                  </div>
+                  <div class="detail-group">
+                    <label>Discovered At:</label>
+                    <span>{{ candidate.discoveredAt | date:'medium' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="candidate.extractedDescription" class="detail-group mt-3">
+                <label>Description:</label>
+                <p class="description">{{ candidate.extractedDescription }}</p>
+              </div>
+
+              <div *ngIf="candidate.extractedImageUrl" class="detail-group mt-3">
+                <label>Product Image:</label>
+                <div class="product-image">
+                  <img [src]="candidate.extractedImageUrl" [alt]="candidate.extractedProductName" 
+                       class="img-thumbnail" style="max-width: 300px; max-height: 300px;">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">
+              <h5>AI Analysis</h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="candidate.suggestedCategory" class="detail-group">
+                <label>Suggested Category:</label>
+                <span>{{ candidate.suggestedCategory.name }}</span>
+                <div class="confidence-score">
+                  Confidence: {{ (candidate.categoryConfidenceScore * 100) | number:'1.1-1' }}%
+                </div>
+              </div>
+
+              <div *ngIf="candidate.similarProduct" class="detail-group">
+                <label>Similar Product:</label>
+                <span>{{ candidate.similarProduct.productName }}</span>
+                <div class="similarity-score">
+                  Similarity: {{ (candidate.similarityScore * 100) | number:'1.1-1' }}%
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mt-3">
+            <div class="card-header">
+              <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+              <div class="action-buttons">
+                <button class="btn btn-success btn-block" 
+                        [disabled]="candidate.status !== 'Pending'"
+                        (click)="approveCandidate()">
+                  <i class="fas fa-check mr-2"></i>
+                  Approve
+                </button>
+                <button class="btn btn-danger btn-block mt-2" 
+                        [disabled]="candidate.status !== 'Pending'"
+                        (click)="rejectCandidate()">
+                  <i class="fas fa-times mr-2"></i>
+                  Reject
+                </button>
+                <button class="btn btn-warning btn-block mt-2" 
+                        [disabled]="candidate.status !== 'Pending'"
+                        (click)="requestModification()">
+                  <i class="fas fa-edit mr-2"></i>
+                  Request Modification
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

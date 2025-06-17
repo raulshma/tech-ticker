@@ -1,4 +1,5 @@
 using TechTicker.Application.Configuration;
+using TechTicker.Application.MessageHandlers;
 using TechTicker.Application.Services;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess;
@@ -27,6 +28,16 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IMappingService, MappingService>();
 builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
 builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
+
+// Add Product Discovery services
+builder.Services.AddScoped<IProductDiscoveryService, ProductDiscoveryService>();
+builder.Services.AddScoped<IUrlAnalysisService, UrlAnalysisService>();
+builder.Services.AddScoped<ICategoryPredictionService, CategoryPredictionService>();
+builder.Services.AddScoped<IProductSimilarityService, ProductSimilarityService>();
+builder.Services.AddScoped<IDiscoveryWorkflowService, DiscoveryWorkflowService>();
+
+// Add message handlers
+builder.Services.AddScoped<ProductDiscoveryEventHandler>();
 
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();

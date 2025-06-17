@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using TechTicker.Application.Configuration;
 using TechTicker.Application.Messages;
+using TechTicker.Application.MessageHandlers;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.ScrapingWorker.Services;
 
@@ -43,6 +44,11 @@ public class Worker : BackgroundService
             await _messageConsumer.StartConsumingAsync<RawPriceDataEvent>(
                 _messagingConfig.RawPriceDataQueue,
                 HandleRawPriceDataAsync);
+
+            // Start consuming product discovery events
+            await _messageConsumer.StartConsumingAsync<ProductDiscoveryEvent>(
+                _messagingConfig.ProductDiscoveryEventQueue,
+                HandleProductDiscoveryEventAsync);
 
             // Start periodic orchestration (every 5 minutes)
             var orchestrationTimer = new PeriodicTimer(TimeSpan.FromMinutes(5));
@@ -169,6 +175,20 @@ public class Worker : BackgroundService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error handling raw price data for product {ProductId}", rawPriceData.CanonicalProductId);
+        }
+    }
+
+    private async Task HandleProductDiscoveryEventAsync(ProductDiscoveryEvent discoveryEvent)
+    {
+        try
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            var eventHandler = scope.ServiceProvider.GetRequiredService<ProductDiscoveryEventHandler>();
+            await eventHandler.HandleAsync(discoveryEvent);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error handling product discovery event {EventId}", discoveryEvent.EventId);
         }
     }
 }

@@ -22,6 +22,10 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<PriceHistory> PriceHistory { get; set; } = null!;
     public DbSet<AlertRule> AlertRules { get; set; } = null!;
     public DbSet<ScraperRunLog> ScraperRunLogs { get; set; } = null!;
+    
+    // Product Discovery entities
+    public DbSet<ProductDiscoveryCandidate> ProductDiscoveryCandidates { get; set; } = null!;
+    public DbSet<DiscoveryApprovalWorkflow> DiscoveryApprovalWorkflows { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -238,6 +242,81 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.Property(e => e.UpdatedAt).IsRequired();
             entity.Property(e => e.IsActive).IsRequired().HasDefaultValue(true);
         });
+
+        // Configure ProductDiscoveryCandidate entity
+        modelBuilder.Entity<ProductDiscoveryCandidate>(entity =>
+        {
+            entity.HasKey(e => e.CandidateId);
+            entity.Property(e => e.SourceUrl).IsRequired().HasMaxLength(2048);
+            entity.Property(e => e.ExtractedProductName).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.ExtractedManufacturer).HasMaxLength(100);
+            entity.Property(e => e.ExtractedModelNumber).HasMaxLength(100);
+            entity.Property(e => e.ExtractedPrice).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.ExtractedImageUrl).HasMaxLength(2048);
+            entity.Property(e => e.CategoryConfidenceScore).HasColumnType("decimal(5,4)").HasDefaultValue(0);
+            entity.Property(e => e.SimilarityScore).HasColumnType("decimal(5,4)").HasDefaultValue(0);
+            entity.Property(e => e.DiscoveryMethod).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.DiscoveredAt).IsRequired();
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50).HasDefaultValue(DiscoveryStatus.Pending);
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            // Configure JSON column for PostgreSQL
+            entity.Property(e => e.ExtractedSpecifications).HasColumnType("jsonb");
+
+            // Indexes
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.DiscoveredAt);
+            entity.HasIndex(e => e.DiscoveryMethod);
+            entity.HasIndex(e => e.SuggestedCategoryId);
+            entity.HasIndex(e => e.DiscoveredByUserId);
+
+            // Relationships
+            entity.HasOne(e => e.SuggestedCategory)
+                  .WithMany()
+                  .HasForeignKey(e => e.SuggestedCategoryId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.SimilarProduct)
+                  .WithMany()
+                  .HasForeignKey(e => e.SimilarProductId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.DiscoveredByUser)
+                  .WithMany()
+                  .HasForeignKey(e => e.DiscoveredByUserId)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Configure DiscoveryApprovalWorkflow entity
+        modelBuilder.Entity<DiscoveryApprovalWorkflow>(entity =>
+        {
+            entity.HasKey(e => e.WorkflowId);
+            entity.Property(e => e.CandidateId).IsRequired();
+            entity.Property(e => e.ReviewerId).IsRequired();
+            entity.Property(e => e.Action).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.ActionDate).IsRequired();
+
+            // Configure JSON column for PostgreSQL
+            entity.Property(e => e.Modifications).HasColumnType("jsonb");
+
+            // Indexes
+            entity.HasIndex(e => e.CandidateId);
+            entity.HasIndex(e => e.ReviewerId);
+            entity.HasIndex(e => e.Action);
+            entity.HasIndex(e => e.ActionDate);
+
+            // Relationships
+            entity.HasOne(e => e.Candidate)
+                  .WithMany(c => c.ApprovalWorkflows)
+                  .HasForeignKey(e => e.CandidateId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Reviewer)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReviewerId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 
     public override int SaveChanges()
@@ -299,6 +378,17 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             {
                 if (entry.State == EntityState.Added)
                     runLog.CreatedAt = DateTimeOffset.UtcNow;
+            }
+            else if (entry.Entity is ProductDiscoveryCandidate candidate)
+            {
+                if (entry.State == EntityState.Added)
+                    candidate.CreatedAt = DateTimeOffset.UtcNow;
+                candidate.UpdatedAt = DateTimeOffset.UtcNow;
+            }
+            else if (entry.Entity is DiscoveryApprovalWorkflow workflow)
+            {
+                if (entry.State == EntityState.Added)
+                    workflow.ActionDate = DateTimeOffset.UtcNow;
             }
         }
     }

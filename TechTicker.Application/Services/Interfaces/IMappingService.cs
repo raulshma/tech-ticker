@@ -41,4 +41,10 @@ public interface IMappingService
     ApplicationUser MapToEntity(CreateUserDto createDto);
     ApplicationUser MapToEntity(RegisterUserDto registerDto);
     void MapToEntity(UpdateUserDto updateDto, ApplicationUser user);
+
+    // Product Discovery mappings
+    ProductDiscoveryCandidateDto MapToDto(ProductDiscoveryCandidate candidate);
+    ProductDiscoveryCandidate MapToEntity(CreateProductDiscoveryCandidateDto createDto);
+    void MapToEntity(ApprovalDecision approvalDecision, ProductDiscoveryCandidate candidate);
+
 }

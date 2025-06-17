@@ -358,4 +358,105 @@ public class MappingService : IMappingService
         if (updateDto.IsActive.HasValue)
             user.IsActive = updateDto.IsActive.Value;
     }
+
+    public ProductDiscoveryCandidateDto MapToDto(ProductDiscoveryCandidate candidate)
+    {
+        return new ProductDiscoveryCandidateDto
+        {
+            CandidateId = candidate.CandidateId,
+            SourceUrl = candidate.SourceUrl,
+            ExtractedProductName = candidate.ExtractedProductName,
+            ExtractedManufacturer = candidate.ExtractedManufacturer,
+            ExtractedModelNumber = candidate.ExtractedModelNumber,
+            ExtractedPrice = candidate.ExtractedPrice,
+            ExtractedImageUrl = candidate.ExtractedImageUrl,
+            ExtractedDescription = candidate.ExtractedDescription,
+            ExtractedSpecifications = candidate.ExtractedSpecificationsDict,
+            SuggestedCategoryId = candidate.SuggestedCategoryId,
+            CategoryConfidenceScore = candidate.CategoryConfidenceScore,
+            SimilarProductId = candidate.SimilarProductId,
+            SimilarityScore = candidate.SimilarityScore,
+            DiscoveryMethod = candidate.DiscoveryMethod,
+            DiscoveredByUserId = candidate.DiscoveredByUserId,
+            DiscoveredAt = candidate.DiscoveredAt,
+            Status = candidate.Status,
+            RejectionReason = candidate.RejectionReason,
+            CreatedAt = candidate.CreatedAt,
+            UpdatedAt = candidate.UpdatedAt,
+            SuggestedCategory = candidate.SuggestedCategory != null ? MapToDto(candidate.SuggestedCategory) : null,
+            SimilarProduct = candidate.SimilarProduct != null ? MapToDto(candidate.SimilarProduct) : null,
+            DiscoveredByUser = candidate.DiscoveredByUser != null ? MapToDto(candidate.DiscoveredByUser, new List<string>()) : null
+        };
+    }
+
+    public ProductDiscoveryCandidate MapToEntity(CreateProductDiscoveryCandidateDto createDto)
+    {
+        return new ProductDiscoveryCandidate
+        {
+            CandidateId = Guid.NewGuid(),
+            SourceUrl = createDto.SourceUrl,
+            ExtractedProductName = createDto.ExtractedProductName,
+            ExtractedManufacturer = createDto.ExtractedManufacturer,
+            ExtractedModelNumber = createDto.ExtractedModelNumber,
+            ExtractedPrice = createDto.ExtractedPrice,
+            ExtractedImageUrl = createDto.ExtractedImageUrl,
+            ExtractedDescription = createDto.ExtractedDescription,
+            ExtractedSpecificationsDict = createDto.ExtractedSpecifications,
+            SuggestedCategoryId = createDto.SuggestedCategoryId,
+            CategoryConfidenceScore = createDto.CategoryConfidenceScore,
+            SimilarProductId = createDto.SimilarProductId,
+            SimilarityScore = createDto.SimilarityScore,
+            DiscoveryMethod = createDto.DiscoveryMethod,
+            DiscoveredByUserId = createDto.DiscoveredByUserId,
+            DiscoveredAt = DateTimeOffset.UtcNow,
+            Status = DiscoveryStatus.Pending,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+    }
+
+    public void MapToEntity(ApprovalDecision approvalDecision, ProductDiscoveryCandidate candidate)
+    {
+        // Apply modifications from approval decision to candidate
+        if (approvalDecision.Modifications != null)
+        {
+            foreach (var modification in approvalDecision.Modifications)
+            {
+                switch (modification.Key.ToLowerInvariant())
+                {
+                    case "productname":
+                        candidate.ExtractedProductName = modification.Value?.ToString() ?? candidate.ExtractedProductName;
+                        break;
+                    case "manufacturer":
+                        candidate.ExtractedManufacturer = modification.Value?.ToString();
+                        break;
+                    case "modelnumber":
+                        candidate.ExtractedModelNumber = modification.Value?.ToString();
+                        break;
+                    case "categoryid":
+                        if (Guid.TryParse(modification.Value?.ToString(), out var categoryId))
+                        {
+                            candidate.SuggestedCategoryId = categoryId;
+                        }
+                        break;
+                    case "description":
+                        candidate.ExtractedDescription = modification.Value?.ToString();
+                        break;
+                }
+            }
+        }
+
+        // Update candidate based on approval decision
+        if (approvalDecision.CategoryOverride.HasValue)
+        {
+            candidate.SuggestedCategoryId = approvalDecision.CategoryOverride.Value;
+        }
+
+        if (!string.IsNullOrEmpty(approvalDecision.ProductNameOverride))
+        {
+            candidate.ExtractedProductName = approvalDecision.ProductNameOverride;
+        }
+
+        candidate.UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }

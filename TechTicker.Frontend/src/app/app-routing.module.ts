@@ -48,6 +48,11 @@ const routes: Routes = [
         path: 'scraper-logs',
         loadChildren: () => import('./features/scraper-logs/scraper-logs.module').then(m => m.ScraperLogsModule),
         canActivate: [AdminGuard]
+      },
+      {
+        path: 'product-discovery',
+        loadChildren: () => import('./features/product-discovery/product-discovery.module').then(m => m.ProductDiscoveryModule),
+        canActivate: [AdminGuard]
       }
       // {
       //   path: 'alerts',

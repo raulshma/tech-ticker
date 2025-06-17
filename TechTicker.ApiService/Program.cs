@@ -80,6 +80,13 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
 builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
 
+// Add Product Discovery services
+builder.Services.AddScoped<IProductDiscoveryService, ProductDiscoveryService>();
+builder.Services.AddScoped<IUrlAnalysisService, UrlAnalysisService>();
+builder.Services.AddScoped<ICategoryPredictionService, CategoryPredictionService>();
+builder.Services.AddScoped<IProductSimilarityService, ProductSimilarityService>();
+builder.Services.AddScoped<IDiscoveryWorkflowService, DiscoveryWorkflowService>();
+
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
 

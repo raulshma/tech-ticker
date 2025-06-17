@@ -1,0 +1,172 @@
+<div class="url-analysis-container">
+  <div class="analysis-header">
+    <h2>URL Analysis</h2>
+    <p>Analyze a single product URL to extract product information and create a discovery candidate.</p>
+  </div>
+
+  <form [formGroup]="analysisForm" (ngSubmit)="onAnalyze()" class="analysis-form">
+    <div class="form-group">
+      <label for="url">Product URL</label>
+      <div class="input-group">
+        <input 
+          type="url" 
+          id="url"
+          class="form-control"
+          formControlName="url"
+          placeholder="https://example.com/product/..."
+          [class.is-invalid]="analysisForm.get('url')?.invalid && analysisForm.get('url')?.touched">
+        <div class="input-group-append">
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="analysisForm.invalid || isAnalyzing">
+            <span *ngIf="isAnalyzing" class="spinner-border spinner-border-sm mr-2"></span>
+            <i *ngIf="!isAnalyzing" class="fas fa-search mr-2"></i>
+            {{ isAnalyzing ? 'Analyzing...' : 'Analyze' }}
+          </button>
+        </div>
+      </div>
+      <div *ngIf="analysisForm.get('url')?.invalid && analysisForm.get('url')?.touched" class="invalid-feedback">
+        Please enter a valid URL starting with http:// or https://
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onReset()">
+        <i class="fas fa-undo mr-2"></i>
+        Reset
+      </button>
+    </div>
+  </form>
+
+  <!-- Error Display -->
+  <div *ngIf="error" class="alert alert-danger mt-4">
+    <i class="fas fa-exclamation-triangle mr-2"></i>
+    {{ error }}
+  </div>
+
+  <!-- Results Display -->
+  <div *ngIf="result" class="results-container mt-4">
+    <div class="results-header">
+      <h3>Analysis Results</h3>
+      <div class="results-summary">
+        <span class="badge badge-info">
+          {{ result.metadata.successfulExtractions }} successful
+        </span>
+        <span *ngIf="result.metadata.failedExtractions > 0" class="badge badge-warning ml-2">
+          {{ result.metadata.failedExtractions }} failed
+        </span>
+        <span class="badge badge-light ml-2">
+          {{ result.metadata.processingTime }} processing time
+        </span>
+      </div>
+    </div>
+
+    <!-- Candidates -->
+    <div *ngFor="let candidate of result.candidates" class="candidate-card">
+      <div class="candidate-header">
+        <h4>{{ candidate.extractedProductName }}</h4>
+        <span class="badge" [ngClass]="getStatusBadgeClass(candidate.status)">
+          {{ candidate.status }}
+        </span>
+      </div>
+
+      <div class="candidate-details">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="detail-group">
+              <label>Source URL:</label>
+              <a [href]="candidate.sourceUrl" target="_blank" class="source-link">
+                {{ candidate.sourceUrl }}
+                <i class="fas fa-external-link-alt ml-1"></i>
+              </a>
+            </div>
+
+            <div *ngIf="candidate.extractedManufacturer" class="detail-group">
+              <label>Manufacturer:</label>
+              <span>{{ candidate.extractedManufacturer }}</span>
+            </div>
+
+            <div *ngIf="candidate.extractedModelNumber" class="detail-group">
+              <label>Model Number:</label>
+              <span>{{ candidate.extractedModelNumber }}</span>
+            </div>
+
+            <div *ngIf="candidate.extractedPrice" class="detail-group">
+              <label>Price:</label>
+              <span class="price">${{ candidate.extractedPrice | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div *ngIf="candidate.suggestedCategory" class="detail-group">
+              <label>Suggested Category:</label>
+              <span>{{ candidate.suggestedCategory.name }}</span>
+              <span class="confidence-score ml-2">
+                ({{ (candidate.categoryConfidenceScore * 100) | number:'1.1-1' }}% confidence)
+              </span>
+            </div>
+
+            <div *ngIf="candidate.similarProduct" class="detail-group">
+              <label>Similar Product:</label>
+              <span>{{ candidate.similarProduct.productName }}</span>
+              <span class="similarity-score ml-2">
+                ({{ (candidate.similarityScore * 100) | number:'1.1-1' }}% similarity)
+              </span>
+            </div>
+
+            <div class="detail-group">
+              <label>Discovery Method:</label>
+              <span>{{ candidate.discoveryMethod }}</span>
+            </div>
+
+            <div class="detail-group">
+              <label>Discovered At:</label>
+              <span>{{ candidate.discoveredAt | date:'medium' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="candidate.extractedDescription" class="detail-group mt-3">
+          <label>Description:</label>
+          <p class="description">{{ candidate.extractedDescription }}</p>
+        </div>
+
+        <div *ngIf="candidate.extractedImageUrl" class="detail-group mt-3">
+          <label>Product Image:</label>
+          <div class="product-image">
+            <img [src]="candidate.extractedImageUrl" [alt]="candidate.extractedProductName" 
+                 class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+          </div>
+        </div>
+      </div>
+
+      <div class="candidate-actions">
+        <a [routerLink]="['/product-discovery/candidates', candidate.candidateId]" 
+           class="btn btn-primary btn-sm">
+          <i class="fas fa-eye mr-1"></i>
+          View Details
+        </a>
+      </div>
+    </div>
+
+    <!-- Warnings and Errors -->
+    <div *ngIf="result.metadata.warnings.length > 0" class="mt-4">
+      <h5>Warnings</h5>
+      <div class="alert alert-warning">
+        <ul class="mb-0">
+          <li *ngFor="let warning of result.metadata.warnings">{{ warning }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <div *ngIf="result.metadata.errors.length > 0" class="mt-4">
+      <h5>Errors</h5>
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          <li *ngFor="let error of result.metadata.errors">{{ error }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
