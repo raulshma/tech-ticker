@@ -73,7 +73,7 @@
               <div *ngIf="candidate.extractedImageUrl" class="detail-group mt-3">
                 <label>Product Image:</label>
                 <div class="product-image">
-                  <img [src]="candidate.extractedImageUrl" [alt]="candidate.extractedProductName" 
+                  <img [src]="candidate.extractedImageUrl" [alt]="candidate.extractedProductName"
                        class="img-thumbnail" style="max-width: 300px; max-height: 300px;">
                 </div>
               </div>
@@ -91,15 +91,15 @@
                 <label>Suggested Category:</label>
                 <span>{{ candidate.suggestedCategory.name }}</span>
                 <div class="confidence-score">
-                  Confidence: {{ (candidate.categoryConfidenceScore * 100) | number:'1.1-1' }}%
+                  Confidence: {{ (getConfidenceScore(candidate.categoryConfidenceScore) * 100) | number:'1.1-1' }}%
                 </div>
               </div>
 
               <div *ngIf="candidate.similarProduct" class="detail-group">
                 <label>Similar Product:</label>
-                <span>{{ candidate.similarProduct.productName }}</span>
+                <span>{{ getProductName(candidate.similarProduct) }}</span>
                 <div class="similarity-score">
-                  Similarity: {{ (candidate.similarityScore * 100) | number:'1.1-1' }}%
+                  Similarity: {{ (getSimilarityScore(candidate.similarityScore) * 100) | number:'1.1-1' }}%
                 </div>
               </div>
             </div>
@@ -111,20 +111,20 @@
             </div>
             <div class="card-body">
               <div class="action-buttons">
-                <button class="btn btn-success btn-block" 
-                        [disabled]="candidate.status !== 'Pending'"
+                <button class="btn btn-success btn-block"
+                        [disabled]="!isStatusPending(candidate.status)"
                         (click)="approveCandidate()">
                   <i class="fas fa-check mr-2"></i>
                   Approve
                 </button>
-                <button class="btn btn-danger btn-block mt-2" 
-                        [disabled]="candidate.status !== 'Pending'"
+                <button class="btn btn-danger btn-block mt-2"
+                        [disabled]="!isStatusPending(candidate.status)"
                         (click)="rejectCandidate()">
                   <i class="fas fa-times mr-2"></i>
                   Reject
                 </button>
-                <button class="btn btn-warning btn-block mt-2" 
-                        [disabled]="candidate.status !== 'Pending'"
+                <button class="btn btn-warning btn-block mt-2"
+                        [disabled]="!isStatusPending(candidate.status)"
                         (click)="requestModification()">
                   <i class="fas fa-edit mr-2"></i>
                   Request Modification

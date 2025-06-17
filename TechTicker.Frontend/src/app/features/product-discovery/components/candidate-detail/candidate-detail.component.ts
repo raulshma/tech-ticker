@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProductDiscoveryService, ProductDiscoveryCandidate } from '../../services/product-discovery.service';
+import { ProductDiscoveryCandidateDtoApiResponse } from '../../../../shared/api/api-client';
 
 @Component({
   selector: 'app-candidate-detail',
@@ -30,9 +31,9 @@ export class CandidateDetailComponent implements OnInit {
     this.error = null;
 
     this.productDiscoveryService.getCandidate(candidateId).subscribe({
-      next: (response) => {
+      next: (response: ProductDiscoveryCandidateDtoApiResponse) => {
         this.isLoading = false;
-        if (response.isSuccess) {
+        if (response.success && response.data) {
           this.candidate = response.data;
         } else {
           this.error = response.message || 'Failed to load candidate';
@@ -45,8 +46,9 @@ export class CandidateDetailComponent implements OnInit {
     });
   }
 
-  getStatusBadgeClass(status: string): string {
-    switch (status) {
+  getStatusBadgeClass(status: any): string {
+    const statusStr = status?.toString() || '';
+    switch (statusStr) {
       case 'Pending': return 'badge-warning';
       case 'UnderReview': return 'badge-info';
       case 'Approved': return 'badge-success';
@@ -69,5 +71,22 @@ export class CandidateDetailComponent implements OnInit {
   requestModification(): void {
     // TODO: Implement modification request logic
     console.log('Request modification');
+  }
+
+  // Helper methods for template
+  getConfidenceScore(score: number | undefined): number {
+    return score || 0;
+  }
+
+  getSimilarityScore(score: number | undefined): number {
+    return score || 0;
+  }
+
+  getProductName(product: any): string {
+    return product?.name || 'Unknown Product';
+  }
+
+  isStatusPending(status: any): boolean {
+    return status?.toString() === 'Pending';
   }
 }

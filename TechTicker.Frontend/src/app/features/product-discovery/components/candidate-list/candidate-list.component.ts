@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ProductDiscoveryService, ProductDiscoveryCandidate, CandidateFilterRequest, PagedResponse } from '../../services/product-discovery.service';
+import { ProductDiscoveryService, ProductDiscoveryCandidate, CandidateFilterRequest } from '../../services/product-discovery.service';
+import { ProductDiscoveryCandidateDtoPagedResponse } from '../../../../shared/api/api-client';
 
 @Component({
   selector: 'app-candidate-list',
@@ -72,12 +73,12 @@ export class CandidateListComponent implements OnInit {
     });
 
     this.productDiscoveryService.getCandidates(filter).subscribe({
-      next: (response: PagedResponse<ProductDiscoveryCandidate>) => {
+      next: (response: ProductDiscoveryCandidateDtoPagedResponse) => {
         this.isLoading = false;
-        if (response.isSuccess) {
+        if (response.success && response.data) {
           this.candidates = response.data;
-          this.totalCount = response.totalCount;
-          this.totalPages = response.totalPages;
+          this.totalCount = response.pagination?.totalCount || 0;
+          this.totalPages = response.pagination?.totalPages || 0;
         } else {
           this.error = response.message || 'Failed to load candidates';
         }
@@ -110,8 +111,9 @@ export class CandidateListComponent implements OnInit {
     this.currentPage = 1;
   }
 
-  getStatusBadgeClass(status: string): string {
-    switch (status) {
+  getStatusBadgeClass(status: any): string {
+    const statusStr = status?.toString() || '';
+    switch (statusStr) {
       case 'Pending': return 'badge-warning';
       case 'UnderReview': return 'badge-info';
       case 'Approved': return 'badge-success';
@@ -121,7 +123,8 @@ export class CandidateListComponent implements OnInit {
     }
   }
 
-  getConfidenceClass(score: number): string {
+  getConfidenceClass(score: number | undefined): string {
+    if (!score) return 'text-muted';
     if (score >= 0.8) return 'text-success';
     if (score >= 0.6) return 'text-warning';
     return 'text-danger';
@@ -137,5 +140,14 @@ export class CandidateListComponent implements OnInit {
     }
 
     return pages;
+  }
+
+  // Helper methods for template
+  getSourceUrlLength(url: string | undefined): number {
+    return url?.length || 0;
+  }
+
+  getConfidenceScore(score: number | undefined): number {
+    return score || 0;
   }
 }

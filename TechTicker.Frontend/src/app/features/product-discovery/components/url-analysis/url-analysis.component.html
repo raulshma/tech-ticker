@@ -8,16 +8,16 @@
     <div class="form-group">
       <label for="url">Product URL</label>
       <div class="input-group">
-        <input 
-          type="url" 
+        <input
+          type="url"
           id="url"
           class="form-control"
           formControlName="url"
           placeholder="https://example.com/product/..."
           [class.is-invalid]="analysisForm.get('url')?.invalid && analysisForm.get('url')?.touched">
         <div class="input-group-append">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             class="btn btn-primary"
             [disabled]="analysisForm.invalid || isAnalyzing">
             <span *ngIf="isAnalyzing" class="spinner-border spinner-border-sm mr-2"></span>
@@ -51,13 +51,13 @@
       <h3>Analysis Results</h3>
       <div class="results-summary">
         <span class="badge badge-info">
-          {{ result.metadata.successfulExtractions }} successful
+          {{ getMetadataValue(result.metadata, 'successfulExtractions') }} successful
         </span>
-        <span *ngIf="result.metadata.failedExtractions > 0" class="badge badge-warning ml-2">
-          {{ result.metadata.failedExtractions }} failed
+        <span *ngIf="getMetadataValue(result.metadata, 'failedExtractions') > 0" class="badge badge-warning ml-2">
+          {{ getMetadataValue(result.metadata, 'failedExtractions') }} failed
         </span>
         <span class="badge badge-light ml-2">
-          {{ result.metadata.processingTime }} processing time
+          {{ getMetadataValue(result.metadata, 'processingTime') }} processing time
         </span>
       </div>
     </div>
@@ -103,15 +103,15 @@
               <label>Suggested Category:</label>
               <span>{{ candidate.suggestedCategory.name }}</span>
               <span class="confidence-score ml-2">
-                ({{ (candidate.categoryConfidenceScore * 100) | number:'1.1-1' }}% confidence)
+                ({{ (getConfidenceScore(candidate.categoryConfidenceScore) * 100) | number:'1.1-1' }}% confidence)
               </span>
             </div>
 
             <div *ngIf="candidate.similarProduct" class="detail-group">
               <label>Similar Product:</label>
-              <span>{{ candidate.similarProduct.productName }}</span>
+              <span>{{ getProductName(candidate.similarProduct) }}</span>
               <span class="similarity-score ml-2">
-                ({{ (candidate.similarityScore * 100) | number:'1.1-1' }}% similarity)
+                ({{ (getSimilarityScore(candidate.similarityScore) * 100) | number:'1.1-1' }}% similarity)
               </span>
             </div>
 
@@ -135,14 +135,14 @@
         <div *ngIf="candidate.extractedImageUrl" class="detail-group mt-3">
           <label>Product Image:</label>
           <div class="product-image">
-            <img [src]="candidate.extractedImageUrl" [alt]="candidate.extractedProductName" 
+            <img [src]="candidate.extractedImageUrl" [alt]="candidate.extractedProductName"
                  class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
           </div>
         </div>
       </div>
 
       <div class="candidate-actions">
-        <a [routerLink]="['/product-discovery/candidates', candidate.candidateId]" 
+        <a [routerLink]="['/product-discovery/candidates', candidate.candidateId]"
            class="btn btn-primary btn-sm">
           <i class="fas fa-eye mr-1"></i>
           View Details
@@ -151,20 +151,20 @@
     </div>
 
     <!-- Warnings and Errors -->
-    <div *ngIf="result.metadata.warnings.length > 0" class="mt-4">
+    <div *ngIf="getMetadataArray(result.metadata, 'warnings').length > 0" class="mt-4">
       <h5>Warnings</h5>
       <div class="alert alert-warning">
         <ul class="mb-0">
-          <li *ngFor="let warning of result.metadata.warnings">{{ warning }}</li>
+          <li *ngFor="let warning of getMetadataArray(result.metadata, 'warnings')">{{ warning }}</li>
         </ul>
       </div>
     </div>
 
-    <div *ngIf="result.metadata.errors.length > 0" class="mt-4">
+    <div *ngIf="getMetadataArray(result.metadata, 'errors').length > 0" class="mt-4">
       <h5>Errors</h5>
       <div class="alert alert-danger">
         <ul class="mb-0">
-          <li *ngFor="let error of result.metadata.errors">{{ error }}</li>
+          <li *ngFor="let error of getMetadataArray(result.metadata, 'errors')">{{ error }}</li>
         </ul>
       </div>
     </div>
