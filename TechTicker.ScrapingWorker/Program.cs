@@ -25,6 +25,19 @@ builder.Services.Configure<MessagingConfiguration>(
 
 // Add repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Register individual repositories for direct injection
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductSellerMappingRepository, ProductSellerMappingRepository>();
+builder.Services.AddScoped<IScraperSiteConfigurationRepository, ScraperSiteConfigurationRepository>();
+builder.Services.AddScoped<IPriceHistoryRepository, PriceHistoryRepository>();
+builder.Services.AddScoped<IAlertRuleRepository, AlertRuleRepository>();
+builder.Services.AddScoped<IScraperRunLogRepository, ScraperRunLogRepository>();
+builder.Services.AddScoped<IProductDiscoveryCandidateRepository, ProductDiscoveryCandidateRepository>();
+builder.Services.AddScoped<IDiscoveryApprovalWorkflowRepository, DiscoveryApprovalWorkflowRepository>();
+
+// Register application services
 builder.Services.AddScoped<IMappingService, MappingService>();
 builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
 builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
