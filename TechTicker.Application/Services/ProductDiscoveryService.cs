@@ -123,6 +123,7 @@ public class ProductDiscoveryService : IProductDiscoveryService
 
             // Step 6: Save candidate
             await _candidateRepository.AddAsync(candidate);
+            await _unitOfWork.SaveChangesAsync();
 
             // Step 7: Map to DTO
             var candidateDto = MapCandidateToDto(candidate);

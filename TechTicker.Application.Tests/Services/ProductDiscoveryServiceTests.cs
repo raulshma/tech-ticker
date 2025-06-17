@@ -58,7 +58,7 @@ public class ProductDiscoveryServiceTests
         // Arrange
         var url = "https://example.com/product/123";
         var userId = Guid.NewGuid();
-        
+
         var extractedData = new ProductExtractionResult
         {
             ExtractedProductName = "Test Product",
@@ -82,6 +82,20 @@ public class ProductDiscoveryServiceTests
             }
         };
 
+        var candidateDto = new ProductDiscoveryCandidateDto
+        {
+            CandidateId = Guid.NewGuid(),
+            ExtractedProductName = "Test Product",
+            ExtractedManufacturer = "Test Manufacturer",
+            ExtractedPrice = 99.99m,
+            ExtractedDescription = "Test Description"
+        };
+
+        // Mock URL validation
+        _mockUrlAnalysisService
+            .Setup(x => x.IsValidProductUrlAsync(url))
+            .ReturnsAsync(Result<bool>.Success(true));
+
         _mockUrlAnalysisService
             .Setup(x => x.ExtractProductDataAsync(url))
             .ReturnsAsync(Result<ProductExtractionResult>.Success(extractedData));
@@ -93,6 +107,16 @@ public class ProductDiscoveryServiceTests
         _mockProductSimilarityService
             .Setup(x => x.FindSimilarProductsAsync(It.IsAny<ProductExtractionResult>(), 5))
             .ReturnsAsync(Result<List<SimilarProductResult>>.Success(similarityResults));
+
+        // Mock mapping service
+        _mockMappingService
+            .Setup(x => x.MapToDto(It.IsAny<ProductDiscoveryCandidate>()))
+            .Returns(candidateDto);
+
+        // Mock message publisher
+        _mockMessagePublisher
+            .Setup(x => x.PublishAsync(It.IsAny<object>(), It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
 
         // Act
         var result = await _service.AnalyzeUrlAsync(url, userId);
@@ -114,12 +138,17 @@ public class ProductDiscoveryServiceTests
         var url = "invalid-url";
         var userId = Guid.NewGuid();
 
+        // Mock URL validation to return failure
+        _mockUrlAnalysisService
+            .Setup(x => x.IsValidProductUrlAsync(url))
+            .ReturnsAsync(Result<bool>.Failure("Invalid URL format"));
+
         // Act
         var result = await _service.AnalyzeUrlAsync(url, userId);
 
         // Assert
         Assert.False(result.IsSuccess);
-        Assert.Contains("Invalid URL format", result.ErrorMessage);
+        Assert.Contains("Invalid URL format", result.ErrorMessage!);
     }
 
     [Fact]
@@ -128,16 +157,27 @@ public class ProductDiscoveryServiceTests
         // Arrange
         var url = "https://example.com/product/123";
         var userId = Guid.NewGuid();
-        
+
+        // Mock URL validation to succeed first
+        _mockUrlAnalysisService
+            .Setup(x => x.IsValidProductUrlAsync(url))
+            .ReturnsAsync(Result<bool>.Success(true));
+
+        // Mock extraction to fail
         _mockUrlAnalysisService
             .Setup(x => x.ExtractProductDataAsync(url))
             .ReturnsAsync(Result<ProductExtractionResult>.Failure("Failed to extract product data"));
+
+        // Mock message publisher for failure event
+        _mockMessagePublisher
+            .Setup(x => x.PublishAsync(It.IsAny<object>(), It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
 
         // Act
         var result = await _service.AnalyzeUrlAsync(url, userId);
 
         // Assert
         Assert.False(result.IsSuccess);
-        Assert.Contains("Failed to extract product data", result.ErrorMessage);
+        Assert.Contains("Failed to extract product data", result.ErrorMessage!);
     }
 }
