@@ -105,7 +105,10 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
             else
             {
                 mapping.LastScrapeStatus = "FAILED";
-                mapping.LastScrapeErrorCode = errorMessage;
+                // Truncate error message to fit database constraint (50 characters max)
+                mapping.LastScrapeErrorCode = errorMessage?.Length > 50
+                    ? errorMessage.Substring(0, 47) + "..."
+                    : errorMessage;
                 mapping.ConsecutiveFailureCount++;
 
                 // Disable mapping if too many consecutive failures

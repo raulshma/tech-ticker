@@ -1760,6 +1760,841 @@ export class TechTickerApiClient {
     }
 
     /**
+     * @return OK
+     */
+    scrapeNow(mappingId: string): Observable<ApiResponse> {
+        let url_ = this.baseUrl + "/api/Mappings/{mappingId}/scrape-now";
+        if (mappingId === undefined || mappingId === null)
+            throw new Error("The parameter 'mappingId' must be defined.");
+        url_ = url_.replace("{mappingId}", encodeURIComponent("" + mappingId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processScrapeNow(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processScrapeNow(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
+        }));
+    }
+
+    protected processScrapeNow(response: HttpResponseBase): Observable<ApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    analyzeUrl(body: AnalyzeUrlRequest | undefined): Observable<DiscoveryResultApiResponse> {
+        let url_ = this.baseUrl + "/api/ProductDiscovery/analyze-url";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAnalyzeUrl(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAnalyzeUrl(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<DiscoveryResultApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<DiscoveryResultApiResponse>;
+        }));
+    }
+
+    protected processAnalyzeUrl(response: HttpResponseBase): Observable<DiscoveryResultApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = DiscoveryResultApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 401) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkAnalyze(body: BulkAnalyzeRequest | undefined): Observable<DiscoveryResultApiResponse> {
+        let url_ = this.baseUrl + "/api/ProductDiscovery/bulk-analyze";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkAnalyze(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkAnalyze(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<DiscoveryResultApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<DiscoveryResultApiResponse>;
+        }));
+    }
+
+    protected processBulkAnalyze(response: HttpResponseBase): Observable<DiscoveryResultApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = DiscoveryResultApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 401) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param status (optional) 
+     * @param categoryId (optional) 
+     * @param discoveredByUserId (optional) 
+     * @param fromDate (optional) 
+     * @param toDate (optional) 
+     * @param searchTerm (optional) 
+     * @param pageNumber (optional) 
+     * @param pageSize (optional) 
+     * @param sortBy (optional) 
+     * @param sortDescending (optional) 
+     * @return OK
+     */
+    candidates(status: DiscoveryStatus | undefined, categoryId: string | undefined, discoveredByUserId: string | undefined, fromDate: Date | undefined, toDate: Date | undefined, searchTerm: string | undefined, pageNumber: number | undefined, pageSize: number | undefined, sortBy: string | undefined, sortDescending: boolean | undefined): Observable<ProductDiscoveryCandidateDtoPagedResponse> {
+        let url_ = this.baseUrl + "/api/ProductDiscovery/candidates?";
+        if (status === null)
+            throw new Error("The parameter 'status' cannot be null.");
+        else if (status !== undefined)
+            url_ += "Status=" + encodeURIComponent("" + status) + "&";
+        if (categoryId === null)
+            throw new Error("The parameter 'categoryId' cannot be null.");
+        else if (categoryId !== undefined)
+            url_ += "CategoryId=" + encodeURIComponent("" + categoryId) + "&";
+        if (discoveredByUserId === null)
+            throw new Error("The parameter 'discoveredByUserId' cannot be null.");
+        else if (discoveredByUserId !== undefined)
+            url_ += "DiscoveredByUserId=" + encodeURIComponent("" + discoveredByUserId) + "&";
+        if (fromDate === null)
+            throw new Error("The parameter 'fromDate' cannot be null.");
+        else if (fromDate !== undefined)
+            url_ += "FromDate=" + encodeURIComponent(fromDate ? "" + fromDate.toISOString() : "") + "&";
+        if (toDate === null)
+            throw new Error("The parameter 'toDate' cannot be null.");
+        else if (toDate !== undefined)
+            url_ += "ToDate=" + encodeURIComponent(toDate ? "" + toDate.toISOString() : "") + "&";
+        if (searchTerm === null)
+            throw new Error("The parameter 'searchTerm' cannot be null.");
+        else if (searchTerm !== undefined)
+            url_ += "SearchTerm=" + encodeURIComponent("" + searchTerm) + "&";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        if (sortBy === null)
+            throw new Error("The parameter 'sortBy' cannot be null.");
+        else if (sortBy !== undefined)
+            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
+        if (sortDescending === null)
+            throw new Error("The parameter 'sortDescending' cannot be null.");
+        else if (sortDescending !== undefined)
+            url_ += "SortDescending=" + encodeURIComponent("" + sortDescending) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCandidates(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCandidates(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProductDiscoveryCandidateDtoPagedResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProductDiscoveryCandidateDtoPagedResponse>;
+        }));
+    }
+
+    protected processCandidates(response: HttpResponseBase): Observable<ProductDiscoveryCandidateDtoPagedResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductDiscoveryCandidateDtoPagedResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 401) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    candidates2(candidateId: string): Observable<ProductDiscoveryCandidateDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/ProductDiscovery/candidates/{candidateId}";
+        if (candidateId === undefined || candidateId === null)
+            throw new Error("The parameter 'candidateId' must be defined.");
+        url_ = url_.replace("{candidateId}", encodeURIComponent("" + candidateId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCandidates2(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCandidates2(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProductDiscoveryCandidateDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProductDiscoveryCandidateDtoApiResponse>;
+        }));
+    }
+
+    protected processCandidates2(response: HttpResponseBase): Observable<ProductDiscoveryCandidateDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductDiscoveryCandidateDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status === 401) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    approve(candidateId: string, body: ApprovalRequest | undefined): Observable<ApprovalResultApiResponse> {
+        let url_ = this.baseUrl + "/api/ProductDiscovery/candidates/{candidateId}/approve";
+        if (candidateId === undefined || candidateId === null)
+            throw new Error("The parameter 'candidateId' must be defined.");
+        url_ = url_.replace("{candidateId}", encodeURIComponent("" + candidateId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processApprove(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processApprove(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ApprovalResultApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ApprovalResultApiResponse>;
+        }));
+    }
+
+    protected processApprove(response: HttpResponseBase): Observable<ApprovalResultApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApprovalResultApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status === 409) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result409: any = null;
+            let resultData409 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result409 = ApiResponse.fromJS(resultData409);
+            return throwException("Conflict", status, _responseText, _headers, result409);
+            }));
+        } else if (status === 401) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    reject(candidateId: string, body: RejectionRequest | undefined): Observable<ApprovalResultApiResponse> {
+        let url_ = this.baseUrl + "/api/ProductDiscovery/candidates/{candidateId}/reject";
+        if (candidateId === undefined || candidateId === null)
+            throw new Error("The parameter 'candidateId' must be defined.");
+        url_ = url_.replace("{candidateId}", encodeURIComponent("" + candidateId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processReject(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processReject(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ApprovalResultApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ApprovalResultApiResponse>;
+        }));
+    }
+
+    protected processReject(response: HttpResponseBase): Observable<ApprovalResultApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApprovalResultApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status === 409) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result409: any = null;
+            let resultData409 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result409 = ApiResponse.fromJS(resultData409);
+            return throwException("Conflict", status, _responseText, _headers, result409);
+            }));
+        } else if (status === 401) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param limit (optional) 
+     * @return OK
+     */
+    similarProducts(candidateId: string, limit: number | undefined): Observable<SimilarProductResultListApiResponse> {
+        let url_ = this.baseUrl + "/api/ProductDiscovery/similar-products/{candidateId}?";
+        if (candidateId === undefined || candidateId === null)
+            throw new Error("The parameter 'candidateId' must be defined.");
+        url_ = url_.replace("{candidateId}", encodeURIComponent("" + candidateId));
+        if (limit === null)
+            throw new Error("The parameter 'limit' cannot be null.");
+        else if (limit !== undefined)
+            url_ += "limit=" + encodeURIComponent("" + limit) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSimilarProducts(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSimilarProducts(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SimilarProductResultListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SimilarProductResultListApiResponse>;
+        }));
+    }
+
+    protected processSimilarProducts(response: HttpResponseBase): Observable<SimilarProductResultListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SimilarProductResultListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status === 401) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param grouping (optional) 
+     * @return OK
+     */
+    statistics(startDate: Date, endDate: Date, grouping: string | undefined): Observable<ObjectApiResponse> {
+        let url_ = this.baseUrl + "/api/ProductDiscovery/statistics?";
+        if (startDate === undefined || startDate === null)
+            throw new Error("The parameter 'startDate' must be defined and cannot be null.");
+        else
+            url_ += "StartDate=" + encodeURIComponent(startDate ? "" + startDate.toISOString() : "") + "&";
+        if (endDate === undefined || endDate === null)
+            throw new Error("The parameter 'endDate' must be defined and cannot be null.");
+        else
+            url_ += "EndDate=" + encodeURIComponent(endDate ? "" + endDate.toISOString() : "") + "&";
+        if (grouping === null)
+            throw new Error("The parameter 'grouping' cannot be null.");
+        else if (grouping !== undefined)
+            url_ += "Grouping=" + encodeURIComponent("" + grouping) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processStatistics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processStatistics(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
+        }));
+    }
+
+    protected processStatistics(response: HttpResponseBase): Observable<ObjectApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 401) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    retry(body: string[] | undefined): Observable<DiscoveryResultApiResponse> {
+        let url_ = this.baseUrl + "/api/ProductDiscovery/retry";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRetry(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRetry(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<DiscoveryResultApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<DiscoveryResultApiResponse>;
+        }));
+    }
+
+    protected processRetry(response: HttpResponseBase): Observable<DiscoveryResultApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = DiscoveryResultApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 401) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("Forbidden", status, _responseText, _headers, result403);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return OK
      */
@@ -2873,7 +3708,7 @@ export class TechTickerApiClient {
      * @param mappingId (optional) 
      * @return OK
      */
-    statistics(dateFrom: Date | undefined, dateTo: Date | undefined, mappingId: string | undefined): Observable<ScraperRunStatisticsDtoApiResponse> {
+    statistics2(dateFrom: Date | undefined, dateTo: Date | undefined, mappingId: string | undefined): Observable<ScraperRunStatisticsDtoApiResponse> {
         let url_ = this.baseUrl + "/api/scraper-logs/statistics?";
         if (dateFrom === null)
             throw new Error("The parameter 'dateFrom' cannot be null.");
@@ -2898,11 +3733,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processStatistics(response_);
+            return this.processStatistics2(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processStatistics(response_ as any);
+                    return this.processStatistics2(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperRunStatisticsDtoApiResponse>;
                 }
@@ -2911,7 +3746,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processStatistics(response: HttpResponseBase): Observable<ScraperRunStatisticsDtoApiResponse> {
+    protected processStatistics2(response: HttpResponseBase): Observable<ScraperRunStatisticsDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3850,6 +4685,54 @@ export interface IAlertRuleDtoPagedResponse {
     pagination?: PaginationMeta;
 }
 
+export class AnalyzeUrlRequest implements IAnalyzeUrlRequest {
+    url!: string;
+    userId?: string | undefined;
+    autoApprove?: boolean;
+    autoApprovalThreshold?: number | undefined;
+
+    constructor(data?: IAnalyzeUrlRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.url = _data["url"];
+            this.userId = _data["userId"];
+            this.autoApprove = _data["autoApprove"];
+            this.autoApprovalThreshold = _data["autoApprovalThreshold"];
+        }
+    }
+
+    static fromJS(data: any): AnalyzeUrlRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new AnalyzeUrlRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["url"] = this.url;
+        data["userId"] = this.userId;
+        data["autoApprove"] = this.autoApprove;
+        data["autoApprovalThreshold"] = this.autoApprovalThreshold;
+        return data;
+    }
+}
+
+export interface IAnalyzeUrlRequest {
+    url: string;
+    userId?: string | undefined;
+    autoApprove?: boolean;
+    autoApprovalThreshold?: number | undefined;
+}
+
 export class ApiResponse implements IApiResponse {
     success?: boolean;
     data?: any | undefined;
@@ -3932,6 +4815,273 @@ export interface IApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class ApprovalRequest implements IApprovalRequest {
+    action!: WorkflowAction;
+    comments?: string | undefined;
+    modifications?: { [key: string]: any; } | undefined;
+    createProduct?: boolean;
+    categoryOverride?: string | undefined;
+    productNameOverride?: string | undefined;
+
+    constructor(data?: IApprovalRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.action = _data["action"];
+            this.comments = _data["comments"];
+            if (_data["modifications"]) {
+                this.modifications = {} as any;
+                for (let key in _data["modifications"]) {
+                    if (_data["modifications"].hasOwnProperty(key))
+                        (<any>this.modifications)![key] = _data["modifications"][key];
+                }
+            }
+            this.createProduct = _data["createProduct"];
+            this.categoryOverride = _data["categoryOverride"];
+            this.productNameOverride = _data["productNameOverride"];
+        }
+    }
+
+    static fromJS(data: any): ApprovalRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new ApprovalRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["action"] = this.action;
+        data["comments"] = this.comments;
+        if (this.modifications) {
+            data["modifications"] = {};
+            for (let key in this.modifications) {
+                if (this.modifications.hasOwnProperty(key))
+                    (<any>data["modifications"])[key] = (<any>this.modifications)[key];
+            }
+        }
+        data["createProduct"] = this.createProduct;
+        data["categoryOverride"] = this.categoryOverride;
+        data["productNameOverride"] = this.productNameOverride;
+        return data;
+    }
+}
+
+export interface IApprovalRequest {
+    action: WorkflowAction;
+    comments?: string | undefined;
+    modifications?: { [key: string]: any; } | undefined;
+    createProduct?: boolean;
+    categoryOverride?: string | undefined;
+    productNameOverride?: string | undefined;
+}
+
+export class ApprovalResult implements IApprovalResult {
+    isSuccess?: boolean;
+    errorMessage?: string | undefined;
+    candidateId?: string;
+    newStatus?: DiscoveryStatus;
+    createdProductId?: string | undefined;
+    workflowNotes?: string | undefined;
+
+    constructor(data?: IApprovalResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.errorMessage = _data["errorMessage"];
+            this.candidateId = _data["candidateId"];
+            this.newStatus = _data["newStatus"];
+            this.createdProductId = _data["createdProductId"];
+            this.workflowNotes = _data["workflowNotes"];
+        }
+    }
+
+    static fromJS(data: any): ApprovalResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new ApprovalResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["errorMessage"] = this.errorMessage;
+        data["candidateId"] = this.candidateId;
+        data["newStatus"] = this.newStatus;
+        data["createdProductId"] = this.createdProductId;
+        data["workflowNotes"] = this.workflowNotes;
+        return data;
+    }
+}
+
+export interface IApprovalResult {
+    isSuccess?: boolean;
+    errorMessage?: string | undefined;
+    candidateId?: string;
+    newStatus?: DiscoveryStatus;
+    createdProductId?: string | undefined;
+    workflowNotes?: string | undefined;
+}
+
+export class ApprovalResultApiResponse implements IApprovalResultApiResponse {
+    success?: boolean;
+    data?: ApprovalResult;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IApprovalResultApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ApprovalResult.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ApprovalResultApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ApprovalResultApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IApprovalResultApiResponse {
+    success?: boolean;
+    data?: ApprovalResult;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class BulkAnalyzeRequest implements IBulkAnalyzeRequest {
+    urls!: string[];
+    batchSize?: number | undefined;
+    discoveryMethod?: string | undefined;
+    userId?: string | undefined;
+
+    constructor(data?: IBulkAnalyzeRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.urls = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["urls"])) {
+                this.urls = [] as any;
+                for (let item of _data["urls"])
+                    this.urls!.push(item);
+            }
+            this.batchSize = _data["batchSize"];
+            this.discoveryMethod = _data["discoveryMethod"];
+            this.userId = _data["userId"];
+        }
+    }
+
+    static fromJS(data: any): BulkAnalyzeRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkAnalyzeRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.urls)) {
+            data["urls"] = [];
+            for (let item of this.urls)
+                data["urls"].push(item);
+        }
+        data["batchSize"] = this.batchSize;
+        data["discoveryMethod"] = this.discoveryMethod;
+        data["userId"] = this.userId;
+        return data;
+    }
+}
+
+export interface IBulkAnalyzeRequest {
+    urls: string[];
+    batchSize?: number | undefined;
+    discoveryMethod?: string | undefined;
+    userId?: string | undefined;
 }
 
 export class CategoryDto implements ICategoryDto {
@@ -4666,6 +5816,226 @@ export interface IDashboardStatsDtoApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class DiscoveryMetadata implements IDiscoveryMetadata {
+    processedUrls?: number;
+    successfulExtractions?: number;
+    failedExtractions?: number;
+    processingTime?: string;
+    warnings?: string[] | undefined;
+    errors?: string[] | undefined;
+
+    constructor(data?: IDiscoveryMetadata) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.processedUrls = _data["processedUrls"];
+            this.successfulExtractions = _data["successfulExtractions"];
+            this.failedExtractions = _data["failedExtractions"];
+            this.processingTime = _data["processingTime"];
+            if (Array.isArray(_data["warnings"])) {
+                this.warnings = [] as any;
+                for (let item of _data["warnings"])
+                    this.warnings!.push(item);
+            }
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): DiscoveryMetadata {
+        data = typeof data === 'object' ? data : {};
+        let result = new DiscoveryMetadata();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["processedUrls"] = this.processedUrls;
+        data["successfulExtractions"] = this.successfulExtractions;
+        data["failedExtractions"] = this.failedExtractions;
+        data["processingTime"] = this.processingTime;
+        if (Array.isArray(this.warnings)) {
+            data["warnings"] = [];
+            for (let item of this.warnings)
+                data["warnings"].push(item);
+        }
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IDiscoveryMetadata {
+    processedUrls?: number;
+    successfulExtractions?: number;
+    failedExtractions?: number;
+    processingTime?: string;
+    warnings?: string[] | undefined;
+    errors?: string[] | undefined;
+}
+
+export class DiscoveryResult implements IDiscoveryResult {
+    isSuccess?: boolean;
+    errorMessage?: string | undefined;
+    candidates?: ProductDiscoveryCandidateDto[] | undefined;
+    metadata?: DiscoveryMetadata;
+
+    constructor(data?: IDiscoveryResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.errorMessage = _data["errorMessage"];
+            if (Array.isArray(_data["candidates"])) {
+                this.candidates = [] as any;
+                for (let item of _data["candidates"])
+                    this.candidates!.push(ProductDiscoveryCandidateDto.fromJS(item));
+            }
+            this.metadata = _data["metadata"] ? DiscoveryMetadata.fromJS(_data["metadata"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): DiscoveryResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new DiscoveryResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["errorMessage"] = this.errorMessage;
+        if (Array.isArray(this.candidates)) {
+            data["candidates"] = [];
+            for (let item of this.candidates)
+                data["candidates"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["metadata"] = this.metadata ? this.metadata.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IDiscoveryResult {
+    isSuccess?: boolean;
+    errorMessage?: string | undefined;
+    candidates?: ProductDiscoveryCandidateDto[] | undefined;
+    metadata?: DiscoveryMetadata;
+}
+
+export class DiscoveryResultApiResponse implements IDiscoveryResultApiResponse {
+    success?: boolean;
+    data?: DiscoveryResult;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IDiscoveryResultApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? DiscoveryResult.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): DiscoveryResultApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new DiscoveryResultApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IDiscoveryResultApiResponse {
+    success?: boolean;
+    data?: DiscoveryResult;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export enum DiscoveryStatus {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+}
+
 export class Int32ApiResponse implements IInt32ApiResponse {
     success?: boolean;
     data?: number;
@@ -5326,6 +6696,386 @@ export interface IPriceHistoryDtoIEnumerableApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class ProblemDetails implements IProblemDetails {
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IProblemDetails) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.type = _data["type"];
+            this.title = _data["title"];
+            this.status = _data["status"];
+            this.detail = _data["detail"];
+            this.instance = _data["instance"];
+        }
+    }
+
+    static fromJS(data: any): ProblemDetails {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProblemDetails();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["type"] = this.type;
+        data["title"] = this.title;
+        data["status"] = this.status;
+        data["detail"] = this.detail;
+        data["instance"] = this.instance;
+        return data;
+    }
+}
+
+export interface IProblemDetails {
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
+
+    [key: string]: any;
+}
+
+export class ProductDiscoveryCandidateDto implements IProductDiscoveryCandidateDto {
+    candidateId?: string;
+    sourceUrl?: string | undefined;
+    extractedProductName?: string | undefined;
+    extractedManufacturer?: string | undefined;
+    extractedModelNumber?: string | undefined;
+    extractedPrice?: number | undefined;
+    extractedImageUrl?: string | undefined;
+    extractedDescription?: string | undefined;
+    extractedSpecifications?: { [key: string]: any; } | undefined;
+    suggestedCategoryId?: string | undefined;
+    categoryConfidenceScore?: number;
+    similarProductId?: string | undefined;
+    similarityScore?: number;
+    discoveryMethod?: string | undefined;
+    discoveredByUserId?: string | undefined;
+    discoveredAt?: Date;
+    status?: DiscoveryStatus;
+    rejectionReason?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+    suggestedCategory?: CategoryDto;
+    similarProduct?: ProductDto;
+    discoveredByUser?: UserDto;
+
+    constructor(data?: IProductDiscoveryCandidateDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.candidateId = _data["candidateId"];
+            this.sourceUrl = _data["sourceUrl"];
+            this.extractedProductName = _data["extractedProductName"];
+            this.extractedManufacturer = _data["extractedManufacturer"];
+            this.extractedModelNumber = _data["extractedModelNumber"];
+            this.extractedPrice = _data["extractedPrice"];
+            this.extractedImageUrl = _data["extractedImageUrl"];
+            this.extractedDescription = _data["extractedDescription"];
+            if (_data["extractedSpecifications"]) {
+                this.extractedSpecifications = {} as any;
+                for (let key in _data["extractedSpecifications"]) {
+                    if (_data["extractedSpecifications"].hasOwnProperty(key))
+                        (<any>this.extractedSpecifications)![key] = _data["extractedSpecifications"][key];
+                }
+            }
+            this.suggestedCategoryId = _data["suggestedCategoryId"];
+            this.categoryConfidenceScore = _data["categoryConfidenceScore"];
+            this.similarProductId = _data["similarProductId"];
+            this.similarityScore = _data["similarityScore"];
+            this.discoveryMethod = _data["discoveryMethod"];
+            this.discoveredByUserId = _data["discoveredByUserId"];
+            this.discoveredAt = _data["discoveredAt"] ? new Date(_data["discoveredAt"].toString()) : <any>undefined;
+            this.status = _data["status"];
+            this.rejectionReason = _data["rejectionReason"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.suggestedCategory = _data["suggestedCategory"] ? CategoryDto.fromJS(_data["suggestedCategory"]) : <any>undefined;
+            this.similarProduct = _data["similarProduct"] ? ProductDto.fromJS(_data["similarProduct"]) : <any>undefined;
+            this.discoveredByUser = _data["discoveredByUser"] ? UserDto.fromJS(_data["discoveredByUser"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProductDiscoveryCandidateDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductDiscoveryCandidateDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["candidateId"] = this.candidateId;
+        data["sourceUrl"] = this.sourceUrl;
+        data["extractedProductName"] = this.extractedProductName;
+        data["extractedManufacturer"] = this.extractedManufacturer;
+        data["extractedModelNumber"] = this.extractedModelNumber;
+        data["extractedPrice"] = this.extractedPrice;
+        data["extractedImageUrl"] = this.extractedImageUrl;
+        data["extractedDescription"] = this.extractedDescription;
+        if (this.extractedSpecifications) {
+            data["extractedSpecifications"] = {};
+            for (let key in this.extractedSpecifications) {
+                if (this.extractedSpecifications.hasOwnProperty(key))
+                    (<any>data["extractedSpecifications"])[key] = (<any>this.extractedSpecifications)[key];
+            }
+        }
+        data["suggestedCategoryId"] = this.suggestedCategoryId;
+        data["categoryConfidenceScore"] = this.categoryConfidenceScore;
+        data["similarProductId"] = this.similarProductId;
+        data["similarityScore"] = this.similarityScore;
+        data["discoveryMethod"] = this.discoveryMethod;
+        data["discoveredByUserId"] = this.discoveredByUserId;
+        data["discoveredAt"] = this.discoveredAt ? this.discoveredAt.toISOString() : <any>undefined;
+        data["status"] = this.status;
+        data["rejectionReason"] = this.rejectionReason;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["suggestedCategory"] = this.suggestedCategory ? this.suggestedCategory.toJSON() : <any>undefined;
+        data["similarProduct"] = this.similarProduct ? this.similarProduct.toJSON() : <any>undefined;
+        data["discoveredByUser"] = this.discoveredByUser ? this.discoveredByUser.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProductDiscoveryCandidateDto {
+    candidateId?: string;
+    sourceUrl?: string | undefined;
+    extractedProductName?: string | undefined;
+    extractedManufacturer?: string | undefined;
+    extractedModelNumber?: string | undefined;
+    extractedPrice?: number | undefined;
+    extractedImageUrl?: string | undefined;
+    extractedDescription?: string | undefined;
+    extractedSpecifications?: { [key: string]: any; } | undefined;
+    suggestedCategoryId?: string | undefined;
+    categoryConfidenceScore?: number;
+    similarProductId?: string | undefined;
+    similarityScore?: number;
+    discoveryMethod?: string | undefined;
+    discoveredByUserId?: string | undefined;
+    discoveredAt?: Date;
+    status?: DiscoveryStatus;
+    rejectionReason?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+    suggestedCategory?: CategoryDto;
+    similarProduct?: ProductDto;
+    discoveredByUser?: UserDto;
+}
+
+export class ProductDiscoveryCandidateDtoApiResponse implements IProductDiscoveryCandidateDtoApiResponse {
+    success?: boolean;
+    data?: ProductDiscoveryCandidateDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProductDiscoveryCandidateDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ProductDiscoveryCandidateDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductDiscoveryCandidateDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductDiscoveryCandidateDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProductDiscoveryCandidateDtoApiResponse {
+    success?: boolean;
+    data?: ProductDiscoveryCandidateDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProductDiscoveryCandidateDtoPagedResponse implements IProductDiscoveryCandidateDtoPagedResponse {
+    success?: boolean;
+    data?: ProductDiscoveryCandidateDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+
+    constructor(data?: IProductDiscoveryCandidateDtoPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ProductDiscoveryCandidateDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+            this.pagination = _data["pagination"] ? PaginationMeta.fromJS(_data["pagination"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProductDiscoveryCandidateDtoPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductDiscoveryCandidateDtoPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        data["pagination"] = this.pagination ? this.pagination.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProductDiscoveryCandidateDtoPagedResponse {
+    success?: boolean;
+    data?: ProductDiscoveryCandidateDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+}
+
 export class ProductDto implements IProductDto {
     productId?: string;
     name?: string | undefined;
@@ -5916,6 +7666,54 @@ export interface IRegisterUserDto {
     password: string;
     firstName?: string | undefined;
     lastName?: string | undefined;
+}
+
+export class RejectionRequest implements IRejectionRequest {
+    reason!: string;
+    comments?: string | undefined;
+    blockDomain?: boolean;
+    useForTraining?: boolean;
+
+    constructor(data?: IRejectionRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.reason = _data["reason"];
+            this.comments = _data["comments"];
+            this.blockDomain = _data["blockDomain"];
+            this.useForTraining = _data["useForTraining"];
+        }
+    }
+
+    static fromJS(data: any): RejectionRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new RejectionRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["reason"] = this.reason;
+        data["comments"] = this.comments;
+        data["blockDomain"] = this.blockDomain;
+        data["useForTraining"] = this.useForTraining;
+        return data;
+    }
+}
+
+export interface IRejectionRequest {
+    reason: string;
+    comments?: string | undefined;
+    blockDomain?: boolean;
+    useForTraining?: boolean;
 }
 
 export class ScraperRunLogDto implements IScraperRunLogDto {
@@ -7266,6 +9064,174 @@ export interface ISellerPerformanceMetricDtoIEnumerableApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class SimilarProductResult implements ISimilarProductResult {
+    productId?: string;
+    productName?: string | undefined;
+    similarityScore?: number;
+    matchingMethod?: string | undefined;
+    matchingFields?: string[] | undefined;
+    matchMetadata?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISimilarProductResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productId = _data["productId"];
+            this.productName = _data["productName"];
+            this.similarityScore = _data["similarityScore"];
+            this.matchingMethod = _data["matchingMethod"];
+            if (Array.isArray(_data["matchingFields"])) {
+                this.matchingFields = [] as any;
+                for (let item of _data["matchingFields"])
+                    this.matchingFields!.push(item);
+            }
+            if (_data["matchMetadata"]) {
+                this.matchMetadata = {} as any;
+                for (let key in _data["matchMetadata"]) {
+                    if (_data["matchMetadata"].hasOwnProperty(key))
+                        (<any>this.matchMetadata)![key] = _data["matchMetadata"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SimilarProductResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new SimilarProductResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productId"] = this.productId;
+        data["productName"] = this.productName;
+        data["similarityScore"] = this.similarityScore;
+        data["matchingMethod"] = this.matchingMethod;
+        if (Array.isArray(this.matchingFields)) {
+            data["matchingFields"] = [];
+            for (let item of this.matchingFields)
+                data["matchingFields"].push(item);
+        }
+        if (this.matchMetadata) {
+            data["matchMetadata"] = {};
+            for (let key in this.matchMetadata) {
+                if (this.matchMetadata.hasOwnProperty(key))
+                    (<any>data["matchMetadata"])[key] = (<any>this.matchMetadata)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISimilarProductResult {
+    productId?: string;
+    productName?: string | undefined;
+    similarityScore?: number;
+    matchingMethod?: string | undefined;
+    matchingFields?: string[] | undefined;
+    matchMetadata?: { [key: string]: any; } | undefined;
+}
+
+export class SimilarProductResultListApiResponse implements ISimilarProductResultListApiResponse {
+    success?: boolean;
+    data?: SimilarProductResult[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISimilarProductResultListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(SimilarProductResult.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SimilarProductResultListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SimilarProductResultListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISimilarProductResultListApiResponse {
+    success?: boolean;
+    data?: SimilarProductResult[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class StringApiResponse implements IStringApiResponse {
     success?: boolean;
     data?: string | undefined;
@@ -8052,6 +10018,14 @@ export interface IValidationExampleRequest {
     email?: string | undefined;
     phone?: string | undefined;
     website?: string | undefined;
+}
+
+export enum WorkflowAction {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
 }
 
 export class ApiException extends Error {

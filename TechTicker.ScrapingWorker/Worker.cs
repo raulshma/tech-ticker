@@ -158,9 +158,18 @@ public class Worker : BackgroundService
                 _messagingConfig.ScrapingExchange,
                 _messagingConfig.ScrapingResultRoutingKey);
 
-            using var scope = _serviceScopeFactory.CreateScope();
-            var orchestrationService = scope.ServiceProvider.GetRequiredService<IScrapingOrchestrationService>();
-            await orchestrationService.ProcessScrapingResultAsync(command.MappingId, false, ex.Message);
+            // Try to update mapping status, but handle service disposal gracefully
+            try
+            {
+                using var scope = _serviceScopeFactory.CreateScope();
+                var orchestrationService = scope.ServiceProvider.GetRequiredService<IScrapingOrchestrationService>();
+                await orchestrationService.ProcessScrapingResultAsync(command.MappingId, false, ex.Message);
+            }
+            catch (ObjectDisposedException)
+            {
+                // Service provider is disposed (likely during shutdown), skip mapping update
+                _logger.LogWarning("Cannot update mapping status for {MappingId} - service provider disposed", command.MappingId);
+            }
         }
     }
 
