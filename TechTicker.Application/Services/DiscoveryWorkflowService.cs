@@ -442,7 +442,10 @@ public class DiscoveryWorkflowService : IDiscoveryWorkflowService
         {
             // For now, implement basic permission checking
             // In a real system, this would check user roles and permissions
-            
+
+            // Simulate async work for future implementation
+            await Task.Delay(1, CancellationToken.None);
+
             // System user (Guid.Empty) can perform auto-approvals
             if (userId == Guid.Empty && action == WorkflowAction.Approve)
             {

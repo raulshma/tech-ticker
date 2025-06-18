@@ -21,12 +21,14 @@ import { SiteConfigsRoutingModule } from './site-configs-routing.module';
 import { SiteConfigsListComponent } from './components/site-configs-list/site-configs-list.component';
 import { SiteConfigFormComponent } from './components/site-config-form/site-config-form.component';
 import { SiteConfigDeleteDialogComponent } from './components/site-config-delete-dialog/site-config-delete-dialog.component';
+import { AiSelectorGeneratorComponent } from './components/ai-selector-generator/ai-selector-generator.component';
 
 @NgModule({
   declarations: [
     SiteConfigsListComponent,
     SiteConfigFormComponent,
-    SiteConfigDeleteDialogComponent
+    SiteConfigDeleteDialogComponent,
+    AiSelectorGeneratorComponent
   ],
   imports: [
     CommonModule,

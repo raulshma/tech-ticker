@@ -459,4 +459,54 @@ public class MappingService : IMappingService
 
         candidate.UpdatedAt = DateTimeOffset.UtcNow;
     }
+
+    public SiteConfigurationDto MapToDto(SiteConfiguration entity)
+    {
+        return new SiteConfigurationDto
+        {
+            Id = entity.Id,
+            Domain = entity.Domain,
+            SiteName = entity.SiteName,
+            IsActive = entity.IsActive,
+            Notes = entity.Notes,
+            TestHtml = entity.TestHtml,
+            CreatedAt = entity.CreatedAt,
+            UpdatedAt = entity.UpdatedAt,
+            CreatedByUserId = entity.CreatedByUserId?.ToString(),
+            UpdatedByUserId = entity.UpdatedByUserId?.ToString(),
+            Selectors = new SelectorSet
+            {
+                Domain = entity.Domain,
+                ProductNameSelectors = entity.ProductNameSelectorsArray,
+                PriceSelectors = entity.PriceSelectorsArray,
+                ImageSelectors = entity.ImageSelectorsArray,
+                DescriptionSelectors = entity.DescriptionSelectorsArray,
+                ManufacturerSelectors = entity.ManufacturerSelectorsArray,
+                ModelNumberSelectors = entity.ModelNumberSelectorsArray,
+                SpecificationSelectors = entity.SpecificationSelectorsArray,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt
+            }
+        };
+    }
+
+    public SiteConfiguration MapToEntity(SaveSiteConfigurationRequest request, Guid? id = null)
+    {
+        return new SiteConfiguration
+        {
+            Id = id ?? Guid.NewGuid(),
+            Domain = request.Domain.ToLowerInvariant(),
+            SiteName = request.SiteName,
+            IsActive = request.IsActive,
+            Notes = request.Notes,
+            TestHtml = request.TestHtml,
+            ProductNameSelectorsArray = request.Selectors.ProductNameSelectors,
+            PriceSelectorsArray = request.Selectors.PriceSelectors,
+            ImageSelectorsArray = request.Selectors.ImageSelectors,
+            DescriptionSelectorsArray = request.Selectors.DescriptionSelectors,
+            ManufacturerSelectorsArray = request.Selectors.ManufacturerSelectors,
+            ModelNumberSelectorsArray = request.Selectors.ModelNumberSelectors,
+            SpecificationSelectorsArray = request.Selectors.SpecificationSelectors
+        };
+    }
 }

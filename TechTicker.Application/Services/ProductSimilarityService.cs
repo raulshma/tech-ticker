@@ -200,6 +200,10 @@ public class ProductSimilarityService : IProductSimilarityService
         {
             // For now, return a static threshold
             // In future, this could be dynamic based on category or user settings
+
+            // Simulate async work for future implementation
+            await Task.Delay(1, CancellationToken.None);
+
             return Result<decimal>.Success(DefaultDuplicateThreshold);
         }
         catch (Exception ex)

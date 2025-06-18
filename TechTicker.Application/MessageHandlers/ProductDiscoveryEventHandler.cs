@@ -70,7 +70,7 @@ public class ProductDiscoveryEventHandler
 
             // Check for auto-approval candidates
             var autoApprovalResult = await _workflowService.ProcessAutoApprovalsAsync();
-            if (autoApprovalResult.IsSuccess && autoApprovalResult.Data!.Any())
+            if (autoApprovalResult.IsSuccess && autoApprovalResult.Data != null && autoApprovalResult.Data.Any())
             {
                 _logger.LogInformation("Auto-approved {Count} candidates", autoApprovalResult.Data.Count);
             }
@@ -90,9 +90,9 @@ public class ProductDiscoveryEventHandler
         {
             // Check for auto-approval candidates
             var autoApprovalResult = await _workflowService.ProcessAutoApprovalsAsync();
-            if (autoApprovalResult.IsSuccess && autoApprovalResult.Data!.Any())
+            if (autoApprovalResult.IsSuccess && autoApprovalResult.Data != null && autoApprovalResult.Data.Any())
             {
-                _logger.LogInformation("Auto-approved {Count} candidates from bulk analysis", 
+                _logger.LogInformation("Auto-approved {Count} candidates from bulk analysis",
                     autoApprovalResult.Data.Count);
             }
         }
@@ -102,13 +102,16 @@ public class ProductDiscoveryEventHandler
     {
         if (message.CandidateIds.Any())
         {
-            _logger.LogInformation("New discovery candidate created: {CandidateId}", 
+            _logger.LogInformation("New discovery candidate created: {CandidateId}",
                 message.CandidateIds.First());
-            
+
             // Additional processing could be added here, such as:
             // - Sending notifications to admins
             // - Triggering additional analysis
             // - Updating statistics
+
+            // Simulate async work for future implementation
+            await Task.Delay(1, CancellationToken.None);
         }
     }
 
@@ -116,13 +119,16 @@ public class ProductDiscoveryEventHandler
     {
         if (message.CandidateIds.Any())
         {
-            _logger.LogInformation("Approval processed for candidate: {CandidateId}", 
+            _logger.LogInformation("Approval processed for candidate: {CandidateId}",
                 message.CandidateIds.First());
-            
+
             // Additional processing could be added here, such as:
             // - Sending notifications
             // - Updating metrics
             // - Triggering product creation workflows
+
+            // Simulate async work for future implementation
+            await Task.Delay(1, CancellationToken.None);
         }
     }
 }

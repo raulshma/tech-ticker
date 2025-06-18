@@ -188,16 +188,16 @@ public class ProductDiscoveryService : IProductDiscoveryService
                     var result = await AnalyzeUrlAsync(url, userId);
                     if (result.IsSuccess && result.Data!.Candidates.Any())
                     {
-                        return new { Success = true, Candidate = result.Data.Candidates.First(), Error = (string?)null };
+                        return new { Success = true, Candidate = (ProductDiscoveryCandidateDto?)result.Data.Candidates.First(), Error = (string?)null };
                     }
                     else
                     {
-                        return new { Success = false, Candidate = (ProductDiscoveryCandidateDto?)null, Error = result.ErrorMessage };
+                        return new { Success = false, Candidate = (ProductDiscoveryCandidateDto?)null, Error = (string?)(result.ErrorMessage ?? "Unknown error") };
                     }
                 }
                 catch (Exception ex)
                 {
-                    return new { Success = false, Candidate = (ProductDiscoveryCandidateDto?)null, Error = ex.Message };
+                    return new { Success = false, Candidate = (ProductDiscoveryCandidateDto?)null, Error = (string?)ex.Message };
                 }
                 finally
                 {

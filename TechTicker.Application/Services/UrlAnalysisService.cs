@@ -20,6 +20,7 @@ public class UrlAnalysisService : IUrlAnalysisService
     private readonly ILogger<UrlAnalysisService> _logger;
     private readonly IBrowsingContext _browsingContext;
     private readonly ProductDiscoveryOptions _options;
+    private readonly ISiteConfigurationService _siteConfigurationService;
 
     // Common product page patterns
     private static readonly string[] ProductUrlPatterns = new[]
@@ -33,55 +34,17 @@ public class UrlAnalysisService : IUrlAnalysisService
         @"/shop/"
     };
 
-    // Supported domains for product extraction
-    private static readonly Dictionary<string, SiteConfig> SupportedSites = new()
-    {
-        {
-            "amazon.com", new SiteConfig
-            {
-                ProductNameSelectors = new[] { "#productTitle", "h1.a-size-large" },
-                PriceSelectors = new[] { ".a-price .a-offscreen", ".a-price-whole" },
-                ImageSelectors = new[] { "#landingImage", ".a-dynamic-image" },
-                DescriptionSelectors = new[] { "#feature-bullets ul", "#productDescription" },
-                ManufacturerSelectors = new[] { "#bylineInfo", ".a-color-secondary" }
-            }
-        },
-        {
-            "newegg.com", new SiteConfig
-            {
-                ProductNameSelectors = new[] { "h1.product-title", ".product-title" },
-                PriceSelectors = new[] { ".price-current .price-current-num", ".price-current" },
-                ImageSelectors = new[] { ".product-view-img-original img", ".mainSlide img" },
-                DescriptionSelectors = new[] { ".product-overview", ".product-bullets" },
-                ManufacturerSelectors = new[] { ".product-brand", ".grpBrand" }
-            }
-        },
-        {
-            "bestbuy.com", new SiteConfig
-            {
-                ProductNameSelectors = new[] { "h1.heading-5", ".sku-title h1" },
-                PriceSelectors = new[] { ".pricing-current-price .sr-only", ".pricing-current-price" },
-                ImageSelectors = new[] { ".primary-image img", ".carousel-image img" },
-                DescriptionSelectors = new[] { ".product-data-value", ".key-specs" },
-                ManufacturerSelectors = new[] { ".product-data-value.body-copy-lg" }
-            }
-        },
-        {
-            "vishalperipherals.com", new SiteConfig
-            {
-                ProductNameSelectors = new[] { "#product-single > div > div.details-info.col-xs-12.col-sm-12.col-md-6.col-lg-6 > div > form > h1" },
-                PriceSelectors = new[] { "#js-product-price" },
-                ImageSelectors = new[] { ".primary-image img", ".carousel-image img" },
-                DescriptionSelectors = new[] { ".product-data-value", ".key-specs" },
-                ManufacturerSelectors = new[] { "#product-single > div > div.details-info.col-xs-12.col-sm-12.col-md-6.col-lg-6 > div > div.product_infor > div:nth-child(4) > p > span" }
-            }
-        }
-    };
 
-    public UrlAnalysisService(HttpClient httpClient, IOptions<ProductDiscoveryOptions> options, ILogger<UrlAnalysisService> logger)
+
+    public UrlAnalysisService(
+        HttpClient httpClient,
+        IOptions<ProductDiscoveryOptions> options,
+        ISiteConfigurationService siteConfigurationService,
+        ILogger<UrlAnalysisService> logger)
     {
         _httpClient = httpClient;
         _options = options.Value;
+        _siteConfigurationService = siteConfigurationService;
         _logger = logger;
 
         // Configure AngleSharp
@@ -107,12 +70,14 @@ public class UrlAnalysisService : IUrlAnalysisService
 
             // Check if site is supported
             var domain = uri.Host.ToLowerInvariant();
-            var siteConfig = GetSiteConfig(domain);
-            if (siteConfig == null)
+            var siteConfigResult = await _siteConfigurationService.GetConfigurationByDomainAsync(domain);
+            if (siteConfigResult.IsFailure)
             {
-                _logger.LogWarning("Unsupported domain: {Domain}", domain);
+                _logger.LogWarning("No configuration found for domain: {Domain}, using generic extraction", domain);
                 return await ExtractGenericProductDataAsync(url);
             }
+
+            var siteConfig = siteConfigResult.Data!;
 
             // Fetch page content
             var response = await _httpClient.GetAsync(url);
@@ -127,15 +92,20 @@ public class UrlAnalysisService : IUrlAnalysisService
             var htmlDocument = document as IHtmlDocument;
 
             // Extract product data using site-specific selectors
+            if (htmlDocument == null)
+            {
+                return Result<ProductExtractionResult>.Failure("Failed to parse HTML document");
+            }
+
             var result = new ProductExtractionResult
             {
                 IsSuccess = true,
                 SourceUrl = url,
-                ExtractedProductName = ExtractText(htmlDocument, siteConfig.ProductNameSelectors),
-                ExtractedPrice = ExtractPrice(htmlDocument, siteConfig.PriceSelectors),
-                ExtractedImageUrl = ExtractImageUrl(htmlDocument, siteConfig.ImageSelectors, uri),
-                ExtractedDescription = ExtractText(htmlDocument, siteConfig.DescriptionSelectors),
-                ExtractedManufacturer = ExtractText(htmlDocument, siteConfig.ManufacturerSelectors),
+                ExtractedProductName = ExtractText(htmlDocument, siteConfig.Selectors.ProductNameSelectors),
+                ExtractedPrice = ExtractPrice(htmlDocument, siteConfig.Selectors.PriceSelectors),
+                ExtractedImageUrl = ExtractImageUrl(htmlDocument, siteConfig.Selectors.ImageSelectors, uri),
+                ExtractedDescription = ExtractText(htmlDocument, siteConfig.Selectors.DescriptionSelectors),
+                ExtractedManufacturer = ExtractText(htmlDocument, siteConfig.Selectors.ManufacturerSelectors),
                 ExtractedSpecifications = ExtractSpecifications(htmlDocument),
                 RawMetadata = ExtractMetadata(htmlDocument)
             };
@@ -167,14 +137,16 @@ public class UrlAnalysisService : IUrlAnalysisService
             }
 
             var domain = uri.Host.ToLowerInvariant();
-            var siteConfig = GetSiteConfig(domain);
+            var siteConfigResult = await _siteConfigurationService.GetConfigurationByDomainAsync(domain);
 
             var result = new SiteCompatibilityResult
             {
                 Domain = domain,
-                IsCompatible = siteConfig != null,
-                Reason = siteConfig != null ? "Site has configured selectors" : "Site not in supported list",
-                SupportedSelectors = siteConfig?.ProductNameSelectors?.ToList() ?? new List<string>()
+                IsCompatible = siteConfigResult.IsSuccess,
+                Reason = siteConfigResult.IsSuccess ? "Site has configured selectors" : "Site not in supported list",
+                SupportedSelectors = siteConfigResult.IsSuccess ?
+                    siteConfigResult.Data!.Selectors.ProductNameSelectors?.ToList() ?? [] :
+                    []
             };
 
             // Test basic connectivity
@@ -318,7 +290,11 @@ public class UrlAnalysisService : IUrlAnalysisService
 
             var html = await response.Content.ReadAsStringAsync();
             var document = await _browsingContext.OpenAsync(req => req.Content(html));
-            var htmlDocument = document as IHtmlDocument;
+
+            if (document is not IHtmlDocument htmlDocument)
+            {
+                return Result<ProductExtractionResult>.Failure("Failed to parse HTML document");
+            }
 
             // Generic extraction using common patterns
             var result = new ProductExtractionResult
@@ -346,10 +322,7 @@ public class UrlAnalysisService : IUrlAnalysisService
         }
     }
 
-    private static SiteConfig? GetSiteConfig(string domain)
-    {
-        return SupportedSites.FirstOrDefault(kvp => domain.Contains(kvp.Key)).Value;
-    }
+
 
     private static bool IsProductUrl(string url)
     {
@@ -399,8 +372,7 @@ public class UrlAnalysisService : IUrlAnalysisService
 
         foreach (var selector in selectors)
         {
-            var img = document.QuerySelector(selector) as IHtmlImageElement;
-            if (img != null && !string.IsNullOrWhiteSpace(img.Source))
+            if (document.QuerySelector(selector) is IHtmlImageElement img && !string.IsNullOrWhiteSpace(img.Source))
             {
                 if (Uri.TryCreate(baseUri, img.Source, out var absoluteUri))
                 {
@@ -431,7 +403,7 @@ public class UrlAnalysisService : IUrlAnalysisService
             }
         }
 
-        return specs.Any() ? specs : null;
+        return specs.Count > 0 ? specs : null;
     }
 
     private static Dictionary<string, string> ExtractMetadata(IHtmlDocument document)
@@ -486,12 +458,4 @@ public class UrlAnalysisService : IUrlAnalysisService
         return ExtractText(document, selectors);
     }
 
-    private class SiteConfig
-    {
-        public string[]? ProductNameSelectors { get; set; }
-        public string[]? PriceSelectors { get; set; }
-        public string[]? ImageSelectors { get; set; }
-        public string[]? DescriptionSelectors { get; set; }
-        public string[]? ManufacturerSelectors { get; set; }
-    }
 }

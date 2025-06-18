@@ -25,7 +25,8 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     
     // Product Discovery entities
     public DbSet<ProductDiscoveryCandidate> ProductDiscoveryCandidates { get; set; } = null!;
-    public DbSet<DiscoveryApprovalWorkflow> DiscoveryApprovalWorkflows { get; set; } = null!;
+    public DbSet<DiscoveryApprovalWorkflow> DiscoveryApprovalWorkflows { get; set; }
+    public DbSet<SiteConfiguration> SiteConfigurations { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -12,8 +12,8 @@ using TechTicker.DataAccess;
 namespace TechTicker.DataAccess.Migrations
 {
     [DbContext(typeof(TechTickerDbContext))]
-    [Migration("20250617105831_AddAdvancedFeaturesEntities")]
-    partial class AddAdvancedFeaturesEntities
+    [Migration("20250618191118_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -817,6 +817,82 @@ namespace TechTicker.DataAccess.Migrations
                     b.ToTable("ScraperSiteConfigurations");
                 });
 
+            modelBuilder.Entity("TechTicker.Domain.Entities.SiteConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("ConfidenceScore")
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DescriptionSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Domain")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ImageSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastTestResult")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTime?>("LastTestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ManufacturerSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("ModelNumberSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PriceSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("ProductNameSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("SiteName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("SpecificationSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("TestHtml")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("UpdatedByUserId");
+
+                    b.ToTable("SiteConfigurations");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -994,6 +1070,21 @@ namespace TechTicker.DataAccess.Migrations
                     b.Navigation("Mapping");
 
                     b.Navigation("ParentRun");
+                });
+
+            modelBuilder.Entity("TechTicker.Domain.Entities.SiteConfiguration", b =>
+                {
+                    b.HasOne("TechTicker.Domain.Entities.ApplicationUser", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId");
+
+                    b.HasOne("TechTicker.Domain.Entities.ApplicationUser", "UpdatedByUser")
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId");
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
                 });
 
             modelBuilder.Entity("TechTicker.Domain.Entities.ApplicationUser", b =>

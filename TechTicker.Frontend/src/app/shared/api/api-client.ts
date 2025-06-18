@@ -4319,6 +4319,651 @@ export class TechTickerApiClient {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param domain (optional) 
+     * @param siteName (optional) 
+     * @param isActive (optional) 
+     * @param page (optional) 
+     * @param pageSize (optional) 
+     * @param sortBy (optional) 
+     * @param sortDescending (optional) 
+     * @return OK
+     */
+    siteConfigurationGET(domain: string | undefined, siteName: string | undefined, isActive: boolean | undefined, page: number | undefined, pageSize: number | undefined, sortBy: string | undefined, sortDescending: boolean | undefined): Observable<SiteConfigurationDtoPagedResponse> {
+        let url_ = this.baseUrl + "/api/SiteConfiguration?";
+        if (domain === null)
+            throw new Error("The parameter 'domain' cannot be null.");
+        else if (domain !== undefined)
+            url_ += "Domain=" + encodeURIComponent("" + domain) + "&";
+        if (siteName === null)
+            throw new Error("The parameter 'siteName' cannot be null.");
+        else if (siteName !== undefined)
+            url_ += "SiteName=" + encodeURIComponent("" + siteName) + "&";
+        if (isActive === null)
+            throw new Error("The parameter 'isActive' cannot be null.");
+        else if (isActive !== undefined)
+            url_ += "IsActive=" + encodeURIComponent("" + isActive) + "&";
+        if (page === null)
+            throw new Error("The parameter 'page' cannot be null.");
+        else if (page !== undefined)
+            url_ += "Page=" + encodeURIComponent("" + page) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        if (sortBy === null)
+            throw new Error("The parameter 'sortBy' cannot be null.");
+        else if (sortBy !== undefined)
+            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
+        if (sortDescending === null)
+            throw new Error("The parameter 'sortDescending' cannot be null.");
+        else if (sortDescending !== undefined)
+            url_ += "SortDescending=" + encodeURIComponent("" + sortDescending) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSiteConfigurationGET(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSiteConfigurationGET(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SiteConfigurationDtoPagedResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SiteConfigurationDtoPagedResponse>;
+        }));
+    }
+
+    protected processSiteConfigurationGET(response: HttpResponseBase): Observable<SiteConfigurationDtoPagedResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SiteConfigurationDtoPagedResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Created
+     */
+    siteConfigurationPOST(body: SaveSiteConfigurationRequest | undefined): Observable<SiteConfigurationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/SiteConfiguration";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSiteConfigurationPOST(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSiteConfigurationPOST(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SiteConfigurationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SiteConfigurationDtoApiResponse>;
+        }));
+    }
+
+    protected processSiteConfigurationPOST(response: HttpResponseBase): Observable<SiteConfigurationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 201) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result201: any = null;
+            let resultData201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result201 = SiteConfigurationDtoApiResponse.fromJS(resultData201);
+            return _observableOf(result201);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    siteConfigurationGET2(id: string): Observable<SiteConfigurationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/SiteConfiguration/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSiteConfigurationGET2(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSiteConfigurationGET2(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SiteConfigurationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SiteConfigurationDtoApiResponse>;
+        }));
+    }
+
+    protected processSiteConfigurationGET2(response: HttpResponseBase): Observable<SiteConfigurationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SiteConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    siteConfigurationPUT(id: string, body: SaveSiteConfigurationRequest | undefined): Observable<SiteConfigurationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/SiteConfiguration/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSiteConfigurationPUT(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSiteConfigurationPUT(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SiteConfigurationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SiteConfigurationDtoApiResponse>;
+        }));
+    }
+
+    protected processSiteConfigurationPUT(response: HttpResponseBase): Observable<SiteConfigurationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SiteConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    siteConfigurationDELETE(id: string): Observable<ApiResponse> {
+        let url_ = this.baseUrl + "/api/SiteConfiguration/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSiteConfigurationDELETE(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSiteConfigurationDELETE(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
+        }));
+    }
+
+    protected processSiteConfigurationDELETE(response: HttpResponseBase): Observable<ApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    byDomain(domain: string): Observable<SiteConfigurationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/SiteConfiguration/by-domain/{domain}";
+        if (domain === undefined || domain === null)
+            throw new Error("The parameter 'domain' must be defined.");
+        url_ = url_.replace("{domain}", encodeURIComponent("" + domain));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processByDomain(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processByDomain(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SiteConfigurationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SiteConfigurationDtoApiResponse>;
+        }));
+    }
+
+    protected processByDomain(response: HttpResponseBase): Observable<SiteConfigurationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SiteConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    active2(): Observable<SiteConfigurationDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/SiteConfiguration/active";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processActive2(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processActive2(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SiteConfigurationDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SiteConfigurationDtoListApiResponse>;
+        }));
+    }
+
+    protected processActive2(response: HttpResponseBase): Observable<SiteConfigurationDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SiteConfigurationDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    generateSelectors(body: GenerateSelectorsRequest | undefined): Observable<SelectorGenerationResultApiResponse> {
+        let url_ = this.baseUrl + "/api/SiteConfiguration/generate-selectors";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGenerateSelectors(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGenerateSelectors(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SelectorGenerationResultApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SelectorGenerationResultApiResponse>;
+        }));
+    }
+
+    protected processGenerateSelectors(response: HttpResponseBase): Observable<SelectorGenerationResultApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SelectorGenerationResultApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    testSelectors(body: TestSelectorsRequest | undefined): Observable<SelectorTestResultApiResponse> {
+        let url_ = this.baseUrl + "/api/SiteConfiguration/test-selectors";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTestSelectors(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTestSelectors(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SelectorTestResultApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SelectorTestResultApiResponse>;
+        }));
+    }
+
+    protected processTestSelectors(response: HttpResponseBase): Observable<SelectorTestResultApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SelectorTestResultApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    suggestImprovements(body: SelectorImprovementRequest | undefined): Observable<SelectorSuggestionListApiResponse> {
+        let url_ = this.baseUrl + "/api/SiteConfiguration/suggest-improvements";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSuggestImprovements(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSuggestImprovements(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SelectorSuggestionListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SelectorSuggestionListApiResponse>;
+        }));
+    }
+
+    protected processSuggestImprovements(response: HttpResponseBase): Observable<SelectorSuggestionListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SelectorSuggestionListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 export class AlertRuleDto implements IAlertRuleDto {
@@ -6036,6 +6681,102 @@ export enum DiscoveryStatus {
     _4 = 4,
 }
 
+export class FieldTestResult implements IFieldTestResult {
+    value?: string | undefined;
+    success?: boolean;
+    selector?: string | undefined;
+    error?: string | undefined;
+
+    constructor(data?: IFieldTestResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.value = _data["value"];
+            this.success = _data["success"];
+            this.selector = _data["selector"];
+            this.error = _data["error"];
+        }
+    }
+
+    static fromJS(data: any): FieldTestResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldTestResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["value"] = this.value;
+        data["success"] = this.success;
+        data["selector"] = this.selector;
+        data["error"] = this.error;
+        return data;
+    }
+}
+
+export interface IFieldTestResult {
+    value?: string | undefined;
+    success?: boolean;
+    selector?: string | undefined;
+    error?: string | undefined;
+}
+
+export class GenerateSelectorsRequest implements IGenerateSelectorsRequest {
+    htmlContent!: string;
+    domain!: string;
+    siteName?: string | undefined;
+    notes?: string | undefined;
+
+    constructor(data?: IGenerateSelectorsRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.htmlContent = _data["htmlContent"];
+            this.domain = _data["domain"];
+            this.siteName = _data["siteName"];
+            this.notes = _data["notes"];
+        }
+    }
+
+    static fromJS(data: any): GenerateSelectorsRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new GenerateSelectorsRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["htmlContent"] = this.htmlContent;
+        data["domain"] = this.domain;
+        data["siteName"] = this.siteName;
+        data["notes"] = this.notes;
+        return data;
+    }
+}
+
+export interface IGenerateSelectorsRequest {
+    htmlContent: string;
+    domain: string;
+    siteName?: string | undefined;
+    notes?: string | undefined;
+}
+
 export class Int32ApiResponse implements IInt32ApiResponse {
     success?: boolean;
     data?: number;
@@ -7716,6 +8457,65 @@ export interface IRejectionRequest {
     useForTraining?: boolean;
 }
 
+export class SaveSiteConfigurationRequest implements ISaveSiteConfigurationRequest {
+    domain!: string;
+    siteName!: string;
+    selectors!: SelectorSet;
+    isActive?: boolean;
+    notes?: string | undefined;
+    testHtml?: string | undefined;
+
+    constructor(data?: ISaveSiteConfigurationRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.selectors = new SelectorSet();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.domain = _data["domain"];
+            this.siteName = _data["siteName"];
+            this.selectors = _data["selectors"] ? SelectorSet.fromJS(_data["selectors"]) : new SelectorSet();
+            this.isActive = _data["isActive"];
+            this.notes = _data["notes"];
+            this.testHtml = _data["testHtml"];
+        }
+    }
+
+    static fromJS(data: any): SaveSiteConfigurationRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaveSiteConfigurationRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["domain"] = this.domain;
+        data["siteName"] = this.siteName;
+        data["selectors"] = this.selectors ? this.selectors.toJSON() : <any>undefined;
+        data["isActive"] = this.isActive;
+        data["notes"] = this.notes;
+        data["testHtml"] = this.testHtml;
+        return data;
+    }
+}
+
+export interface ISaveSiteConfigurationRequest {
+    domain: string;
+    siteName: string;
+    selectors: SelectorSet;
+    isActive?: boolean;
+    notes?: string | undefined;
+    testHtml?: string | undefined;
+}
+
 export class ScraperRunLogDto implements IScraperRunLogDto {
     runId?: string;
     mappingId?: string;
@@ -8916,6 +9716,618 @@ export interface IScrapingSelectorsDto {
     sellerNameOnPageSelector?: string | undefined;
 }
 
+export class SelectorGenerationResult implements ISelectorGenerationResult {
+    domain?: string | undefined;
+    selectors?: SelectorSet;
+    confidence?: number;
+    notes?: string | undefined;
+    generatedAt?: Date;
+
+    constructor(data?: ISelectorGenerationResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.domain = _data["domain"];
+            this.selectors = _data["selectors"] ? SelectorSet.fromJS(_data["selectors"]) : <any>undefined;
+            this.confidence = _data["confidence"];
+            this.notes = _data["notes"];
+            this.generatedAt = _data["generatedAt"] ? new Date(_data["generatedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): SelectorGenerationResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new SelectorGenerationResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["domain"] = this.domain;
+        data["selectors"] = this.selectors ? this.selectors.toJSON() : <any>undefined;
+        data["confidence"] = this.confidence;
+        data["notes"] = this.notes;
+        data["generatedAt"] = this.generatedAt ? this.generatedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ISelectorGenerationResult {
+    domain?: string | undefined;
+    selectors?: SelectorSet;
+    confidence?: number;
+    notes?: string | undefined;
+    generatedAt?: Date;
+}
+
+export class SelectorGenerationResultApiResponse implements ISelectorGenerationResultApiResponse {
+    success?: boolean;
+    data?: SelectorGenerationResult;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISelectorGenerationResultApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? SelectorGenerationResult.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SelectorGenerationResultApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SelectorGenerationResultApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISelectorGenerationResultApiResponse {
+    success?: boolean;
+    data?: SelectorGenerationResult;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class SelectorImprovementRequest implements ISelectorImprovementRequest {
+    htmlContent!: string;
+    currentSelectors!: SelectorSet;
+    testResult!: SelectorTestResult;
+
+    constructor(data?: ISelectorImprovementRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.currentSelectors = new SelectorSet();
+            this.testResult = new SelectorTestResult();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.htmlContent = _data["htmlContent"];
+            this.currentSelectors = _data["currentSelectors"] ? SelectorSet.fromJS(_data["currentSelectors"]) : new SelectorSet();
+            this.testResult = _data["testResult"] ? SelectorTestResult.fromJS(_data["testResult"]) : new SelectorTestResult();
+        }
+    }
+
+    static fromJS(data: any): SelectorImprovementRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new SelectorImprovementRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["htmlContent"] = this.htmlContent;
+        data["currentSelectors"] = this.currentSelectors ? this.currentSelectors.toJSON() : <any>undefined;
+        data["testResult"] = this.testResult ? this.testResult.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ISelectorImprovementRequest {
+    htmlContent: string;
+    currentSelectors: SelectorSet;
+    testResult: SelectorTestResult;
+}
+
+export class SelectorSet implements ISelectorSet {
+    domain?: string | undefined;
+    productNameSelectors?: string[] | undefined;
+    priceSelectors?: string[] | undefined;
+    imageSelectors?: string[] | undefined;
+    descriptionSelectors?: string[] | undefined;
+    manufacturerSelectors?: string[] | undefined;
+    modelNumberSelectors?: string[] | undefined;
+    specificationSelectors?: string[] | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+
+    constructor(data?: ISelectorSet) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.domain = _data["domain"];
+            if (Array.isArray(_data["productNameSelectors"])) {
+                this.productNameSelectors = [] as any;
+                for (let item of _data["productNameSelectors"])
+                    this.productNameSelectors!.push(item);
+            }
+            if (Array.isArray(_data["priceSelectors"])) {
+                this.priceSelectors = [] as any;
+                for (let item of _data["priceSelectors"])
+                    this.priceSelectors!.push(item);
+            }
+            if (Array.isArray(_data["imageSelectors"])) {
+                this.imageSelectors = [] as any;
+                for (let item of _data["imageSelectors"])
+                    this.imageSelectors!.push(item);
+            }
+            if (Array.isArray(_data["descriptionSelectors"])) {
+                this.descriptionSelectors = [] as any;
+                for (let item of _data["descriptionSelectors"])
+                    this.descriptionSelectors!.push(item);
+            }
+            if (Array.isArray(_data["manufacturerSelectors"])) {
+                this.manufacturerSelectors = [] as any;
+                for (let item of _data["manufacturerSelectors"])
+                    this.manufacturerSelectors!.push(item);
+            }
+            if (Array.isArray(_data["modelNumberSelectors"])) {
+                this.modelNumberSelectors = [] as any;
+                for (let item of _data["modelNumberSelectors"])
+                    this.modelNumberSelectors!.push(item);
+            }
+            if (Array.isArray(_data["specificationSelectors"])) {
+                this.specificationSelectors = [] as any;
+                for (let item of _data["specificationSelectors"])
+                    this.specificationSelectors!.push(item);
+            }
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): SelectorSet {
+        data = typeof data === 'object' ? data : {};
+        let result = new SelectorSet();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["domain"] = this.domain;
+        if (Array.isArray(this.productNameSelectors)) {
+            data["productNameSelectors"] = [];
+            for (let item of this.productNameSelectors)
+                data["productNameSelectors"].push(item);
+        }
+        if (Array.isArray(this.priceSelectors)) {
+            data["priceSelectors"] = [];
+            for (let item of this.priceSelectors)
+                data["priceSelectors"].push(item);
+        }
+        if (Array.isArray(this.imageSelectors)) {
+            data["imageSelectors"] = [];
+            for (let item of this.imageSelectors)
+                data["imageSelectors"].push(item);
+        }
+        if (Array.isArray(this.descriptionSelectors)) {
+            data["descriptionSelectors"] = [];
+            for (let item of this.descriptionSelectors)
+                data["descriptionSelectors"].push(item);
+        }
+        if (Array.isArray(this.manufacturerSelectors)) {
+            data["manufacturerSelectors"] = [];
+            for (let item of this.manufacturerSelectors)
+                data["manufacturerSelectors"].push(item);
+        }
+        if (Array.isArray(this.modelNumberSelectors)) {
+            data["modelNumberSelectors"] = [];
+            for (let item of this.modelNumberSelectors)
+                data["modelNumberSelectors"].push(item);
+        }
+        if (Array.isArray(this.specificationSelectors)) {
+            data["specificationSelectors"] = [];
+            for (let item of this.specificationSelectors)
+                data["specificationSelectors"].push(item);
+        }
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ISelectorSet {
+    domain?: string | undefined;
+    productNameSelectors?: string[] | undefined;
+    priceSelectors?: string[] | undefined;
+    imageSelectors?: string[] | undefined;
+    descriptionSelectors?: string[] | undefined;
+    manufacturerSelectors?: string[] | undefined;
+    modelNumberSelectors?: string[] | undefined;
+    specificationSelectors?: string[] | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+export class SelectorSuggestion implements ISelectorSuggestion {
+    field?: string | undefined;
+    currentSelector?: string | undefined;
+    suggestedSelector?: string | undefined;
+    reason?: string | undefined;
+    priority?: string | undefined;
+
+    constructor(data?: ISelectorSuggestion) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.field = _data["field"];
+            this.currentSelector = _data["currentSelector"];
+            this.suggestedSelector = _data["suggestedSelector"];
+            this.reason = _data["reason"];
+            this.priority = _data["priority"];
+        }
+    }
+
+    static fromJS(data: any): SelectorSuggestion {
+        data = typeof data === 'object' ? data : {};
+        let result = new SelectorSuggestion();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["field"] = this.field;
+        data["currentSelector"] = this.currentSelector;
+        data["suggestedSelector"] = this.suggestedSelector;
+        data["reason"] = this.reason;
+        data["priority"] = this.priority;
+        return data;
+    }
+}
+
+export interface ISelectorSuggestion {
+    field?: string | undefined;
+    currentSelector?: string | undefined;
+    suggestedSelector?: string | undefined;
+    reason?: string | undefined;
+    priority?: string | undefined;
+}
+
+export class SelectorSuggestionListApiResponse implements ISelectorSuggestionListApiResponse {
+    success?: boolean;
+    data?: SelectorSuggestion[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISelectorSuggestionListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(SelectorSuggestion.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SelectorSuggestionListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SelectorSuggestionListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISelectorSuggestionListApiResponse {
+    success?: boolean;
+    data?: SelectorSuggestion[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class SelectorTestResult implements ISelectorTestResult {
+    domain?: string | undefined;
+    results?: { [key: string]: FieldTestResult; } | undefined;
+    overallScore?: number;
+    issues?: string[] | undefined;
+    testedAt?: Date;
+
+    constructor(data?: ISelectorTestResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.domain = _data["domain"];
+            if (_data["results"]) {
+                this.results = {} as any;
+                for (let key in _data["results"]) {
+                    if (_data["results"].hasOwnProperty(key))
+                        (<any>this.results)![key] = _data["results"][key] ? FieldTestResult.fromJS(_data["results"][key]) : new FieldTestResult();
+                }
+            }
+            this.overallScore = _data["overallScore"];
+            if (Array.isArray(_data["issues"])) {
+                this.issues = [] as any;
+                for (let item of _data["issues"])
+                    this.issues!.push(item);
+            }
+            this.testedAt = _data["testedAt"] ? new Date(_data["testedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): SelectorTestResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new SelectorTestResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["domain"] = this.domain;
+        if (this.results) {
+            data["results"] = {};
+            for (let key in this.results) {
+                if (this.results.hasOwnProperty(key))
+                    (<any>data["results"])[key] = this.results[key] ? this.results[key].toJSON() : <any>undefined;
+            }
+        }
+        data["overallScore"] = this.overallScore;
+        if (Array.isArray(this.issues)) {
+            data["issues"] = [];
+            for (let item of this.issues)
+                data["issues"].push(item);
+        }
+        data["testedAt"] = this.testedAt ? this.testedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ISelectorTestResult {
+    domain?: string | undefined;
+    results?: { [key: string]: FieldTestResult; } | undefined;
+    overallScore?: number;
+    issues?: string[] | undefined;
+    testedAt?: Date;
+}
+
+export class SelectorTestResultApiResponse implements ISelectorTestResultApiResponse {
+    success?: boolean;
+    data?: SelectorTestResult;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISelectorTestResultApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? SelectorTestResult.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SelectorTestResultApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SelectorTestResultApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISelectorTestResultApiResponse {
+    success?: boolean;
+    data?: SelectorTestResult;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class SellerPerformanceMetricDto implements ISellerPerformanceMetricDto {
     sellerName?: string | undefined;
     totalRuns?: number;
@@ -9232,6 +10644,354 @@ export interface ISimilarProductResultListApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class SiteConfigurationDto implements ISiteConfigurationDto {
+    id?: string;
+    domain?: string | undefined;
+    siteName?: string | undefined;
+    selectors?: SelectorSet;
+    isActive?: boolean;
+    notes?: string | undefined;
+    testHtml?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+    createdByUserId?: string | undefined;
+    updatedByUserId?: string | undefined;
+
+    constructor(data?: ISiteConfigurationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.domain = _data["domain"];
+            this.siteName = _data["siteName"];
+            this.selectors = _data["selectors"] ? SelectorSet.fromJS(_data["selectors"]) : <any>undefined;
+            this.isActive = _data["isActive"];
+            this.notes = _data["notes"];
+            this.testHtml = _data["testHtml"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.createdByUserId = _data["createdByUserId"];
+            this.updatedByUserId = _data["updatedByUserId"];
+        }
+    }
+
+    static fromJS(data: any): SiteConfigurationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SiteConfigurationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["domain"] = this.domain;
+        data["siteName"] = this.siteName;
+        data["selectors"] = this.selectors ? this.selectors.toJSON() : <any>undefined;
+        data["isActive"] = this.isActive;
+        data["notes"] = this.notes;
+        data["testHtml"] = this.testHtml;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["createdByUserId"] = this.createdByUserId;
+        data["updatedByUserId"] = this.updatedByUserId;
+        return data;
+    }
+}
+
+export interface ISiteConfigurationDto {
+    id?: string;
+    domain?: string | undefined;
+    siteName?: string | undefined;
+    selectors?: SelectorSet;
+    isActive?: boolean;
+    notes?: string | undefined;
+    testHtml?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+    createdByUserId?: string | undefined;
+    updatedByUserId?: string | undefined;
+}
+
+export class SiteConfigurationDtoApiResponse implements ISiteConfigurationDtoApiResponse {
+    success?: boolean;
+    data?: SiteConfigurationDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISiteConfigurationDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? SiteConfigurationDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SiteConfigurationDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SiteConfigurationDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISiteConfigurationDtoApiResponse {
+    success?: boolean;
+    data?: SiteConfigurationDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class SiteConfigurationDtoListApiResponse implements ISiteConfigurationDtoListApiResponse {
+    success?: boolean;
+    data?: SiteConfigurationDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISiteConfigurationDtoListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(SiteConfigurationDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SiteConfigurationDtoListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SiteConfigurationDtoListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISiteConfigurationDtoListApiResponse {
+    success?: boolean;
+    data?: SiteConfigurationDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class SiteConfigurationDtoPagedResponse implements ISiteConfigurationDtoPagedResponse {
+    success?: boolean;
+    data?: SiteConfigurationDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+
+    constructor(data?: ISiteConfigurationDtoPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(SiteConfigurationDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+            this.pagination = _data["pagination"] ? PaginationMeta.fromJS(_data["pagination"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): SiteConfigurationDtoPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SiteConfigurationDtoPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        data["pagination"] = this.pagination ? this.pagination.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ISiteConfigurationDtoPagedResponse {
+    success?: boolean;
+    data?: SiteConfigurationDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+}
+
 export class StringApiResponse implements IStringApiResponse {
     success?: boolean;
     data?: string | undefined;
@@ -9314,6 +11074,49 @@ export interface IStringApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class TestSelectorsRequest implements ITestSelectorsRequest {
+    htmlContent!: string;
+    selectors!: SelectorSet;
+
+    constructor(data?: ITestSelectorsRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.selectors = new SelectorSet();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.htmlContent = _data["htmlContent"];
+            this.selectors = _data["selectors"] ? SelectorSet.fromJS(_data["selectors"]) : new SelectorSet();
+        }
+    }
+
+    static fromJS(data: any): TestSelectorsRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestSelectorsRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["htmlContent"] = this.htmlContent;
+        data["selectors"] = this.selectors ? this.selectors.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ITestSelectorsRequest {
+    htmlContent: string;
+    selectors: SelectorSet;
 }
 
 export class UpdateAlertRuleDto implements IUpdateAlertRuleDto {

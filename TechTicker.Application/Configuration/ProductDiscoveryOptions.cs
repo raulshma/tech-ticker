@@ -58,6 +58,11 @@ public class ProductDiscoveryOptions
     /// URL analysis configuration
     /// </summary>
     public UrlAnalysisOptions UrlAnalysis { get; set; } = new();
+
+    /// <summary>
+    /// Google AI configuration for selector generation
+    /// </summary>
+    public GoogleAIOptions GoogleAI { get; set; } = new();
 }
 
 /// <summary>
@@ -107,4 +112,38 @@ public class UrlAnalysisOptions
     /// Delay between retry attempts
     /// </summary>
     public TimeSpan RetryDelay { get; set; } = TimeSpan.FromSeconds(5);
+}
+
+/// <summary>
+/// Configuration for Google AI integration
+/// </summary>
+public class GoogleAIOptions
+{
+    /// <summary>
+    /// Google AI API key
+    /// </summary>
+    [Required(ErrorMessage = "Google AI API key is required")]
+    public string ApiKey { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Model name to use for selector generation
+    /// </summary>
+    public string ModelName { get; set; } = "gemini-2.5-flash";
+
+    /// <summary>
+    /// Maximum tokens for AI response
+    /// </summary>
+    [Range(100, 65536, ErrorMessage = "MaxTokens must be between 100 and 65536")]
+    public int MaxTokens { get; set; } = 65536;
+
+    /// <summary>
+    /// Temperature for AI response creativity
+    /// </summary>
+    [Range(0.0, 2.0, ErrorMessage = "Temperature must be between 0.0 and 2.0")]
+    public double Temperature { get; set; } = 0.1;
+
+    /// <summary>
+    /// Request timeout for AI API calls
+    /// </summary>
+    public TimeSpan RequestTimeout { get; set; } = TimeSpan.FromSeconds(30);
 }

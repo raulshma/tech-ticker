@@ -122,7 +122,7 @@ public class CategoryPredictionService : ICategoryPredictionService
             _logger.LogInformation("Predicting category for product: {ProductName}", productData.ExtractedProductName);
 
             var predictions = await GetCategoryPredictionsAsync(productData, 1);
-            if (predictions.IsFailure || !predictions.Data!.Any())
+            if (predictions.IsFailure || predictions.Data == null || !predictions.Data.Any())
             {
                 return Result<CategoryPrediction>.Failure("No category prediction could be made");
             }
@@ -292,10 +292,13 @@ public class CategoryPredictionService : ICategoryPredictionService
         try
         {
             _logger.LogInformation("Received {Count} training data items for model update", trainingData.Count);
-            
+
             // For now, this is a placeholder for future ML model integration
             // In a real implementation, this would update ML model weights or retrain the model
-            
+
+            // Simulate async work for future ML integration
+            await Task.Delay(1, CancellationToken.None);
+
             _logger.LogInformation("Training data logged for future ML model integration");
             return Result.Success();
         }

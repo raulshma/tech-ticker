@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
+using TechTicker.Application.Configuration;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services;
 using TechTicker.Application.Services.Interfaces;
@@ -23,6 +25,7 @@ public class ProductDiscoveryServiceTests
     private readonly Mock<IMappingService> _mockMappingService;
     private readonly Mock<IMessagePublisher> _mockMessagePublisher;
     private readonly Mock<ILogger<ProductDiscoveryService>> _mockLogger;
+    private readonly Mock<IOptions<ProductDiscoveryOptions>> _mockOptions;
     private readonly ProductDiscoveryService _service;
 
     public ProductDiscoveryServiceTests()
@@ -37,6 +40,16 @@ public class ProductDiscoveryServiceTests
         _mockMappingService = new Mock<IMappingService>();
         _mockMessagePublisher = new Mock<IMessagePublisher>();
         _mockLogger = new Mock<ILogger<ProductDiscoveryService>>();
+        _mockOptions = new Mock<IOptions<ProductDiscoveryOptions>>();
+
+        // Setup default options
+        _mockOptions.Setup(x => x.Value).Returns(new ProductDiscoveryOptions
+        {
+            MaxConcurrentAnalysis = 5,
+            DefaultCategoryConfidenceThreshold = 0.7m,
+            SimilarityScoreThreshold = 0.8m,
+            AutoApprovalThreshold = 0.95m
+        });
 
         _service = new ProductDiscoveryService(
             _mockUnitOfWork.Object,
@@ -48,6 +61,7 @@ public class ProductDiscoveryServiceTests
             _mockDiscoveryWorkflowService.Object,
             _mockMappingService.Object,
             _mockMessagePublisher.Object,
+            _mockOptions.Object,
             _mockLogger.Object
         );
     }
