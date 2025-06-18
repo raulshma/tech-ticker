@@ -3,6 +3,8 @@ using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using TechTicker.Application.Configuration;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Shared.Utilities;
@@ -17,6 +19,7 @@ public class UrlAnalysisService : IUrlAnalysisService
     private readonly HttpClient _httpClient;
     private readonly ILogger<UrlAnalysisService> _logger;
     private readonly IBrowsingContext _browsingContext;
+    private readonly ProductDiscoveryOptions _options;
 
     // Common product page patterns
     private static readonly string[] ProductUrlPatterns = new[]
@@ -62,21 +65,32 @@ public class UrlAnalysisService : IUrlAnalysisService
                 DescriptionSelectors = new[] { ".product-data-value", ".key-specs" },
                 ManufacturerSelectors = new[] { ".product-data-value.body-copy-lg" }
             }
+        },
+        {
+            "vishalperipherals.com", new SiteConfig
+            {
+                ProductNameSelectors = new[] { "#product-single > div > div.details-info.col-xs-12.col-sm-12.col-md-6.col-lg-6 > div > form > h1" },
+                PriceSelectors = new[] { "#js-product-price" },
+                ImageSelectors = new[] { ".primary-image img", ".carousel-image img" },
+                DescriptionSelectors = new[] { ".product-data-value", ".key-specs" },
+                ManufacturerSelectors = new[] { "#product-single > div > div.details-info.col-xs-12.col-sm-12.col-md-6.col-lg-6 > div > div.product_infor > div:nth-child(4) > p > span" }
+            }
         }
     };
 
-    public UrlAnalysisService(HttpClient httpClient, ILogger<UrlAnalysisService> logger)
+    public UrlAnalysisService(HttpClient httpClient, IOptions<ProductDiscoveryOptions> options, ILogger<UrlAnalysisService> logger)
     {
         _httpClient = httpClient;
+        _options = options.Value;
         _logger = logger;
-        
+
         // Configure AngleSharp
         var config = AngleSharp.Configuration.Default.WithDefaultLoader();
         _browsingContext = BrowsingContext.New(config);
-        
-        // Configure HttpClient
-        _httpClient.DefaultRequestHeaders.Add("User-Agent", 
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+
+        // Configure HttpClient with configurable User-Agent
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", _options.UrlAnalysis.UserAgent);
+        _httpClient.Timeout = _options.UrlAnalysis.RequestTimeout;
     }
 
     public async Task<Result<ProductExtractionResult>> ExtractProductDataAsync(string url)
@@ -154,7 +168,7 @@ public class UrlAnalysisService : IUrlAnalysisService
 
             var domain = uri.Host.ToLowerInvariant();
             var siteConfig = GetSiteConfig(domain);
-            
+
             var result = new SiteCompatibilityResult
             {
                 Domain = domain,
@@ -222,7 +236,7 @@ public class UrlAnalysisService : IUrlAnalysisService
                 if (!Uri.TryCreate(new Uri(catalogUrl), href, out var absoluteUrl)) continue;
 
                 var urlString = absoluteUrl.ToString();
-                
+
                 // Check if URL matches product patterns
                 if (IsProductUrl(urlString))
                 {
@@ -232,7 +246,7 @@ public class UrlAnalysisService : IUrlAnalysisService
 
             var uniqueUrls = productUrls.Distinct().ToList();
             _logger.LogInformation("Extracted {Count} unique product URLs from catalog", uniqueUrls.Count);
-            
+
             return Result<List<string>>.Success(uniqueUrls);
         }
         catch (Exception ex)
@@ -430,7 +444,7 @@ public class UrlAnalysisService : IUrlAnalysisService
         {
             var property = meta.GetAttribute("property") ?? meta.GetAttribute("name");
             var content = meta.GetAttribute("content");
-            
+
             if (!string.IsNullOrWhiteSpace(property) && !string.IsNullOrWhiteSpace(content))
             {
                 metadata[property] = content;

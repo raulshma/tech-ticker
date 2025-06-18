@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using TechTicker.Application.Configuration;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Messages;
 using TechTicker.Application.Services.Interfaces;
@@ -21,6 +23,7 @@ public class DiscoveryWorkflowService : IDiscoveryWorkflowService
     private readonly IMappingService _mappingService;
     private readonly IMessagePublisher _messagePublisher;
     private readonly ILogger<DiscoveryWorkflowService> _logger;
+    private readonly ProductDiscoveryOptions _options;
 
     public DiscoveryWorkflowService(
         IProductDiscoveryCandidateRepository candidateRepository,
@@ -29,6 +32,7 @@ public class DiscoveryWorkflowService : IDiscoveryWorkflowService
         IProductSellerMappingRepository mappingRepository,
         IMappingService mappingService,
         IMessagePublisher messagePublisher,
+        IOptions<ProductDiscoveryOptions> options,
         ILogger<DiscoveryWorkflowService> logger)
     {
         _candidateRepository = candidateRepository;
@@ -37,6 +41,7 @@ public class DiscoveryWorkflowService : IDiscoveryWorkflowService
         _mappingRepository = mappingRepository;
         _mappingService = mappingService;
         _messagePublisher = messagePublisher;
+        _options = options.Value;
         _logger = logger;
     }
 
@@ -287,11 +292,12 @@ public class DiscoveryWorkflowService : IDiscoveryWorkflowService
         }
     }
 
-    public async Task<Result<List<ApprovalResult>>> ProcessAutoApprovalsAsync(decimal confidenceThreshold = 0.95m)
+    public async Task<Result<List<ApprovalResult>>> ProcessAutoApprovalsAsync(decimal? confidenceThreshold = null)
     {
         try
         {
-            _logger.LogInformation("Processing auto-approvals with confidence threshold {Threshold}", confidenceThreshold);
+            var threshold = confidenceThreshold ?? _options.AutoApprovalThreshold;
+            _logger.LogInformation("Processing auto-approvals with confidence threshold {Threshold}", threshold);
 
             var result = await _candidateRepository.GetPendingCandidatesAsync(1, 100);
             var pendingCandidates = result.Items;
@@ -301,8 +307,8 @@ public class DiscoveryWorkflowService : IDiscoveryWorkflowService
             foreach (var candidate in pendingCandidates)
             {
                 // Check if candidate meets auto-approval criteria
-                if (candidate.CategoryConfidenceScore >= confidenceThreshold &&
-                    candidate.SimilarityScore < 0.8m) // Not too similar to existing products
+                if (candidate.CategoryConfidenceScore >= threshold &&
+                    candidate.SimilarityScore < _options.SimilarityScoreThreshold) // Not too similar to existing products
                 {
                     try
                     {

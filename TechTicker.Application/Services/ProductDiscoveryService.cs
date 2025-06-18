@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using TechTicker.Application.Configuration;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Messages;
 using TechTicker.Application.Services.Interfaces;
@@ -24,6 +26,7 @@ public class ProductDiscoveryService : IProductDiscoveryService
     private readonly IMappingService _mappingService;
     private readonly IMessagePublisher _messagePublisher;
     private readonly ILogger<ProductDiscoveryService> _logger;
+    private readonly ProductDiscoveryOptions _options;
 
     public ProductDiscoveryService(
         IUnitOfWork unitOfWork,
@@ -35,6 +38,7 @@ public class ProductDiscoveryService : IProductDiscoveryService
         IDiscoveryWorkflowService workflowService,
         IMappingService mappingService,
         IMessagePublisher messagePublisher,
+        IOptions<ProductDiscoveryOptions> options,
         ILogger<ProductDiscoveryService> logger)
     {
         _unitOfWork = unitOfWork;
@@ -46,6 +50,7 @@ public class ProductDiscoveryService : IProductDiscoveryService
         _workflowService = workflowService;
         _mappingService = mappingService;
         _messagePublisher = messagePublisher;
+        _options = options.Value;
         _logger = logger;
     }
 
@@ -174,7 +179,7 @@ public class ProductDiscoveryService : IProductDiscoveryService
             var errors = new List<string>();
 
             // Process URLs in parallel with limited concurrency
-            var semaphore = new SemaphoreSlim(5, 5); // Max 5 concurrent operations
+            var semaphore = new SemaphoreSlim(_options.MaxConcurrentAnalysis, _options.MaxConcurrentAnalysis);
             var tasks = urlList.Select(async url =>
             {
                 await semaphore.WaitAsync();

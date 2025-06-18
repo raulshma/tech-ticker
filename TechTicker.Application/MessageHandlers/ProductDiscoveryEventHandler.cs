@@ -69,7 +69,7 @@ public class ProductDiscoveryEventHandler
                 message.CandidateIds.Count);
 
             // Check for auto-approval candidates
-            var autoApprovalResult = await _workflowService.ProcessAutoApprovalsAsync(0.95m);
+            var autoApprovalResult = await _workflowService.ProcessAutoApprovalsAsync();
             if (autoApprovalResult.IsSuccess && autoApprovalResult.Data!.Any())
             {
                 _logger.LogInformation("Auto-approved {Count} candidates", autoApprovalResult.Data.Count);
@@ -89,7 +89,7 @@ public class ProductDiscoveryEventHandler
         if (message.IsSuccess && message.CandidateIds.Any())
         {
             // Check for auto-approval candidates
-            var autoApprovalResult = await _workflowService.ProcessAutoApprovalsAsync(0.95m);
+            var autoApprovalResult = await _workflowService.ProcessAutoApprovalsAsync();
             if (autoApprovalResult.IsSuccess && autoApprovalResult.Data!.Any())
             {
                 _logger.LogInformation("Auto-approved {Count} candidates from bulk analysis", 

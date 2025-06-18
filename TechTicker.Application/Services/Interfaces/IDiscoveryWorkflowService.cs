@@ -47,7 +47,7 @@ public interface IDiscoveryWorkflowService
     /// <summary>
     /// Automatically approves candidates that meet auto-approval criteria
     /// </summary>
-    Task<Result<List<ApprovalResult>>> ProcessAutoApprovalsAsync(decimal confidenceThreshold = 0.95m);
+    Task<Result<List<ApprovalResult>>> ProcessAutoApprovalsAsync(decimal? confidenceThreshold = null);
     
     /// <summary>
     /// Creates a product from an approved candidate

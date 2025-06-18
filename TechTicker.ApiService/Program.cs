@@ -93,6 +93,14 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
 builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
 
+// Configure Product Discovery options with validation
+builder.Services.Configure<ProductDiscoveryOptions>(
+    builder.Configuration.GetSection(ProductDiscoveryOptions.SectionName));
+builder.Services.AddOptions<ProductDiscoveryOptions>()
+    .Bind(builder.Configuration.GetSection(ProductDiscoveryOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 // Add Product Discovery services
 builder.Services.AddScoped<IProductDiscoveryService, ProductDiscoveryService>();
 builder.Services.AddScoped<IUrlAnalysisService, UrlAnalysisService>();
