@@ -12,6 +12,8 @@ public interface IUnitOfWork : IDisposable
     IPriceHistoryRepository PriceHistory { get; }
     IAlertRuleRepository AlertRules { get; }
     IScraperRunLogRepository ScraperRunLogs { get; }
+    IProductDiscoveryCandidateRepository ProductDiscoveryCandidates { get; }
+    IDiscoveryApprovalWorkflowRepository DiscoveryApprovalWorkflows { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync();

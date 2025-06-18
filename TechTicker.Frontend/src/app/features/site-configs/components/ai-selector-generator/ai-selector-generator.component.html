@@ -1,0 +1,257 @@
+<div class="ai-selector-generator-container">
+  <div class="header-section">
+    <h1>AI Selector Generator</h1>
+    <p>Generate CSS selectors automatically using AI by providing HTML content from a product page.</p>
+  </div>
+
+  <!-- Step 1: Generate Selectors -->
+  <mat-card class="step-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>auto_fix_high</mat-icon>
+        Step 1: Generate Selectors
+      </mat-card-title>
+      <mat-card-subtitle>Provide HTML content and domain information to generate selectors</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="generatorForm" class="generator-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Domain</mat-label>
+            <input matInput formControlName="domain" placeholder="e.g., amazon.com">
+            <mat-error *ngIf="generatorForm.get('domain')?.hasError('required')">
+              Domain is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Site Name (Optional)</mat-label>
+            <input matInput formControlName="siteName" placeholder="e.g., Amazon">
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>HTML Content</mat-label>
+          <textarea matInput formControlName="htmlContent" rows="10"
+                    placeholder="Paste the HTML content from a product page here..."></textarea>
+          <mat-error *ngIf="generatorForm.get('htmlContent')?.hasError('required')">
+            HTML content is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Notes (Optional)</mat-label>
+          <textarea matInput formControlName="notes" rows="3"
+                    placeholder="Any additional notes or requirements..."></textarea>
+        </mat-form-field>
+
+        <div class="action-buttons">
+          <button mat-raised-button color="primary"
+                  [disabled]="!generatorForm.valid || isGenerating"
+                  (click)="generateSelectors()">
+            <mat-icon *ngIf="!isGenerating">auto_fix_high</mat-icon>
+            <mat-spinner *ngIf="isGenerating" diameter="20"></mat-spinner>
+            {{ isGenerating ? 'Generating...' : 'Generate Selectors' }}
+          </button>
+          <button mat-button type="button" (click)="resetForm()">Reset</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Step 2: Generated Results -->
+  <mat-card class="step-card" *ngIf="generationResult">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>check_circle</mat-icon>
+        Step 2: Generated Selectors
+      </mat-card-title>
+      <mat-card-subtitle>
+        Confidence:
+        <mat-chip [color]="getConfidenceColor(generationResult.confidence || 0)" selected>
+          {{ ((generationResult.confidence || 0) * 100).toFixed(1) }}%
+        </mat-chip>
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="selectors-grid">
+        <div class="selector-group" *ngIf="getSelectorsArray(generationResult.selectors?.productNameSelectors).length > 0">
+          <h4>Product Name</h4>
+          <mat-chip-listbox>
+            <mat-chip-option *ngFor="let selector of getSelectorsArray(generationResult.selectors?.productNameSelectors)">
+              {{ selector }}
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+
+        <div class="selector-group" *ngIf="getSelectorsArray(generationResult.selectors?.priceSelectors).length > 0">
+          <h4>Price</h4>
+          <mat-chip-listbox>
+            <mat-chip-option *ngFor="let selector of getSelectorsArray(generationResult.selectors?.priceSelectors)">
+              {{ selector }}
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+
+        <div class="selector-group" *ngIf="getSelectorsArray(generationResult.selectors?.imageSelectors).length > 0">
+          <h4>Image</h4>
+          <mat-chip-listbox>
+            <mat-chip-option *ngFor="let selector of getSelectorsArray(generationResult.selectors?.imageSelectors)">
+              {{ selector }}
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+
+        <div class="selector-group" *ngIf="getSelectorsArray(generationResult.selectors?.descriptionSelectors).length > 0">
+          <h4>Description</h4>
+          <mat-chip-listbox>
+            <mat-chip-option *ngFor="let selector of getSelectorsArray(generationResult.selectors?.descriptionSelectors)">
+              {{ selector }}
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+
+        <div class="selector-group" *ngIf="getSelectorsArray(generationResult.selectors?.manufacturerSelectors).length > 0">
+          <h4>Manufacturer</h4>
+          <mat-chip-listbox>
+            <mat-chip-option *ngFor="let selector of getSelectorsArray(generationResult.selectors?.manufacturerSelectors)">
+              {{ selector }}
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+
+        <div class="selector-group" *ngIf="getSelectorsArray(generationResult.selectors?.modelNumberSelectors).length > 0">
+          <h4>Model Number</h4>
+          <mat-chip-listbox>
+            <mat-chip-option *ngFor="let selector of getSelectorsArray(generationResult.selectors?.modelNumberSelectors)">
+              {{ selector }}
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+      </div>
+
+      <div class="notes-section" *ngIf="generationResult.notes">
+        <h4>AI Notes</h4>
+        <p>{{ generationResult.notes }}</p>
+      </div>
+
+      <div class="action-buttons">
+        <button mat-raised-button color="accent" (click)="saveConfiguration()">
+          <mat-icon>save</mat-icon>
+          Save Configuration
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Step 3: Test Selectors -->
+  <mat-card class="step-card" *ngIf="generationResult">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>science</mat-icon>
+        Step 3: Test Selectors (Optional)
+      </mat-card-title>
+      <mat-card-subtitle>Test the generated selectors against different HTML content</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="testForm" class="test-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Test HTML Content</mat-label>
+          <textarea matInput formControlName="testHtmlContent" rows="8"
+                    placeholder="Paste HTML content from another product page to test the selectors..."></textarea>
+          <mat-error *ngIf="testForm.get('testHtmlContent')?.hasError('required')">
+            Test HTML content is required
+          </mat-error>
+        </mat-form-field>
+
+        <div class="action-buttons">
+          <button mat-raised-button color="primary"
+                  [disabled]="!testForm.valid || isTesting"
+                  (click)="testSelectors()">
+            <mat-icon *ngIf="!isTesting">science</mat-icon>
+            <mat-spinner *ngIf="isTesting" diameter="20"></mat-spinner>
+            {{ isTesting ? 'Testing...' : 'Test Selectors' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Step 4: Test Results -->
+  <mat-card class="step-card" *ngIf="testResult">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>assessment</mat-icon>
+        Step 4: Test Results
+      </mat-card-title>
+      <mat-card-subtitle>
+        Overall Score:
+        <mat-chip [color]="getScoreColor(testResult.overallScore || 0)" selected>
+          {{ ((testResult.overallScore || 0) * 100).toFixed(1) }}%
+        </mat-chip>
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="test-results">
+        <div class="result-item" *ngFor="let result of getTestResultEntries()">
+          <h4>{{ result.key }}</h4>
+          <div class="result-details">
+            <mat-chip [color]="result.value.success ? 'primary' : 'warn'" selected>
+              {{ result.value.success ? 'Success' : 'Failed' }}
+            </mat-chip>
+            <span class="selector">{{ result.value.selector }}</span>
+            <span class="value" *ngIf="result.value.value">Value: {{ result.value.value }}</span>
+            <span class="error" *ngIf="result.value.error">Error: {{ result.value.error }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="issues-section" *ngIf="testResult.issues && testResult.issues.length > 0">
+        <h4>Issues Found</h4>
+        <ul>
+          <li *ngFor="let issue of testResult.issues">{{ issue }}</li>
+        </ul>
+      </div>
+
+      <div class="action-buttons">
+        <button mat-raised-button color="accent" (click)="getSuggestions()">
+          <mat-icon>lightbulb</mat-icon>
+          Get Improvement Suggestions
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Step 5: Improvement Suggestions -->
+  <mat-card class="step-card" *ngIf="suggestions.length > 0">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>lightbulb</mat-icon>
+        Step 5: Improvement Suggestions
+      </mat-card-title>
+      <mat-card-subtitle>AI-generated suggestions to improve selector accuracy</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="suggestions-list">
+        <div class="suggestion-item" *ngFor="let suggestion of suggestions">
+          <div class="suggestion-header">
+            <h4>{{ suggestion.field }}</h4>
+            <mat-chip [color]="getPriorityColor(suggestion.priority || '')" selected>
+              {{ suggestion.priority }} Priority
+            </mat-chip>
+          </div>
+          <div class="suggestion-content">
+            <p><strong>Current:</strong> {{ suggestion.currentSelector }}</p>
+            <p><strong>Suggested:</strong> {{ suggestion.suggestedSelector }}</p>
+            <p><strong>Reason:</strong> {{ suggestion.reason }}</p>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,29 @@
+<div class="product-discovery-container">
+  <div class="header">
+    <h1>Product Discovery</h1>
+    <p class="subtitle">Intelligent product detection from URLs with admin approval workflow</p>
+  </div>
+
+  <nav class="discovery-nav">
+    <a routerLink="analyze" routerLinkActive="active" class="nav-link">
+      <i class="fas fa-search"></i>
+      Analyze URL
+    </a>
+    <a routerLink="bulk-analyze" routerLinkActive="active" class="nav-link">
+      <i class="fas fa-list"></i>
+      Bulk Analysis
+    </a>
+    <a routerLink="candidates" routerLinkActive="active" class="nav-link">
+      <i class="fas fa-clipboard-list"></i>
+      Candidates
+    </a>
+    <a routerLink="workflow" routerLinkActive="active" class="nav-link">
+      <i class="fas fa-tasks"></i>
+      Workflow
+    </a>
+  </nav>
+
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

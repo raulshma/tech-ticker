@@ -67,6 +67,10 @@ export class SiteConfigsListComponent implements OnInit {
     this.router.navigate(['/site-configs/new']);
   }
 
+  openAiGenerator(): void {
+    this.router.navigate(['/site-configs/ai-generator']);
+  }
+
   editSiteConfig(config: ScraperSiteConfigurationDto): void {
     this.router.navigate(['/site-configs/edit', config.siteConfigId]);
   }
@@ -110,7 +114,7 @@ export class SiteConfigsListComponent implements OnInit {
     if (config.priceSelector) selectors.push('Price');
     if (config.stockSelector) selectors.push('Stock');
     if (config.sellerNameOnPageSelector) selectors.push('Seller');
-    
+
     return selectors.length > 0 ? selectors.join(', ') : 'None configured';
   }
 }

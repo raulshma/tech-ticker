@@ -327,6 +327,44 @@ namespace TechTicker.DataAccess.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("TechTicker.Domain.Entities.DiscoveryApprovalWorkflow", b =>
+                {
+                    b.Property<Guid>("WorkflowId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Action")
+                        .HasMaxLength(50)
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("ActionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Modifications")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("ReviewerId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("WorkflowId");
+
+                    b.HasIndex("Action");
+
+                    b.HasIndex("ActionDate");
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("ReviewerId");
+
+                    b.ToTable("DiscoveryApprovalWorkflows");
+                });
+
             modelBuilder.Entity("TechTicker.Domain.Entities.PriceHistory", b =>
                 {
                     b.Property<Guid>("PriceHistoryId")
@@ -435,6 +473,102 @@ namespace TechTicker.DataAccess.Migrations
                         .HasFilter("\"SKU\" IS NOT NULL");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("TechTicker.Domain.Entities.ProductDiscoveryCandidate", b =>
+                {
+                    b.Property<Guid>("CandidateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("CategoryConfidenceScore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(5,4)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("DiscoveredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DiscoveredByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DiscoveryMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ExtractedDescription")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExtractedImageUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<string>("ExtractedManufacturer")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ExtractedModelNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal?>("ExtractedPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("ExtractedProductName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ExtractedSpecifications")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("SimilarProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("SimilarityScore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(5,4)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<Guid?>("SuggestedCategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("CandidateId");
+
+                    b.HasIndex("DiscoveredAt");
+
+                    b.HasIndex("DiscoveredByUserId");
+
+                    b.HasIndex("DiscoveryMethod");
+
+                    b.HasIndex("SimilarProductId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("SuggestedCategoryId");
+
+                    b.ToTable("ProductDiscoveryCandidates");
                 });
 
             modelBuilder.Entity("TechTicker.Domain.Entities.ProductSellerMapping", b =>
@@ -680,6 +814,82 @@ namespace TechTicker.DataAccess.Migrations
                     b.ToTable("ScraperSiteConfigurations");
                 });
 
+            modelBuilder.Entity("TechTicker.Domain.Entities.SiteConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("ConfidenceScore")
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DescriptionSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Domain")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ImageSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastTestResult")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTime?>("LastTestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ManufacturerSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("ModelNumberSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PriceSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("ProductNameSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("SiteName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("SpecificationSelectors")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("TestHtml")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("UpdatedByUserId");
+
+                    b.ToTable("SiteConfigurations");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -750,6 +960,25 @@ namespace TechTicker.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TechTicker.Domain.Entities.DiscoveryApprovalWorkflow", b =>
+                {
+                    b.HasOne("TechTicker.Domain.Entities.ProductDiscoveryCandidate", "Candidate")
+                        .WithMany("ApprovalWorkflows")
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TechTicker.Domain.Entities.ApplicationUser", "Reviewer")
+                        .WithMany()
+                        .HasForeignKey("ReviewerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("Reviewer");
+                });
+
             modelBuilder.Entity("TechTicker.Domain.Entities.PriceHistory", b =>
                 {
                     b.HasOne("TechTicker.Domain.Entities.Product", "Product")
@@ -778,6 +1007,30 @@ namespace TechTicker.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("TechTicker.Domain.Entities.ProductDiscoveryCandidate", b =>
+                {
+                    b.HasOne("TechTicker.Domain.Entities.ApplicationUser", "DiscoveredByUser")
+                        .WithMany()
+                        .HasForeignKey("DiscoveredByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TechTicker.Domain.Entities.Product", "SimilarProduct")
+                        .WithMany()
+                        .HasForeignKey("SimilarProductId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TechTicker.Domain.Entities.Category", "SuggestedCategory")
+                        .WithMany()
+                        .HasForeignKey("SuggestedCategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("DiscoveredByUser");
+
+                    b.Navigation("SimilarProduct");
+
+                    b.Navigation("SuggestedCategory");
                 });
 
             modelBuilder.Entity("TechTicker.Domain.Entities.ProductSellerMapping", b =>
@@ -816,6 +1069,21 @@ namespace TechTicker.DataAccess.Migrations
                     b.Navigation("ParentRun");
                 });
 
+            modelBuilder.Entity("TechTicker.Domain.Entities.SiteConfiguration", b =>
+                {
+                    b.HasOne("TechTicker.Domain.Entities.ApplicationUser", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId");
+
+                    b.HasOne("TechTicker.Domain.Entities.ApplicationUser", "UpdatedByUser")
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId");
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UpdatedByUser");
+                });
+
             modelBuilder.Entity("TechTicker.Domain.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("AlertRules");
@@ -831,6 +1099,11 @@ namespace TechTicker.DataAccess.Migrations
                     b.Navigation("AlertRules");
 
                     b.Navigation("ProductSellerMappings");
+                });
+
+            modelBuilder.Entity("TechTicker.Domain.Entities.ProductDiscoveryCandidate", b =>
+                {
+                    b.Navigation("ApprovalWorkflows");
                 });
 
             modelBuilder.Entity("TechTicker.Domain.Entities.ProductSellerMapping", b =>

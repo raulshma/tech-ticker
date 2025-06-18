@@ -9,8 +9,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "generate-api": "nswag run nswag.json",
-    "prebuild": "npm run generate-api"
+    "generate-api": "nswag run nswag.json"
   },
   "private": true,
   "dependencies": {

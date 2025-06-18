@@ -18,6 +18,8 @@ public class UnitOfWork : IUnitOfWork
     private IPriceHistoryRepository? _priceHistory;
     private IAlertRuleRepository? _alertRules;
     private IScraperRunLogRepository? _scraperRunLogs;
+    private IProductDiscoveryCandidateRepository? _productDiscoveryCandidates;
+    private IDiscoveryApprovalWorkflowRepository? _discoveryApprovalWorkflows;
 
     public UnitOfWork(TechTickerDbContext context)
     {
@@ -44,6 +46,12 @@ public class UnitOfWork : IUnitOfWork
 
     public IScraperRunLogRepository ScraperRunLogs =>
         _scraperRunLogs ??= new ScraperRunLogRepository(_context);
+
+    public IProductDiscoveryCandidateRepository ProductDiscoveryCandidates =>
+        _productDiscoveryCandidates ??= new ProductDiscoveryCandidateRepository(_context);
+
+    public IDiscoveryApprovalWorkflowRepository DiscoveryApprovalWorkflows =>
+        _discoveryApprovalWorkflows ??= new DiscoveryApprovalWorkflowRepository(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

@@ -12,6 +12,7 @@ public class MessagingConfiguration
     public string ScrapingExchange { get; set; } = "techticker.scraping";
     public string AlertsExchange { get; set; } = "techticker.alerts";
     public string PriceDataExchange { get; set; } = "techticker.pricedata";
+    public string ProductDiscoveryExchange { get; set; } = "techticker.productdiscovery";
 
     // Queue names
     public string ScrapeCommandQueue { get; set; } = "scrape.commands";
@@ -19,6 +20,7 @@ public class MessagingConfiguration
     public string RawPriceDataQueue { get; set; } = "pricedata.raw";
     public string PricePointRecordedQueue { get; set; } = "pricedata.recorded";
     public string AlertTriggeredQueue { get; set; } = "alerts.triggered";
+    public string ProductDiscoveryEventQueue { get; set; } = "productdiscovery.events";
 
     // Routing keys
     public string ScrapeCommandRoutingKey { get; set; } = "scrape.command";
@@ -26,4 +28,5 @@ public class MessagingConfiguration
     public string RawPriceDataRoutingKey { get; set; } = "pricedata.raw";
     public string PricePointRecordedRoutingKey { get; set; } = "pricedata.recorded";
     public string AlertTriggeredRoutingKey { get; set; } = "alert.triggered";
+    public string ProductDiscoveryEventRoutingKey { get; set; } = "productdiscovery.event";
 }

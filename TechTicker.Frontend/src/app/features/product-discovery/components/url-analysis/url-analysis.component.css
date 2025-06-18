@@ -1,0 +1,169 @@
+.url-analysis-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.analysis-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.analysis-header h2 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.analysis-header p {
+  color: #6c757d;
+  font-size: 1.1rem;
+}
+
+.analysis-form {
+  background: #f8f9fa;
+  padding: 30px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.input-group {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-control {
+  border: 1px solid #ced4da;
+  padding: 12px 15px;
+  font-size: 1rem;
+}
+
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.btn {
+  padding: 12px 20px;
+  font-weight: 500;
+}
+
+.form-actions {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.results-container {
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.results-header {
+  background: #007bff;
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.results-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.results-summary .badge {
+  font-size: 0.9rem;
+  padding: 6px 12px;
+}
+
+.candidate-card {
+  border-bottom: 1px solid #dee2e6;
+  padding: 25px;
+}
+
+.candidate-card:last-child {
+  border-bottom: none;
+}
+
+.candidate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.candidate-header h4 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.3rem;
+}
+
+.badge-warning { background-color: #ffc107; color: #212529; }
+.badge-info { background-color: #17a2b8; }
+.badge-success { background-color: #28a745; }
+.badge-danger { background-color: #dc3545; }
+.badge-secondary { background-color: #6c757d; }
+.badge-light { background-color: #f8f9fa; color: #495057; }
+
+.detail-group {
+  margin-bottom: 15px;
+}
+
+.detail-group label {
+  font-weight: 600;
+  color: #495057;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.source-link {
+  color: #007bff;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.source-link:hover {
+  text-decoration: underline;
+}
+
+.price {
+  font-weight: 600;
+  color: #28a745;
+  font-size: 1.1rem;
+}
+
+.confidence-score,
+.similarity-score {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.description {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.product-image {
+  margin-top: 10px;
+}
+
+.candidate-actions {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #dee2e6;
+  text-align: right;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}

@@ -68,6 +68,20 @@ builder.Services.Configure<MessagingConfiguration>(
 
 // Add repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Register individual repositories for direct injection
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductSellerMappingRepository, ProductSellerMappingRepository>();
+builder.Services.AddScoped<IScraperSiteConfigurationRepository, ScraperSiteConfigurationRepository>();
+builder.Services.AddScoped<IPriceHistoryRepository, PriceHistoryRepository>();
+builder.Services.AddScoped<IAlertRuleRepository, AlertRuleRepository>();
+builder.Services.AddScoped<IScraperRunLogRepository, ScraperRunLogRepository>();
+builder.Services.AddScoped<IProductDiscoveryCandidateRepository, ProductDiscoveryCandidateRepository>();
+builder.Services.AddScoped<IDiscoveryApprovalWorkflowRepository, DiscoveryApprovalWorkflowRepository>();
+builder.Services.AddScoped<ISiteConfigurationRepository, SiteConfigurationRepository>();
+
+// Register application services
 builder.Services.AddScoped<IMappingService, MappingService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -79,6 +93,30 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
 builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
+
+// Configure Product Discovery options with validation
+builder.Services.Configure<ProductDiscoveryOptions>(
+    builder.Configuration.GetSection(ProductDiscoveryOptions.SectionName));
+builder.Services.AddOptions<ProductDiscoveryOptions>()
+    .Bind(builder.Configuration.GetSection(ProductDiscoveryOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+// Add Product Discovery services
+builder.Services.AddScoped<IProductDiscoveryService, ProductDiscoveryService>();
+builder.Services.AddScoped<IUrlAnalysisService, UrlAnalysisService>();
+builder.Services.AddScoped<ICategoryPredictionService, CategoryPredictionService>();
+builder.Services.AddScoped<IProductSimilarityService, ProductSimilarityService>();
+builder.Services.AddScoped<IDiscoveryWorkflowService, DiscoveryWorkflowService>();
+builder.Services.AddScoped<ISiteConfigurationService, SiteConfigurationService>();
+builder.Services.AddScoped<IAISelectorGenerationService, AISelectorGenerationService>();
+
+// Add HttpClient for AI service
+builder.Services.AddHttpClient<AISelectorGenerationService>();
+
+// Add Google AI health check
+builder.Services.AddHealthChecks()
+    .AddCheck<GoogleAIHealthCheckService>("google-ai", tags: new[] { "ai", "external" });
 
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
@@ -147,6 +185,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Map health checks
+app.MapHealthChecks("/health");
+app.MapHealthChecks("/health/google-ai", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ai")
+});
+
 // Initialize database and roles
 await InitializeDatabaseAsync(app);
 
@@ -198,7 +243,6 @@ static async Task HandleDatabaseMigrationAsync(TechTickerDbContext context)
 {
     try
     {
-        await context.Database.EnsureCreatedAsync();
         // Apply pending migrations
         await context.Database.MigrateAsync();
         Console.WriteLine("Database migrations applied successfully.");

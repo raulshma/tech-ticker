@@ -104,6 +104,7 @@ public class RabbitMQPublisher : IMessagePublisher, IDisposable
         _channel.ExchangeDeclare(_config.ScrapingExchange, ExchangeType.Topic, durable: true);
         _channel.ExchangeDeclare(_config.AlertsExchange, ExchangeType.Topic, durable: true);
         _channel.ExchangeDeclare(_config.PriceDataExchange, ExchangeType.Topic, durable: true);
+        _channel.ExchangeDeclare(_config.ProductDiscoveryExchange, ExchangeType.Topic, durable: true);
 
         // Declare queues and bind them
         DeclareQueues();
@@ -128,6 +129,10 @@ public class RabbitMQPublisher : IMessagePublisher, IDisposable
         // Alert queues
         _channel.QueueDeclare(_config.AlertTriggeredQueue, durable: true, exclusive: false, autoDelete: false);
         _channel.QueueBind(_config.AlertTriggeredQueue, _config.AlertsExchange, _config.AlertTriggeredRoutingKey);
+
+        // Product discovery queues
+        _channel.QueueDeclare(_config.ProductDiscoveryEventQueue, durable: true, exclusive: false, autoDelete: false);
+        _channel.QueueBind(_config.ProductDiscoveryEventQueue, _config.ProductDiscoveryExchange, _config.ProductDiscoveryEventRoutingKey);
     }
 
     public void Dispose()
