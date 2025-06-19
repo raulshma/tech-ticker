@@ -12,8 +12,8 @@ using TechTicker.DataAccess;
 namespace TechTicker.DataAccess.Migrations
 {
     [DbContext(typeof(TechTickerDbContext))]
-    [Migration("20250616185252_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250619065617_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

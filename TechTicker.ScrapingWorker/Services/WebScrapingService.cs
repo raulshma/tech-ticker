@@ -1,5 +1,6 @@
 using AngleSharp;
 using AngleSharp.Html.Dom;
+using AngleSharp.Io;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -26,7 +27,9 @@ public partial class WebScrapingService
         _logger = logger;
         _scraperRunLogService = scraperRunLogService;
 
-        var config = Configuration.Default.WithDefaultLoader();
+        var config = Configuration.Default
+            .WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true })
+            .WithJs();
         _browsingContext = BrowsingContext.New(config);
     }
 
@@ -353,7 +356,7 @@ public partial class WebScrapingService
                 return null;
 
             var cleanPrice = priceMatch.Value.Replace(",", "");
-            
+
             if (decimal.TryParse(cleanPrice, NumberStyles.Number, CultureInfo.InvariantCulture, out var price))
             {
                 return price;
@@ -380,13 +383,13 @@ public partial class WebScrapingService
 
             // Normalize stock status
             var lowerStock = stockText.ToLower();
-            
+
             if (lowerStock.Contains("in stock") || lowerStock.Contains("available") || lowerStock.Contains("in-stock"))
                 return "In Stock";
-            
+
             if (lowerStock.Contains("out of stock") || lowerStock.Contains("unavailable") || lowerStock.Contains("sold out"))
                 return "Out of Stock";
-            
+
             if (lowerStock.Contains("limited") || lowerStock.Contains("few left"))
                 return "Limited Stock";
 

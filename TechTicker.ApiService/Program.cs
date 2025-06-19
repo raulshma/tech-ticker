@@ -198,7 +198,6 @@ static async Task HandleDatabaseMigrationAsync(TechTickerDbContext context)
 {
     try
     {
-        await context.Database.EnsureCreatedAsync();
         // Apply pending migrations
         await context.Database.MigrateAsync();
         Console.WriteLine("Database migrations applied successfully.");

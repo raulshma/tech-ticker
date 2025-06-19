@@ -47,7 +47,8 @@ public class Worker : BackgroundService
             // Start periodic orchestration (every 5 minutes)
             var orchestrationTimer = new PeriodicTimer(TimeSpan.FromMinutes(5));
 
-            while (!stoppingToken.IsCancellationRequested)            {
+            while (!stoppingToken.IsCancellationRequested)
+            {
                 try
                 {
                     await orchestrationTimer.WaitForNextTickAsync(stoppingToken);
@@ -75,7 +76,8 @@ public class Worker : BackgroundService
             await _messageConsumer.StopConsumingAsync();
             _logger.LogInformation("TechTicker Scraping Worker stopped");
         }
-    }    private async Task HandleScrapeCommandAsync(ScrapeProductPageCommand command)
+    }
+    private async Task HandleScrapeCommandAsync(ScrapeProductPageCommand command)
     {
         try
         {
