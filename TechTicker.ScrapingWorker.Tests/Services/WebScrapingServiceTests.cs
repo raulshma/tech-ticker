@@ -10,16 +10,18 @@ using TechTicker.Shared.Utilities;
 
 namespace TechTicker.ScrapingWorker.Tests.Services;
 
-public class WebScrapingServiceTests
+public class WebScrapingServiceTests : IDisposable
 {
     private readonly WebScrapingService _webScrapingService;
     private readonly Mock<ILogger<WebScrapingService>> _mockLogger;
     private readonly Mock<IScraperRunLogService> _mockScraperRunLogService;
+    private readonly HttpClient _httpClient;
 
     public WebScrapingServiceTests()
     {
         _mockLogger = new Mock<ILogger<WebScrapingService>>();
         _mockScraperRunLogService = new Mock<IScraperRunLogService>();
+        _httpClient = new HttpClient();
 
         // Setup default mock responses
         _mockScraperRunLogService
@@ -38,7 +40,7 @@ public class WebScrapingServiceTests
             .Setup(x => x.FailRunAsync(It.IsAny<Guid>(), It.IsAny<FailScraperRunDto>()))
             .ReturnsAsync(Result<bool>.Success(true));
 
-        _webScrapingService = new WebScrapingService(_mockLogger.Object, _mockScraperRunLogService.Object);
+        _webScrapingService = new WebScrapingService(_mockLogger.Object, _httpClient, _mockScraperRunLogService.Object);
     }
 
     [Fact]
@@ -317,5 +319,10 @@ public class WebScrapingServiceTests
         // Assert
         result.Should().NotBeNull();
         // Should handle null headers gracefully
+    }
+
+    public void Dispose()
+    {
+        _httpClient?.Dispose();
     }
 }

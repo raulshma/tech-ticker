@@ -32,7 +32,7 @@ A message broker (RabbitMQ) is used for asynchronous communication between the A
 *   **Orchestration & Development:** .NET Aspire
 *   **Database:** PostgreSQL with Entity Framework Core (EF Core)
 *   **Message Broker:** RabbitMQ
-*   **Web Scraping:** AngleSharp, HttpClientFactory
+*   **Web Scraping:** HtmlAgilityPack, HttpClientFactory
 *   **Authentication:** JWT (JSON Web Tokens) via ASP.NET Core Identity
 *   **Logging:** Serilog integrated with OpenTelemetry
 *   **Containerization:** Docker (facilitated by .NET Aspire)

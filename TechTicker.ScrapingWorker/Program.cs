@@ -32,6 +32,12 @@ builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
 builder.Services.AddSingleton<IMessageConsumer, RabbitMQConsumer>();
 
+// Add HTTP client for web scraping
+builder.Services.AddHttpClient<WebScrapingService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
 // Add scraping services
 builder.Services.AddScoped<WebScrapingService>();
 builder.Services.AddScoped<PriceDataProcessingService>();

@@ -116,7 +116,7 @@ While the backend is a monolith, logical separation of concerns is maintained by
 *   **Orchestration & Development:** **.NET Aspire**.
 *   **Database:** PostgreSQL. Use **Npgsql** as the ADO.NET provider. Use **Entity Framework Core (EF Core)** as the ORM.
 *   **Message Broker:** RabbitMQ. Use the **RabbitMQ.Client** .NET library.
-*   **Web Scraping Library:** **AngleSharp** for HTML parsing. `HttpClientFactory` for making HTTP requests.
+*   **Web Scraping Library:** **HtmlAgilityPack** for HTML parsing. `HttpClientFactory` for making HTTP requests.
 *   **Authentication:** JWT (JSON Web Tokens). Use **ASP.NET Core Identity** for user management and **`Microsoft.AspNetCore.Authentication.JwtBearer`** for JWT validation.
 *   **Containerization:** Docker. .NET Aspire will assist in generating Dockerfiles.
 *   **Logging:** **Serilog** integrated with .NET Aspire's OpenTelemetry support. Configure Serilog to write to console (for Aspire Dashboard) and potentially a file or a structured logging sink in production.
@@ -347,8 +347,8 @@ While the backend is a monolith, logical separation of concerns is maintained by
     2.  Create `HttpClient` using `IHttpClientFactory`. Configure it: Set `User-Agent` header from `command.ScrapingProfile.UserAgent`. Add other headers from `command.ScrapingProfile.Headers`. Configure `CookieContainer` (`HttpClientHandler.UseCookies = true`). Set timeout (e.g., 30 seconds, configurable: `Scraper:HttpRequestTimeoutSeconds`).
     3.  Perform HTTP GET request to `command.ExactProductUrl`.
     4.  Handle HTTP response: If not success (2xx), log error, publish `ScrapingResultEvent` with `WasSuccessful = false`, `ErrorCode` (e.g., "HTTP_ERROR_XXX", "TIMEOUT"), `HttpStatusCode`, and return.
-    5.  Parse HTML content using AngleSharp: `IBrowsingContext context = BrowsingContext.New(Configuration.Default.WithDefaultLoader()); IDocument document = await context.OpenAsync(req => req.Content(htmlContent));`
-    6.  Extract data using selectors from `command.Selectors`: `productName = document.QuerySelector(command.Selectors.ProductNameSelector)?.TextContent.Trim(); priceStr = document.QuerySelector(command.Selectors.PriceSelector)?.TextContent.Trim(); stockStr = document.QuerySelector(command.Selectors.StockSelector)?.TextContent.Trim();` Handle cases where selectors don't find elements.
+    5.  Parse HTML content using HtmlAgilityPack: `var document = new HtmlDocument(); document.LoadHtml(htmlContent);`
+    6.  Extract data using selectors from `command.Selectors`: `productName = document.DocumentNode.SelectSingleNode(command.Selectors.ProductNameSelector)?.InnerText.Trim(); priceStr = document.DocumentNode.SelectSingleNode(command.Selectors.PriceSelector)?.InnerText.Trim(); stockStr = document.DocumentNode.SelectSingleNode(command.Selectors.StockSelector)?.InnerText.Trim();` Handle cases where selectors don't find elements.
     7.  Attempt to parse price: Remove currency symbols, thousands separators. `Decimal.TryParse(cleanedPriceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price);`
     8.  Publish `RawPriceDataEvent` (see Section 4) if price is successfully parsed. Include `ScrapedProductName`.
     9.  Publish `ScrapingResultEvent` (see Section 4) with `WasSuccessful = true` (if core data like price was extracted) or `false` with `ErrorCode` (e.g., "PARSING_ERROR_PRICE") if critical data is missing.
@@ -985,7 +985,7 @@ The Angular application will be structured into modules for better organization 
     *   Initial `TechTicker.ServiceDefaults` (logging, health checks).
 2.  **Phase 2: Backend Scraping Core (Sprint 3-4):**
     *   Product Mapping & Site Configuration: Models, Repositories, APIs.
-    *   `TechTicker.ScrapingWorker`: `ScrapingOrchestrationModule`, `ScraperModule` (basic HTTP/AngleSharp scraping).
+    *   `TechTicker.ScrapingWorker`: `ScrapingOrchestrationModule`, `ScraperModule` (basic HTTP/HtmlAgilityPack scraping).
     *   RabbitMQ setup within Aspire, define initial messages (`ScrapeProductPageCommand`, `ScrapingResultEvent`).
     *   `PriceNormalizationIngestionModule` and `PriceHistoryModule` (models, consumers, basic API for history).
 3.  **Phase 3: Angular Frontend - Foundation & Core Admin (Sprint 5-7):**

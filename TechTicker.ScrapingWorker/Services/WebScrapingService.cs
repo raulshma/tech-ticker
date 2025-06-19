@@ -1,6 +1,4 @@
-using AngleSharp;
-using AngleSharp.Html.Dom;
-using AngleSharp.Io;
+using HtmlAgilityPack;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -16,21 +14,17 @@ namespace TechTicker.ScrapingWorker.Services;
 public partial class WebScrapingService
 {
     private readonly ILogger<WebScrapingService> _logger;
-    private readonly IBrowsingContext _browsingContext;
+    private readonly HttpClient _httpClient;
     private readonly IScraperRunLogService _scraperRunLogService;
 
     [GeneratedRegex(@"[\d,]+\.?\d*")]
     private static partial Regex PriceRegex();
 
-    public WebScrapingService(ILogger<WebScrapingService> logger, IScraperRunLogService scraperRunLogService)
+    public WebScrapingService(ILogger<WebScrapingService> logger, HttpClient httpClient, IScraperRunLogService scraperRunLogService)
     {
         _logger = logger;
+        _httpClient = httpClient;
         _scraperRunLogService = scraperRunLogService;
-
-        var config = Configuration.Default
-            .WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true })
-            .WithJs();
-        _browsingContext = BrowsingContext.New(config);
     }
 
     public async Task<ScrapingResult> ScrapeProductPageAsync(ScrapeProductPageCommand command)
@@ -67,42 +61,39 @@ public partial class WebScrapingService
                 runId = createResult.Data;
             }
 
-            // Configure request with comprehensive headers
-            var requestOptions = new Dictionary<string, string>
-            {
-                ["User-Agent"] = command.ScrapingProfile.UserAgent,
-                ["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-                ["Accept-Language"] = "en-US,en;q=0.9",
-                ["Accept-Encoding"] = "gzip, deflate, br",
-                ["Cache-Control"] = "no-cache",
-                ["Pragma"] = "no-cache",
-                ["Sec-Fetch-Dest"] = "document",
-                ["Sec-Fetch-Mode"] = "navigate",
-                ["Sec-Fetch-Site"] = "none",
-                ["Sec-Fetch-User"] = "?1",
-                ["Upgrade-Insecure-Requests"] = "1"
-            };
+            // Configure HTTP request with comprehensive headers
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", command.ScrapingProfile.UserAgent);
+            _httpClient.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
+            _httpClient.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9");
+            _httpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
+            _httpClient.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+            _httpClient.DefaultRequestHeaders.Add("Pragma", "no-cache");
+            _httpClient.DefaultRequestHeaders.Add("Sec-Fetch-Dest", "document");
+            _httpClient.DefaultRequestHeaders.Add("Sec-Fetch-Mode", "navigate");
+            _httpClient.DefaultRequestHeaders.Add("Sec-Fetch-Site", "none");
+            _httpClient.DefaultRequestHeaders.Add("Sec-Fetch-User", "?1");
+            _httpClient.DefaultRequestHeaders.Add("Upgrade-Insecure-Requests", "1");
 
             // Add custom headers from profile (these can override defaults)
             if (command.ScrapingProfile.Headers != null)
             {
                 foreach (var header in command.ScrapingProfile.Headers)
                 {
-                    requestOptions[header.Key] = header.Value;
+                    _httpClient.DefaultRequestHeaders.Remove(header.Key);
+                    _httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
                 }
             }
 
             // Load the page with timing
             var pageLoadStopwatch = Stopwatch.StartNew();
-            var document = await _browsingContext.OpenAsync(req =>
-            {
-                req.Address(command.ExactProductUrl);
-                foreach (var header in requestOptions)
-                {
-                    req.Header(header.Key, header.Value);
-                }
-            });
+            var response = await _httpClient.GetAsync(command.ExactProductUrl);
+            var htmlContent = await response.Content.ReadAsStringAsync();
             pageLoadStopwatch.Stop();
+
+            // Parse HTML with HtmlAgilityPack
+            var document = new HtmlDocument();
+            document.LoadHtml(htmlContent);
 
             // Update log with page load timing
             if (runId.HasValue)
@@ -110,21 +101,22 @@ public partial class WebScrapingService
                 await _scraperRunLogService.UpdateRunLogAsync(runId.Value, new UpdateScraperRunLogDto
                 {
                     PageLoadTime = pageLoadStopwatch.Elapsed,
-                    DebugNotes = $"Page loaded in {pageLoadStopwatch.ElapsedMilliseconds}ms"
+                    DebugNotes = $"Page loaded in {pageLoadStopwatch.ElapsedMilliseconds}ms. Status: {response.StatusCode}"
                 });
             }
 
-            if (document == null)
+            // Check if HTTP request was successful
+            if (!response.IsSuccessStatusCode)
             {
-                var errorMessage = "Failed to load the page";
+                var errorMessage = $"HTTP request failed with status {response.StatusCode}";
                 if (runId.HasValue)
                 {
                     await _scraperRunLogService.FailRunAsync(runId.Value, new FailScraperRunDto
                     {
                         ErrorMessage = errorMessage,
-                        ErrorCode = "PAGE_LOAD_FAILED",
+                        ErrorCode = "HTTP_ERROR",
                         ErrorCategory = "NETWORK",
-                        DebugNotes = "Document was null after page load attempt"
+                        DebugNotes = $"HTTP status code: {response.StatusCode}, Reason: {response.ReasonPhrase}"
                     });
                 }
 
@@ -132,22 +124,22 @@ public partial class WebScrapingService
                 {
                     IsSuccess = false,
                     ErrorMessage = errorMessage,
-                    ErrorCode = "PAGE_LOAD_FAILED"
+                    ErrorCode = "HTTP_ERROR"
                 };
             }
 
-            // Extract product data with timing
-            if (document is not IHtmlDocument htmlDocument)
+            // Check if we got valid HTML content
+            if (string.IsNullOrWhiteSpace(htmlContent))
             {
-                var errorMessage = "Failed to cast document to HTML document";
+                var errorMessage = "Received empty or null HTML content";
                 if (runId.HasValue)
                 {
                     await _scraperRunLogService.FailRunAsync(runId.Value, new FailScraperRunDto
                     {
                         ErrorMessage = errorMessage,
-                        ErrorCode = "DOCUMENT_CAST_FAILED",
+                        ErrorCode = "EMPTY_CONTENT",
                         ErrorCategory = "PARSING",
-                        DebugNotes = "Document could not be cast to IHtmlDocument"
+                        DebugNotes = "HTML content was null or whitespace"
                     });
                 }
 
@@ -155,23 +147,22 @@ public partial class WebScrapingService
                 {
                     IsSuccess = false,
                     ErrorMessage = errorMessage,
-                    ErrorCode = "DOCUMENT_CAST_FAILED"
+                    ErrorCode = "EMPTY_CONTENT"
                 };
             }
 
             var parsingStopwatch = Stopwatch.StartNew();
-            var productName = ExtractProductName(htmlDocument, command.Selectors.ProductNameSelector);
-            var price = ExtractPrice(htmlDocument, command.Selectors.PriceSelector);
-            var stockStatus = ExtractStockStatus(htmlDocument, command.Selectors.StockSelector);
-            var sellerNameOnPage = ExtractSellerName(htmlDocument, command.Selectors.SellerNameOnPageSelector);
+            var productName = ExtractProductName(document, command.Selectors.ProductNameSelector);
+            var price = ExtractPrice(document, command.Selectors.PriceSelector);
+            var stockStatus = ExtractStockStatus(document, command.Selectors.StockSelector);
+            var sellerNameOnPage = ExtractSellerName(document, command.Selectors.SellerNameOnPageSelector);
             parsingStopwatch.Stop();
 
             // Get HTML snippet for debugging (first 1000 characters)
-            var outerHtml = htmlDocument.DocumentElement?.OuterHtml;
-            var htmlSnippet = outerHtml?[..Math.Min(1000, outerHtml.Length)];
+            var htmlSnippet = htmlContent.Length > 1000 ? htmlContent[..1000] : htmlContent;
 
             // Check if we got a minimal/empty HTML response (likely JavaScript-rendered content)
-            var isMinimalHtml = IsMinimalHtmlResponse(htmlDocument);
+            var isMinimalHtml = IsMinimalHtmlResponse(document);
 
             if (price == null)
             {
@@ -276,12 +267,12 @@ public partial class WebScrapingService
         };
     }
 
-    private string? ExtractProductName(IHtmlDocument document, string selector)
+    private string? ExtractProductName(HtmlDocument document, string selector)
     {
         try
         {
-            var element = document.QuerySelector(selector);
-            return element?.TextContent?.Trim();
+            var element = document.DocumentNode.SelectSingleNode(selector);
+            return element?.InnerText?.Trim();
         }
         catch (Exception ex)
         {
@@ -293,15 +284,16 @@ public partial class WebScrapingService
     /// <summary>
     /// Detects if the HTML response is minimal/empty, indicating JavaScript-rendered content
     /// </summary>
-    private bool IsMinimalHtmlResponse(IHtmlDocument document)
+    private bool IsMinimalHtmlResponse(HtmlDocument document)
     {
         try
         {
-            var html = document.DocumentElement?.OuterHtml ?? "";
+            var html = document.DocumentNode.OuterHtml ?? "";
 
             // Check for common patterns of minimal HTML responses
-            var bodyContent = document.Body?.TextContent?.Trim() ?? "";
-            var bodyInnerHtml = document.Body?.InnerHtml?.Trim() ?? "";
+            var bodyNode = document.DocumentNode.SelectSingleNode("//body");
+            var bodyContent = bodyNode?.InnerText?.Trim() ?? "";
+            var bodyInnerHtml = bodyNode?.InnerHtml?.Trim() ?? "";
 
             // Indicators of minimal/empty content:
             // 1. Very short HTML (less than 200 characters)
@@ -338,15 +330,15 @@ public partial class WebScrapingService
         }
     }
 
-    private decimal? ExtractPrice(IHtmlDocument document, string selector)
+    private decimal? ExtractPrice(HtmlDocument document, string selector)
     {
         try
         {
-            var element = document.QuerySelector(selector);
+            var element = document.DocumentNode.SelectSingleNode(selector);
             if (element == null)
                 return null;
 
-            var priceText = element.TextContent?.Trim();
+            var priceText = element.InnerText?.Trim();
             if (string.IsNullOrEmpty(priceText))
                 return null;
 
@@ -371,12 +363,12 @@ public partial class WebScrapingService
         }
     }
 
-    private string? ExtractStockStatus(IHtmlDocument document, string selector)
+    private string? ExtractStockStatus(HtmlDocument document, string selector)
     {
         try
         {
-            var element = document.QuerySelector(selector);
-            var stockText = element?.TextContent?.Trim();
+            var element = document.DocumentNode.SelectSingleNode(selector);
+            var stockText = element?.InnerText?.Trim();
 
             if (string.IsNullOrEmpty(stockText))
                 return "Unknown";
@@ -402,15 +394,15 @@ public partial class WebScrapingService
         }
     }
 
-    private string? ExtractSellerName(IHtmlDocument document, string? selector)
+    private string? ExtractSellerName(HtmlDocument document, string? selector)
     {
         if (string.IsNullOrEmpty(selector))
             return null;
 
         try
         {
-            var element = document.QuerySelector(selector);
-            return element?.TextContent?.Trim();
+            var element = document.DocumentNode.SelectSingleNode(selector);
+            return element?.InnerText?.Trim();
         }
         catch (Exception ex)
         {
