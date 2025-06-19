@@ -330,4 +330,32 @@ public class ScrapingOrchestrationServiceTests
         mapping.LastScrapeErrorCode.Should().Be("");
         _mockUnitOfWork.Verify(x => x.SaveChangesAsync(default), Times.Once);
     }
+
+    [Fact]
+    public async Task ProcessScrapingResultAsync_WithLongErrorMessage_ShouldTruncateToFiftyCharacters()
+    {
+        // Arrange
+        var mappingId = Guid.NewGuid();
+        var mapping = new ProductSellerMapping
+        {
+            MappingId = mappingId,
+            CanonicalProductId = Guid.NewGuid(),
+            SellerName = "Amazon",
+            ConsecutiveFailureCount = 0
+        };
+
+        _mockUnitOfWork.Setup(x => x.ProductSellerMappings.GetByIdAsync(mappingId))
+            .ReturnsAsync(mapping);
+
+        var longErrorMessage = "This is a very long error message that exceeds the fifty character limit for the LastScrapeErrorCode field in the database";
+
+        // Act
+        await _orchestrationService.ProcessScrapingResultAsync(mappingId, wasSuccessful: false, longErrorMessage);
+
+        // Assert
+        mapping.LastScrapeStatus.Should().Be("FAILED");
+        mapping.LastScrapeErrorCode.Should().Be("This is a very long error message that exceeds the");
+        mapping.LastScrapeErrorCode.Should().HaveLength(50);
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(default), Times.Once);
+    }
 }

@@ -105,7 +105,7 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
             else
             {
                 mapping.LastScrapeStatus = "FAILED";
-                mapping.LastScrapeErrorCode = errorMessage;
+                mapping.LastScrapeErrorCode = errorMessage?.Length > 50 ? errorMessage.Substring(0, 50) : errorMessage;
                 mapping.ConsecutiveFailureCount++;
 
                 // Disable mapping if too many consecutive failures
