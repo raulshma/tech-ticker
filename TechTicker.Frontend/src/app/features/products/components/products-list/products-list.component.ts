@@ -55,7 +55,6 @@ export class ProductsListComponent implements OnInit {
     // Search filter with debounce
     this.searchControl.valueChanges
       .pipe(
-        startWith(''),
         debounceTime(300),
         distinctUntilChanged()
       )
@@ -66,7 +65,6 @@ export class ProductsListComponent implements OnInit {
 
     // Category filter
     this.categoryControl.valueChanges
-      .pipe(startWith(''))
       .subscribe(() => {
         this.currentPage = 0;
         this.loadProducts();

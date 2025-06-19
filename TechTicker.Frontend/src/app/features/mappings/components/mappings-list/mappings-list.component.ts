@@ -56,7 +56,6 @@ export class MappingsListComponent implements OnInit {
     // Product filter
     this.productControl.valueChanges
       .pipe(
-        startWith(''),
         debounceTime(300),
         distinctUntilChanged()
       )
