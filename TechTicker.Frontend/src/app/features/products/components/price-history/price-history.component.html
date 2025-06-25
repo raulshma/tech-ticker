@@ -1,0 +1,173 @@
+<div class="price-history-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="title-section">
+        <h1>Price History</h1>
+        <h2 *ngIf="product">{{ product.name }}</h2>
+        <p *ngIf="product" class="product-details">
+          {{ product.manufacturer }} - {{ product.modelNumber }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-header>
+      <mat-card-title>Filters</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Seller</mat-label>
+          <mat-select [formControl]="sellerControl">
+            <mat-option value="">All Sellers</mat-option>
+            <mat-option *ngFor="let seller of availableSellers" [value]="seller">
+              {{ seller }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Start Date</mat-label>
+          <input matInput [formControl]="startDateControl" type="date">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>End Date</mat-label>
+          <input matInput [formControl]="endDateControl" type="date">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Limit</mat-label>
+          <mat-select [formControl]="limitControl">
+            <mat-option [value]="50">50</mat-option>
+            <mat-option [value]="100">100</mat-option>
+            <mat-option [value]="200">200</mat-option>
+            <mat-option [value]="500">500</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-raised-button color="accent" (click)="clearFilters()">
+          Clear Filters
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- View Toggle -->
+  <div class="view-toggle">
+    <mat-button-toggle-group [value]="currentView" (change)="switchView($event.value)">
+      <mat-button-toggle value="chart">
+        <mat-icon>show_chart</mat-icon>
+        Chart View
+      </mat-button-toggle>
+      <mat-button-toggle value="table">
+        <mat-icon>table_view</mat-icon>
+        Table View
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading price history...</p>
+  </div>
+
+  <!-- Chart View -->
+  <mat-card *ngIf="currentView === 'chart' && !isLoading" class="chart-card">
+    <mat-card-header>
+      <mat-card-title>Price Trends</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="chart-container" *ngIf="priceHistory.length > 0">
+        <canvas baseChart
+                [data]="lineChartData"
+                [options]="lineChartOptions"
+                [type]="lineChartType">
+        </canvas>
+      </div>
+      <div *ngIf="priceHistory.length === 0" class="no-data">
+        <mat-icon>trending_up</mat-icon>
+        <p>No price history data available for the selected filters.</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Table View -->
+  <mat-card *ngIf="currentView === 'table' && !isLoading" class="table-card">
+    <mat-card-header>
+      <mat-card-title>Price History Data</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="priceHistory.length > 0">
+        <table mat-table [dataSource]="dataSource" matSort class="price-history-table">
+          <!-- Timestamp Column -->
+          <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date & Time</th>
+            <td mat-cell *matCellDef="let element">
+              {{ formatDate(element.timestamp) }}
+            </td>
+          </ng-container>
+
+          <!-- Price Column -->
+          <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+            <td mat-cell *matCellDef="let element" class="price-cell">
+              {{ formatPrice(element.price) }}
+            </td>
+          </ng-container>
+
+          <!-- Stock Status Column -->
+          <ng-container matColumnDef="stockStatus">
+            <th mat-header-cell *matHeaderCellDef>Stock Status</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip [class]="'status-' + element.stockStatus?.toLowerCase()">
+                {{ element.stockStatus }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Seller Column -->
+          <ng-container matColumnDef="seller">
+            <th mat-header-cell *matHeaderCellDef>Seller</th>
+            <td mat-cell *matCellDef="let element">
+              {{ getSellerName(element.sourceUrl) }}
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button 
+                      (click)="openSourceUrl(element.sourceUrl)"
+                      matTooltip="View Source"
+                      *ngIf="element.sourceUrl">
+                <mat-icon>open_in_new</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]"
+                       showFirstLastButtons
+                       aria-label="Select page of price history">
+        </mat-paginator>
+      </div>
+
+      <div *ngIf="priceHistory.length === 0" class="no-data">
+        <mat-icon>table_view</mat-icon>
+        <p>No price history data available for the selected filters.</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

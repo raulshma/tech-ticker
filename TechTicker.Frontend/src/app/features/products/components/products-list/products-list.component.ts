@@ -121,6 +121,10 @@ export class ProductsListComponent implements OnInit {
     this.router.navigate(['/products/new']);
   }
 
+  viewPriceHistory(product: ProductDto): void {
+    this.router.navigate(['/products', product.productId, 'price-history']);
+  }
+
   editProduct(product: ProductDto): void {
     this.router.navigate(['/products/edit', product.productId]);
   }

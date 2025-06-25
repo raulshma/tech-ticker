@@ -16,17 +16,21 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { BaseChartDirective } from 'ng2-charts';
 
 import { ProductsRoutingModule } from './products-routing.module';
 import { ProductsListComponent } from './components/products-list/products-list.component';
 import { ProductFormComponent } from './components/product-form/product-form.component';
 import { ProductDeleteDialogComponent } from './components/product-delete-dialog/product-delete-dialog.component';
+import { PriceHistoryComponent } from './components/price-history/price-history.component';
 
 @NgModule({
   declarations: [
     ProductsListComponent,
     ProductFormComponent,
-    ProductDeleteDialogComponent
+    ProductDeleteDialogComponent,
+    PriceHistoryComponent
   ],
   imports: [
     CommonModule,
@@ -46,7 +50,9 @@ import { ProductDeleteDialogComponent } from './components/product-delete-dialog
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatChipsModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatButtonToggleModule,
+    BaseChartDirective
   ]
 })
 export class ProductsModule { }

@@ -58,21 +58,22 @@ export class ProductsService {
     );
   }
 
-  getProduct(id: string): Observable<ProductDto> {
-    return this.apiClient.productsGET2(id)
-      .pipe(
-        map((response: ProductDtoApiResponse) => {
-          if (!response.success || !response.data) {
-            throw new Error(response.message || 'Failed to fetch product');
-          }
-          return response.data;
-        }),
-        catchError(error => {
-          console.error('Error fetching product:', error);
-          return throwError(() => error);
-        })
-      );
+  getProduct(productId: string): Observable<ProductDto> {
+    return this.apiClient.productsGET2(productId).pipe(
+      map((response: ProductDtoApiResponse) => {
+        if (!response.success || !response.data) {
+          throw new Error(response.message || 'Failed to fetch product');
+        }
+        return response.data;
+      }),
+      catchError(error => {
+        console.error('Error fetching product:', error);
+        return throwError(() => error);
+      })
+    );
   }
+
+
 
   createProduct(product: CreateProductDto): Observable<ProductDto> {
     return this.apiClient.productsPOST(product)
