@@ -111,6 +111,7 @@ public class Worker : BackgroundService
             {
                 var rawPriceData = new RawPriceDataEvent
                 {
+                    MappingId = command.MappingId,
                     CanonicalProductId = command.CanonicalProductId,
                     SellerName = command.SellerName,
                     ScrapedPrice = scrapingResult.Price,

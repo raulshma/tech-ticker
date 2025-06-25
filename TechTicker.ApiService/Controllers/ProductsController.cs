@@ -12,18 +12,12 @@ namespace TechTicker.ApiService.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-public class ProductsController : BaseApiController
+public class ProductsController(
+    IProductService productService,
+    IPriceHistoryService priceHistoryService) : BaseApiController
 {
-    private readonly IProductService _productService;
-    private readonly IPriceHistoryService _priceHistoryService;
-
-    public ProductsController(
-        IProductService productService,
-        IPriceHistoryService priceHistoryService)
-    {
-        _productService = productService;
-        _priceHistoryService = priceHistoryService;
-    }
+    private readonly IProductService _productService = productService;
+    private readonly IPriceHistoryService _priceHistoryService = priceHistoryService;
 
     /// <summary>
     /// Create a new product
@@ -31,7 +25,7 @@ public class ProductsController : BaseApiController
     /// <param name="createDto">Product creation data</param>
     /// <returns>Created product</returns>
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<ActionResult<ApiResponse<ProductDto>>> CreateProduct([FromBody] CreateProductDto createDto)
     {
         var result = await _productService.CreateProductAsync(createDto);
@@ -76,7 +70,7 @@ public class ProductsController : BaseApiController
     /// <param name="updateDto">Product update data</param>
     /// <returns>Updated product</returns>
     [HttpPut("{productId:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<ActionResult<ApiResponse<ProductDto>>> UpdateProduct(Guid productId, [FromBody] UpdateProductDto updateDto)
     {
         var result = await _productService.UpdateProductAsync(productId, updateDto);

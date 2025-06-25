@@ -14,7 +14,6 @@ import {
 })
 export class AppLayoutComponent implements OnInit, OnDestroy {
   currentUser: CurrentUser | null = null;
-  isAdmin = false;
   private destroy$ = new Subject<void>();
 
   constructor(private authService: AuthService, private router: Router) {}
@@ -24,7 +23,6 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((user) => {
         this.currentUser = user;
-        this.isAdmin = this.authService.isAdmin();
       });
   }
 

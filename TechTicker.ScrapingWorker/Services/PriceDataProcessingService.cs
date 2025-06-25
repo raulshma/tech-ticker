@@ -60,7 +60,7 @@ public class PriceDataProcessingService
                 PriceHistoryId = Guid.NewGuid(),
                 Timestamp = normalizedData.Timestamp,
                 CanonicalProductId = normalizedData.CanonicalProductId,
-                MappingId = GetMappingIdFromUrl(normalizedData.SourceUrl), // This would need to be passed or looked up
+                MappingId = normalizedData.MappingId,
                 SellerName = normalizedData.SellerName,
                 Price = normalizedData.ScrapedPrice,
                 StockStatus = normalizedData.ScrapedStockStatus,
@@ -127,6 +127,7 @@ public class PriceDataProcessingService
 
             return new RawPriceDataEvent
             {
+                MappingId = rawData.MappingId,
                 CanonicalProductId = rawData.CanonicalProductId,
                 SellerName = rawData.SellerName.Trim(),
                 ScrapedPrice = Math.Round(rawData.ScrapedPrice, 2),
@@ -184,11 +185,5 @@ public class PriceDataProcessingService
         }
     }
 
-    private Guid GetMappingIdFromUrl(string sourceUrl)
-    {
-        // This is a simplified implementation
-        // In a real scenario, you'd look up the mapping by URL
-        // For now, return a default GUID - this should be improved
-        return Guid.Empty;
-    }
+
 }

@@ -245,6 +245,7 @@ public class RabbitMQPublisherTests
         // Arrange
         var message = new RawPriceDataEvent
         {
+            MappingId = Guid.NewGuid(),
             CanonicalProductId = Guid.NewGuid(),
             SellerName = "Walmart",
             ScrapedPrice = 199.99m,

@@ -92,6 +92,41 @@ export class AuthService {
     return user?.roles?.includes('Admin') ?? false;
   }
 
+  hasRole(role: string): boolean {
+    const user = this.currentUserSubject.value;
+    return user?.roles?.includes(role) ?? false;
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    const user = this.currentUserSubject.value;
+    if (!user?.roles || roles.length === 0) return false;
+    return roles.some(role => user.roles.includes(role));
+  }
+
+  hasAllRoles(roles: string[]): boolean {
+    const user = this.currentUserSubject.value;
+    if (!user?.roles || roles.length === 0) return false;
+    return roles.every(role => user.roles.includes(role));
+  }
+
+  isUser(): boolean {
+    return this.hasRole('User');
+  }
+
+  isModerator(): boolean {
+    return this.hasRole('Moderator');
+  }
+
+  getCurrentUserRoles(): string[] {
+    const user = this.currentUserSubject.value;
+    return user?.roles ?? [];
+  }
+
+  canAccess(requiredRoles: string[], requireAll: boolean = false): boolean {
+    if (requiredRoles.length === 0) return true;
+    return requireAll ? this.hasAllRoles(requiredRoles) : this.hasAnyRole(requiredRoles);
+  }
+
   private isTokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));

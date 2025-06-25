@@ -76,6 +76,7 @@ builder.Services.AddScoped<IScraperSiteConfigurationService, ScraperSiteConfigur
 builder.Services.AddScoped<IPriceHistoryService, PriceHistoryService>();
 builder.Services.AddScoped<IAlertRuleService, AlertRuleService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleService, TechTicker.Application.Services.RoleService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
 builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
@@ -163,7 +164,7 @@ static async Task InitializeDatabaseAsync(WebApplication app)
     await HandleDatabaseMigrationAsync(context);
 
     // Create roles if they don't exist
-    string[] roles = { "Admin", "User" };
+    string[] roles = { "Admin", "User", "Moderator" };
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
@@ -190,6 +191,48 @@ static async Task InitializeDatabaseAsync(WebApplication app)
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+    }
+
+    // Create default moderator user if it doesn't exist
+    var moderatorEmail = "moderator@techticker.com";
+    var moderatorUser = await userManager.FindByEmailAsync(moderatorEmail);
+    if (moderatorUser == null)
+    {
+        moderatorUser = new ApplicationUser
+        {
+            UserName = moderatorEmail,
+            Email = moderatorEmail,
+            FirstName = "Moderator",
+            LastName = "User",
+            IsActive = true
+        };
+
+        var result = await userManager.CreateAsync(moderatorUser, "Moderator123!");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(moderatorUser, "Moderator");
+        }
+    }
+
+    // Create default regular user if it doesn't exist
+    var userEmail = "user@techticker.com";
+    var regularUser = await userManager.FindByEmailAsync(userEmail);
+    if (regularUser == null)
+    {
+        regularUser = new ApplicationUser
+        {
+            UserName = userEmail,
+            Email = userEmail,
+            FirstName = "Regular",
+            LastName = "User",
+            IsActive = true
+        };
+
+        var result = await userManager.CreateAsync(regularUser, "User123!");
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(regularUser, "User");
         }
     }
 }

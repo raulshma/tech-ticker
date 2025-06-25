@@ -10,6 +10,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 
 import { AppLayoutComponent } from './components/layout/app-layout.component';
+import { RbacModule } from './modules/rbac.module';
 
 @NgModule({
   declarations: [
@@ -24,10 +25,12 @@ import { AppLayoutComponent } from './components/layout/app-layout.component';
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+    RbacModule
   ],
   exports: [
-    AppLayoutComponent
+    AppLayoutComponent,
+    RbacModule
   ]
 })
 export class SharedModule { }

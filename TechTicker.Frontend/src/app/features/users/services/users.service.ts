@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, map, catchError, throwError } from 'rxjs';
-import { 
-  TechTickerApiClient, 
-  UserDto, 
-  CreateUserDto, 
+import {
+  TechTickerApiClient,
+  UserDto,
+  CreateUserDto,
   UpdateUserDto,
   UserDtoApiResponse,
   UserDtoPagedResponse,
@@ -117,6 +117,15 @@ export class UsersService {
 
   // Helper method to get available roles
   getAvailableRoles(): string[] {
-    return ['Admin', 'User', 'Moderator']; // These should ideally come from the API
+    return ['Admin', 'User', 'Moderator'];
+  }
+
+  // Get role display names
+  getRoleDisplayNames(): { [key: string]: string } {
+    return {
+      'Admin': 'Administrator',
+      'User': 'User',
+      'Moderator': 'Moderator'
+    };
   }
 }

@@ -13,8 +13,8 @@
 
       <mat-divider></mat-divider>
 
-      <!-- Admin-only sections -->
-      <ng-container *ngIf="isAdmin">
+      <!-- Admin and Moderator sections -->
+      <ng-container *hasAnyRole="['Admin', 'Moderator']">
         <h3 matSubheader>Product Management</h3>
 
         <a mat-list-item routerLink="/categories" routerLinkActive="active-link">
@@ -26,12 +26,10 @@
           <mat-icon matListItemIcon>inventory</mat-icon>
           <span matListItemTitle>Products</span>
         </a>
+      </ng-container>
 
-        <a mat-list-item routerLink="/mappings" routerLinkActive="active-link">
-          <mat-icon matListItemIcon>link</mat-icon>
-          <span matListItemTitle>Product Mappings</span>
-        </a>
-
+      <!-- Admin-only sections -->
+      <ng-container *hasRole="'Admin'">
         <a mat-list-item routerLink="/site-configs" routerLinkActive="active-link">
           <mat-icon matListItemIcon>settings</mat-icon>
           <span matListItemTitle>Site Configurations</span>
@@ -56,13 +54,36 @@
         </a>
       </ng-container>
 
+      <!-- User, Admin, and Moderator accessible sections -->
+      <ng-container *hasAnyRole="['User', 'Admin', 'Moderator']">
+        <h3 matSubheader>Content Management</h3>
+
+        <a mat-list-item routerLink="/mappings" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>link</mat-icon>
+          <span matListItemTitle>Product Mappings</span>
+        </a>
+      </ng-container>
+
       <mat-divider></mat-divider>
 
-      <h3 matSubheader>Alerts</h3>
+      <!-- User features - accessible to Users and Admins -->
+      <ng-container *hasAnyRole="['User', 'Admin']">
+        <h3 matSubheader>Personal</h3>
 
-      <a mat-list-item routerLink="/alerts" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>notifications</mat-icon>
-        <span matListItemTitle>Alert Rules</span>
+        <a mat-list-item routerLink="/alerts" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>notifications</mat-icon>
+          <span matListItemTitle>Alert Rules</span>
+        </a>
+      </ng-container>
+
+      <mat-divider></mat-divider>
+
+      <!-- Development/Testing -->
+      <h3 matSubheader>Development</h3>
+
+      <a mat-list-item routerLink="/rbac-demo" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>security</mat-icon>
+        <span matListItemTitle>RBAC Demo</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>

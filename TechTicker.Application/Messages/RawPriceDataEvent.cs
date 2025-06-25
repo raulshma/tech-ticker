@@ -5,6 +5,7 @@ namespace TechTicker.Application.Messages;
 /// </summary>
 public class RawPriceDataEvent
 {
+    public Guid MappingId { get; set; }
     public Guid CanonicalProductId { get; set; }
     public string SellerName { get; set; } = null!;
     public decimal ScrapedPrice { get; set; }

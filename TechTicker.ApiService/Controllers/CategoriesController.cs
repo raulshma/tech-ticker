@@ -27,7 +27,7 @@ public class CategoriesController : BaseApiController
     /// <param name="createDto">Category creation data</param>
     /// <returns>Created category</returns>
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<ActionResult<ApiResponse<CategoryDto>>> CreateCategory([FromBody] CreateCategoryDto createDto)
     {
         var result = await _categoryService.CreateCategoryAsync(createDto);
@@ -64,7 +64,7 @@ public class CategoriesController : BaseApiController
     /// <param name="updateDto">Category update data</param>
     /// <returns>Updated category</returns>
     [HttpPut("{categoryId:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Moderator")]
     public async Task<ActionResult<ApiResponse<CategoryDto>>> UpdateCategory(Guid categoryId, [FromBody] UpdateCategoryDto updateDto)
     {
         var result = await _categoryService.UpdateCategoryAsync(categoryId, updateDto);

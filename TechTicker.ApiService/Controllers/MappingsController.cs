@@ -13,7 +13,7 @@ namespace TechTicker.ApiService.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "User,Admin")] // Allow both User and Admin roles
+[Authorize(Roles = "User,Admin,Moderator")] // Allow User, Admin, and Moderator roles
 public class MappingsController : BaseApiController
 {
     private readonly IProductSellerMappingService _mappingService;

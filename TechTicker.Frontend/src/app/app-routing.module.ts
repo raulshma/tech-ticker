@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { AdminGuard } from './shared/guards/admin.guard';
+import { RoleGuard } from './shared/guards/role.guard';
 import { AppLayoutComponent } from './shared/components/layout/app-layout.component';
 
 const routes: Routes = [
@@ -22,17 +23,20 @@ const routes: Routes = [
       {
         path: 'categories',
         loadChildren: () => import('./features/categories/categories.module').then(m => m.CategoriesModule),
-        canActivate: [AdminGuard]
+        canActivate: [RoleGuard],
+        data: { roles: ['Admin', 'Moderator'] }
       },
       {
         path: 'products',
         loadChildren: () => import('./features/products/products.module').then(m => m.ProductsModule),
-        canActivate: [AdminGuard]
+        canActivate: [RoleGuard],
+        data: { roles: ['Admin', 'Moderator'] }
       },
       {
         path: 'mappings',
-        loadChildren: () => import('./features/mappings/mappings.module').then(m => m.MappingsModule)
-        // Removed AdminGuard - now accessible to all authenticated users
+        loadChildren: () => import('./features/mappings/mappings.module').then(m => m.MappingsModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['User', 'Admin', 'Moderator'] } // Accessible to Users, Admins, and Moderators
       },
       {
         path: 'site-configs',
@@ -48,11 +52,18 @@ const routes: Routes = [
         path: 'scraper-logs',
         loadChildren: () => import('./features/scraper-logs/scraper-logs.module').then(m => m.ScraperLogsModule),
         canActivate: [AdminGuard]
+      },
+      {
+        path: 'alerts',
+        loadChildren: () => import('./features/alerts/alerts.module').then(m => m.AlertsModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['User', 'Admin'] } // Accessible to Users and Admins
+      },
+      {
+        path: 'rbac-demo',
+        loadComponent: () => import('./shared/components/rbac-demo/rbac-demo.component').then(c => c.RbacDemoComponent),
+        canActivate: [AuthGuard] // Available to all authenticated users for testing
       }
-      // {
-      //   path: 'alerts',
-      //   loadChildren: () => import('./features/alerts/alerts.module').then(m => m.AlertsModule)
-      // }
     ]
   },
   { path: '**', redirectTo: '/login' }

@@ -42,6 +42,7 @@ public class PriceDataProcessingServiceTests
         // Arrange
         var rawData = new RawPriceDataEvent
         {
+            MappingId = Guid.NewGuid(),
             CanonicalProductId = Guid.NewGuid(),
             SellerName = "Amazon",
             ScrapedPrice = 299.99m,
@@ -87,6 +88,7 @@ public class PriceDataProcessingServiceTests
         // Arrange
         var rawData = new RawPriceDataEvent
         {
+            MappingId = Guid.NewGuid(),
             CanonicalProductId = Guid.NewGuid(),
             SellerName = "Amazon",
             ScrapedPrice = 299.99m,
@@ -113,6 +115,7 @@ public class PriceDataProcessingServiceTests
         // Arrange
         var rawData = new RawPriceDataEvent
         {
+            MappingId = Guid.NewGuid(),
             CanonicalProductId = Guid.NewGuid(),
             SellerName = "Test Seller",
             ScrapedPrice = -100m, // Invalid negative price
@@ -135,6 +138,7 @@ public class PriceDataProcessingServiceTests
         // Arrange
         var rawData = new RawPriceDataEvent
         {
+            MappingId = Guid.NewGuid(),
             CanonicalProductId = Guid.NewGuid(),
             SellerName = "Test Seller",
             ScrapedPrice = 0m, // Invalid zero price
@@ -157,6 +161,7 @@ public class PriceDataProcessingServiceTests
         // Arrange
         var rawData = new RawPriceDataEvent
         {
+            MappingId = Guid.NewGuid(),
             CanonicalProductId = Guid.NewGuid(),
             SellerName = "Amazon",
             ScrapedPrice = 299.99m,
@@ -185,6 +190,7 @@ public class PriceDataProcessingServiceTests
         // Arrange
         var rawData = new RawPriceDataEvent
         {
+            MappingId = Guid.NewGuid(),
             CanonicalProductId = Guid.NewGuid(),
             SellerName = sellerName!,
             ScrapedPrice = 299.99m,
@@ -206,5 +212,41 @@ public class PriceDataProcessingServiceTests
     {
         // Assert
         _priceDataProcessingService.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task ProcessRawPriceDataAsync_WithValidMappingId_ShouldUseMappingIdInPriceHistory()
+    {
+        // Arrange
+        var expectedMappingId = Guid.NewGuid();
+        var rawData = new RawPriceDataEvent
+        {
+            MappingId = expectedMappingId,
+            CanonicalProductId = Guid.NewGuid(),
+            SellerName = "Amazon",
+            ScrapedPrice = 299.99m,
+            ScrapedStockStatus = "In Stock",
+            SourceUrl = "https://amazon.com/product/123",
+            ScrapedProductName = "iPhone 15 Pro",
+            Timestamp = DateTimeOffset.UtcNow
+        };
+
+        _mockUnitOfWork.Setup(x => x.Products.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<TechTicker.Domain.Entities.Product, bool>>>()))
+            .ReturnsAsync(true);
+
+        _mockUnitOfWork.Setup(x => x.PriceHistory.FindAsync(It.IsAny<System.Linq.Expressions.Expression<Func<TechTicker.Domain.Entities.PriceHistory, bool>>>()))
+            .ReturnsAsync(new List<TechTicker.Domain.Entities.PriceHistory>());
+
+        TechTicker.Domain.Entities.PriceHistory? capturedPriceHistory = null;
+        _mockUnitOfWork.Setup(x => x.PriceHistory.AddAsync(It.IsAny<TechTicker.Domain.Entities.PriceHistory>()))
+            .Callback<TechTicker.Domain.Entities.PriceHistory>(ph => capturedPriceHistory = ph);
+
+        // Act
+        await _priceDataProcessingService.ProcessRawPriceDataAsync(rawData);
+
+        // Assert
+        _mockUnitOfWork.Verify(x => x.PriceHistory.AddAsync(It.IsAny<TechTicker.Domain.Entities.PriceHistory>()), Times.Once);
+        Assert.NotNull(capturedPriceHistory);
+        Assert.Equal(expectedMappingId, capturedPriceHistory.MappingId);
     }
 }
