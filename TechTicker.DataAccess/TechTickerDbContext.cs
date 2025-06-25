@@ -23,6 +23,10 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<AlertRule> AlertRules { get; set; } = null!;
     public DbSet<ScraperRunLog> ScraperRunLogs { get; set; } = null!;
 
+    // RBAC entities
+    public DbSet<Permission> Permissions { get; set; } = null!;
+    public DbSet<RolePermission> RolePermissions { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -238,6 +242,44 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.Property(e => e.UpdatedAt).IsRequired();
             entity.Property(e => e.IsActive).IsRequired().HasDefaultValue(true);
         });
+
+        // Configure Permission entity
+        modelBuilder.Entity<Permission>(entity =>
+        {
+            entity.HasKey(e => e.PermissionId);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            // Indexes
+            entity.HasIndex(e => e.Name).IsUnique();
+            entity.HasIndex(e => e.Category);
+        });
+
+        // Configure RolePermission entity
+        modelBuilder.Entity<RolePermission>(entity =>
+        {
+            entity.HasKey(e => e.RolePermissionId);
+            entity.Property(e => e.RoleId).IsRequired();
+            entity.Property(e => e.PermissionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+
+            // Unique constraint to prevent duplicate role-permission assignments
+            entity.HasIndex(e => new { e.RoleId, e.PermissionId }).IsUnique();
+
+            // Relationships
+            entity.HasOne(e => e.Role)
+                  .WithMany()
+                  .HasForeignKey(e => e.RoleId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Permission)
+                  .WithMany(p => p.RolePermissions)
+                  .HasForeignKey(e => e.PermissionId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 
     public override int SaveChanges()
@@ -299,6 +341,17 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             {
                 if (entry.State == EntityState.Added)
                     runLog.CreatedAt = DateTimeOffset.UtcNow;
+            }
+            else if (entry.Entity is Permission permission)
+            {
+                if (entry.State == EntityState.Added)
+                    permission.CreatedAt = DateTimeOffset.UtcNow;
+                permission.UpdatedAt = DateTimeOffset.UtcNow;
+            }
+            else if (entry.Entity is RolePermission rolePermission)
+            {
+                if (entry.State == EntityState.Added)
+                    rolePermission.CreatedAt = DateTimeOffset.UtcNow;
             }
         }
     }

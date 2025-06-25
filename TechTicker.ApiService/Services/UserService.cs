@@ -23,6 +23,7 @@ public class UserService : IUserService
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly IMappingService _mappingService;
+    private readonly IPermissionService _permissionService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<UserService> _logger;
 
@@ -31,6 +32,7 @@ public class UserService : IUserService
         SignInManager<ApplicationUser> signInManager,
         RoleManager<IdentityRole<Guid>> roleManager,
         IMappingService mappingService,
+        IPermissionService permissionService,
         IConfiguration configuration,
         ILogger<UserService> logger)
     {
@@ -38,6 +40,7 @@ public class UserService : IUserService
         _signInManager = signInManager;
         _roleManager = roleManager;
         _mappingService = mappingService;
+        _permissionService = permissionService;
         _configuration = configuration;
         _logger = logger;
     }
@@ -88,7 +91,7 @@ public class UserService : IUserService
             }
 
             var roles = await _userManager.GetRolesAsync(user);
-            var token = GenerateJwtToken(user, roles);
+            var token = await GenerateJwtTokenAsync(user, roles);
 
             var loginResponse = new LoginResponseDto
             {
@@ -290,7 +293,7 @@ public class UserService : IUserService
         }
     }
 
-    private string GenerateJwtToken(ApplicationUser user, IList<string> roles)
+    private async Task<string> GenerateJwtTokenAsync(ApplicationUser user, IList<string> roles)
     {
         var jwtSettings = _configuration.GetSection("Jwt");
         var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]!);
@@ -302,7 +305,16 @@ public class UserService : IUserService
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
+        // Add role claims
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+        // Add permission claims
+        var userPermissionsResult = await _permissionService.GetUserPermissionsAsync(user.Id);
+        if (userPermissionsResult.IsSuccess && userPermissionsResult.Data != null)
+        {
+            var permissions = userPermissionsResult.Data.Select(p => p.Name);
+            claims.AddRange(permissions.Select(permission => new Claim("permission", permission)));
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

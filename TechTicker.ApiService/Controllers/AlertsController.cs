@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
+using TechTicker.Shared.Authorization;
+using TechTicker.Shared.Constants;
 using TechTicker.Shared.Controllers;
 using TechTicker.Shared.Common;
 
@@ -29,6 +31,7 @@ public class AlertsController : BaseApiController
     /// <param name="createDto">Alert rule creation data</param>
     /// <returns>Created alert rule</returns>
     [HttpPost]
+    [RequirePermission(Permissions.AlertRulesCreate)]
     public async Task<ActionResult<ApiResponse<AlertRuleDto>>> CreateAlert([FromBody] CreateAlertRuleDto createDto)
     {
         var userId = GetCurrentUserId();
@@ -41,6 +44,7 @@ public class AlertsController : BaseApiController
     /// </summary>
     /// <returns>List of user's alert rules</returns>
     [HttpGet]
+    [RequirePermission(Permissions.AlertRulesRead)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AlertRuleDto>>>> GetAlerts()
     {
         var userId = GetCurrentUserId();

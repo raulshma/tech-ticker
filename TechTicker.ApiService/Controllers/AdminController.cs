@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
+using TechTicker.Shared.Authorization;
+using TechTicker.Shared.Constants;
 using TechTicker.Shared.Controllers;
 using TechTicker.Shared.Common;
 
@@ -12,7 +14,7 @@ namespace TechTicker.ApiService.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "Admin")]
+[RequirePermission(Permissions.UsersRead)]
 public class AdminController : BaseApiController
 {
     private readonly IUserService _userService;

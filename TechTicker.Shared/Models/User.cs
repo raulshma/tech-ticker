@@ -39,6 +39,6 @@ namespace TechTicker.Shared.Models
         public DateTimeOffset UpdatedAt { get; set; }
 
         // Navigation properties
-        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        // Note: Role relationships are handled by ASP.NET Core Identity
     }
 }

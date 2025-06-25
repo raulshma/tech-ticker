@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
+using TechTicker.Shared.Authorization;
+using TechTicker.Shared.Constants;
 using TechTicker.Shared.Controllers;
 using TechTicker.Shared.Common;
 
@@ -25,7 +27,7 @@ public class ProductsController(
     /// <param name="createDto">Product creation data</param>
     /// <returns>Created product</returns>
     [HttpPost]
-    [Authorize(Roles = "Admin,Moderator")]
+    [RequirePermission(Permissions.ProductsCreate)]
     public async Task<ActionResult<ApiResponse<ProductDto>>> CreateProduct([FromBody] CreateProductDto createDto)
     {
         var result = await _productService.CreateProductAsync(createDto);
@@ -41,6 +43,7 @@ public class ProductsController(
     /// <param name="pageSize">Page size</param>
     /// <returns>Paginated list of products</returns>
     [HttpGet]
+    [RequirePermission(Permissions.ProductsRead)]
     public async Task<ActionResult<PagedResponse<ProductDto>>> GetProducts(
         [FromQuery] Guid? categoryId = null,
         [FromQuery] string? search = null,
@@ -57,6 +60,7 @@ public class ProductsController(
     /// <param name="productId">Product ID</param>
     /// <returns>Product details</returns>
     [HttpGet("{productId:guid}")]
+    [RequirePermission(Permissions.ProductsRead)]
     public async Task<ActionResult<ApiResponse<ProductDto>>> GetProduct(Guid productId)
     {
         var result = await _productService.GetProductByIdAsync(productId);
@@ -70,7 +74,7 @@ public class ProductsController(
     /// <param name="updateDto">Product update data</param>
     /// <returns>Updated product</returns>
     [HttpPut("{productId:guid}")]
-    [Authorize(Roles = "Admin,Moderator")]
+    [RequirePermission(Permissions.ProductsUpdate)]
     public async Task<ActionResult<ApiResponse<ProductDto>>> UpdateProduct(Guid productId, [FromBody] UpdateProductDto updateDto)
     {
         var result = await _productService.UpdateProductAsync(productId, updateDto);
@@ -83,7 +87,7 @@ public class ProductsController(
     /// <param name="productId">Product ID</param>
     /// <returns>Success or error</returns>
     [HttpDelete("{productId:guid}")]
-    [Authorize(Roles = "Admin")]
+    [RequirePermission(Permissions.ProductsDelete)]
     public async Task<ActionResult<ApiResponse>> DeleteProduct(Guid productId)
     {
         var result = await _productService.DeleteProductAsync(productId);
@@ -100,6 +104,7 @@ public class ProductsController(
     /// <param name="limit">Optional limit on number of records</param>
     /// <returns>Price history</returns>
     [HttpGet("{productId:guid}/price-history")]
+    [RequirePermission(Permissions.PriceHistoryRead)]
     public async Task<ActionResult<ApiResponse<IEnumerable<PriceHistoryDto>>>> GetPriceHistory(
         Guid productId,
         [FromQuery] string? sellerName = null,

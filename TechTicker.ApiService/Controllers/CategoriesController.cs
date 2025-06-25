@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
+using TechTicker.Shared.Authorization;
+using TechTicker.Shared.Constants;
 using TechTicker.Shared.Controllers;
 using TechTicker.Shared.Common;
 
@@ -27,7 +29,7 @@ public class CategoriesController : BaseApiController
     /// <param name="createDto">Category creation data</param>
     /// <returns>Created category</returns>
     [HttpPost]
-    [Authorize(Roles = "Admin,Moderator")]
+    [RequirePermission(Permissions.ProductsManageCategories)]
     public async Task<ActionResult<ApiResponse<CategoryDto>>> CreateCategory([FromBody] CreateCategoryDto createDto)
     {
         var result = await _categoryService.CreateCategoryAsync(createDto);
@@ -39,6 +41,7 @@ public class CategoriesController : BaseApiController
     /// </summary>
     /// <returns>List of categories</returns>
     [HttpGet]
+    [RequirePermission(Permissions.ProductsRead)]
     public async Task<ActionResult<ApiResponse<IEnumerable<CategoryDto>>>> GetCategories()
     {
         var result = await _categoryService.GetAllCategoriesAsync();

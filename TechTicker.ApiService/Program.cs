@@ -10,6 +10,7 @@ using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess;
 using TechTicker.DataAccess.Repositories;
 using TechTicker.DataAccess.Repositories.Interfaces;
+using TechTicker.DataAccess.Seeders;
 using TechTicker.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,6 +63,20 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Add Authorization with permission-based policies
+builder.Services.AddAuthorization(options =>
+{
+    // Add permission-based policies
+    foreach (var permission in TechTicker.Shared.Constants.Permissions.GetAllPermissions())
+    {
+        options.AddPolicy($"Permission.{permission}", policy =>
+            policy.Requirements.Add(new TechTicker.Shared.Authorization.PermissionRequirement(permission)));
+    }
+});
+
+// Register authorization handler
+builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, TechTicker.Application.Authorization.PermissionAuthorizationHandler>();
+
 // Configure messaging
 builder.Services.Configure<MessagingConfiguration>(
     builder.Configuration.GetSection(MessagingConfiguration.SectionName));
@@ -77,6 +92,7 @@ builder.Services.AddScoped<IPriceHistoryService, PriceHistoryService>();
 builder.Services.AddScoped<IAlertRuleService, AlertRuleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, TechTicker.Application.Services.RoleService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
 builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
@@ -235,6 +251,10 @@ static async Task InitializeDatabaseAsync(WebApplication app)
             await userManager.AddToRoleAsync(regularUser, "User");
         }
     }
+
+    // Seed permissions and role-permission mappings
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    await PermissionSeeder.SeedAsync(context, roleManager, logger);
 }
 
 static async Task HandleDatabaseMigrationAsync(TechTickerDbContext context)
@@ -261,3 +281,6 @@ static async Task HandleDatabaseMigrationAsync(TechTickerDbContext context)
         }
     }
 }
+
+// Make Program class accessible for testing
+public partial class Program { }
