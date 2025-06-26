@@ -1,0 +1,93 @@
+<div class="catalog-container">
+  <!-- Header -->
+  <div class="catalog-header">
+    <div class="header-content">
+      <h1>Product Catalog</h1>
+      <p *ngIf="selectedCategorySlug" class="category-breadcrumb">
+        <mat-icon>folder</mat-icon>
+        {{ getSelectedCategoryName() }}
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button mat-icon-button (click)="toggleViewMode()" [matTooltip]="viewMode === 'grid' ? 'Switch to List View' : 'Switch to Grid View'">
+        <mat-icon>{{ viewMode === 'grid' ? 'view_list' : 'view_module' }}</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-section">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search products</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="Search by name, brand, or model">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="category-filter">
+          <mat-label>Category</mat-label>
+          <mat-select [formControl]="categoryControl" (selectionChange)="onCategorySelect($event.value)">
+            <mat-option value="">All Categories</mat-option>
+            <mat-option *ngFor="let category of categories" [value]="category.categoryId">
+              {{category.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-stroked-button (click)="clearFilters()" class="clear-filters-btn">
+          <mat-icon>clear</mat-icon>
+          Clear Filters
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Results Info -->
+  <div class="results-info" *ngIf="!isLoading">
+    <span class="results-count">{{ totalCount }} products found</span>
+    <span class="page-info" *ngIf="totalCount > pageSize">
+      Showing {{ (currentPage * pageSize) + 1 }} - {{ getEndIndex() }} of {{ totalCount }}
+    </span>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner></mat-spinner>
+    <p>Loading products...</p>
+  </div>
+
+  <!-- Products Grid/List -->
+  <div class="products-container" *ngIf="!isLoading">
+    <div class="products-grid" [class.list-view]="viewMode === 'list'" *ngIf="products.length > 0">
+      <app-product-card
+        *ngFor="let product of products"
+        [product]="product"
+        [viewMode]="viewMode"
+        (productClick)="onProductClick($event)">
+      </app-product-card>
+    </div>
+
+    <!-- No Results -->
+    <div class="no-results" *ngIf="products.length === 0">
+      <mat-icon class="no-results-icon">search_off</mat-icon>
+      <h3>No products found</h3>
+      <p>Try adjusting your search criteria or browse different categories.</p>
+      <button mat-raised-button color="primary" (click)="clearFilters()">
+        Clear Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <mat-paginator
+    *ngIf="!isLoading && totalCount > 0"
+    [length]="totalCount"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    [pageIndex]="currentPage"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
+</div>

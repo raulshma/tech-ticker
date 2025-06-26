@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable, map, catchError, of } from 'rxjs';
-import { 
-  TechTickerApiClient, 
-  ScraperRunLogSummaryDto, 
+import {
+  TechTickerApiClient,
+  ScraperRunLogSummaryDto,
   ScraperRunLogDto,
-  ScraperRunLogSummaryDtoPagedResultDto 
+  ScraperRunLogSummaryDtoPagedResultDto
 } from '../../../shared/api/api-client';
 
 export interface ScraperLogFilter {
@@ -39,7 +39,7 @@ export class ScraperLogsService {
    * Get paginated list of scraper run logs with filtering
    */
   getScraperLogs(filter: ScraperLogFilter): Observable<ScraperLogPagedResult | null> {
-    return this.apiClient.scraperLogs(
+    return this.apiClient.getScraperLogs(
       filter.page,
       filter.pageSize,
       filter.mappingId,
@@ -74,7 +74,7 @@ export class ScraperLogsService {
    * Get detailed information for a specific scraper run log
    */
   getScraperLogDetail(runId: string): Observable<ScraperRunLogDto | null> {
-    return this.apiClient.scraperLogs2(runId).pipe(
+    return this.apiClient.getScraperRunById(runId).pipe(
       map(response => {
         if (response.success && response.data) {
           return response.data;
@@ -92,7 +92,7 @@ export class ScraperLogsService {
    * Get scraper logs for a specific mapping
    */
   getScraperLogsByMapping(mappingId: string, page: number = 1, pageSize: number = 10): Observable<ScraperLogPagedResult | null> {
-    return this.apiClient.mapping(mappingId, page, pageSize).pipe(
+    return this.apiClient.getScraperLogsByMapping(mappingId, page, pageSize).pipe(
       map(response => {
         if (response.success && response.data) {
           return {
@@ -118,7 +118,7 @@ export class ScraperLogsService {
    * Get recent failed scraper runs
    */
   getRecentFailures(count: number = 10): Observable<ScraperRunLogSummaryDto[]> {
-    return this.apiClient.recentFailures(count).pipe(
+    return this.apiClient.getRecentFailures(count).pipe(
       map(response => {
         if (response.success && response.data) {
           return response.data;
@@ -136,7 +136,7 @@ export class ScraperLogsService {
    * Get recent scraper runs for a specific mapping
    */
   getRecentRunsByMapping(mappingId: string, count: number = 10): Observable<ScraperRunLogSummaryDto[]> {
-    return this.apiClient.recent(mappingId, count).pipe(
+    return this.apiClient.getRecentRunsForMapping(mappingId, count).pipe(
       map(response => {
         if (response.success && response.data) {
           return response.data;
@@ -154,7 +154,7 @@ export class ScraperLogsService {
    * Get retry chain for a specific run
    */
   getRetryChain(runId: string): Observable<ScraperRunLogDto[]> {
-    return this.apiClient.retryChain(runId).pipe(
+    return this.apiClient.getRetryChain(runId).pipe(
       map(response => {
         if (response.success && response.data) {
           return response.data;
@@ -172,7 +172,7 @@ export class ScraperLogsService {
    * Get currently in-progress scraper runs
    */
   getInProgressRuns(): Observable<ScraperRunLogSummaryDto[]> {
-    return this.apiClient.inProgress().pipe(
+    return this.apiClient.getInProgressRuns().pipe(
       map(response => {
         if (response.success && response.data) {
           return response.data;
@@ -191,7 +191,7 @@ export class ScraperLogsService {
    */
   formatDuration(duration?: string): string {
     if (!duration) return 'N/A';
-    
+
     // Parse ISO 8601 duration format (PT1M30S)
     const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?/);
     if (!match) return duration;
@@ -215,7 +215,7 @@ export class ScraperLogsService {
     switch (status?.toUpperCase()) {
       case 'SUCCESS': return 'success';
       case 'FAILED': return 'warn';
-      case 'STARTED': 
+      case 'STARTED':
       case 'IN_PROGRESS': return 'primary';
       case 'TIMEOUT': return 'accent';
       case 'CANCELLED': return 'disabled';
@@ -230,7 +230,7 @@ export class ScraperLogsService {
     switch (status?.toUpperCase()) {
       case 'SUCCESS': return 'check_circle';
       case 'FAILED': return 'error';
-      case 'STARTED': 
+      case 'STARTED':
       case 'IN_PROGRESS': return 'hourglass_empty';
       case 'TIMEOUT': return 'schedule';
       case 'CANCELLED': return 'cancel';

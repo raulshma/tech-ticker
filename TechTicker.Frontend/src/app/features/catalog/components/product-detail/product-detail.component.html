@@ -1,0 +1,173 @@
+<div class="product-detail-container">
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner></mat-spinner>
+    <p>Loading product details...</p>
+  </div>
+
+  <!-- Product Details -->
+  <div class="product-detail" *ngIf="!isLoading && product">
+    <!-- Header -->
+    <div class="detail-header">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="breadcrumb">
+        <span class="breadcrumb-item">Catalog</span>
+        <mat-icon>chevron_right</mat-icon>
+        <span class="breadcrumb-item">{{ getCategoryName() }}</span>
+        <mat-icon>chevron_right</mat-icon>
+        <span class="breadcrumb-current">{{ product.name }}</span>
+      </div>
+    </div>
+
+    <!-- Product Overview -->
+    <div class="product-overview">
+      <div class="product-image-section">
+        <img [src]="getProductImage()" [alt]="product.name" class="product-image" />
+      </div>
+
+      <div class="product-info-section">
+        <div class="product-header">
+          <h1 class="product-title">{{ getProductTitle() }}</h1>
+          <div class="product-meta">
+            <mat-chip class="category-chip">{{ getCategoryName() }}</mat-chip>
+            <span class="product-sku" *ngIf="product.sku">SKU: {{ product.sku }}</span>
+          </div>
+        </div>
+
+        <div class="product-description" *ngIf="product.description">
+          <p>{{ product.description }}</p>
+        </div>
+
+        <!-- Pricing Summary -->
+        <div class="pricing-summary">
+          <div class="price-info">
+            <div class="best-price" *ngIf="getBestPrice()">
+              <span class="price-label">Best Price:</span>
+              <span class="price-value">{{ formatPrice(getBestPrice()!) }}</span>
+            </div>
+
+            <div class="price-range" *ngIf="product.currentPrices && product.currentPrices.length > 1">
+              <span class="range-label">Price Range:</span>
+              <span class="range-value">
+                {{ formatPrice(getBestPrice()!) }} - {{ formatPrice(getWorstPrice()!) }}
+              </span>
+            </div>
+
+            <div class="savings-info" *ngIf="getSavingsAmount()">
+              <mat-icon class="savings-icon">savings</mat-icon>
+              <span class="savings-text">
+                Save {{ formatPrice(getSavingsAmount()!) }} ({{ getSavingsPercentage() }}%)
+                by choosing the best price
+              </span>
+            </div>
+          </div>
+
+          <div class="availability-info">
+            <div class="sellers-count">
+              <mat-icon>store</mat-icon>
+              <span>Available from {{ product.availableSellersCount }} sellers</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Section -->
+    <mat-tab-group (selectedTabChange)="onTabChange($event.index)" class="detail-tabs">
+      <!-- Current Prices Tab -->
+      <mat-tab label="Current Prices">
+        <div class="tab-content">
+          <div class="prices-section" *ngIf="product.currentPrices && product.currentPrices.length > 0">
+            <h3>Compare Prices</h3>
+            <div class="prices-list">
+              <div
+                *ngFor="let price of product.currentPrices"
+                class="price-item"
+                [class.best-price]="price.price === getBestPrice()">
+
+                <div class="seller-info">
+                  <div class="seller-header">
+                    <span class="seller-name">{{ extractSellerName(price.sourceUrl!) }}</span>
+                    <div class="stock-status" [class]="getStockStatusColor(price.stockStatus!)">
+                      <mat-icon>{{ getStockStatusIcon(price.stockStatus!) }}</mat-icon>
+                      <span>{{ price.stockStatus }}</span>
+                    </div>
+                  </div>
+                  <div class="last-updated">
+                    Last updated: {{ price.lastUpdated | date:'short' }}
+                  </div>
+                </div>
+
+                <div class="price-info">
+                  <span class="price">{{ formatPrice(price.price!) }}</span>
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    (click)="openSellerLink(price.sourceUrl!)"
+                    [disabled]="!price.stockStatus || !price.stockStatus.toLowerCase().includes('stock')">
+                    <mat-icon>open_in_new</mat-icon>
+                    View on {{ extractSellerName(price.sourceUrl!) }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="no-prices" *ngIf="!product.currentPrices || product.currentPrices.length === 0">
+            <mat-icon class="no-prices-icon">price_change</mat-icon>
+            <h3>No Current Prices Available</h3>
+            <p>Price information is not currently available for this product.</p>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Price History Tab -->
+      <mat-tab label="Price History">
+        <div class="tab-content">
+          <div class="price-history-section">
+            <h3>Price History</h3>
+
+            <div class="loading-history" *ngIf="isLoadingPriceHistory">
+              <mat-spinner diameter="40"></mat-spinner>
+              <span>Loading price history...</span>
+            </div>
+
+            <div class="price-history-content" *ngIf="!isLoadingPriceHistory && priceHistory.length > 0">
+              <p class="history-info">
+                Showing {{ priceHistory.length }} price points from the last 30 days
+              </p>
+              <!-- Price history chart would go here -->
+              <div class="chart-placeholder">
+                <mat-icon>show_chart</mat-icon>
+                <p>Price history chart will be displayed here</p>
+              </div>
+            </div>
+
+            <div class="no-history" *ngIf="!isLoadingPriceHistory && priceHistory.length === 0">
+              <mat-icon class="no-history-icon">timeline</mat-icon>
+              <h4>No Price History Available</h4>
+              <p>Price history data is not available for this product yet.</p>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Specifications Tab -->
+      <mat-tab label="Specifications" *ngIf="hasSpecifications()">
+        <div class="tab-content">
+          <div class="specifications-section">
+            <h3>Product Specifications</h3>
+            <div class="specs-grid">
+              <div *ngFor="let spec of getSpecificationEntries()" class="spec-item">
+                <span class="spec-label">{{ spec[0] }}:</span>
+                <span class="spec-value">{{ spec[1] }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

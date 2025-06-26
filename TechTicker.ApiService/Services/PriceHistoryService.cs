@@ -57,4 +57,27 @@ public class PriceHistoryService : IPriceHistoryService
             return Result<IEnumerable<PriceHistoryDto>>.Failure("An error occurred while retrieving price history.", "INTERNAL_ERROR");
         }
     }
+
+    public async Task<Result<IEnumerable<CurrentPriceDto>>> GetCurrentPricesAsync(Guid productId)
+    {
+        try
+        {
+            // Validate product exists
+            var productExists = await _unitOfWork.Products.ExistsAsync(p => p.ProductId == productId);
+            if (!productExists)
+            {
+                return Result<IEnumerable<CurrentPriceDto>>.Failure("Product not found.", "PRODUCT_NOT_FOUND");
+            }
+
+            var currentPrices = await _unitOfWork.PriceHistory.GetCurrentPricesAsync(productId);
+            var currentPriceDtos = currentPrices.Select(_mappingService.MapToCurrentPriceDto);
+
+            return Result<IEnumerable<CurrentPriceDto>>.Success(currentPriceDtos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving current prices for product {ProductId}", productId);
+            return Result<IEnumerable<CurrentPriceDto>>.Failure("An error occurred while retrieving current prices.", "INTERNAL_ERROR");
+        }
+    }
 }

@@ -35,7 +35,7 @@ export class UsersService {
     const page = params.page || 1;
     const pageSize = params.pageSize || 10;
 
-    return this.apiClient.usersGET(page, pageSize)
+    return this.apiClient.getAllUsers(page, pageSize)
       .pipe(
         map((response: UserDtoPagedResponse) => {
           if (!response.success || !response.data) {
@@ -57,7 +57,7 @@ export class UsersService {
   }
 
   getUser(id: string): Observable<UserDto> {
-    return this.apiClient.usersGET2(id)
+    return this.apiClient.getUserById(id)
       .pipe(
         map((response: UserDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -73,7 +73,7 @@ export class UsersService {
   }
 
   createUser(user: CreateUserDto): Observable<UserDto> {
-    return this.apiClient.usersPOST(user)
+    return this.apiClient.createUser(user)
       .pipe(
         map((response: UserDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -89,7 +89,7 @@ export class UsersService {
   }
 
   updateUser(id: string, user: UpdateUserDto): Observable<UserDto> {
-    return this.apiClient.usersPUT(id, user)
+    return this.apiClient.updateUser(id, user)
       .pipe(
         map((response: UserDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -105,7 +105,7 @@ export class UsersService {
   }
 
   deleteUser(id: string): Observable<void> {
-    return this.apiClient.usersDELETE(id)
+    return this.apiClient.deleteUser(id)
       .pipe(
         map(() => void 0),
         catchError(error => {

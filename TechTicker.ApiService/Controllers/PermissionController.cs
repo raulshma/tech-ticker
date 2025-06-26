@@ -28,7 +28,7 @@ public class PermissionController : BaseApiController
     /// Get all permissions
     /// </summary>
     /// <returns>List of all permissions</returns>
-    [HttpGet]
+    [HttpGet(Name = "GetAllPermissions")]
     [RequirePermission(Permissions.SystemManagePermissions)]
     public async Task<ActionResult<ApiResponse<IEnumerable<PermissionDto>>>> GetAllPermissions()
     {
@@ -41,7 +41,7 @@ public class PermissionController : BaseApiController
     /// </summary>
     /// <param name="category">Permission category</param>
     /// <returns>List of permissions in the specified category</returns>
-    [HttpGet("category/{category}")]
+    [HttpGet("category/{category}", Name = "GetPermissionsByCategory")]
     [RequirePermission(Permissions.SystemManagePermissions)]
     public async Task<ActionResult<ApiResponse<IEnumerable<PermissionDto>>>> GetPermissionsByCategory(string category)
     {
@@ -54,7 +54,7 @@ public class PermissionController : BaseApiController
     /// </summary>
     /// <param name="id">Permission ID</param>
     /// <returns>Permission details</returns>
-    [HttpGet("{id}")]
+    [HttpGet("{id}", Name = "GetPermissionById")]
     [RequirePermission(Permissions.SystemManagePermissions)]
     public async Task<ActionResult<ApiResponse<PermissionDto>>> GetPermissionById(Guid id)
     {
@@ -67,7 +67,7 @@ public class PermissionController : BaseApiController
     /// </summary>
     /// <param name="createDto">Permission creation data</param>
     /// <returns>Created permission</returns>
-    [HttpPost]
+    [HttpPost(Name = "CreatePermission")]
     [RequirePermission(Permissions.SystemManagePermissions)]
     public async Task<ActionResult<ApiResponse<PermissionDto>>> CreatePermission([FromBody] CreatePermissionDto createDto)
     {
@@ -107,7 +107,7 @@ public class PermissionController : BaseApiController
     /// </summary>
     /// <param name="roleId">Role ID</param>
     /// <returns>List of permissions assigned to the role</returns>
-    [HttpGet("role/{roleId}")]
+    [HttpGet("role/{roleId}", Name = "GetRolePermissions")]
     [RequirePermission(Permissions.UsersManageRoles)]
     public async Task<ActionResult<ApiResponse<IEnumerable<PermissionDto>>>> GetRolePermissions(Guid roleId)
     {
@@ -120,7 +120,7 @@ public class PermissionController : BaseApiController
     /// </summary>
     /// <param name="roleName">Role name</param>
     /// <returns>List of permissions assigned to the role</returns>
-    [HttpGet("role/name/{roleName}")]
+    [HttpGet("role/name/{roleName}", Name = "GetRolePermissionsByName")]
     [RequirePermission(Permissions.UsersManageRoles)]
     public async Task<ActionResult<ApiResponse<IEnumerable<PermissionDto>>>> GetRolePermissionsByName(string roleName)
     {
@@ -161,7 +161,7 @@ public class PermissionController : BaseApiController
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <returns>List of permissions for the user</returns>
-    [HttpGet("user/{userId}")]
+    [HttpGet("user/{userId}", Name = "GetUserPermissions")]
     [RequirePermission(Permissions.UsersRead)]
     public async Task<ActionResult<ApiResponse<IEnumerable<PermissionDto>>>> GetUserPermissions(Guid userId)
     {
@@ -201,7 +201,7 @@ public class PermissionController : BaseApiController
     /// Get all available permission categories
     /// </summary>
     /// <returns>List of permission categories with their permissions</returns>
-    [HttpGet("categories")]
+    [HttpGet("categories", Name = "GetPermissionCategories")]
     [RequirePermission(Permissions.SystemManagePermissions)]
     public ActionResult<ApiResponse<Dictionary<string, string[]>>> GetPermissionCategories()
     {

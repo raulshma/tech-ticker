@@ -30,7 +30,7 @@ public class AlertsController : BaseApiController
     /// </summary>
     /// <param name="createDto">Alert rule creation data</param>
     /// <returns>Created alert rule</returns>
-    [HttpPost]
+    [HttpPost(Name = "CreateAlert")]
     [RequirePermission(Permissions.AlertRulesCreate)]
     public async Task<ActionResult<ApiResponse<AlertRuleDto>>> CreateAlert([FromBody] CreateAlertRuleDto createDto)
     {
@@ -43,7 +43,7 @@ public class AlertsController : BaseApiController
     /// Get current user's alert rules
     /// </summary>
     /// <returns>List of user's alert rules</returns>
-    [HttpGet]
+    [HttpGet(Name = "GetUserAlerts")]
     [RequirePermission(Permissions.AlertRulesRead)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AlertRuleDto>>>> GetAlerts()
     {
@@ -57,7 +57,7 @@ public class AlertsController : BaseApiController
     /// </summary>
     /// <param name="productId">Product ID</param>
     /// <returns>List of alert rules for the product</returns>
-    [HttpGet("product/{productId:guid}")]
+    [HttpGet("product/{productId:guid}", Name = "GetProductAlerts")]
     public async Task<ActionResult<ApiResponse<IEnumerable<AlertRuleDto>>>> GetProductAlerts(Guid productId)
     {
         var userId = GetCurrentUserId();
@@ -71,7 +71,7 @@ public class AlertsController : BaseApiController
     /// <param name="alertRuleId">Alert rule ID</param>
     /// <param name="updateDto">Alert rule update data</param>
     /// <returns>Updated alert rule</returns>
-    [HttpPut("{alertRuleId:guid}")]
+    [HttpPut("{alertRuleId:guid}", Name = "UpdateAlert")]
     public async Task<ActionResult<ApiResponse<AlertRuleDto>>> UpdateAlert(Guid alertRuleId, [FromBody] UpdateAlertRuleDto updateDto)
     {
         var userId = GetCurrentUserId();
@@ -84,7 +84,7 @@ public class AlertsController : BaseApiController
     /// </summary>
     /// <param name="alertRuleId">Alert rule ID</param>
     /// <returns>Success or error</returns>
-    [HttpDelete("{alertRuleId:guid}")]
+    [HttpDelete("{alertRuleId:guid}", Name = "DeleteAlert")]
     public async Task<ActionResult<ApiResponse>> DeleteAlert(Guid alertRuleId)
     {
         var userId = GetCurrentUserId();

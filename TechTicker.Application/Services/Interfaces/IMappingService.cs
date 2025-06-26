@@ -30,6 +30,7 @@ public interface IMappingService
 
     // PriceHistory mappings
     PriceHistoryDto MapToDto(PriceHistory priceHistory);
+    CurrentPriceDto MapToCurrentPriceDto(PriceHistory priceHistory);
 
     // AlertRule mappings
     AlertRuleDto MapToDto(AlertRule alertRule);

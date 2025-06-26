@@ -20,7 +20,7 @@ public class RolesController(IRoleService roleService) : BaseApiController
     /// Get all available roles
     /// </summary>
     /// <returns>List of roles</returns>
-    [HttpGet]
+    [HttpGet(Name = "GetAllRoles")]
     public async Task<ActionResult<ApiResponse<IEnumerable<RoleInfoDto>>>> GetAllRoles()
     {
         var result = await _roleService.GetAllRolesAsync();
@@ -32,7 +32,7 @@ public class RolesController(IRoleService roleService) : BaseApiController
     /// </summary>
     /// <param name="roleId">Role ID</param>
     /// <returns>Role details</returns>
-    [HttpGet("{roleId:guid}")]
+    [HttpGet("{roleId:guid}", Name = "GetRoleById")]
     public async Task<ActionResult<ApiResponse<RoleInfoDto>>> GetRole(Guid roleId)
     {
         var result = await _roleService.GetRoleByIdAsync(roleId);
@@ -44,7 +44,7 @@ public class RolesController(IRoleService roleService) : BaseApiController
     /// </summary>
     /// <param name="createRoleDto">Role creation data</param>
     /// <returns>Created role</returns>
-    [HttpPost]
+    [HttpPost(Name = "CreateRole")]
     public async Task<ActionResult<ApiResponse<RoleInfoDto>>> CreateRole([FromBody] CreateRoleDto createRoleDto)
     {
         var result = await _roleService.CreateRoleAsync(createRoleDto.Name);
@@ -56,7 +56,7 @@ public class RolesController(IRoleService roleService) : BaseApiController
     /// </summary>
     /// <param name="roleId">Role ID</param>
     /// <returns>Success or error</returns>
-    [HttpDelete("{roleId:guid}")]
+    [HttpDelete("{roleId:guid}", Name = "DeleteRole")]
     public async Task<ActionResult<ApiResponse>> DeleteRole(Guid roleId)
     {
         var result = await _roleService.DeleteRoleAsync(roleId);
@@ -68,7 +68,7 @@ public class RolesController(IRoleService roleService) : BaseApiController
     /// </summary>
     /// <param name="roleName">Role name</param>
     /// <returns>List of users in the role</returns>
-    [HttpGet("{roleName}/users")]
+    [HttpGet("{roleName}/users", Name = "GetUsersInRole")]
     public async Task<ActionResult<ApiResponse<IEnumerable<UserRoleInfoDto>>>> GetUsersInRole(string roleName)
     {
         var result = await _roleService.GetUsersInRoleAsync(roleName);

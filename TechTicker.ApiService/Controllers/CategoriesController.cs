@@ -28,7 +28,7 @@ public class CategoriesController : BaseApiController
     /// </summary>
     /// <param name="createDto">Category creation data</param>
     /// <returns>Created category</returns>
-    [HttpPost]
+    [HttpPost(Name = "CreateCategory")]
     [RequirePermission(Permissions.ProductsManageCategories)]
     public async Task<ActionResult<ApiResponse<CategoryDto>>> CreateCategory([FromBody] CreateCategoryDto createDto)
     {
@@ -40,7 +40,7 @@ public class CategoriesController : BaseApiController
     /// Get all categories
     /// </summary>
     /// <returns>List of categories</returns>
-    [HttpGet]
+    [HttpGet(Name = "GetCategories")]
     [RequirePermission(Permissions.ProductsRead)]
     public async Task<ActionResult<ApiResponse<IEnumerable<CategoryDto>>>> GetCategories()
     {
@@ -53,7 +53,7 @@ public class CategoriesController : BaseApiController
     /// </summary>
     /// <param name="categoryIdOrSlug">Category ID or slug</param>
     /// <returns>Category details</returns>
-    [HttpGet("{categoryIdOrSlug}")]
+    [HttpGet("{categoryIdOrSlug}", Name = "GetCategoryByIdOrSlug")]
     public async Task<ActionResult<ApiResponse<CategoryDto>>> GetCategory(string categoryIdOrSlug)
     {
         var result = await _categoryService.GetCategoryByIdOrSlugAsync(categoryIdOrSlug);
@@ -66,7 +66,7 @@ public class CategoriesController : BaseApiController
     /// <param name="categoryId">Category ID</param>
     /// <param name="updateDto">Category update data</param>
     /// <returns>Updated category</returns>
-    [HttpPut("{categoryId:guid}")]
+    [HttpPut("{categoryId:guid}", Name = "UpdateCategory")]
     [Authorize(Roles = "Admin,Moderator")]
     public async Task<ActionResult<ApiResponse<CategoryDto>>> UpdateCategory(Guid categoryId, [FromBody] UpdateCategoryDto updateDto)
     {
@@ -79,7 +79,7 @@ public class CategoriesController : BaseApiController
     /// </summary>
     /// <param name="categoryId">Category ID</param>
     /// <returns>Success or error</returns>
-    [HttpDelete("{categoryId:guid}")]
+    [HttpDelete("{categoryId:guid}", Name = "DeleteCategory")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ApiResponse>> DeleteCategory(Guid categoryId)
     {

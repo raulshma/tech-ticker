@@ -32,7 +32,7 @@ export class PriceHistoryService {
   constructor(private apiClient: TechTickerApiClient) {}
 
   getPriceHistory(productId: string, filter: PriceHistoryFilter = {}): Observable<PriceHistoryDto[]> {
-    return this.apiClient.priceHistory(
+    return this.apiClient.getPriceHistory(
       productId,
       filter.sellerName,
       filter.startDate,
@@ -61,32 +61,32 @@ export class PriceHistoryService {
     }
 
     // Sort by timestamp
-    const sortedHistory = [...priceHistory].sort((a, b) => 
+    const sortedHistory = [...priceHistory].sort((a, b) =>
       new Date(a.timestamp!).getTime() - new Date(b.timestamp!).getTime()
     );
 
     // Group by seller name for multiple datasets
     const sellerGroups = new Map<string, { timestamps: Date[], prices: number[] }>();
-    
+
     sortedHistory.forEach(item => {
       const sellerName = this.extractSellerName(item.sourceUrl || 'Unknown');
       if (!sellerGroups.has(sellerName)) {
         sellerGroups.set(sellerName, { timestamps: [], prices: [] });
       }
-      
+
       const group = sellerGroups.get(sellerName)!;
       group.timestamps.push(new Date(item.timestamp!));
       group.prices.push(item.price || 0);
     });
 
     // Create labels from all unique timestamps
-    const allTimestamps = [...new Set(sortedHistory.map(item => 
+    const allTimestamps = [...new Set(sortedHistory.map(item =>
       new Date(item.timestamp!).toLocaleDateString()
     ))];
 
     // Generate colors for different sellers
     const colors = [
-      '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+      '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
       '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
     ];
 

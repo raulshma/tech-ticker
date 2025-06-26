@@ -193,4 +193,114 @@ public class ProductService : IProductService
             return Result.Failure("An error occurred while deleting the product.", "INTERNAL_ERROR");
         }
     }
+
+    public async Task<Result<PagedResponse<ProductWithCurrentPricesDto>>> GetProductsWithCurrentPricesAsync(
+        Guid? categoryId = null,
+        string? search = null,
+        int pageNumber = 1,
+        int pageSize = 10)
+    {
+        try
+        {
+            // Validate category exists if provided
+            if (categoryId.HasValue)
+            {
+                var categoryExists = await _unitOfWork.Categories.ExistsAsync(c => c.CategoryId == categoryId.Value);
+                if (!categoryExists)
+                {
+                    return Result<PagedResponse<ProductWithCurrentPricesDto>>.Failure("Category not found.", "CATEGORY_NOT_FOUND");
+                }
+            }
+
+            var (products, totalCount) = await _unitOfWork.Products.GetProductsAsync(
+                categoryId, search, pageNumber, pageSize);
+
+            var productIds = products.Select(p => p.ProductId).ToList();
+            var currentPrices = await _unitOfWork.PriceHistory.GetCurrentPricesAsync(productIds);
+
+            var productsWithPrices = products.Select(product =>
+            {
+                var productPrices = currentPrices
+                    .Where(cp => cp.CanonicalProductId == product.ProductId)
+                    .Select(_mappingService.MapToCurrentPriceDto)
+                    .ToList();
+
+                var productDto = _mappingService.MapToDto(product);
+
+                return new ProductWithCurrentPricesDto
+                {
+                    ProductId = productDto.ProductId,
+                    Name = productDto.Name,
+                    Manufacturer = productDto.Manufacturer,
+                    ModelNumber = productDto.ModelNumber,
+                    SKU = productDto.SKU,
+                    CategoryId = productDto.CategoryId,
+                    Description = productDto.Description,
+                    Specifications = productDto.Specifications,
+                    IsActive = productDto.IsActive,
+                    CreatedAt = productDto.CreatedAt,
+                    UpdatedAt = productDto.UpdatedAt,
+                    Category = productDto.Category,
+                    CurrentPrices = productPrices,
+                    LowestCurrentPrice = productPrices.Any() ? productPrices.Min(p => p.Price) : null,
+                    HighestCurrentPrice = productPrices.Any() ? productPrices.Max(p => p.Price) : null,
+                    AvailableSellersCount = productPrices.Count
+                };
+            });
+
+            var pagedResponse = PagedResponse<ProductWithCurrentPricesDto>.SuccessResult(
+                productsWithPrices, pageNumber, pageSize, totalCount);
+
+            return Result<PagedResponse<ProductWithCurrentPricesDto>>.Success(pagedResponse);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving products with current prices");
+            return Result<PagedResponse<ProductWithCurrentPricesDto>>.Failure("An error occurred while retrieving products.", "INTERNAL_ERROR");
+        }
+    }
+
+    public async Task<Result<ProductWithCurrentPricesDto>> GetProductWithCurrentPricesAsync(Guid productId)
+    {
+        try
+        {
+            var product = await _unitOfWork.Products.GetByIdWithCategoryAsync(productId);
+            if (product == null)
+            {
+                return Result<ProductWithCurrentPricesDto>.Failure("Product not found.", "RESOURCE_NOT_FOUND");
+            }
+
+            var currentPrices = await _unitOfWork.PriceHistory.GetCurrentPricesAsync(productId);
+            var currentPriceDtos = currentPrices.Select(_mappingService.MapToCurrentPriceDto).ToList();
+
+            var productDto = _mappingService.MapToDto(product);
+
+            var productWithPrices = new ProductWithCurrentPricesDto
+            {
+                ProductId = productDto.ProductId,
+                Name = productDto.Name,
+                Manufacturer = productDto.Manufacturer,
+                ModelNumber = productDto.ModelNumber,
+                SKU = productDto.SKU,
+                CategoryId = productDto.CategoryId,
+                Description = productDto.Description,
+                Specifications = productDto.Specifications,
+                IsActive = productDto.IsActive,
+                CreatedAt = productDto.CreatedAt,
+                UpdatedAt = productDto.UpdatedAt,
+                Category = productDto.Category,
+                CurrentPrices = currentPriceDtos,
+                LowestCurrentPrice = currentPriceDtos.Any() ? currentPriceDtos.Min(p => p.Price) : null,
+                HighestCurrentPrice = currentPriceDtos.Any() ? currentPriceDtos.Max(p => p.Price) : null,
+                AvailableSellersCount = currentPriceDtos.Count
+            };
+
+            return Result<ProductWithCurrentPricesDto>.Success(productWithPrices);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving product {ProductId} with current prices", productId);
+            return Result<ProductWithCurrentPricesDto>.Failure("An error occurred while retrieving the product.", "INTERNAL_ERROR");
+        }
+    }
 }

@@ -1,0 +1,90 @@
+<mat-card class="product-card" [class.list-view]="viewMode === 'list'" (click)="onCardClick()">
+  <div class="card-content">
+    <!-- Product Image -->
+    <div class="product-image">
+      <img [src]="getProductImage()" [alt]="product.name" />
+      <div class="category-badge">
+        <mat-chip>{{ getCategoryName() }}</mat-chip>
+      </div>
+    </div>
+
+    <!-- Product Info -->
+    <div class="product-info">
+      <div class="product-header">
+        <h3 class="product-title">{{ getProductTitle() }}</h3>
+        <p class="product-description" *ngIf="product.description">
+          {{ product.description }}
+        </p>
+      </div>
+
+      <!-- Pricing Info -->
+      <div class="pricing-section">
+        <div class="price-info">
+          <span class="price-label">Price:</span>
+          <span class="price-value">{{ getPriceRange() }}</span>
+        </div>
+        
+        <div class="sellers-info" *ngIf="hasMultipleSellers()">
+          <mat-icon class="sellers-icon">store</mat-icon>
+          <span>{{ product.availableSellersCount }} sellers</span>
+        </div>
+      </div>
+
+      <!-- Stock Status -->
+      <div class="stock-section">
+        <div class="stock-status" [class]="getStockStatusColor(getStockStatus())">
+          <mat-icon>{{ getStockStatusIcon(getStockStatus()) }}</mat-icon>
+          <span>{{ getStockStatus() }}</span>
+        </div>
+      </div>
+
+      <!-- Sellers Preview (Grid View Only) -->
+      <div class="sellers-preview" *ngIf="viewMode === 'grid' && getAvailableSellers().length > 0">
+        <span class="sellers-label">Available at:</span>
+        <div class="sellers-list">
+          <mat-chip *ngFor="let seller of getAvailableSellers()" class="seller-chip">
+            {{ seller }}
+          </mat-chip>
+          <span *ngIf="product.availableSellersCount! > 3" class="more-sellers">
+            +{{ product.availableSellersCount! - 3 }} more
+          </span>
+        </div>
+      </div>
+
+      <!-- List View Additional Info -->
+      <div class="list-additional-info" *ngIf="viewMode === 'list'">
+        <div class="specifications" *ngIf="product.specifications">
+          <span class="spec-label">Key Features:</span>
+          <div class="spec-items">
+            <span *ngFor="let spec of getKeySpecs()" class="spec-item">{{ spec }}</span>
+          </div>
+        </div>
+        
+        <div class="price-breakdown" *ngIf="product.currentPrices && product.currentPrices.length > 1">
+          <span class="breakdown-label">Price Comparison:</span>
+          <div class="price-list">
+            <div *ngFor="let price of product.currentPrices | slice:0:3" class="price-item">
+              <span class="seller-name">{{ extractSellerName(price.sourceUrl!) }}</span>
+              <span class="seller-price">{{ formatPrice(price.price!) }}</span>
+              <mat-icon class="stock-icon" [class]="getStockStatusColor(price.stockStatus!)">
+                {{ getStockStatusIcon(price.stockStatus!) }}
+              </mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Actions -->
+  <mat-card-actions class="card-actions">
+    <button mat-button color="primary">
+      <mat-icon>visibility</mat-icon>
+      View Details
+    </button>
+    <button mat-button *ngIf="getBestPrice()">
+      <mat-icon>shopping_cart</mat-icon>
+      Compare Prices
+    </button>
+  </mat-card-actions>
+</mat-card>

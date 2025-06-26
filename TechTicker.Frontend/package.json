@@ -7,10 +7,11 @@
     "start:win32": "ng serve --port %PORT%",
     "start:default": "ng serve --port $PORT",
     "build": "ng build",
+    "build:with-api": "npm run generate-api && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "generate-api": "nswag run nswag.json",
-    "prebuild": "npm run generate-api"
+    "generate-api-safe": "nswag run nswag.json || echo \"API generation failed - using existing client\""
   },
   "private": true,
   "dependencies": {

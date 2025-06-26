@@ -110,6 +110,21 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "TechTicker API", Version = "v1" });
+
+    // Configure custom operation IDs to avoid duplicates
+    c.CustomOperationIds(apiDesc =>
+    {
+        // First, try to get the explicit operation name from the route name
+        if (!string.IsNullOrEmpty(apiDesc.ActionDescriptor.AttributeRouteInfo?.Name))
+        {
+            return apiDesc.ActionDescriptor.AttributeRouteInfo.Name;
+        }
+
+        // Fallback to action name for cleaner method names
+        var actionName = apiDesc.ActionDescriptor.RouteValues["action"];
+        return actionName;
+    });
+
     c.AddSecurityDefinition("Bearer", new()
     {
         Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token.",

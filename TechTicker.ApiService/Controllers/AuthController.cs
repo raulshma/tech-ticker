@@ -27,7 +27,7 @@ public class AuthController : BaseApiController
     /// </summary>
     /// <param name="registerDto">User registration data</param>
     /// <returns>Created user information</returns>
-    [HttpPost("register")]
+    [HttpPost("register", Name = "Register")]
     public async Task<ActionResult<ApiResponse<UserDto>>> Register([FromBody] RegisterUserDto registerDto)
     {
         var result = await _userService.RegisterUserAsync(registerDto);
@@ -39,7 +39,7 @@ public class AuthController : BaseApiController
     /// </summary>
     /// <param name="loginDto">User login credentials</param>
     /// <returns>JWT token and user information</returns>
-    [HttpPost("login")]
+    [HttpPost("login", Name = "Login")]
     public async Task<ActionResult<ApiResponse<LoginResponseDto>>> Login([FromBody] LoginUserDto loginDto)
     {
         var result = await _userService.LoginUserAsync(loginDto);
@@ -50,7 +50,7 @@ public class AuthController : BaseApiController
     /// Get current user information
     /// </summary>
     /// <returns>Current user details</returns>
-    [HttpGet("me")]
+    [HttpGet("me", Name = "GetCurrentUser")]
     [Authorize]
     public async Task<ActionResult<ApiResponse<UserDto>>> GetCurrentUser()
     {

@@ -15,7 +15,7 @@ import { AuthInterceptor } from './shared/interceptors/auth.interceptor';
 import { ErrorInterceptor } from './shared/interceptors/error.interceptor';
 
 // API Configuration
-import { API_BASE_URL } from './shared/services/api-config.service';
+import { API_BASE_URL } from './shared/api/api-client';
 import { environment } from '../environments/environment';
 
 @NgModule({

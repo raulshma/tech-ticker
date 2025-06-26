@@ -24,7 +24,7 @@ export class MappingsService {
   ) {}
 
   getMappings(canonicalProductId?: string): Observable<ProductSellerMappingDto[]> {
-    return this.apiClient.mappingsGET(canonicalProductId)
+    return this.apiClient.getMappings(canonicalProductId)
       .pipe(
         map((response: ProductSellerMappingDtoIEnumerableApiResponse) => {
           if (!response.success || !response.data) {
@@ -53,7 +53,7 @@ export class MappingsService {
   }
 
   createMapping(mapping: CreateProductSellerMappingDto): Observable<ProductSellerMappingDto> {
-    return this.apiClient.mappingsPOST(mapping)
+    return this.apiClient.createMapping(mapping)
       .pipe(
         map((response: ProductSellerMappingDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -69,7 +69,7 @@ export class MappingsService {
   }
 
   updateMapping(id: string, mapping: UpdateProductSellerMappingDto): Observable<ProductSellerMappingDto> {
-    return this.apiClient.mappingsPUT(id, mapping)
+    return this.apiClient.updateMapping(id, mapping)
       .pipe(
         map((response: ProductSellerMappingDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -85,7 +85,7 @@ export class MappingsService {
   }
 
   deleteMapping(id: string): Observable<void> {
-    return this.apiClient.mappingsDELETE(id)
+    return this.apiClient.deleteMapping(id)
       .pipe(
         map(() => void 0),
         catchError(error => {
@@ -96,10 +96,7 @@ export class MappingsService {
   }
 
   triggerManualScraping(mappingId: string): Observable<string> {
-    // For now, we'll use a direct HTTP call since the NSwag client hasn't been regenerated yet
-    // This will be replaced with the generated client method later
-    const url = `${environment.apiUrl}/mappings/${mappingId}/scrape-now`;
-    return this.http.post<ApiResponse>(url, {})
+    return this.apiClient.triggerManualScraping(mappingId)
       .pipe(
         map((response: ApiResponse) => {
           if (!response.success) {
@@ -116,7 +113,7 @@ export class MappingsService {
 
   // Helper method to get site configurations for dropdowns
   getSiteConfigurations(): Observable<ScraperSiteConfigurationDto[]> {
-    return this.apiClient.all()
+    return this.apiClient.getAllSiteConfigs()
       .pipe(
         map((response) => {
           if (!response.success || !response.data) {

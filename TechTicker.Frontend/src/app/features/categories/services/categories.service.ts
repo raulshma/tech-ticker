@@ -17,7 +17,7 @@ export class CategoriesService {
   constructor(private apiClient: TechTickerApiClient) {}
 
   getCategories(): Observable<CategoryDto[]> {
-    return this.apiClient.categoriesGET()
+    return this.apiClient.getCategories()
       .pipe(
         map((response: CategoryDtoIEnumerableApiResponse) => {
           if (!response.success || !response.data) {
@@ -33,7 +33,7 @@ export class CategoriesService {
   }
 
   getCategory(id: string): Observable<CategoryDto> {
-    return this.apiClient.categoriesGET2(id)
+    return this.apiClient.getCategoryByIdOrSlug(id)
       .pipe(
         map((response: CategoryDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -49,7 +49,7 @@ export class CategoriesService {
   }
 
   createCategory(category: CreateCategoryDto): Observable<CategoryDto> {
-    return this.apiClient.categoriesPOST(category)
+    return this.apiClient.createCategory(category)
       .pipe(
         map((response: CategoryDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -65,7 +65,7 @@ export class CategoriesService {
   }
 
   updateCategory(id: string, category: UpdateCategoryDto): Observable<CategoryDto> {
-    return this.apiClient.categoriesPUT(id, category)
+    return this.apiClient.updateCategory(id, category)
       .pipe(
         map((response: CategoryDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -81,7 +81,7 @@ export class CategoriesService {
   }
 
   deleteCategory(id: string): Observable<void> {
-    return this.apiClient.categoriesDELETE(id)
+    return this.apiClient.deleteCategory(id)
       .pipe(
         map(() => void 0),
         catchError(error => {

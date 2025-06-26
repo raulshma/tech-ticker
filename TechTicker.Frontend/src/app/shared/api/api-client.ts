@@ -33,7 +33,7 @@ export class TechTickerApiClient {
      * @param pageSize (optional) 
      * @return OK
      */
-    usersGET(page: number | undefined, pageSize: number | undefined): Observable<UserDtoPagedResponse> {
+    getAllUsers(page: number | undefined, pageSize: number | undefined): Observable<UserDtoPagedResponse> {
         let url_ = this.baseUrl + "/api/Admin/users?";
         if (page === null)
             throw new Error("The parameter 'page' cannot be null.");
@@ -54,11 +54,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUsersGET(response_);
+            return this.processGetAllUsers(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processUsersGET(response_ as any);
+                    return this.processGetAllUsers(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<UserDtoPagedResponse>;
                 }
@@ -67,7 +67,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processUsersGET(response: HttpResponseBase): Observable<UserDtoPagedResponse> {
+    protected processGetAllUsers(response: HttpResponseBase): Observable<UserDtoPagedResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -93,7 +93,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    usersPOST(body: CreateUserDto | undefined): Observable<UserDtoApiResponse> {
+    createUser(body: CreateUserDto | undefined): Observable<UserDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Admin/users";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -110,11 +110,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUsersPOST(response_);
+            return this.processCreateUser(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processUsersPOST(response_ as any);
+                    return this.processCreateUser(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<UserDtoApiResponse>;
                 }
@@ -123,7 +123,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processUsersPOST(response: HttpResponseBase): Observable<UserDtoApiResponse> {
+    protected processCreateUser(response: HttpResponseBase): Observable<UserDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -148,7 +148,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    usersGET2(userId: string): Observable<UserDtoApiResponse> {
+    getUserById(userId: string): Observable<UserDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Admin/users/{userId}";
         if (userId === undefined || userId === null)
             throw new Error("The parameter 'userId' must be defined.");
@@ -164,11 +164,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUsersGET2(response_);
+            return this.processGetUserById(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processUsersGET2(response_ as any);
+                    return this.processGetUserById(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<UserDtoApiResponse>;
                 }
@@ -177,7 +177,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processUsersGET2(response: HttpResponseBase): Observable<UserDtoApiResponse> {
+    protected processGetUserById(response: HttpResponseBase): Observable<UserDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -203,7 +203,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    usersPUT(userId: string, body: UpdateUserDto | undefined): Observable<UserDtoApiResponse> {
+    updateUser(userId: string, body: UpdateUserDto | undefined): Observable<UserDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Admin/users/{userId}";
         if (userId === undefined || userId === null)
             throw new Error("The parameter 'userId' must be defined.");
@@ -223,11 +223,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUsersPUT(response_);
+            return this.processUpdateUser(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processUsersPUT(response_ as any);
+                    return this.processUpdateUser(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<UserDtoApiResponse>;
                 }
@@ -236,7 +236,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processUsersPUT(response: HttpResponseBase): Observable<UserDtoApiResponse> {
+    protected processUpdateUser(response: HttpResponseBase): Observable<UserDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -261,7 +261,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    usersDELETE(userId: string): Observable<ApiResponse> {
+    deleteUser(userId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/Admin/users/{userId}";
         if (userId === undefined || userId === null)
             throw new Error("The parameter 'userId' must be defined.");
@@ -277,11 +277,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUsersDELETE(response_);
+            return this.processDeleteUser(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processUsersDELETE(response_ as any);
+                    return this.processDeleteUser(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
@@ -290,7 +290,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processUsersDELETE(response: HttpResponseBase): Observable<ApiResponse> {
+    protected processDeleteUser(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -319,7 +319,7 @@ export class TechTickerApiClient {
      * @param pageSize (optional) 
      * @return OK
      */
-    alerts(userId: string | undefined, productId: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<AlertRuleDtoPagedResponse> {
+    getAllAlerts(userId: string | undefined, productId: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<AlertRuleDtoPagedResponse> {
         let url_ = this.baseUrl + "/api/Admin/alerts?";
         if (userId === null)
             throw new Error("The parameter 'userId' cannot be null.");
@@ -348,11 +348,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAlerts(response_);
+            return this.processGetAllAlerts(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAlerts(response_ as any);
+                    return this.processGetAllAlerts(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<AlertRuleDtoPagedResponse>;
                 }
@@ -361,7 +361,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processAlerts(response: HttpResponseBase): Observable<AlertRuleDtoPagedResponse> {
+    protected processGetAllAlerts(response: HttpResponseBase): Observable<AlertRuleDtoPagedResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -387,7 +387,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    alertsPOST(body: CreateAlertRuleDto | undefined): Observable<AlertRuleDtoApiResponse> {
+    createAlert(body: CreateAlertRuleDto | undefined): Observable<AlertRuleDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Alerts";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -404,11 +404,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAlertsPOST(response_);
+            return this.processCreateAlert(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAlertsPOST(response_ as any);
+                    return this.processCreateAlert(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<AlertRuleDtoApiResponse>;
                 }
@@ -417,7 +417,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processAlertsPOST(response: HttpResponseBase): Observable<AlertRuleDtoApiResponse> {
+    protected processCreateAlert(response: HttpResponseBase): Observable<AlertRuleDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -442,7 +442,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    alertsGET(): Observable<AlertRuleDtoIEnumerableApiResponse> {
+    getUserAlerts(): Observable<AlertRuleDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Alerts";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -455,11 +455,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAlertsGET(response_);
+            return this.processGetUserAlerts(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAlertsGET(response_ as any);
+                    return this.processGetUserAlerts(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<AlertRuleDtoIEnumerableApiResponse>;
                 }
@@ -468,7 +468,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processAlertsGET(response: HttpResponseBase): Observable<AlertRuleDtoIEnumerableApiResponse> {
+    protected processGetUserAlerts(response: HttpResponseBase): Observable<AlertRuleDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -493,7 +493,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    product(productId: string): Observable<AlertRuleDtoIEnumerableApiResponse> {
+    getProductAlerts(productId: string): Observable<AlertRuleDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Alerts/product/{productId}";
         if (productId === undefined || productId === null)
             throw new Error("The parameter 'productId' must be defined.");
@@ -509,11 +509,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processProduct(response_);
+            return this.processGetProductAlerts(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processProduct(response_ as any);
+                    return this.processGetProductAlerts(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<AlertRuleDtoIEnumerableApiResponse>;
                 }
@@ -522,7 +522,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processProduct(response: HttpResponseBase): Observable<AlertRuleDtoIEnumerableApiResponse> {
+    protected processGetProductAlerts(response: HttpResponseBase): Observable<AlertRuleDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -548,7 +548,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    alertsPUT(alertRuleId: string, body: UpdateAlertRuleDto | undefined): Observable<AlertRuleDtoApiResponse> {
+    updateAlert(alertRuleId: string, body: UpdateAlertRuleDto | undefined): Observable<AlertRuleDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Alerts/{alertRuleId}";
         if (alertRuleId === undefined || alertRuleId === null)
             throw new Error("The parameter 'alertRuleId' must be defined.");
@@ -568,11 +568,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAlertsPUT(response_);
+            return this.processUpdateAlert(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAlertsPUT(response_ as any);
+                    return this.processUpdateAlert(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<AlertRuleDtoApiResponse>;
                 }
@@ -581,7 +581,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processAlertsPUT(response: HttpResponseBase): Observable<AlertRuleDtoApiResponse> {
+    protected processUpdateAlert(response: HttpResponseBase): Observable<AlertRuleDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -606,7 +606,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    alertsDELETE(alertRuleId: string): Observable<ApiResponse> {
+    deleteAlert(alertRuleId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/Alerts/{alertRuleId}";
         if (alertRuleId === undefined || alertRuleId === null)
             throw new Error("The parameter 'alertRuleId' must be defined.");
@@ -622,11 +622,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAlertsDELETE(response_);
+            return this.processDeleteAlert(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAlertsDELETE(response_ as any);
+                    return this.processDeleteAlert(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
@@ -635,7 +635,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processAlertsDELETE(response: HttpResponseBase): Observable<ApiResponse> {
+    protected processDeleteAlert(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -772,7 +772,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    me(): Observable<UserDtoApiResponse> {
+    getCurrentUser(): Observable<UserDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Auth/me";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -785,11 +785,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processMe(response_);
+            return this.processGetCurrentUser(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processMe(response_ as any);
+                    return this.processGetCurrentUser(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<UserDtoApiResponse>;
                 }
@@ -798,7 +798,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processMe(response: HttpResponseBase): Observable<UserDtoApiResponse> {
+    protected processGetCurrentUser(response: HttpResponseBase): Observable<UserDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -824,7 +824,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    categoriesPOST(body: CreateCategoryDto | undefined): Observable<CategoryDtoApiResponse> {
+    createCategory(body: CreateCategoryDto | undefined): Observable<CategoryDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Categories";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -841,11 +841,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCategoriesPOST(response_);
+            return this.processCreateCategory(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processCategoriesPOST(response_ as any);
+                    return this.processCreateCategory(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<CategoryDtoApiResponse>;
                 }
@@ -854,7 +854,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processCategoriesPOST(response: HttpResponseBase): Observable<CategoryDtoApiResponse> {
+    protected processCreateCategory(response: HttpResponseBase): Observable<CategoryDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -879,7 +879,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    categoriesGET(): Observable<CategoryDtoIEnumerableApiResponse> {
+    getCategories(): Observable<CategoryDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Categories";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -892,11 +892,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCategoriesGET(response_);
+            return this.processGetCategories(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processCategoriesGET(response_ as any);
+                    return this.processGetCategories(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<CategoryDtoIEnumerableApiResponse>;
                 }
@@ -905,7 +905,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processCategoriesGET(response: HttpResponseBase): Observable<CategoryDtoIEnumerableApiResponse> {
+    protected processGetCategories(response: HttpResponseBase): Observable<CategoryDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -930,7 +930,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    categoriesGET2(categoryIdOrSlug: string): Observable<CategoryDtoApiResponse> {
+    getCategoryByIdOrSlug(categoryIdOrSlug: string): Observable<CategoryDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Categories/{categoryIdOrSlug}";
         if (categoryIdOrSlug === undefined || categoryIdOrSlug === null)
             throw new Error("The parameter 'categoryIdOrSlug' must be defined.");
@@ -946,11 +946,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCategoriesGET2(response_);
+            return this.processGetCategoryByIdOrSlug(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processCategoriesGET2(response_ as any);
+                    return this.processGetCategoryByIdOrSlug(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<CategoryDtoApiResponse>;
                 }
@@ -959,7 +959,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processCategoriesGET2(response: HttpResponseBase): Observable<CategoryDtoApiResponse> {
+    protected processGetCategoryByIdOrSlug(response: HttpResponseBase): Observable<CategoryDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -985,7 +985,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    categoriesPUT(categoryId: string, body: UpdateCategoryDto | undefined): Observable<CategoryDtoApiResponse> {
+    updateCategory(categoryId: string, body: UpdateCategoryDto | undefined): Observable<CategoryDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Categories/{categoryId}";
         if (categoryId === undefined || categoryId === null)
             throw new Error("The parameter 'categoryId' must be defined.");
@@ -1005,11 +1005,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCategoriesPUT(response_);
+            return this.processUpdateCategory(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processCategoriesPUT(response_ as any);
+                    return this.processUpdateCategory(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<CategoryDtoApiResponse>;
                 }
@@ -1018,7 +1018,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processCategoriesPUT(response: HttpResponseBase): Observable<CategoryDtoApiResponse> {
+    protected processUpdateCategory(response: HttpResponseBase): Observable<CategoryDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1043,7 +1043,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    categoriesDELETE(categoryId: string): Observable<ApiResponse> {
+    deleteCategory(categoryId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/Categories/{categoryId}";
         if (categoryId === undefined || categoryId === null)
             throw new Error("The parameter 'categoryId' must be defined.");
@@ -1059,11 +1059,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCategoriesDELETE(response_);
+            return this.processDeleteCategory(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processCategoriesDELETE(response_ as any);
+                    return this.processDeleteCategory(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
@@ -1072,7 +1072,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processCategoriesDELETE(response: HttpResponseBase): Observable<ApiResponse> {
+    protected processDeleteCategory(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1097,7 +1097,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    stats(): Observable<DashboardStatsDtoApiResponse> {
+    getDashboardStats(): Observable<DashboardStatsDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Dashboard/stats";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1110,11 +1110,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processStats(response_);
+            return this.processGetDashboardStats(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processStats(response_ as any);
+                    return this.processGetDashboardStats(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<DashboardStatsDtoApiResponse>;
                 }
@@ -1123,7 +1123,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processStats(response: HttpResponseBase): Observable<DashboardStatsDtoApiResponse> {
+    protected processGetDashboardStats(response: HttpResponseBase): Observable<DashboardStatsDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1148,7 +1148,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    success(): Observable<ObjectApiResponse> {
+    getSuccessExample(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Example/success";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1161,11 +1161,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSuccess(response_);
+            return this.processGetSuccessExample(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSuccess(response_ as any);
+                    return this.processGetSuccessExample(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
@@ -1174,7 +1174,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processSuccess(response: HttpResponseBase): Observable<ObjectApiResponse> {
+    protected processGetSuccessExample(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1203,7 +1203,7 @@ export class TechTickerApiClient {
      * @param take (optional) 
      * @return OK
      */
-    paginated(pageNumber: number | undefined, pageSize: number | undefined, skip: number | undefined, take: number | undefined): Observable<ObjectPagedResponse> {
+    getPaginatedExample(pageNumber: number | undefined, pageSize: number | undefined, skip: number | undefined, take: number | undefined): Observable<ObjectPagedResponse> {
         let url_ = this.baseUrl + "/api/Example/paginated?";
         if (pageNumber === null)
             throw new Error("The parameter 'pageNumber' cannot be null.");
@@ -1232,11 +1232,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processPaginated(response_);
+            return this.processGetPaginatedExample(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processPaginated(response_ as any);
+                    return this.processGetPaginatedExample(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectPagedResponse>;
                 }
@@ -1245,7 +1245,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processPaginated(response: HttpResponseBase): Observable<ObjectPagedResponse> {
+    protected processGetPaginatedExample(response: HttpResponseBase): Observable<ObjectPagedResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1270,7 +1270,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    result(id: number): Observable<ObjectApiResponse> {
+    getResultExample(id: number): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Example/result/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1286,11 +1286,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processResult(response_);
+            return this.processGetResultExample(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processResult(response_ as any);
+                    return this.processGetResultExample(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
@@ -1299,7 +1299,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processResult(response: HttpResponseBase): Observable<ObjectApiResponse> {
+    protected processGetResultExample(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1324,7 +1324,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    error(type: string): Observable<void> {
+    getErrorExample(type: string): Observable<void> {
         let url_ = this.baseUrl + "/api/Example/error/{type}";
         if (type === undefined || type === null)
             throw new Error("The parameter 'type' must be defined.");
@@ -1339,11 +1339,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processError(response_);
+            return this.processGetErrorExample(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processError(response_ as any);
+                    return this.processGetErrorExample(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<void>;
                 }
@@ -1352,7 +1352,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processError(response: HttpResponseBase): Observable<void> {
+    protected processGetErrorExample(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1375,7 +1375,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    validate(body: ValidationExampleRequest | undefined): Observable<StringApiResponse> {
+    validateExample(body: ValidationExampleRequest | undefined): Observable<StringApiResponse> {
         let url_ = this.baseUrl + "/api/Example/validate";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1392,11 +1392,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processValidate(response_);
+            return this.processValidateExample(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processValidate(response_ as any);
+                    return this.processValidateExample(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<StringApiResponse>;
                 }
@@ -1405,7 +1405,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processValidate(response: HttpResponseBase): Observable<StringApiResponse> {
+    protected processValidateExample(response: HttpResponseBase): Observable<StringApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1431,7 +1431,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    utilities(body: UtilitiesExampleRequest | undefined): Observable<ObjectApiResponse> {
+    utilitiesExample(body: UtilitiesExampleRequest | undefined): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Example/utilities";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1448,11 +1448,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUtilities(response_);
+            return this.processUtilitiesExample(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processUtilities(response_ as any);
+                    return this.processUtilitiesExample(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
@@ -1461,7 +1461,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processUtilities(response: HttpResponseBase): Observable<ObjectApiResponse> {
+    protected processUtilitiesExample(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1487,7 +1487,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    mappingsPOST(body: CreateProductSellerMappingDto | undefined): Observable<ProductSellerMappingDtoApiResponse> {
+    createMapping(body: CreateProductSellerMappingDto | undefined): Observable<ProductSellerMappingDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Mappings";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1504,11 +1504,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processMappingsPOST(response_);
+            return this.processCreateMapping(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processMappingsPOST(response_ as any);
+                    return this.processCreateMapping(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ProductSellerMappingDtoApiResponse>;
                 }
@@ -1517,7 +1517,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processMappingsPOST(response: HttpResponseBase): Observable<ProductSellerMappingDtoApiResponse> {
+    protected processCreateMapping(response: HttpResponseBase): Observable<ProductSellerMappingDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1543,7 +1543,7 @@ export class TechTickerApiClient {
      * @param canonicalProductId (optional) 
      * @return OK
      */
-    mappingsGET(canonicalProductId: string | undefined): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
+    getMappings(canonicalProductId: string | undefined): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Mappings?";
         if (canonicalProductId === null)
             throw new Error("The parameter 'canonicalProductId' cannot be null.");
@@ -1560,11 +1560,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processMappingsGET(response_);
+            return this.processGetMappings(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processMappingsGET(response_ as any);
+                    return this.processGetMappings(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ProductSellerMappingDtoIEnumerableApiResponse>;
                 }
@@ -1573,7 +1573,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processMappingsGET(response: HttpResponseBase): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
+    protected processGetMappings(response: HttpResponseBase): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1598,7 +1598,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    active(): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
+    getActiveMappings(): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Mappings/active";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1611,11 +1611,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processActive(response_);
+            return this.processGetActiveMappings(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processActive(response_ as any);
+                    return this.processGetActiveMappings(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ProductSellerMappingDtoIEnumerableApiResponse>;
                 }
@@ -1624,7 +1624,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processActive(response: HttpResponseBase): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
+    protected processGetActiveMappings(response: HttpResponseBase): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1650,7 +1650,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    mappingsPUT(mappingId: string, body: UpdateProductSellerMappingDto | undefined): Observable<ProductSellerMappingDtoApiResponse> {
+    updateMapping(mappingId: string, body: UpdateProductSellerMappingDto | undefined): Observable<ProductSellerMappingDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Mappings/{mappingId}";
         if (mappingId === undefined || mappingId === null)
             throw new Error("The parameter 'mappingId' must be defined.");
@@ -1670,11 +1670,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processMappingsPUT(response_);
+            return this.processUpdateMapping(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processMappingsPUT(response_ as any);
+                    return this.processUpdateMapping(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ProductSellerMappingDtoApiResponse>;
                 }
@@ -1683,7 +1683,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processMappingsPUT(response: HttpResponseBase): Observable<ProductSellerMappingDtoApiResponse> {
+    protected processUpdateMapping(response: HttpResponseBase): Observable<ProductSellerMappingDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1708,7 +1708,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    mappingsDELETE(mappingId: string): Observable<ApiResponse> {
+    deleteMapping(mappingId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/Mappings/{mappingId}";
         if (mappingId === undefined || mappingId === null)
             throw new Error("The parameter 'mappingId' must be defined.");
@@ -1724,11 +1724,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processMappingsDELETE(response_);
+            return this.processDeleteMapping(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processMappingsDELETE(response_ as any);
+                    return this.processDeleteMapping(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
@@ -1737,7 +1737,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processMappingsDELETE(response: HttpResponseBase): Observable<ApiResponse> {
+    protected processDeleteMapping(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1760,10 +1760,835 @@ export class TechTickerApiClient {
     }
 
     /**
+     * @return OK
+     */
+    triggerManualScraping(mappingId: string): Observable<ApiResponse> {
+        let url_ = this.baseUrl + "/api/Mappings/{mappingId}/scrape-now";
+        if (mappingId === undefined || mappingId === null)
+            throw new Error("The parameter 'mappingId' must be defined.");
+        url_ = url_.replace("{mappingId}", encodeURIComponent("" + mappingId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTriggerManualScraping(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTriggerManualScraping(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
+        }));
+    }
+
+    protected processTriggerManualScraping(response: HttpResponseBase): Observable<ApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getAllPermissions(): Observable<PermissionDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllPermissions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllPermissions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PermissionDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PermissionDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetAllPermissions(response: HttpResponseBase): Observable<PermissionDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PermissionDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return OK
      */
-    productsPOST(body: CreateProductDto | undefined): Observable<ProductDtoApiResponse> {
+    createPermission(body: CreatePermissionDto | undefined): Observable<PermissionDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreatePermission(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreatePermission(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PermissionDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PermissionDtoApiResponse>;
+        }));
+    }
+
+    protected processCreatePermission(response: HttpResponseBase): Observable<PermissionDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PermissionDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getPermissionsByCategory(category: string): Observable<PermissionDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/category/{category}";
+        if (category === undefined || category === null)
+            throw new Error("The parameter 'category' must be defined.");
+        url_ = url_.replace("{category}", encodeURIComponent("" + category));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPermissionsByCategory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPermissionsByCategory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PermissionDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PermissionDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetPermissionsByCategory(response: HttpResponseBase): Observable<PermissionDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PermissionDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getPermissionById(id: string): Observable<PermissionDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPermissionById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPermissionById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PermissionDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PermissionDtoApiResponse>;
+        }));
+    }
+
+    protected processGetPermissionById(response: HttpResponseBase): Observable<PermissionDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PermissionDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    updatePermission(id: string, body: UpdatePermissionDto | undefined): Observable<PermissionDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdatePermission(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdatePermission(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PermissionDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PermissionDtoApiResponse>;
+        }));
+    }
+
+    protected processUpdatePermission(response: HttpResponseBase): Observable<PermissionDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PermissionDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    deletePermission(id: string): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeletePermission(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeletePermission(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processDeletePermission(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getRolePermissions(roleId: string): Observable<PermissionDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/role/{roleId}";
+        if (roleId === undefined || roleId === null)
+            throw new Error("The parameter 'roleId' must be defined.");
+        url_ = url_.replace("{roleId}", encodeURIComponent("" + roleId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetRolePermissions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetRolePermissions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PermissionDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PermissionDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetRolePermissions(response: HttpResponseBase): Observable<PermissionDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PermissionDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getRolePermissionsByName(roleName: string): Observable<PermissionDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/role/name/{roleName}";
+        if (roleName === undefined || roleName === null)
+            throw new Error("The parameter 'roleName' must be defined.");
+        url_ = url_.replace("{roleName}", encodeURIComponent("" + roleName));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetRolePermissionsByName(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetRolePermissionsByName(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PermissionDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PermissionDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetRolePermissionsByName(response: HttpResponseBase): Observable<PermissionDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PermissionDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    assignPermissionToRole(roleId: string, permissionId: string): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/role/{roleId}/permission/{permissionId}";
+        if (roleId === undefined || roleId === null)
+            throw new Error("The parameter 'roleId' must be defined.");
+        url_ = url_.replace("{roleId}", encodeURIComponent("" + roleId));
+        if (permissionId === undefined || permissionId === null)
+            throw new Error("The parameter 'permissionId' must be defined.");
+        url_ = url_.replace("{permissionId}", encodeURIComponent("" + permissionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAssignPermissionToRole(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAssignPermissionToRole(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processAssignPermissionToRole(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    removePermissionFromRole(roleId: string, permissionId: string): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/role/{roleId}/permission/{permissionId}";
+        if (roleId === undefined || roleId === null)
+            throw new Error("The parameter 'roleId' must be defined.");
+        url_ = url_.replace("{roleId}", encodeURIComponent("" + roleId));
+        if (permissionId === undefined || permissionId === null)
+            throw new Error("The parameter 'permissionId' must be defined.");
+        url_ = url_.replace("{permissionId}", encodeURIComponent("" + permissionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemovePermissionFromRole(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemovePermissionFromRole(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processRemovePermissionFromRole(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getUserPermissions(userId: string): Observable<PermissionDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/user/{userId}";
+        if (userId === undefined || userId === null)
+            throw new Error("The parameter 'userId' must be defined.");
+        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUserPermissions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUserPermissions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PermissionDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PermissionDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetUserPermissions(response: HttpResponseBase): Observable<PermissionDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PermissionDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    checkUserPermission(userId: string, permissionName: string): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/user/{userId}/check/{permissionName}";
+        if (userId === undefined || userId === null)
+            throw new Error("The parameter 'userId' must be defined.");
+        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+        if (permissionName === undefined || permissionName === null)
+            throw new Error("The parameter 'permissionName' must be defined.");
+        url_ = url_.replace("{permissionName}", encodeURIComponent("" + permissionName));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCheckUserPermission(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCheckUserPermission(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processCheckUserPermission(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkAssignPermissionsToRole(roleId: string, body: string[] | undefined): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/role/{roleId}/permissions/bulk";
+        if (roleId === undefined || roleId === null)
+            throw new Error("The parameter 'roleId' must be defined.");
+        url_ = url_.replace("{roleId}", encodeURIComponent("" + roleId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkAssignPermissionsToRole(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkAssignPermissionsToRole(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processBulkAssignPermissionsToRole(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getPermissionCategories(): Observable<StringStringArrayDictionaryApiResponse> {
+        let url_ = this.baseUrl + "/api/Permission/categories";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPermissionCategories(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPermissionCategories(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StringStringArrayDictionaryApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StringStringArrayDictionaryApiResponse>;
+        }));
+    }
+
+    protected processGetPermissionCategories(response: HttpResponseBase): Observable<StringStringArrayDictionaryApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StringStringArrayDictionaryApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createProduct(body: CreateProductDto | undefined): Observable<ProductDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Products";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1780,11 +2605,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processProductsPOST(response_);
+            return this.processCreateProduct(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processProductsPOST(response_ as any);
+                    return this.processCreateProduct(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ProductDtoApiResponse>;
                 }
@@ -1793,7 +2618,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processProductsPOST(response: HttpResponseBase): Observable<ProductDtoApiResponse> {
+    protected processCreateProduct(response: HttpResponseBase): Observable<ProductDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1822,7 +2647,7 @@ export class TechTickerApiClient {
      * @param pageSize (optional) 
      * @return OK
      */
-    productsGET(categoryId: string | undefined, search: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<ProductDtoPagedResponse> {
+    getProducts(categoryId: string | undefined, search: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<ProductDtoPagedResponse> {
         let url_ = this.baseUrl + "/api/Products?";
         if (categoryId === null)
             throw new Error("The parameter 'categoryId' cannot be null.");
@@ -1851,11 +2676,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processProductsGET(response_);
+            return this.processGetProducts(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processProductsGET(response_ as any);
+                    return this.processGetProducts(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ProductDtoPagedResponse>;
                 }
@@ -1864,7 +2689,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processProductsGET(response: HttpResponseBase): Observable<ProductDtoPagedResponse> {
+    protected processGetProducts(response: HttpResponseBase): Observable<ProductDtoPagedResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1889,7 +2714,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    productsGET2(productId: string): Observable<ProductDtoApiResponse> {
+    getProductById(productId: string): Observable<ProductDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Products/{productId}";
         if (productId === undefined || productId === null)
             throw new Error("The parameter 'productId' must be defined.");
@@ -1905,11 +2730,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processProductsGET2(response_);
+            return this.processGetProductById(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processProductsGET2(response_ as any);
+                    return this.processGetProductById(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ProductDtoApiResponse>;
                 }
@@ -1918,7 +2743,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processProductsGET2(response: HttpResponseBase): Observable<ProductDtoApiResponse> {
+    protected processGetProductById(response: HttpResponseBase): Observable<ProductDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1944,7 +2769,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    productsPUT(productId: string, body: UpdateProductDto | undefined): Observable<ProductDtoApiResponse> {
+    updateProduct(productId: string, body: UpdateProductDto | undefined): Observable<ProductDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Products/{productId}";
         if (productId === undefined || productId === null)
             throw new Error("The parameter 'productId' must be defined.");
@@ -1964,11 +2789,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processProductsPUT(response_);
+            return this.processUpdateProduct(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processProductsPUT(response_ as any);
+                    return this.processUpdateProduct(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ProductDtoApiResponse>;
                 }
@@ -1977,7 +2802,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processProductsPUT(response: HttpResponseBase): Observable<ProductDtoApiResponse> {
+    protected processUpdateProduct(response: HttpResponseBase): Observable<ProductDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2002,7 +2827,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    productsDELETE(productId: string): Observable<ApiResponse> {
+    deleteProduct(productId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/Products/{productId}";
         if (productId === undefined || productId === null)
             throw new Error("The parameter 'productId' must be defined.");
@@ -2018,11 +2843,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processProductsDELETE(response_);
+            return this.processDeleteProduct(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processProductsDELETE(response_ as any);
+                    return this.processDeleteProduct(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
@@ -2031,7 +2856,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processProductsDELETE(response: HttpResponseBase): Observable<ApiResponse> {
+    protected processDeleteProduct(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2060,7 +2885,7 @@ export class TechTickerApiClient {
      * @param limit (optional) 
      * @return OK
      */
-    priceHistory(productId: string, sellerName: string | undefined, startDate: Date | undefined, endDate: Date | undefined, limit: number | undefined): Observable<PriceHistoryDtoIEnumerableApiResponse> {
+    getPriceHistory(productId: string, sellerName: string | undefined, startDate: Date | undefined, endDate: Date | undefined, limit: number | undefined): Observable<PriceHistoryDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Products/{productId}/price-history?";
         if (productId === undefined || productId === null)
             throw new Error("The parameter 'productId' must be defined.");
@@ -2092,11 +2917,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processPriceHistory(response_);
+            return this.processGetPriceHistory(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processPriceHistory(response_ as any);
+                    return this.processGetPriceHistory(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<PriceHistoryDtoIEnumerableApiResponse>;
                 }
@@ -2105,7 +2930,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processPriceHistory(response: HttpResponseBase): Observable<PriceHistoryDtoIEnumerableApiResponse> {
+    protected processGetPriceHistory(response: HttpResponseBase): Observable<PriceHistoryDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2130,7 +2955,455 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    public(): Observable<ObjectApiResponse> {
+    getCurrentPrices(productId: string): Observable<CurrentPriceDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/Products/{productId}/current-prices";
+        if (productId === undefined || productId === null)
+            throw new Error("The parameter 'productId' must be defined.");
+        url_ = url_.replace("{productId}", encodeURIComponent("" + productId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCurrentPrices(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCurrentPrices(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CurrentPriceDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CurrentPriceDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetCurrentPrices(response: HttpResponseBase): Observable<CurrentPriceDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CurrentPriceDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param categoryId (optional) 
+     * @param search (optional) 
+     * @param page (optional) 
+     * @param pageSize (optional) 
+     * @return OK
+     */
+    getProductsCatalog(categoryId: string | undefined, search: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<ProductWithCurrentPricesDtoPagedResponse> {
+        let url_ = this.baseUrl + "/api/Products/catalog?";
+        if (categoryId === null)
+            throw new Error("The parameter 'categoryId' cannot be null.");
+        else if (categoryId !== undefined)
+            url_ += "categoryId=" + encodeURIComponent("" + categoryId) + "&";
+        if (search === null)
+            throw new Error("The parameter 'search' cannot be null.");
+        else if (search !== undefined)
+            url_ += "search=" + encodeURIComponent("" + search) + "&";
+        if (page === null)
+            throw new Error("The parameter 'page' cannot be null.");
+        else if (page !== undefined)
+            url_ += "page=" + encodeURIComponent("" + page) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "pageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetProductsCatalog(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetProductsCatalog(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProductWithCurrentPricesDtoPagedResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProductWithCurrentPricesDtoPagedResponse>;
+        }));
+    }
+
+    protected processGetProductsCatalog(response: HttpResponseBase): Observable<ProductWithCurrentPricesDtoPagedResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductWithCurrentPricesDtoPagedResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getProductCatalogDetail(productId: string): Observable<ProductWithCurrentPricesDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Products/catalog/{productId}";
+        if (productId === undefined || productId === null)
+            throw new Error("The parameter 'productId' must be defined.");
+        url_ = url_.replace("{productId}", encodeURIComponent("" + productId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetProductCatalogDetail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetProductCatalogDetail(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProductWithCurrentPricesDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProductWithCurrentPricesDtoApiResponse>;
+        }));
+    }
+
+    protected processGetProductCatalogDetail(response: HttpResponseBase): Observable<ProductWithCurrentPricesDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductWithCurrentPricesDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getAllRoles(): Observable<RoleInfoDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/Roles";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllRoles(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllRoles(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RoleInfoDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RoleInfoDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetAllRoles(response: HttpResponseBase): Observable<RoleInfoDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RoleInfoDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createRole(body: CreateRoleDto | undefined): Observable<RoleInfoDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Roles";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateRole(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateRole(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RoleInfoDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RoleInfoDtoApiResponse>;
+        }));
+    }
+
+    protected processCreateRole(response: HttpResponseBase): Observable<RoleInfoDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RoleInfoDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getRoleById(roleId: string): Observable<RoleInfoDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Roles/{roleId}";
+        if (roleId === undefined || roleId === null)
+            throw new Error("The parameter 'roleId' must be defined.");
+        url_ = url_.replace("{roleId}", encodeURIComponent("" + roleId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetRoleById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetRoleById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RoleInfoDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RoleInfoDtoApiResponse>;
+        }));
+    }
+
+    protected processGetRoleById(response: HttpResponseBase): Observable<RoleInfoDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RoleInfoDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    deleteRole(roleId: string): Observable<ApiResponse> {
+        let url_ = this.baseUrl + "/api/Roles/{roleId}";
+        if (roleId === undefined || roleId === null)
+            throw new Error("The parameter 'roleId' must be defined.");
+        url_ = url_.replace("{roleId}", encodeURIComponent("" + roleId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteRole(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteRole(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
+        }));
+    }
+
+    protected processDeleteRole(response: HttpResponseBase): Observable<ApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getUsersInRole(roleName: string): Observable<UserRoleInfoDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/Roles/{roleName}/users";
+        if (roleName === undefined || roleName === null)
+            throw new Error("The parameter 'roleName' must be defined.");
+        url_ = url_.replace("{roleName}", encodeURIComponent("" + roleName));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUsersInRole(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUsersInRole(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<UserRoleInfoDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<UserRoleInfoDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetUsersInRole(response: HttpResponseBase): Observable<UserRoleInfoDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserRoleInfoDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getPublicData(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/public";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2143,11 +3416,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processPublic(response_);
+            return this.processGetPublicData(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processPublic(response_ as any);
+                    return this.processGetPublicData(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
@@ -2156,7 +3429,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processPublic(response: HttpResponseBase): Observable<ObjectApiResponse> {
+    protected processGetPublicData(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2181,7 +3454,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    dataGET(): Observable<ObjectApiResponse> {
+    getData(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/data";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2194,11 +3467,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDataGET(response_);
+            return this.processGetData(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processDataGET(response_ as any);
+                    return this.processGetData(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
@@ -2207,7 +3480,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processDataGET(response: HttpResponseBase): Observable<ObjectApiResponse> {
+    protected processGetData(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2233,7 +3506,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    dataPOST(body: any | undefined): Observable<ObjectApiResponse> {
+    createData(body: any | undefined): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/data";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2250,11 +3523,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDataPOST(response_);
+            return this.processCreateData(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processDataPOST(response_ as any);
+                    return this.processCreateData(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
@@ -2263,7 +3536,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processDataPOST(response: HttpResponseBase): Observable<ObjectApiResponse> {
+    protected processCreateData(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2288,7 +3561,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    admin(): Observable<ObjectApiResponse> {
+    getAdminData(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/admin";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2301,11 +3574,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAdmin(response_);
+            return this.processGetAdminData(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAdmin(response_ as any);
+                    return this.processGetAdminData(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
@@ -2314,7 +3587,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processAdmin(response: HttpResponseBase): Observable<ObjectApiResponse> {
+    protected processGetAdminData(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2339,7 +3612,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    dataGET2(userId: string): Observable<ObjectApiResponse> {
+    getUserData(userId: string): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/users/{userId}/data";
         if (userId === undefined || userId === null)
             throw new Error("The parameter 'userId' must be defined.");
@@ -2355,11 +3628,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDataGET2(response_);
+            return this.processGetUserData(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processDataGET2(response_ as any);
+                    return this.processGetUserData(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
@@ -2368,7 +3641,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processDataGET2(response: HttpResponseBase): Observable<ObjectApiResponse> {
+    protected processGetUserData(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2393,7 +3666,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    internal(): Observable<ObjectApiResponse> {
+    getInternalData(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/internal";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2406,11 +3679,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processInternal(response_);
+            return this.processGetInternalData(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processInternal(response_ as any);
+                    return this.processGetInternalData(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
@@ -2419,7 +3692,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processInternal(response: HttpResponseBase): Observable<ObjectApiResponse> {
+    protected processGetInternalData(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2444,7 +3717,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    custom(): Observable<ObjectApiResponse> {
+    getCustomData(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/custom";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2457,11 +3730,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCustom(response_);
+            return this.processGetCustomData(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processCustom(response_ as any);
+                    return this.processGetCustomData(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
@@ -2470,7 +3743,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processCustom(response: HttpResponseBase): Observable<ObjectApiResponse> {
+    protected processGetCustomData(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2495,7 +3768,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    manualAuth(): Observable<ObjectApiResponse> {
+    getDataWithManualAuth(): Observable<ObjectApiResponse> {
         let url_ = this.baseUrl + "/api/Sample/manual-auth";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2508,11 +3781,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processManualAuth(response_);
+            return this.processGetDataWithManualAuth(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processManualAuth(response_ as any);
+                    return this.processGetDataWithManualAuth(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ObjectApiResponse>;
                 }
@@ -2521,7 +3794,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processManualAuth(response: HttpResponseBase): Observable<ObjectApiResponse> {
+    protected processGetDataWithManualAuth(response: HttpResponseBase): Observable<ObjectApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2554,7 +3827,7 @@ export class TechTickerApiClient {
      * @param sellerName (optional) 
      * @return OK
      */
-    scraperLogs(page: number | undefined, pageSize: number | undefined, mappingId: string | undefined, status: string | undefined, errorCategory: string | undefined, dateFrom: Date | undefined, dateTo: Date | undefined, sellerName: string | undefined): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
+    getScraperLogs(page: number | undefined, pageSize: number | undefined, mappingId: string | undefined, status: string | undefined, errorCategory: string | undefined, dateFrom: Date | undefined, dateTo: Date | undefined, sellerName: string | undefined): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
         let url_ = this.baseUrl + "/api/scraper-logs?";
         if (page === null)
             throw new Error("The parameter 'page' cannot be null.");
@@ -2599,11 +3872,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processScraperLogs(response_);
+            return this.processGetScraperLogs(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processScraperLogs(response_ as any);
+                    return this.processGetScraperLogs(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse>;
                 }
@@ -2612,7 +3885,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processScraperLogs(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
+    protected processGetScraperLogs(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2637,7 +3910,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    scraperLogs2(runId: string): Observable<ScraperRunLogDtoApiResponse> {
+    getScraperRunById(runId: string): Observable<ScraperRunLogDtoApiResponse> {
         let url_ = this.baseUrl + "/api/scraper-logs/{runId}";
         if (runId === undefined || runId === null)
             throw new Error("The parameter 'runId' must be defined.");
@@ -2653,11 +3926,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processScraperLogs2(response_);
+            return this.processGetScraperRunById(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processScraperLogs2(response_ as any);
+                    return this.processGetScraperRunById(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperRunLogDtoApiResponse>;
                 }
@@ -2666,7 +3939,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processScraperLogs2(response: HttpResponseBase): Observable<ScraperRunLogDtoApiResponse> {
+    protected processGetScraperRunById(response: HttpResponseBase): Observable<ScraperRunLogDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2693,7 +3966,7 @@ export class TechTickerApiClient {
      * @param pageSize (optional) 
      * @return OK
      */
-    mapping(mappingId: string, page: number | undefined, pageSize: number | undefined): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
+    getScraperLogsByMapping(mappingId: string, page: number | undefined, pageSize: number | undefined): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
         let url_ = this.baseUrl + "/api/scraper-logs/mapping/{mappingId}?";
         if (mappingId === undefined || mappingId === null)
             throw new Error("The parameter 'mappingId' must be defined.");
@@ -2717,11 +3990,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processMapping(response_);
+            return this.processGetScraperLogsByMapping(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processMapping(response_ as any);
+                    return this.processGetScraperLogsByMapping(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse>;
                 }
@@ -2730,7 +4003,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processMapping(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
+    protected processGetScraperLogsByMapping(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoPagedResultDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2756,7 +4029,7 @@ export class TechTickerApiClient {
      * @param count (optional) 
      * @return OK
      */
-    recentFailures(count: number | undefined): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+    getRecentFailures(count: number | undefined): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/scraper-logs/recent-failures?";
         if (count === null)
             throw new Error("The parameter 'count' cannot be null.");
@@ -2773,11 +4046,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processRecentFailures(response_);
+            return this.processGetRecentFailures(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processRecentFailures(response_ as any);
+                    return this.processGetRecentFailures(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse>;
                 }
@@ -2786,7 +4059,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processRecentFailures(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+    protected processGetRecentFailures(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2812,7 +4085,7 @@ export class TechTickerApiClient {
      * @param count (optional) 
      * @return OK
      */
-    recent(mappingId: string, count: number | undefined): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+    getRecentRunsForMapping(mappingId: string, count: number | undefined): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/scraper-logs/mapping/{mappingId}/recent?";
         if (mappingId === undefined || mappingId === null)
             throw new Error("The parameter 'mappingId' must be defined.");
@@ -2832,11 +4105,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processRecent(response_);
+            return this.processGetRecentRunsForMapping(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processRecent(response_ as any);
+                    return this.processGetRecentRunsForMapping(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse>;
                 }
@@ -2845,7 +4118,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processRecent(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+    protected processGetRecentRunsForMapping(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2873,7 +4146,7 @@ export class TechTickerApiClient {
      * @param mappingId (optional) 
      * @return OK
      */
-    statistics(dateFrom: Date | undefined, dateTo: Date | undefined, mappingId: string | undefined): Observable<ScraperRunStatisticsDtoApiResponse> {
+    getStatistics(dateFrom: Date | undefined, dateTo: Date | undefined, mappingId: string | undefined): Observable<ScraperRunStatisticsDtoApiResponse> {
         let url_ = this.baseUrl + "/api/scraper-logs/statistics?";
         if (dateFrom === null)
             throw new Error("The parameter 'dateFrom' cannot be null.");
@@ -2898,11 +4171,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processStatistics(response_);
+            return this.processGetStatistics(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processStatistics(response_ as any);
+                    return this.processGetStatistics(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperRunStatisticsDtoApiResponse>;
                 }
@@ -2911,7 +4184,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processStatistics(response: HttpResponseBase): Observable<ScraperRunStatisticsDtoApiResponse> {
+    protected processGetStatistics(response: HttpResponseBase): Observable<ScraperRunStatisticsDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2936,7 +4209,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    retryChain(runId: string): Observable<ScraperRunLogDtoIEnumerableApiResponse> {
+    getRetryChain(runId: string): Observable<ScraperRunLogDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/scraper-logs/{runId}/retry-chain";
         if (runId === undefined || runId === null)
             throw new Error("The parameter 'runId' must be defined.");
@@ -2952,11 +4225,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processRetryChain(response_);
+            return this.processGetRetryChain(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processRetryChain(response_ as any);
+                    return this.processGetRetryChain(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperRunLogDtoIEnumerableApiResponse>;
                 }
@@ -2965,7 +4238,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processRetryChain(response: HttpResponseBase): Observable<ScraperRunLogDtoIEnumerableApiResponse> {
+    protected processGetRetryChain(response: HttpResponseBase): Observable<ScraperRunLogDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2992,7 +4265,7 @@ export class TechTickerApiClient {
      * @param dateTo (optional) 
      * @return OK
      */
-    performanceMetrics(dateFrom: Date | undefined, dateTo: Date | undefined): Observable<SellerPerformanceMetricDtoIEnumerableApiResponse> {
+    getPerformanceMetrics(dateFrom: Date | undefined, dateTo: Date | undefined): Observable<SellerPerformanceMetricDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/scraper-logs/performance-metrics?";
         if (dateFrom === null)
             throw new Error("The parameter 'dateFrom' cannot be null.");
@@ -3013,11 +4286,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processPerformanceMetrics(response_);
+            return this.processGetPerformanceMetrics(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processPerformanceMetrics(response_ as any);
+                    return this.processGetPerformanceMetrics(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<SellerPerformanceMetricDtoIEnumerableApiResponse>;
                 }
@@ -3026,7 +4299,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processPerformanceMetrics(response: HttpResponseBase): Observable<SellerPerformanceMetricDtoIEnumerableApiResponse> {
+    protected processGetPerformanceMetrics(response: HttpResponseBase): Observable<SellerPerformanceMetricDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3051,7 +4324,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    inProgress(): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+    getInProgressRuns(): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/scraper-logs/in-progress";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3064,11 +4337,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processInProgress(response_);
+            return this.processGetInProgressRuns(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processInProgress(response_ as any);
+                    return this.processGetInProgressRuns(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse>;
                 }
@@ -3077,7 +4350,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processInProgress(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
+    protected processGetInProgressRuns(response: HttpResponseBase): Observable<ScraperRunLogSummaryDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3103,7 +4376,7 @@ export class TechTickerApiClient {
      * @param daysToKeep (optional) 
      * @return OK
      */
-    cleanup(daysToKeep: number | undefined): Observable<Int32ApiResponse> {
+    cleanupOldLogs(daysToKeep: number | undefined): Observable<Int32ApiResponse> {
         let url_ = this.baseUrl + "/api/scraper-logs/cleanup?";
         if (daysToKeep === null)
             throw new Error("The parameter 'daysToKeep' cannot be null.");
@@ -3120,11 +4393,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCleanup(response_);
+            return this.processCleanupOldLogs(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processCleanup(response_ as any);
+                    return this.processCleanupOldLogs(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<Int32ApiResponse>;
                 }
@@ -3133,7 +4406,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processCleanup(response: HttpResponseBase): Observable<Int32ApiResponse> {
+    protected processCleanupOldLogs(response: HttpResponseBase): Observable<Int32ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3158,7 +4431,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    all(): Observable<ScraperSiteConfigurationDtoIEnumerableApiResponse> {
+    getAllSiteConfigs(): Observable<ScraperSiteConfigurationDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/site-configs/all";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3171,11 +4444,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAll(response_);
+            return this.processGetAllSiteConfigs(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAll(response_ as any);
+                    return this.processGetAllSiteConfigs(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperSiteConfigurationDtoIEnumerableApiResponse>;
                 }
@@ -3184,7 +4457,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processAll(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoIEnumerableApiResponse> {
+    protected processGetAllSiteConfigs(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoIEnumerableApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3210,7 +4483,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    siteConfigsPOST(body: CreateScraperSiteConfigurationDto | undefined): Observable<ScraperSiteConfigurationDtoApiResponse> {
+    createSiteConfig(body: CreateScraperSiteConfigurationDto | undefined): Observable<ScraperSiteConfigurationDtoApiResponse> {
         let url_ = this.baseUrl + "/api/site-configs";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3227,11 +4500,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSiteConfigsPOST(response_);
+            return this.processCreateSiteConfig(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSiteConfigsPOST(response_ as any);
+                    return this.processCreateSiteConfig(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
                 }
@@ -3240,7 +4513,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processSiteConfigsPOST(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
+    protected processCreateSiteConfig(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3266,7 +4539,7 @@ export class TechTickerApiClient {
      * @param domain (optional) 
      * @return OK
      */
-    siteConfigsGET(domain: string | undefined): Observable<ScraperSiteConfigurationDtoApiResponse> {
+    getSiteConfigByDomain(domain: string | undefined): Observable<ScraperSiteConfigurationDtoApiResponse> {
         let url_ = this.baseUrl + "/api/site-configs?";
         if (domain === null)
             throw new Error("The parameter 'domain' cannot be null.");
@@ -3283,11 +4556,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSiteConfigsGET(response_);
+            return this.processGetSiteConfigByDomain(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSiteConfigsGET(response_ as any);
+                    return this.processGetSiteConfigByDomain(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
                 }
@@ -3296,7 +4569,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processSiteConfigsGET(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
+    protected processGetSiteConfigByDomain(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3321,7 +4594,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    siteConfigsGET2(siteConfigId: string): Observable<ScraperSiteConfigurationDtoApiResponse> {
+    getSiteConfig(siteConfigId: string): Observable<ScraperSiteConfigurationDtoApiResponse> {
         let url_ = this.baseUrl + "/api/site-configs/{siteConfigId}";
         if (siteConfigId === undefined || siteConfigId === null)
             throw new Error("The parameter 'siteConfigId' must be defined.");
@@ -3337,11 +4610,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSiteConfigsGET2(response_);
+            return this.processGetSiteConfig(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSiteConfigsGET2(response_ as any);
+                    return this.processGetSiteConfig(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
                 }
@@ -3350,7 +4623,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processSiteConfigsGET2(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
+    protected processGetSiteConfig(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3376,7 +4649,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    siteConfigsPUT(siteConfigId: string, body: UpdateScraperSiteConfigurationDto | undefined): Observable<ScraperSiteConfigurationDtoApiResponse> {
+    updateSiteConfig(siteConfigId: string, body: UpdateScraperSiteConfigurationDto | undefined): Observable<ScraperSiteConfigurationDtoApiResponse> {
         let url_ = this.baseUrl + "/api/site-configs/{siteConfigId}";
         if (siteConfigId === undefined || siteConfigId === null)
             throw new Error("The parameter 'siteConfigId' must be defined.");
@@ -3396,11 +4669,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSiteConfigsPUT(response_);
+            return this.processUpdateSiteConfig(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSiteConfigsPUT(response_ as any);
+                    return this.processUpdateSiteConfig(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ScraperSiteConfigurationDtoApiResponse>;
                 }
@@ -3409,7 +4682,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processSiteConfigsPUT(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
+    protected processUpdateSiteConfig(response: HttpResponseBase): Observable<ScraperSiteConfigurationDtoApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3434,7 +4707,7 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
-    siteConfigsDELETE(siteConfigId: string): Observable<ApiResponse> {
+    deleteSiteConfig(siteConfigId: string): Observable<ApiResponse> {
         let url_ = this.baseUrl + "/api/site-configs/{siteConfigId}";
         if (siteConfigId === undefined || siteConfigId === null)
             throw new Error("The parameter 'siteConfigId' must be defined.");
@@ -3450,11 +4723,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSiteConfigsDELETE(response_);
+            return this.processDeleteSiteConfig(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSiteConfigsDELETE(response_ as any);
+                    return this.processDeleteSiteConfig(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ApiResponse>;
                 }
@@ -3463,7 +4736,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processSiteConfigsDELETE(response: HttpResponseBase): Observable<ApiResponse> {
+    protected processDeleteSiteConfig(response: HttpResponseBase): Observable<ApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3934,6 +5207,90 @@ export interface IApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class BooleanApiResponse implements IBooleanApiResponse {
+    success?: boolean;
+    data?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IBooleanApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BooleanApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new BooleanApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBooleanApiResponse {
+    success?: boolean;
+    data?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class CategoryDto implements ICategoryDto {
     categoryId?: string;
     name?: string | undefined;
@@ -4266,6 +5623,50 @@ export interface ICreateCategoryDto {
     description?: string | undefined;
 }
 
+export class CreatePermissionDto implements ICreatePermissionDto {
+    name!: string;
+    description?: string | undefined;
+    category!: string;
+
+    constructor(data?: ICreatePermissionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.category = _data["category"];
+        }
+    }
+
+    static fromJS(data: any): CreatePermissionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreatePermissionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["category"] = this.category;
+        return data;
+    }
+}
+
+export interface ICreatePermissionDto {
+    name: string;
+    description?: string | undefined;
+    category: string;
+}
+
 export class CreateProductDto implements ICreateProductDto {
     name!: string;
     manufacturer?: string | undefined;
@@ -4392,6 +5793,42 @@ export interface ICreateProductSellerMappingDto {
     isActiveForScraping?: boolean;
     scrapingFrequencyOverride?: string | undefined;
     siteConfigId?: string | undefined;
+}
+
+export class CreateRoleDto implements ICreateRoleDto {
+    name?: string | undefined;
+
+    constructor(data?: ICreateRoleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): CreateRoleDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateRoleDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface ICreateRoleDto {
+    name?: string | undefined;
 }
 
 export class CreateScraperSiteConfigurationDto implements ICreateScraperSiteConfigurationDto {
@@ -4528,6 +5965,154 @@ export interface ICreateUserDto {
     firstName?: string | undefined;
     lastName?: string | undefined;
     roles?: string[] | undefined;
+}
+
+export class CurrentPriceDto implements ICurrentPriceDto {
+    sellerName?: string | undefined;
+    price?: number;
+    stockStatus?: string | undefined;
+    sourceUrl?: string | undefined;
+    lastUpdated?: Date;
+    scrapedProductNameOnPage?: string | undefined;
+
+    constructor(data?: ICurrentPriceDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.sellerName = _data["sellerName"];
+            this.price = _data["price"];
+            this.stockStatus = _data["stockStatus"];
+            this.sourceUrl = _data["sourceUrl"];
+            this.lastUpdated = _data["lastUpdated"] ? new Date(_data["lastUpdated"].toString()) : <any>undefined;
+            this.scrapedProductNameOnPage = _data["scrapedProductNameOnPage"];
+        }
+    }
+
+    static fromJS(data: any): CurrentPriceDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CurrentPriceDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["sellerName"] = this.sellerName;
+        data["price"] = this.price;
+        data["stockStatus"] = this.stockStatus;
+        data["sourceUrl"] = this.sourceUrl;
+        data["lastUpdated"] = this.lastUpdated ? this.lastUpdated.toISOString() : <any>undefined;
+        data["scrapedProductNameOnPage"] = this.scrapedProductNameOnPage;
+        return data;
+    }
+}
+
+export interface ICurrentPriceDto {
+    sellerName?: string | undefined;
+    price?: number;
+    stockStatus?: string | undefined;
+    sourceUrl?: string | undefined;
+    lastUpdated?: Date;
+    scrapedProductNameOnPage?: string | undefined;
+}
+
+export class CurrentPriceDtoIEnumerableApiResponse implements ICurrentPriceDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: CurrentPriceDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ICurrentPriceDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(CurrentPriceDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): CurrentPriceDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new CurrentPriceDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ICurrentPriceDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: CurrentPriceDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class DashboardStatsDto implements IDashboardStatsDto {
@@ -5180,6 +6765,238 @@ export interface IPaginationMeta {
     hasNextPage?: boolean;
     firstItemOnPage?: number;
     lastItemOnPage?: number;
+}
+
+export class PermissionDto implements IPermissionDto {
+    permissionId?: string;
+    name?: string | undefined;
+    description?: string | undefined;
+    category?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+
+    constructor(data?: IPermissionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.permissionId = _data["permissionId"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.category = _data["category"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): PermissionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PermissionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["permissionId"] = this.permissionId;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["category"] = this.category;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IPermissionDto {
+    permissionId?: string;
+    name?: string | undefined;
+    description?: string | undefined;
+    category?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+export class PermissionDtoApiResponse implements IPermissionDtoApiResponse {
+    success?: boolean;
+    data?: PermissionDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IPermissionDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? PermissionDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): PermissionDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new PermissionDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IPermissionDtoApiResponse {
+    success?: boolean;
+    data?: PermissionDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class PermissionDtoIEnumerableApiResponse implements IPermissionDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: PermissionDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IPermissionDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(PermissionDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): PermissionDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new PermissionDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IPermissionDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: PermissionDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class PriceHistoryDto implements IPriceHistoryDto {
@@ -5870,6 +7687,302 @@ export interface IProductSellerMappingDtoIEnumerableApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class ProductWithCurrentPricesDto implements IProductWithCurrentPricesDto {
+    productId?: string;
+    name?: string | undefined;
+    manufacturer?: string | undefined;
+    modelNumber?: string | undefined;
+    sku?: string | undefined;
+    categoryId?: string;
+    description?: string | undefined;
+    specifications?: { [key: string]: any; } | undefined;
+    isActive?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+    category?: CategoryDto;
+    currentPrices?: CurrentPriceDto[] | undefined;
+    lowestCurrentPrice?: number | undefined;
+    highestCurrentPrice?: number | undefined;
+    availableSellersCount?: number;
+
+    constructor(data?: IProductWithCurrentPricesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productId = _data["productId"];
+            this.name = _data["name"];
+            this.manufacturer = _data["manufacturer"];
+            this.modelNumber = _data["modelNumber"];
+            this.sku = _data["sku"];
+            this.categoryId = _data["categoryId"];
+            this.description = _data["description"];
+            if (_data["specifications"]) {
+                this.specifications = {} as any;
+                for (let key in _data["specifications"]) {
+                    if (_data["specifications"].hasOwnProperty(key))
+                        (<any>this.specifications)![key] = _data["specifications"][key];
+                }
+            }
+            this.isActive = _data["isActive"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.category = _data["category"] ? CategoryDto.fromJS(_data["category"]) : <any>undefined;
+            if (Array.isArray(_data["currentPrices"])) {
+                this.currentPrices = [] as any;
+                for (let item of _data["currentPrices"])
+                    this.currentPrices!.push(CurrentPriceDto.fromJS(item));
+            }
+            this.lowestCurrentPrice = _data["lowestCurrentPrice"];
+            this.highestCurrentPrice = _data["highestCurrentPrice"];
+            this.availableSellersCount = _data["availableSellersCount"];
+        }
+    }
+
+    static fromJS(data: any): ProductWithCurrentPricesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductWithCurrentPricesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productId"] = this.productId;
+        data["name"] = this.name;
+        data["manufacturer"] = this.manufacturer;
+        data["modelNumber"] = this.modelNumber;
+        data["sku"] = this.sku;
+        data["categoryId"] = this.categoryId;
+        data["description"] = this.description;
+        if (this.specifications) {
+            data["specifications"] = {};
+            for (let key in this.specifications) {
+                if (this.specifications.hasOwnProperty(key))
+                    (<any>data["specifications"])[key] = (<any>this.specifications)[key];
+            }
+        }
+        data["isActive"] = this.isActive;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["category"] = this.category ? this.category.toJSON() : <any>undefined;
+        if (Array.isArray(this.currentPrices)) {
+            data["currentPrices"] = [];
+            for (let item of this.currentPrices)
+                data["currentPrices"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["lowestCurrentPrice"] = this.lowestCurrentPrice;
+        data["highestCurrentPrice"] = this.highestCurrentPrice;
+        data["availableSellersCount"] = this.availableSellersCount;
+        return data;
+    }
+}
+
+export interface IProductWithCurrentPricesDto {
+    productId?: string;
+    name?: string | undefined;
+    manufacturer?: string | undefined;
+    modelNumber?: string | undefined;
+    sku?: string | undefined;
+    categoryId?: string;
+    description?: string | undefined;
+    specifications?: { [key: string]: any; } | undefined;
+    isActive?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+    category?: CategoryDto;
+    currentPrices?: CurrentPriceDto[] | undefined;
+    lowestCurrentPrice?: number | undefined;
+    highestCurrentPrice?: number | undefined;
+    availableSellersCount?: number;
+}
+
+export class ProductWithCurrentPricesDtoApiResponse implements IProductWithCurrentPricesDtoApiResponse {
+    success?: boolean;
+    data?: ProductWithCurrentPricesDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProductWithCurrentPricesDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ProductWithCurrentPricesDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductWithCurrentPricesDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductWithCurrentPricesDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProductWithCurrentPricesDtoApiResponse {
+    success?: boolean;
+    data?: ProductWithCurrentPricesDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProductWithCurrentPricesDtoPagedResponse implements IProductWithCurrentPricesDtoPagedResponse {
+    success?: boolean;
+    data?: ProductWithCurrentPricesDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+
+    constructor(data?: IProductWithCurrentPricesDtoPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ProductWithCurrentPricesDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+            this.pagination = _data["pagination"] ? PaginationMeta.fromJS(_data["pagination"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProductWithCurrentPricesDtoPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductWithCurrentPricesDtoPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        data["pagination"] = this.pagination ? this.pagination.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProductWithCurrentPricesDtoPagedResponse {
+    success?: boolean;
+    data?: ProductWithCurrentPricesDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+}
+
 export class RegisterUserDto implements IRegisterUserDto {
     email!: string;
     password!: string;
@@ -5916,6 +8029,238 @@ export interface IRegisterUserDto {
     password: string;
     firstName?: string | undefined;
     lastName?: string | undefined;
+}
+
+export class RoleInfoDto implements IRoleInfoDto {
+    id?: string;
+    name?: string | undefined;
+    displayName?: string | undefined;
+    description?: string | undefined;
+    userCount?: number;
+    isSystemRole?: boolean;
+
+    constructor(data?: IRoleInfoDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.displayName = _data["displayName"];
+            this.description = _data["description"];
+            this.userCount = _data["userCount"];
+            this.isSystemRole = _data["isSystemRole"];
+        }
+    }
+
+    static fromJS(data: any): RoleInfoDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RoleInfoDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["displayName"] = this.displayName;
+        data["description"] = this.description;
+        data["userCount"] = this.userCount;
+        data["isSystemRole"] = this.isSystemRole;
+        return data;
+    }
+}
+
+export interface IRoleInfoDto {
+    id?: string;
+    name?: string | undefined;
+    displayName?: string | undefined;
+    description?: string | undefined;
+    userCount?: number;
+    isSystemRole?: boolean;
+}
+
+export class RoleInfoDtoApiResponse implements IRoleInfoDtoApiResponse {
+    success?: boolean;
+    data?: RoleInfoDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IRoleInfoDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? RoleInfoDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): RoleInfoDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new RoleInfoDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IRoleInfoDtoApiResponse {
+    success?: boolean;
+    data?: RoleInfoDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class RoleInfoDtoIEnumerableApiResponse implements IRoleInfoDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: RoleInfoDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IRoleInfoDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(RoleInfoDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): RoleInfoDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new RoleInfoDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IRoleInfoDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: RoleInfoDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class ScraperRunLogDto implements IScraperRunLogDto {
@@ -7350,6 +9695,102 @@ export interface IStringApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class StringStringArrayDictionaryApiResponse implements IStringStringArrayDictionaryApiResponse {
+    success?: boolean;
+    data?: { [key: string]: string[]; } | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IStringStringArrayDictionaryApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (_data["data"]) {
+                this.data = {} as any;
+                for (let key in _data["data"]) {
+                    if (_data["data"].hasOwnProperty(key))
+                        (<any>this.data)![key] = _data["data"][key];
+                }
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): StringStringArrayDictionaryApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new StringStringArrayDictionaryApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (this.data) {
+            data["data"] = {};
+            for (let key in this.data) {
+                if (this.data.hasOwnProperty(key))
+                    (<any>data["data"])[key] = (<any>this.data)[key];
+            }
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IStringStringArrayDictionaryApiResponse {
+    success?: boolean;
+    data?: { [key: string]: string[]; } | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class UpdateAlertRuleDto implements IUpdateAlertRuleDto {
     conditionType?: string | undefined;
     thresholdValue?: number | undefined;
@@ -7448,6 +9889,46 @@ export interface IUpdateCategoryDto {
     name?: string | undefined;
     slug?: string | undefined;
     description?: string | undefined;
+}
+
+export class UpdatePermissionDto implements IUpdatePermissionDto {
+    description?: string | undefined;
+    category?: string | undefined;
+
+    constructor(data?: IUpdatePermissionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.description = _data["description"];
+            this.category = _data["category"];
+        }
+    }
+
+    static fromJS(data: any): UpdatePermissionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdatePermissionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["description"] = this.description;
+        data["category"] = this.category;
+        return data;
+    }
+}
+
+export interface IUpdatePermissionDto {
+    description?: string | undefined;
+    category?: string | undefined;
 }
 
 export class UpdateProductDto implements IUpdateProductDto {
@@ -7968,6 +10449,158 @@ export interface IUserDtoPagedResponse {
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
     pagination?: PaginationMeta;
+}
+
+export class UserRoleInfoDto implements IUserRoleInfoDto {
+    userId?: string;
+    email?: string | undefined;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    fullName?: string | undefined;
+    roleName?: string | undefined;
+    assignedAt?: Date;
+
+    constructor(data?: IUserRoleInfoDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.userId = _data["userId"];
+            this.email = _data["email"];
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.fullName = _data["fullName"];
+            this.roleName = _data["roleName"];
+            this.assignedAt = _data["assignedAt"] ? new Date(_data["assignedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): UserRoleInfoDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserRoleInfoDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["userId"] = this.userId;
+        data["email"] = this.email;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["fullName"] = this.fullName;
+        data["roleName"] = this.roleName;
+        data["assignedAt"] = this.assignedAt ? this.assignedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IUserRoleInfoDto {
+    userId?: string;
+    email?: string | undefined;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    fullName?: string | undefined;
+    roleName?: string | undefined;
+    assignedAt?: Date;
+}
+
+export class UserRoleInfoDtoIEnumerableApiResponse implements IUserRoleInfoDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: UserRoleInfoDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IUserRoleInfoDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(UserRoleInfoDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): UserRoleInfoDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserRoleInfoDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IUserRoleInfoDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: UserRoleInfoDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class UtilitiesExampleRequest implements IUtilitiesExampleRequest {

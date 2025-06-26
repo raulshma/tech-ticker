@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, map, catchError, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
-// import { TechTickerApiClient } from '../api/api-client';
+import { TechTickerApiClient, RoleInfoDto, RoleInfoDtoIEnumerableApiResponse } from '../api/api-client';
 
 export interface RoleDefinition {
   name: string;
@@ -61,8 +61,8 @@ export class RoleService {
   };
 
   constructor(
-    private authService: AuthService
-    // private apiClient: TechTickerApiClient
+    private authService: AuthService,
+    private apiClient: TechTickerApiClient
   ) {}
 
   getAvailableRoles(): RoleDefinition[] {
@@ -70,13 +70,20 @@ export class RoleService {
   }
 
   // Fetch roles from API (for admin use)
-  fetchRolesFromApi(): Observable<any> {
-    // TODO: Regenerate NSwag client to include roles endpoints
-    // return this.apiClient.rolesGET();
-    return new Observable(observer => {
-      observer.next([]);
-      observer.complete();
-    });
+  fetchRolesFromApi(): Observable<RoleInfoDto[]> {
+    return this.apiClient.getAllRoles()
+      .pipe(
+        map((response: RoleInfoDtoIEnumerableApiResponse) => {
+          if (!response.success || !response.data) {
+            throw new Error(response.message || 'Failed to fetch roles');
+          }
+          return response.data;
+        }),
+        catchError(error => {
+          console.error('Error fetching roles:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
   getRoleDefinition(roleName: string): RoleDefinition | undefined {

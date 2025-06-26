@@ -240,6 +240,19 @@ public class MappingService : IMappingService
         };
     }
 
+    public CurrentPriceDto MapToCurrentPriceDto(PriceHistory priceHistory)
+    {
+        return new CurrentPriceDto
+        {
+            SellerName = priceHistory.SellerName,
+            Price = priceHistory.Price,
+            StockStatus = priceHistory.StockStatus,
+            SourceUrl = priceHistory.SourceUrl,
+            LastUpdated = priceHistory.Timestamp,
+            ScrapedProductNameOnPage = priceHistory.ScrapedProductNameOnPage
+        };
+    }
+
     public AlertRuleDto MapToDto(AlertRule alertRule)
     {
         return new AlertRuleDto

@@ -1,0 +1,23 @@
+<div class="category-filter">
+  <h3>Categories</h3>
+  <div class="category-list">
+    <button 
+      mat-button 
+      class="category-item"
+      [class.selected]="selectedCategoryId === null"
+      (click)="onCategoryClick(null)">
+      <mat-icon>all_inclusive</mat-icon>
+      All Categories
+    </button>
+    
+    <button 
+      mat-button 
+      class="category-item"
+      *ngFor="let category of categories"
+      [class.selected]="isSelected(category.categoryId!)"
+      (click)="onCategoryClick(category.categoryId!)">
+      <mat-icon>folder</mat-icon>
+      {{ category.name }}
+    </button>
+  </div>
+</div>

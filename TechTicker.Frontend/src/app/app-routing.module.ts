@@ -21,6 +21,10 @@ const routes: Routes = [
         loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule)
       },
       {
+        path: 'catalog',
+        loadChildren: () => import('./features/catalog/catalog.module').then(m => m.CatalogModule)
+      },
+      {
         path: 'categories',
         loadChildren: () => import('./features/categories/categories.module').then(m => m.CategoriesModule),
         canActivate: [RoleGuard],

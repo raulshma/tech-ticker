@@ -33,7 +33,7 @@ export class ProductsService {
   constructor(private apiClient: TechTickerApiClient) {}
 
   getProducts(filter: ProductsFilter = {}): Observable<PagedResult<ProductDto>> {
-    return this.apiClient.productsGET(
+    return this.apiClient.getProducts(
       filter.categoryId,
       filter.search,
       filter.page || 1,
@@ -59,7 +59,7 @@ export class ProductsService {
   }
 
   getProduct(productId: string): Observable<ProductDto> {
-    return this.apiClient.productsGET2(productId).pipe(
+    return this.apiClient.getProductById(productId).pipe(
       map((response: ProductDtoApiResponse) => {
         if (!response.success || !response.data) {
           throw new Error(response.message || 'Failed to fetch product');
@@ -76,7 +76,7 @@ export class ProductsService {
 
 
   createProduct(product: CreateProductDto): Observable<ProductDto> {
-    return this.apiClient.productsPOST(product)
+    return this.apiClient.createProduct(product)
       .pipe(
         map((response: ProductDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -92,7 +92,7 @@ export class ProductsService {
   }
 
   updateProduct(id: string, product: UpdateProductDto): Observable<ProductDto> {
-    return this.apiClient.productsPUT(id, product)
+    return this.apiClient.updateProduct(id, product)
       .pipe(
         map((response: ProductDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -108,7 +108,7 @@ export class ProductsService {
   }
 
   deleteProduct(id: string): Observable<void> {
-    return this.apiClient.productsDELETE(id)
+    return this.apiClient.deleteProduct(id)
       .pipe(
         map(() => void 0),
         catchError(error => {

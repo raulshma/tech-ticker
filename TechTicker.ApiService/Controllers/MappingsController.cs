@@ -32,7 +32,7 @@ public class MappingsController : BaseApiController
     /// </summary>
     /// <param name="createDto">Mapping creation data</param>
     /// <returns>Created mapping</returns>
-    [HttpPost]
+    [HttpPost(Name = "CreateMapping")]
     public async Task<ActionResult<ApiResponse<ProductSellerMappingDto>>> CreateMapping([FromBody] CreateProductSellerMappingDto createDto)
     {
         var result = await _mappingService.CreateMappingAsync(createDto);
@@ -44,7 +44,7 @@ public class MappingsController : BaseApiController
     /// </summary>
     /// <param name="canonicalProductId">Product ID</param>
     /// <returns>List of mappings for the product</returns>
-    [HttpGet]
+    [HttpGet(Name = "GetMappings")]
     public async Task<ActionResult<ApiResponse<IEnumerable<ProductSellerMappingDto>>>> GetMappings([FromQuery] Guid? canonicalProductId = null)
     {
         if (canonicalProductId.HasValue)
@@ -62,7 +62,7 @@ public class MappingsController : BaseApiController
     /// Get all active mappings (for scraping orchestrator)
     /// </summary>
     /// <returns>List of active mappings</returns>
-    [HttpGet("active")]
+    [HttpGet("active", Name = "GetActiveMappings")]
     public async Task<ActionResult<ApiResponse<IEnumerable<ProductSellerMappingDto>>>> GetActiveMappings()
     {
         var result = await _mappingService.GetActiveMappingsAsync();
@@ -75,7 +75,7 @@ public class MappingsController : BaseApiController
     /// <param name="mappingId">Mapping ID</param>
     /// <param name="updateDto">Mapping update data</param>
     /// <returns>Updated mapping</returns>
-    [HttpPut("{mappingId:guid}")]
+    [HttpPut("{mappingId:guid}", Name = "UpdateMapping")]
     public async Task<ActionResult<ApiResponse<ProductSellerMappingDto>>> UpdateMapping(Guid mappingId, [FromBody] UpdateProductSellerMappingDto updateDto)
     {
         var result = await _mappingService.UpdateMappingAsync(mappingId, updateDto);
@@ -87,7 +87,7 @@ public class MappingsController : BaseApiController
     /// </summary>
     /// <param name="mappingId">Mapping ID</param>
     /// <returns>Success or error</returns>
-    [HttpDelete("{mappingId:guid}")]
+    [HttpDelete("{mappingId:guid}", Name = "DeleteMapping")]
     public async Task<ActionResult<ApiResponse>> DeleteMapping(Guid mappingId)
     {
         var result = await _mappingService.DeleteMappingAsync(mappingId);
@@ -99,7 +99,7 @@ public class MappingsController : BaseApiController
     /// </summary>
     /// <param name="mappingId">Mapping ID to scrape</param>
     /// <returns>Success or error response</returns>
-    [HttpPost("{mappingId:guid}/scrape-now")]
+    [HttpPost("{mappingId:guid}/scrape-now", Name = "TriggerManualScraping")]
     public async Task<ActionResult<ApiResponse>> TriggerManualScraping(Guid mappingId)
     {
         var success = await _scrapingOrchestrationService.TriggerManualScrapingAsync(mappingId);

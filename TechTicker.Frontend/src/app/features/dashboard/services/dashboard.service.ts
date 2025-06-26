@@ -21,7 +21,7 @@ export class DashboardService {
   constructor(private apiClient: TechTickerApiClient) {}
 
   getDashboardStats(): Observable<DashboardStats> {
-    return this.apiClient.stats()
+    return this.apiClient.getDashboardStats()
       .pipe(
         map((response: DashboardStatsDtoApiResponse) => {
           if (!response.success || !response.data) {

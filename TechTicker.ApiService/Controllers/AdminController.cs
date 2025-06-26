@@ -34,7 +34,7 @@ public class AdminController : BaseApiController
     /// <param name="page">Page number</param>
     /// <param name="pageSize">Page size</param>
     /// <returns>Paginated list of users</returns>
-    [HttpGet("users")]
+    [HttpGet("users", Name = "GetAllUsers")]
     public async Task<ActionResult<PagedResponse<UserDto>>> GetUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var result = await _userService.GetAllUsersAsync(page, pageSize);
@@ -46,7 +46,7 @@ public class AdminController : BaseApiController
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <returns>User details</returns>
-    [HttpGet("users/{userId:guid}")]
+    [HttpGet("users/{userId:guid}", Name = "GetUserById")]
     public async Task<ActionResult<ApiResponse<UserDto>>> GetUser(Guid userId)
     {
         var result = await _userService.GetUserByIdAsync(userId);
@@ -58,7 +58,7 @@ public class AdminController : BaseApiController
     /// </summary>
     /// <param name="createDto">User creation data</param>
     /// <returns>Created user</returns>
-    [HttpPost("users")]
+    [HttpPost("users", Name = "CreateUser")]
     public async Task<ActionResult<ApiResponse<UserDto>>> CreateUser([FromBody] CreateUserDto createDto)
     {
         var result = await _userService.CreateUserAsync(createDto);
@@ -71,7 +71,7 @@ public class AdminController : BaseApiController
     /// <param name="userId">User ID</param>
     /// <param name="updateDto">User update data</param>
     /// <returns>Updated user</returns>
-    [HttpPut("users/{userId:guid}")]
+    [HttpPut("users/{userId:guid}", Name = "UpdateUser")]
     public async Task<ActionResult<ApiResponse<UserDto>>> UpdateUser(Guid userId, [FromBody] UpdateUserDto updateDto)
     {
         var result = await _userService.UpdateUserAsync(userId, updateDto);
@@ -83,7 +83,7 @@ public class AdminController : BaseApiController
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <returns>Success or error</returns>
-    [HttpDelete("users/{userId:guid}")]
+    [HttpDelete("users/{userId:guid}", Name = "DeleteUser")]
     public async Task<ActionResult<ApiResponse>> DeleteUser(Guid userId)
     {
         var result = await _userService.DeleteUserAsync(userId);
@@ -98,7 +98,7 @@ public class AdminController : BaseApiController
     /// <param name="page">Page number</param>
     /// <param name="pageSize">Page size</param>
     /// <returns>Paginated list of alert rules</returns>
-    [HttpGet("alerts")]
+    [HttpGet("alerts", Name = "GetAllAlerts")]
     public async Task<ActionResult<PagedResponse<AlertRuleDto>>> GetAllAlerts(
         [FromQuery] Guid? userId = null,
         [FromQuery] Guid? productId = null,

@@ -26,7 +26,7 @@ public class ProductsController(
     /// </summary>
     /// <param name="createDto">Product creation data</param>
     /// <returns>Created product</returns>
-    [HttpPost]
+    [HttpPost(Name = "CreateProduct")]
     [RequirePermission(Permissions.ProductsCreate)]
     public async Task<ActionResult<ApiResponse<ProductDto>>> CreateProduct([FromBody] CreateProductDto createDto)
     {
@@ -42,7 +42,7 @@ public class ProductsController(
     /// <param name="page">Page number</param>
     /// <param name="pageSize">Page size</param>
     /// <returns>Paginated list of products</returns>
-    [HttpGet]
+    [HttpGet(Name = "GetProducts")]
     [RequirePermission(Permissions.ProductsRead)]
     public async Task<ActionResult<PagedResponse<ProductDto>>> GetProducts(
         [FromQuery] Guid? categoryId = null,
@@ -59,7 +59,7 @@ public class ProductsController(
     /// </summary>
     /// <param name="productId">Product ID</param>
     /// <returns>Product details</returns>
-    [HttpGet("{productId:guid}")]
+    [HttpGet("{productId:guid}", Name = "GetProductById")]
     [RequirePermission(Permissions.ProductsRead)]
     public async Task<ActionResult<ApiResponse<ProductDto>>> GetProduct(Guid productId)
     {
@@ -121,6 +121,52 @@ public class ProductsController(
         };
 
         var result = await _priceHistoryService.GetPriceHistoryAsync(productId, queryDto);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Get current prices for a product from all sellers
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <returns>Current prices from all sellers</returns>
+    [HttpGet("{productId:guid}/current-prices")]
+    [RequirePermission(Permissions.ProductsRead)]
+    public async Task<ActionResult<ApiResponse<IEnumerable<CurrentPriceDto>>>> GetCurrentPrices(Guid productId)
+    {
+        var result = await _priceHistoryService.GetCurrentPricesAsync(productId);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Get products with current pricing information for catalog browsing
+    /// </summary>
+    /// <param name="categoryId">Optional category filter</param>
+    /// <param name="search">Optional search term</param>
+    /// <param name="page">Page number</param>
+    /// <param name="pageSize">Page size</param>
+    /// <returns>Paginated list of products with current prices</returns>
+    [HttpGet("catalog", Name = "GetProductsCatalog")]
+    [RequirePermission(Permissions.ProductsRead)]
+    public async Task<ActionResult<PagedResponse<ProductWithCurrentPricesDto>>> GetProductsCatalog(
+        [FromQuery] Guid? categoryId = null,
+        [FromQuery] string? search = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 12)
+    {
+        var result = await _productService.GetProductsWithCurrentPricesAsync(categoryId, search, page, pageSize);
+        return HandlePagedResult(result);
+    }
+
+    /// <summary>
+    /// Get a single product with current pricing information for catalog detail view
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <returns>Product with current prices</returns>
+    [HttpGet("catalog/{productId:guid}", Name = "GetProductCatalogDetail")]
+    [RequirePermission(Permissions.ProductsRead)]
+    public async Task<ActionResult<ApiResponse<ProductWithCurrentPricesDto>>> GetProductCatalogDetail(Guid productId)
+    {
+        var result = await _productService.GetProductWithCurrentPricesAsync(productId);
         return HandleResult(result);
     }
 }

@@ -19,7 +19,7 @@ export class SiteConfigsService {
   constructor(private apiClient: TechTickerApiClient) {}
 
   getSiteConfigs(): Observable<ScraperSiteConfigurationDto[]> {
-    return this.apiClient.all()
+    return this.apiClient.getAllSiteConfigs()
       .pipe(
         map((response) => {
           if (!response.success || !response.data) {
@@ -37,7 +37,7 @@ export class SiteConfigsService {
   }
 
   getSiteConfig(id: string): Observable<ScraperSiteConfigurationDto> {
-    return this.apiClient.siteConfigsGET2(id)
+    return this.apiClient.getSiteConfig(id)
       .pipe(
         map((response: ScraperSiteConfigurationDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -53,7 +53,7 @@ export class SiteConfigsService {
   }
 
   createSiteConfig(siteConfig: CreateScraperSiteConfigurationDto): Observable<ScraperSiteConfigurationDto> {
-    return this.apiClient.siteConfigsPOST(siteConfig)
+    return this.apiClient.createSiteConfig(siteConfig)
       .pipe(
         map((response: ScraperSiteConfigurationDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -74,7 +74,7 @@ export class SiteConfigsService {
   }
 
   updateSiteConfig(id: string, siteConfig: UpdateScraperSiteConfigurationDto): Observable<ScraperSiteConfigurationDto> {
-    return this.apiClient.siteConfigsPUT(id, siteConfig)
+    return this.apiClient.updateSiteConfig(id, siteConfig)
       .pipe(
         map((response: ScraperSiteConfigurationDtoApiResponse) => {
           if (!response.success || !response.data) {
@@ -98,7 +98,7 @@ export class SiteConfigsService {
   }
 
   deleteSiteConfig(id: string): Observable<void> {
-    return this.apiClient.siteConfigsDELETE(id)
+    return this.apiClient.deleteSiteConfig(id)
       .pipe(
         map(() => {
           // Remove from local list

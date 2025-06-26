@@ -62,4 +62,30 @@ public class PriceHistoryRepository : Repository<PriceHistory>, IPriceHistoryRep
             .OrderByDescending(ph => ph.Timestamp)
             .FirstOrDefaultAsync();
     }
+
+    public async Task<IEnumerable<PriceHistory>> GetCurrentPricesAsync(Guid productId)
+    {
+        // Get the latest price from each seller for the product
+        var latestPrices = await _dbSet
+            .Where(ph => ph.CanonicalProductId == productId)
+            .GroupBy(ph => ph.SellerName)
+            .Select(g => g.OrderByDescending(ph => ph.Timestamp).First())
+            .ToListAsync();
+
+        return latestPrices;
+    }
+
+    public async Task<IEnumerable<PriceHistory>> GetCurrentPricesAsync(IEnumerable<Guid> productIds)
+    {
+        var productIdsList = productIds.ToList();
+
+        // Get the latest price from each seller for each product
+        var latestPrices = await _dbSet
+            .Where(ph => productIdsList.Contains(ph.CanonicalProductId))
+            .GroupBy(ph => new { ph.CanonicalProductId, ph.SellerName })
+            .Select(g => g.OrderByDescending(ph => ph.Timestamp).First())
+            .ToListAsync();
+
+        return latestPrices;
+    }
 }

@@ -1,59 +1,94 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-
-export interface AlertRule {
-  id: string;
-  name: string;
-  productId: string;
-  productName: string;
-  alertType: 'price_drop' | 'price_increase' | 'availability' | 'back_in_stock';
-  threshold?: number;
-  isActive: boolean;
-  createdAt: Date;
-  lastTriggered?: Date;
-}
+import { Observable, map, catchError, throwError } from 'rxjs';
+import {
+  TechTickerApiClient,
+  AlertRuleDto,
+  CreateAlertRuleDto,
+  UpdateAlertRuleDto,
+  AlertRuleDtoApiResponse,
+  AlertRuleDtoIEnumerableApiResponse,
+  ApiResponse
+} from '../../../shared/api/api-client';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlertsService {
 
-  constructor() { }
+  constructor(private apiClient: TechTickerApiClient) { }
 
-  // Placeholder methods for future implementation
-  getAlertRules(): Observable<AlertRule[]> {
-    // Return empty array for now - will be implemented when backend is ready
-    return of([]);
+  getUserAlerts(): Observable<AlertRuleDto[]> {
+    return this.apiClient.getUserAlerts()
+      .pipe(
+        map((response: AlertRuleDtoIEnumerableApiResponse) => {
+          if (!response.success || !response.data) {
+            throw new Error(response.message || 'Failed to fetch user alerts');
+          }
+          return response.data;
+        }),
+        catchError(error => {
+          console.error('Error fetching user alerts:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
-  createAlertRule(alertRule: Partial<AlertRule>): Observable<AlertRule> {
-    // Placeholder implementation
-    const newAlert: AlertRule = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: alertRule.name || '',
-      productId: alertRule.productId || '',
-      productName: alertRule.productName || '',
-      alertType: alertRule.alertType || 'price_drop',
-      threshold: alertRule.threshold,
-      isActive: true,
-      createdAt: new Date()
-    };
-    
-    return of(newAlert);
+  getProductAlerts(productId: string): Observable<AlertRuleDto[]> {
+    return this.apiClient.getProductAlerts(productId)
+      .pipe(
+        map((response: AlertRuleDtoIEnumerableApiResponse) => {
+          if (!response.success || !response.data) {
+            throw new Error(response.message || 'Failed to fetch product alerts');
+          }
+          return response.data;
+        }),
+        catchError(error => {
+          console.error('Error fetching product alerts:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
-  updateAlertRule(id: string, updates: Partial<AlertRule>): Observable<AlertRule> {
-    // Placeholder implementation
-    return of({} as AlertRule);
+  createAlert(alertRule: CreateAlertRuleDto): Observable<AlertRuleDto> {
+    return this.apiClient.createAlert(alertRule)
+      .pipe(
+        map((response: AlertRuleDtoApiResponse) => {
+          if (!response.success || !response.data) {
+            throw new Error(response.message || 'Failed to create alert');
+          }
+          return response.data;
+        }),
+        catchError(error => {
+          console.error('Error creating alert:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
-  deleteAlertRule(id: string): Observable<void> {
-    // Placeholder implementation
-    return of(void 0);
+  updateAlert(alertRuleId: string, updates: UpdateAlertRuleDto): Observable<AlertRuleDto> {
+    return this.apiClient.updateAlert(alertRuleId, updates)
+      .pipe(
+        map((response: AlertRuleDtoApiResponse) => {
+          if (!response.success || !response.data) {
+            throw new Error(response.message || 'Failed to update alert');
+          }
+          return response.data;
+        }),
+        catchError(error => {
+          console.error('Error updating alert:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
-  toggleAlertRule(id: string): Observable<AlertRule> {
-    // Placeholder implementation
-    return of({} as AlertRule);
+  deleteAlert(alertRuleId: string): Observable<void> {
+    return this.apiClient.deleteAlert(alertRuleId)
+      .pipe(
+        map(() => void 0),
+        catchError(error => {
+          console.error('Error deleting alert:', error);
+          return throwError(() => error);
+        })
+      );
   }
 }

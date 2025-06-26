@@ -181,7 +181,7 @@ export class AuthService {
   }
 
   getCurrentUser(): Observable<CurrentUser> {
-    return this.apiClient.me()
+    return this.apiClient.getCurrentUser()
       .pipe(
         map((response: UserDtoApiResponse) => {
           if (!response.success || !response.data) {
