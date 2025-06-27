@@ -123,6 +123,12 @@ public class CompleteScraperRunDto
     public decimal? ExtractedPrice { get; set; }
     public string? ExtractedStockStatus { get; set; }
     public string? ExtractedSellerName { get; set; }
+    public string? ExtractedPrimaryImageUrl { get; set; }
+    public List<string>? ExtractedAdditionalImageUrls { get; set; }
+    public List<string>? ExtractedOriginalImageUrls { get; set; }
+    public int? ImageProcessingCount { get; set; }
+    public int? ImageUploadCount { get; set; }
+    public string? ImageScrapingError { get; set; }
     public TimeSpan? ResponseTime { get; set; }
     public TimeSpan? PageLoadTime { get; set; }
     public TimeSpan? ParsingTime { get; set; }

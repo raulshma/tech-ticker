@@ -203,6 +203,8 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.Property(e => e.ExtractedPrice).HasColumnType("decimal(10,2)");
             entity.Property(e => e.ExtractedStockStatus).HasMaxLength(100);
             entity.Property(e => e.ExtractedSellerName).HasMaxLength(200);
+            entity.Property(e => e.ExtractedPrimaryImageUrl).HasMaxLength(2048);
+            entity.Property(e => e.ImageScrapingError).HasMaxLength(500);
             entity.Property(e => e.ErrorCode).HasMaxLength(100);
             entity.Property(e => e.ErrorCategory).HasMaxLength(50);
             entity.Property(e => e.AttemptNumber).IsRequired().HasDefaultValue(1);

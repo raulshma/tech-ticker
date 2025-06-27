@@ -135,6 +135,63 @@
       </mat-card-content>
     </mat-card>
 
+    <!-- Image Extraction Results -->
+    <mat-card class="info-card" *ngIf="hasImageData()">
+      <mat-card-header>
+        <mat-card-title>Image Extraction Results</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item" *ngIf="scraperLog.extractedPrimaryImageUrl">
+            <label>Primary Image:</label>
+            <span class="value url-value">{{scraperLog.extractedPrimaryImageUrl}}</span>
+            <button mat-icon-button (click)="copyToClipboard(scraperLog.extractedPrimaryImageUrl!)" matTooltip="Copy URL">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.imageProcessingCount !== null && scraperLog.imageProcessingCount !== undefined">
+            <label>Images Processed:</label>
+            <span class="value">{{scraperLog.imageProcessingCount}}</span>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.imageUploadCount !== null && scraperLog.imageUploadCount !== undefined">
+            <label>Images Uploaded:</label>
+            <span class="value">{{scraperLog.imageUploadCount}}</span>
+          </div>
+
+          <div class="info-item full-width" *ngIf="scraperLog.extractedAdditionalImageUrls && scraperLog.extractedAdditionalImageUrls.length > 0">
+            <label>Additional Images:</label>
+            <div class="value">
+              <div *ngFor="let imageUrl of scraperLog.extractedAdditionalImageUrls; let i = index" class="image-url-item">
+                <span class="url-value">{{imageUrl}}</span>
+                <button mat-icon-button (click)="copyToClipboard(imageUrl)" matTooltip="Copy URL">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-item full-width" *ngIf="scraperLog.extractedOriginalImageUrls && scraperLog.extractedOriginalImageUrls.length > 0">
+            <label>Original Image URLs:</label>
+            <div class="value">
+              <div *ngFor="let imageUrl of scraperLog.extractedOriginalImageUrls; let i = index" class="image-url-item">
+                <span class="url-value">{{imageUrl}}</span>
+                <button mat-icon-button (click)="copyToClipboard(imageUrl)" matTooltip="Copy URL">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-item full-width" *ngIf="scraperLog.imageScrapingError">
+            <label>Image Scraping Error:</label>
+            <span class="value error-value">{{scraperLog.imageScrapingError}}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
     <!-- Performance Metrics -->
     <mat-card class="info-card" *ngIf="scraperLog.pageLoadTime || scraperLog.parsingTime">
       <mat-card-header>

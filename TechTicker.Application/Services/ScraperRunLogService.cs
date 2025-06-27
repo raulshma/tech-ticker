@@ -305,6 +305,16 @@ public class ScraperRunLogService : IScraperRunLogService
             runLog.ExtractedPrice = completeDto.ExtractedPrice;
             runLog.ExtractedStockStatus = completeDto.ExtractedStockStatus;
             runLog.ExtractedSellerName = completeDto.ExtractedSellerName;
+            runLog.ExtractedPrimaryImageUrl = completeDto.ExtractedPrimaryImageUrl;
+            runLog.ExtractedAdditionalImageUrls = completeDto.ExtractedAdditionalImageUrls != null
+                ? JsonSerializer.Serialize(completeDto.ExtractedAdditionalImageUrls)
+                : null;
+            runLog.ExtractedOriginalImageUrls = completeDto.ExtractedOriginalImageUrls != null
+                ? JsonSerializer.Serialize(completeDto.ExtractedOriginalImageUrls)
+                : null;
+            runLog.ImageProcessingCount = completeDto.ImageProcessingCount;
+            runLog.ImageUploadCount = completeDto.ImageUploadCount;
+            runLog.ImageScrapingError = completeDto.ImageScrapingError;
 
             if (completeDto.ResponseTime.HasValue)
                 runLog.ResponseTime = completeDto.ResponseTime.Value;
@@ -472,6 +482,12 @@ public class ScraperRunLogService : IScraperRunLogService
             ExtractedPrice = runLog.ExtractedPrice,
             ExtractedStockStatus = runLog.ExtractedStockStatus,
             ExtractedSellerName = runLog.ExtractedSellerName,
+            ExtractedPrimaryImageUrl = runLog.ExtractedPrimaryImageUrl,
+            ExtractedAdditionalImageUrls = ParseJsonStringToList(runLog.ExtractedAdditionalImageUrls),
+            ExtractedOriginalImageUrls = ParseJsonStringToList(runLog.ExtractedOriginalImageUrls),
+            ImageProcessingCount = runLog.ImageProcessingCount,
+            ImageUploadCount = runLog.ImageUploadCount,
+            ImageScrapingError = runLog.ImageScrapingError,
             ErrorMessage = runLog.ErrorMessage,
             ErrorCode = runLog.ErrorCode,
             ErrorStackTrace = runLog.ErrorStackTrace,
@@ -499,5 +515,20 @@ public class ScraperRunLogService : IScraperRunLogService
                 UpdatedAt = runLog.Mapping.UpdatedAt
             } : null
         };
+    }
+
+    private static List<string>? ParseJsonStringToList(string? jsonString)
+    {
+        if (string.IsNullOrEmpty(jsonString))
+            return null;
+
+        try
+        {
+            return JsonSerializer.Deserialize<List<string>>(jsonString);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 }

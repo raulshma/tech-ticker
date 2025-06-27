@@ -144,6 +144,15 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
     return !!(this.scraperLog?.selectors);
   }
 
+  hasImageData(): boolean {
+    return !!(this.scraperLog?.extractedPrimaryImageUrl ||
+             (this.scraperLog?.extractedAdditionalImageUrls && this.scraperLog.extractedAdditionalImageUrls.length > 0) ||
+             (this.scraperLog?.extractedOriginalImageUrls && this.scraperLog.extractedOriginalImageUrls.length > 0) ||
+             this.scraperLog?.imageProcessingCount !== null ||
+             this.scraperLog?.imageUploadCount !== null ||
+             this.scraperLog?.imageScrapingError);
+  }
+
   getAdditionalHeadersJson(): string {
     if (!this.scraperLog?.additionalHeaders) return 'N/A';
     if (typeof this.scraperLog.additionalHeaders === 'string') {

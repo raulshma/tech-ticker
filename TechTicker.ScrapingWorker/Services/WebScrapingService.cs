@@ -57,7 +57,8 @@ public partial class WebScrapingService
                     ProductNameSelector = command.Selectors.ProductNameSelector,
                     PriceSelector = command.Selectors.PriceSelector,
                     StockSelector = command.Selectors.StockSelector,
-                    SellerNameOnPageSelector = command.Selectors.SellerNameOnPageSelector
+                    SellerNameOnPageSelector = command.Selectors.SellerNameOnPageSelector,
+                    ImageSelector = command.Selectors.ImageSelector
                 },
                 AttemptNumber = 1, // TODO: Handle retry logic
                 DebugNotes = "Starting scraping operation"
@@ -227,6 +228,12 @@ public partial class WebScrapingService
                     ExtractedPrice = price.Value,
                     ExtractedStockStatus = stockStatus ?? "Unknown",
                     ExtractedSellerName = sellerNameOnPage,
+                    ExtractedPrimaryImageUrl = imageResult?.PrimaryImageUrl,
+                    ExtractedAdditionalImageUrls = imageResult?.AdditionalImageUrls,
+                    ExtractedOriginalImageUrls = imageResult?.OriginalImageUrls,
+                    ImageProcessingCount = imageResult?.ProcessedCount,
+                    ImageUploadCount = imageResult?.SuccessfulUploads,
+                    ImageScrapingError = imageResult?.ErrorMessage,
                     PageLoadTime = pageLoadStopwatch.Elapsed,
                     ParsingTime = parsingStopwatch.Elapsed,
                     RawHtmlSnippet = htmlSnippet,

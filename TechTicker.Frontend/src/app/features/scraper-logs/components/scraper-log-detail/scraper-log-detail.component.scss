@@ -69,6 +69,26 @@
             padding: 4px 8px;
             border-radius: 4px;
           }
+
+          &.error-value {
+            color: #f44336;
+            font-weight: 500;
+          }
+
+          .image-url-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .url-value {
+              flex: 1;
+            }
+          }
         }
 
         button {

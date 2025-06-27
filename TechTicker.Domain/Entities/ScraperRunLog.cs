@@ -62,6 +62,39 @@ public class ScraperRunLog
     [MaxLength(200)]
     public string? ExtractedSellerName { get; set; }
 
+    // Image extraction results
+    /// <summary>
+    /// Primary image URL extracted during scraping
+    /// </summary>
+    [MaxLength(2048)]
+    public string? ExtractedPrimaryImageUrl { get; set; }
+
+    /// <summary>
+    /// Additional image URLs as JSON array
+    /// </summary>
+    public string? ExtractedAdditionalImageUrls { get; set; }
+
+    /// <summary>
+    /// Original scraped image URLs as JSON array (before processing)
+    /// </summary>
+    public string? ExtractedOriginalImageUrls { get; set; }
+
+    /// <summary>
+    /// Number of images successfully processed
+    /// </summary>
+    public int? ImageProcessingCount { get; set; }
+
+    /// <summary>
+    /// Number of images successfully uploaded/stored
+    /// </summary>
+    public int? ImageUploadCount { get; set; }
+
+    /// <summary>
+    /// Image scraping error message if any
+    /// </summary>
+    [MaxLength(500)]
+    public string? ImageScrapingError { get; set; }
+
     // Error details
     public string? ErrorMessage { get; set; }
 

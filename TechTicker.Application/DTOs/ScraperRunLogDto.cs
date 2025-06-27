@@ -30,6 +30,14 @@ public class ScraperRunLogDto
     public string? ExtractedStockStatus { get; set; }
     public string? ExtractedSellerName { get; set; }
 
+    // Image extraction results
+    public string? ExtractedPrimaryImageUrl { get; set; }
+    public List<string>? ExtractedAdditionalImageUrls { get; set; }
+    public List<string>? ExtractedOriginalImageUrls { get; set; }
+    public int? ImageProcessingCount { get; set; }
+    public int? ImageUploadCount { get; set; }
+    public string? ImageScrapingError { get; set; }
+
     // Error details
     public string? ErrorMessage { get; set; }
     public string? ErrorCode { get; set; }
@@ -123,6 +131,7 @@ public class ScrapingSelectorsDto
     public string PriceSelector { get; set; } = null!;
     public string StockSelector { get; set; } = null!;
     public string? SellerNameOnPageSelector { get; set; }
+    public string? ImageSelector { get; set; }
 }
 
 /// <summary>

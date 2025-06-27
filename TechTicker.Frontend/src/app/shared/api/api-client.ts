@@ -8366,6 +8366,12 @@ export class ScraperRunLogDto implements IScraperRunLogDto {
     extractedPrice?: number | undefined;
     extractedStockStatus?: string | undefined;
     extractedSellerName?: string | undefined;
+    extractedPrimaryImageUrl?: string | undefined;
+    extractedAdditionalImageUrls?: string[] | undefined;
+    extractedOriginalImageUrls?: string[] | undefined;
+    imageProcessingCount?: number | undefined;
+    imageUploadCount?: number | undefined;
+    imageScrapingError?: string | undefined;
     errorMessage?: string | undefined;
     errorCode?: string | undefined;
     errorStackTrace?: string | undefined;
@@ -8417,6 +8423,20 @@ export class ScraperRunLogDto implements IScraperRunLogDto {
             this.extractedPrice = _data["extractedPrice"];
             this.extractedStockStatus = _data["extractedStockStatus"];
             this.extractedSellerName = _data["extractedSellerName"];
+            this.extractedPrimaryImageUrl = _data["extractedPrimaryImageUrl"];
+            if (Array.isArray(_data["extractedAdditionalImageUrls"])) {
+                this.extractedAdditionalImageUrls = [] as any;
+                for (let item of _data["extractedAdditionalImageUrls"])
+                    this.extractedAdditionalImageUrls!.push(item);
+            }
+            if (Array.isArray(_data["extractedOriginalImageUrls"])) {
+                this.extractedOriginalImageUrls = [] as any;
+                for (let item of _data["extractedOriginalImageUrls"])
+                    this.extractedOriginalImageUrls!.push(item);
+            }
+            this.imageProcessingCount = _data["imageProcessingCount"];
+            this.imageUploadCount = _data["imageUploadCount"];
+            this.imageScrapingError = _data["imageScrapingError"];
             this.errorMessage = _data["errorMessage"];
             this.errorCode = _data["errorCode"];
             this.errorStackTrace = _data["errorStackTrace"];
@@ -8472,6 +8492,20 @@ export class ScraperRunLogDto implements IScraperRunLogDto {
         data["extractedPrice"] = this.extractedPrice;
         data["extractedStockStatus"] = this.extractedStockStatus;
         data["extractedSellerName"] = this.extractedSellerName;
+        data["extractedPrimaryImageUrl"] = this.extractedPrimaryImageUrl;
+        if (Array.isArray(this.extractedAdditionalImageUrls)) {
+            data["extractedAdditionalImageUrls"] = [];
+            for (let item of this.extractedAdditionalImageUrls)
+                data["extractedAdditionalImageUrls"].push(item);
+        }
+        if (Array.isArray(this.extractedOriginalImageUrls)) {
+            data["extractedOriginalImageUrls"] = [];
+            for (let item of this.extractedOriginalImageUrls)
+                data["extractedOriginalImageUrls"].push(item);
+        }
+        data["imageProcessingCount"] = this.imageProcessingCount;
+        data["imageUploadCount"] = this.imageUploadCount;
+        data["imageScrapingError"] = this.imageScrapingError;
         data["errorMessage"] = this.errorMessage;
         data["errorCode"] = this.errorCode;
         data["errorStackTrace"] = this.errorStackTrace;
@@ -8514,6 +8548,12 @@ export interface IScraperRunLogDto {
     extractedPrice?: number | undefined;
     extractedStockStatus?: string | undefined;
     extractedSellerName?: string | undefined;
+    extractedPrimaryImageUrl?: string | undefined;
+    extractedAdditionalImageUrls?: string[] | undefined;
+    extractedOriginalImageUrls?: string[] | undefined;
+    imageProcessingCount?: number | undefined;
+    imageUploadCount?: number | undefined;
+    imageScrapingError?: string | undefined;
     errorMessage?: string | undefined;
     errorCode?: string | undefined;
     errorStackTrace?: string | undefined;
@@ -9508,6 +9548,7 @@ export class ScrapingSelectorsDto implements IScrapingSelectorsDto {
     priceSelector?: string | undefined;
     stockSelector?: string | undefined;
     sellerNameOnPageSelector?: string | undefined;
+    imageSelector?: string | undefined;
 
     constructor(data?: IScrapingSelectorsDto) {
         if (data) {
@@ -9524,6 +9565,7 @@ export class ScrapingSelectorsDto implements IScrapingSelectorsDto {
             this.priceSelector = _data["priceSelector"];
             this.stockSelector = _data["stockSelector"];
             this.sellerNameOnPageSelector = _data["sellerNameOnPageSelector"];
+            this.imageSelector = _data["imageSelector"];
         }
     }
 
@@ -9540,6 +9582,7 @@ export class ScrapingSelectorsDto implements IScrapingSelectorsDto {
         data["priceSelector"] = this.priceSelector;
         data["stockSelector"] = this.stockSelector;
         data["sellerNameOnPageSelector"] = this.sellerNameOnPageSelector;
+        data["imageSelector"] = this.imageSelector;
         return data;
     }
 }
@@ -9549,6 +9592,7 @@ export interface IScrapingSelectorsDto {
     priceSelector?: string | undefined;
     stockSelector?: string | undefined;
     sellerNameOnPageSelector?: string | undefined;
+    imageSelector?: string | undefined;
 }
 
 export class SellerPerformanceMetricDto implements ISellerPerformanceMetricDto {
