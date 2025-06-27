@@ -22,6 +22,13 @@ public interface IImageStorageService
     /// <param name="productId">Product ID for organizing images</param>
     /// <returns>List of relative paths to saved images</returns>
     Task<List<string>> SaveImagesAsync(List<ImageUploadData> images, Guid productId);
+
+    /// <summary>
+    /// Check if a local image file exists and is valid
+    /// </summary>
+    /// <param name="relativePath">Relative path to the image file</param>
+    /// <returns>True if file exists and is valid</returns>
+    Task<bool> ImageExistsAsync(string relativePath);
 }
 
 /// <summary>

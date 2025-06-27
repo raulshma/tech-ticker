@@ -129,6 +129,76 @@ public class ImageStorageServiceTests : IDisposable
         result.Should().StartWith("images/products/");
     }
 
+    [Fact]
+    public async Task ImageExistsAsync_WithValidImage_ShouldReturnTrue()
+    {
+        // Arrange
+        var productId = Guid.NewGuid();
+        var relativePath = Path.Combine("images", "products", productId.ToString(), "test-image.jpg");
+        var fullPath = Path.Combine(_testImagePath, relativePath.Replace('/', Path.DirectorySeparatorChar));
+
+        // Create directory structure
+        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+
+        // Create a valid JPEG file (minimal JPEG header)
+        var jpegHeader = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46 };
+        await File.WriteAllBytesAsync(fullPath, jpegHeader);
+
+        // Act
+        var result = await _imageStorageService.ImageExistsAsync(relativePath);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ImageExistsAsync_WithNonExistentFile_ShouldReturnFalse()
+    {
+        // Arrange
+        var relativePath = "images/products/test/non-existent-image.jpg";
+
+        // Act
+        var result = await _imageStorageService.ImageExistsAsync(relativePath);
+
+        // Assert
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task ImageExistsAsync_WithEmptyFile_ShouldReturnFalse()
+    {
+        // Arrange
+        var productId = Guid.NewGuid();
+        var relativePath = Path.Combine("images", "products", productId.ToString(), "empty-image.jpg");
+        var fullPath = Path.Combine(_testImagePath, relativePath.Replace('/', Path.DirectorySeparatorChar));
+
+        // Create directory structure
+        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+
+        // Create an empty file
+        await File.WriteAllBytesAsync(fullPath, Array.Empty<byte>());
+
+        // Act
+        var result = await _imageStorageService.ImageExistsAsync(relativePath);
+
+        // Assert
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task ImageExistsAsync_WithNullOrEmptyPath_ShouldReturnFalse()
+    {
+        // Act & Assert
+        var result1 = await _imageStorageService.ImageExistsAsync(null!);
+        result1.Should().BeFalse();
+
+        var result2 = await _imageStorageService.ImageExistsAsync("");
+        result2.Should().BeFalse();
+
+        var result3 = await _imageStorageService.ImageExistsAsync("   ");
+        result3.Should().BeFalse();
+    }
+
     public void Dispose()
     {
         // Clean up test directory

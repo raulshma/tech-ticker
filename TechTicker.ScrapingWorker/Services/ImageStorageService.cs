@@ -138,4 +138,97 @@ public class ImageStorageService : IImageStorageService
             _ => ".jpg" // Default fallback
         };
     }
+
+    public async Task<bool> ImageExistsAsync(string relativePath)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(relativePath))
+            {
+                return false;
+            }
+
+            // Convert relative path to full path
+            var fullPath = Path.Combine(_baseImagePath, relativePath.Replace('/', Path.DirectorySeparatorChar));
+
+            // Check if file exists
+            if (!File.Exists(fullPath))
+            {
+                _logger.LogDebug("Image file does not exist: {Path}", fullPath);
+                return false;
+            }
+
+            // Check if file is not empty and is a valid image
+            var fileInfo = new FileInfo(fullPath);
+            if (fileInfo.Length == 0)
+            {
+                _logger.LogWarning("Image file is empty: {Path}", fullPath);
+                return false;
+            }
+
+            // Basic validation - check if file can be read
+            try
+            {
+                await using var stream = File.OpenRead(fullPath);
+                var buffer = new byte[8];
+                var bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+
+                if (bytesRead < 4)
+                {
+                    _logger.LogWarning("Image file is too small to be valid: {Path}", fullPath);
+                    return false;
+                }
+
+                // Check for common image file signatures
+                var isValidImage = IsValidImageSignature(buffer);
+                if (!isValidImage)
+                {
+                    _logger.LogWarning("Image file does not have valid image signature: {Path}", fullPath);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Cannot read image file: {Path}", fullPath);
+                return false;
+            }
+
+            _logger.LogDebug("Image file exists and is valid: {Path}", relativePath);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error checking if image exists: {Path}", relativePath);
+            return false;
+        }
+    }
+
+    private static bool IsValidImageSignature(byte[] buffer)
+    {
+        if (buffer.Length < 4) return false;
+
+        // Check for common image file signatures
+        // JPEG: FF D8 FF
+        if (buffer[0] == 0xFF && buffer[1] == 0xD8 && buffer[2] == 0xFF)
+            return true;
+
+        // PNG: 89 50 4E 47
+        if (buffer[0] == 0x89 && buffer[1] == 0x50 && buffer[2] == 0x4E && buffer[3] == 0x47)
+            return true;
+
+        // GIF: 47 49 46 38 or 47 49 46 39
+        if (buffer[0] == 0x47 && buffer[1] == 0x49 && buffer[2] == 0x46 &&
+            (buffer[3] == 0x38 || buffer[3] == 0x39))
+            return true;
+
+        // WebP: 52 49 46 46 (RIFF) - need to check further for WebP
+        if (buffer[0] == 0x52 && buffer[1] == 0x49 && buffer[2] == 0x46 && buffer[3] == 0x46)
+            return true; // Simplified check for WebP
+
+        // BMP: 42 4D
+        if (buffer[0] == 0x42 && buffer[1] == 0x4D)
+            return true;
+
+        return false;
+    }
 }

@@ -25,4 +25,11 @@ public interface IProductImageService
     /// <param name="maxAge">Maximum age of images to consider recent</param>
     /// <returns>True if product has recent images</returns>
     Task<bool> HasRecentImagesAsync(Guid productId, TimeSpan maxAge);
+
+    /// <summary>
+    /// Get existing image URLs for a product to avoid re-downloading
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <returns>Dictionary mapping original URLs to local paths</returns>
+    Task<Dictionary<string, string>> GetExistingImageMappingsAsync(Guid productId);
 }

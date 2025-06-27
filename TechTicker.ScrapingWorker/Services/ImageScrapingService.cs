@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using System.Text.RegularExpressions;
+using TechTicker.Application.Services.Interfaces;
 
 namespace TechTicker.ScrapingWorker.Services;
 
@@ -11,6 +12,7 @@ public partial class ImageScrapingService : IImageScrapingService
     private readonly ILogger<ImageScrapingService> _logger;
     private readonly HttpClient _httpClient;
     private readonly IImageStorageService _imageStorageService;
+    private readonly IProductImageService _productImageService;
 
     [GeneratedRegex(@"^https?://", RegexOptions.IgnoreCase)]
     private static partial Regex AbsoluteUrlRegex();
@@ -18,11 +20,13 @@ public partial class ImageScrapingService : IImageScrapingService
     public ImageScrapingService(
         ILogger<ImageScrapingService> logger,
         HttpClient httpClient,
-        IImageStorageService imageStorageService)
+        IImageStorageService imageStorageService,
+        IProductImageService productImageService)
     {
         _logger = logger;
         _httpClient = httpClient;
         _imageStorageService = imageStorageService;
+        _productImageService = productImageService;
     }
 
     public async Task<ImageScrapingResult> ScrapeImagesAsync(
@@ -60,13 +64,42 @@ public partial class ImageScrapingService : IImageScrapingService
             result.OriginalImageUrls = urlsToProcess;
             result.ProcessedCount = urlsToProcess.Count;
 
-            _logger.LogInformation("Found {Count} images to process (limited to {MaxImages})", 
+            _logger.LogInformation("Found {Count} images to process (limited to {MaxImages})",
                 urlsToProcess.Count, maxImages);
 
-            // Download and upload images
-            var imageUploadData = new List<ImageUploadData>();
-            
+            // Check for existing images to avoid re-downloading
+            var existingImageMappings = await _productImageService.GetExistingImageMappingsAsync(productId);
+            var existingPaths = new List<string>();
+            var urlsToDownload = new List<string>();
+
             foreach (var imageUrl in urlsToProcess)
+            {
+                if (existingImageMappings.TryGetValue(imageUrl, out var existingPath))
+                {
+                    // Check if the local file still exists and is valid
+                    var fileExists = await _imageStorageService.ImageExistsAsync(existingPath);
+                    if (fileExists)
+                    {
+                        existingPaths.Add(existingPath);
+                        _logger.LogDebug("Skipping download for existing image: {Url} -> {Path}", imageUrl, existingPath);
+                        continue;
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Local file missing or invalid, will re-download: {Url} -> {Path}", imageUrl, existingPath);
+                    }
+                }
+
+                urlsToDownload.Add(imageUrl);
+            }
+
+            _logger.LogInformation("Skipping {ExistingCount} existing images, downloading {DownloadCount} new images",
+                existingPaths.Count, urlsToDownload.Count);
+
+            // Download new images
+            var imageUploadData = new List<ImageUploadData>();
+
+            foreach (var imageUrl in urlsToDownload)
             {
                 try
                 {
@@ -82,30 +115,40 @@ public partial class ImageScrapingService : IImageScrapingService
                 }
             }
 
-            if (!imageUploadData.Any())
+            // Save new images to local storage
+            var newSavedPaths = new List<string>();
+            if (imageUploadData.Any())
             {
-                result.ErrorMessage = "Failed to download any images";
-                result.IsSuccess = false;
-                return result;
+                newSavedPaths = await _imageStorageService.SaveImagesAsync(imageUploadData, productId);
+                _logger.LogInformation("Successfully saved {SavedCount}/{DownloadCount} new images",
+                    newSavedPaths.Count, imageUploadData.Count);
             }
 
-            // Save images to local storage
-            var savedPaths = await _imageStorageService.SaveImagesAsync(imageUploadData, productId);
-            result.SuccessfulUploads = savedPaths.Count;
+            // Combine existing and new image paths
+            var allImagePaths = new List<string>();
+            allImagePaths.AddRange(existingPaths);
+            allImagePaths.AddRange(newSavedPaths);
 
-            if (savedPaths.Count > 0)
+            result.SuccessfulUploads = allImagePaths.Count;
+
+            if (allImagePaths.Count > 0)
             {
-                result.PrimaryImageUrl = savedPaths.First();
-                result.AdditionalImageUrls = savedPaths.Skip(1).ToList();
+                result.PrimaryImageUrl = allImagePaths.First();
+                result.AdditionalImageUrls = allImagePaths.Skip(1).ToList();
                 result.IsSuccess = true;
 
-                _logger.LogInformation("Successfully processed {SuccessCount}/{TotalCount} images",
-                    savedPaths.Count, imageUploadData.Count);
+                _logger.LogInformation("Successfully processed {TotalCount} images ({ExistingCount} existing, {NewCount} new)",
+                    allImagePaths.Count, existingPaths.Count, newSavedPaths.Count);
+            }
+            else if (urlsToProcess.Any())
+            {
+                result.ErrorMessage = "Failed to download or find any images";
+                result.IsSuccess = false;
             }
             else
             {
-                result.ErrorMessage = "Failed to save any images to local storage";
-                result.IsSuccess = false;
+                // No images to process, but that's okay
+                result.IsSuccess = true;
             }
 
             return result;

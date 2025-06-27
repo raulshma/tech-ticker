@@ -144,4 +144,62 @@ public class ProductImageServiceTests
         result.Should().BeFalse();
         _mockProductRepository.Verify(x => x.GetByIdAsync(productId), Times.Once);
     }
+
+    [Fact]
+    public async Task GetExistingImageMappingsAsync_WithExistingImages_ShouldReturnMappings()
+    {
+        // Arrange
+        var productId = Guid.NewGuid();
+        var originalUrls = new List<string>
+        {
+            "https://example.com/image1.jpg",
+            "https://example.com/image2.jpg"
+        };
+        var localPaths = new List<string>
+        {
+            "images/products/test/primary.jpg",
+            "images/products/test/additional1.jpg"
+        };
+
+        var product = new Product
+        {
+            ProductId = productId,
+            Name = "Test Product",
+            CategoryId = Guid.NewGuid(),
+            PrimaryImageUrl = localPaths[0],
+            AdditionalImageUrls = System.Text.Json.JsonSerializer.Serialize(localPaths.Skip(1).ToList()),
+            OriginalImageUrls = System.Text.Json.JsonSerializer.Serialize(originalUrls),
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        _mockProductRepository.Setup(x => x.GetByIdAsync(productId))
+            .ReturnsAsync(product);
+
+        // Act
+        var result = await _productImageService.GetExistingImageMappingsAsync(productId);
+
+        // Assert
+        result.Should().HaveCount(2);
+        result.Should().ContainKey(originalUrls[0]).WhoseValue.Should().Be(localPaths[0]);
+        result.Should().ContainKey(originalUrls[1]).WhoseValue.Should().Be(localPaths[1]);
+        _mockProductRepository.Verify(x => x.GetByIdAsync(productId), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetExistingImageMappingsAsync_WithNonExistentProduct_ShouldReturnEmptyDictionary()
+    {
+        // Arrange
+        var productId = Guid.NewGuid();
+
+        _mockProductRepository.Setup(x => x.GetByIdAsync(productId))
+            .ReturnsAsync((Product?)null);
+
+        // Act
+        var result = await _productImageService.GetExistingImageMappingsAsync(productId);
+
+        // Assert
+        result.Should().BeEmpty();
+        _mockProductRepository.Verify(x => x.GetByIdAsync(productId), Times.Once);
+    }
 }

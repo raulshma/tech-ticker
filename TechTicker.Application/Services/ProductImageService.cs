@@ -95,4 +95,53 @@ public class ProductImageService : IProductImageService
             return false;
         }
     }
+
+    public async Task<Dictionary<string, string>> GetExistingImageMappingsAsync(Guid productId)
+    {
+        try
+        {
+            var mappings = new Dictionary<string, string>();
+
+            var product = await _unitOfWork.Products.GetByIdAsync(productId);
+            if (product == null)
+            {
+                _logger.LogDebug("Product {ProductId} not found, returning empty image mappings", productId);
+                return mappings;
+            }
+
+            // Get original URLs and corresponding local paths
+            var originalUrls = product.OriginalImageUrlsList ?? new List<string>();
+            var localPaths = new List<string>();
+
+            // Combine primary and additional images
+            if (!string.IsNullOrEmpty(product.PrimaryImageUrl))
+            {
+                localPaths.Add(product.PrimaryImageUrl);
+            }
+
+            if (product.AdditionalImageUrlsList != null)
+            {
+                localPaths.AddRange(product.AdditionalImageUrlsList);
+            }
+
+            // Create mapping (assuming same order)
+            for (int i = 0; i < Math.Min(originalUrls.Count, localPaths.Count); i++)
+            {
+                if (!string.IsNullOrEmpty(originalUrls[i]) && !string.IsNullOrEmpty(localPaths[i]))
+                {
+                    mappings[originalUrls[i]] = localPaths[i];
+                }
+            }
+
+            _logger.LogDebug("Found {Count} existing image mappings for product {ProductId}",
+                mappings.Count, productId);
+
+            return mappings;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting existing image mappings for product {ProductId}", productId);
+            return new Dictionary<string, string>();
+        }
+    }
 }
