@@ -125,6 +125,12 @@ public class Worker : BackgroundService
                     OriginalImageUrls = scrapingResult.OriginalImageUrls
                 };
 
+                _logger.LogInformation("Publishing price data with images for product {ProductId}: Primary={PrimaryImage}, Additional={AdditionalCount}, Original={OriginalCount}",
+                    command.CanonicalProductId,
+                    rawPriceData.PrimaryImageUrl ?? "None",
+                    rawPriceData.AdditionalImageUrls?.Count ?? 0,
+                    rawPriceData.OriginalImageUrls?.Count ?? 0);
+
                 await _messagePublisher.PublishAsync(
                     rawPriceData,
                     _messagingConfig.PriceDataExchange,

@@ -14,7 +14,6 @@ public class PriceDataProcessingServiceTests
     private readonly Mock<ILogger<PriceDataProcessingService>> _mockLogger;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly Mock<IMessagePublisher> _mockMessagePublisher;
-    private readonly Mock<IProductImageService> _mockProductImageService;
     private readonly MessagingConfiguration _messagingConfig;
 
     public PriceDataProcessingServiceTests()
@@ -22,7 +21,6 @@ public class PriceDataProcessingServiceTests
         _mockLogger = new Mock<ILogger<PriceDataProcessingService>>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockMessagePublisher = new Mock<IMessagePublisher>();
-        _mockProductImageService = new Mock<IProductImageService>();
 
         _messagingConfig = new MessagingConfiguration
         {
@@ -35,8 +33,7 @@ public class PriceDataProcessingServiceTests
             _mockUnitOfWork.Object,
             _mockMessagePublisher.Object,
             options,
-            _mockLogger.Object,
-            _mockProductImageService.Object);
+            _mockLogger.Object);
     }
 
     [Fact]

@@ -17,20 +17,17 @@ public class PriceDataProcessingService
     private readonly IMessagePublisher _messagePublisher;
     private readonly MessagingConfiguration _messagingConfig;
     private readonly ILogger<PriceDataProcessingService> _logger;
-    private readonly IProductImageService _productImageService;
 
     public PriceDataProcessingService(
         IUnitOfWork unitOfWork,
         IMessagePublisher messagePublisher,
         IOptions<MessagingConfiguration> messagingConfig,
-        ILogger<PriceDataProcessingService> logger,
-        IProductImageService productImageService)
+        ILogger<PriceDataProcessingService> logger)
     {
         _unitOfWork = unitOfWork;
         _messagePublisher = messagePublisher;
         _messagingConfig = messagingConfig.Value;
         _logger = logger;
-        _productImageService = productImageService;
     }
 
     public async Task ProcessRawPriceDataAsync(RawPriceDataEvent rawData)
@@ -72,10 +69,12 @@ public class PriceDataProcessingService
             };
 
             await _unitOfWork.PriceHistory.AddAsync(priceHistory);
-            await _unitOfWork.SaveChangesAsync();
 
-            // Update product images if provided
+            // Update product images if provided (before saving price history)
             await UpdateProductImagesIfProvidedAsync(normalizedData);
+
+            // Save both price history and image updates in the same transaction
+            await _unitOfWork.SaveChangesAsync();
 
             // Publish price point recorded event for alert processing
             var pricePointEvent = new PricePointRecordedEvent
@@ -93,8 +92,11 @@ public class PriceDataProcessingService
                 _messagingConfig.PriceDataExchange,
                 _messagingConfig.PricePointRecordedRoutingKey);
 
-            _logger.LogInformation("Successfully processed and recorded price point for product {ProductId}: ${Price}", 
-                rawData.CanonicalProductId, normalizedData.ScrapedPrice);
+            _logger.LogInformation("Successfully processed and recorded price point for product {ProductId}: ${Price}. Images: Primary={PrimaryImage}, Additional={AdditionalCount}, Original={OriginalCount}",
+                rawData.CanonicalProductId, normalizedData.ScrapedPrice,
+                normalizedData.PrimaryImageUrl ?? "None",
+                normalizedData.AdditionalImageUrls?.Count ?? 0,
+                normalizedData.OriginalImageUrls?.Count ?? 0);
         }
         catch (Exception ex)
         {
@@ -140,7 +142,11 @@ public class PriceDataProcessingService
                 ScrapedStockStatus = normalizedStockStatus,
                 Timestamp = rawData.Timestamp,
                 SourceUrl = rawData.SourceUrl,
-                ScrapedProductName = rawData.ScrapedProductName?.Trim()
+                ScrapedProductName = rawData.ScrapedProductName?.Trim(),
+                // Preserve image data
+                PrimaryImageUrl = rawData.PrimaryImageUrl,
+                AdditionalImageUrls = rawData.AdditionalImageUrls,
+                OriginalImageUrls = rawData.OriginalImageUrls
             };
         }
         catch (Exception ex)
@@ -200,6 +206,13 @@ public class PriceDataProcessingService
                               (normalizedData.AdditionalImageUrls?.Count > 0) ||
                               (normalizedData.OriginalImageUrls?.Count > 0);
 
+            _logger.LogDebug("Image data check for product {ProductId}: Primary={Primary}, Additional={Additional}, Original={Original}, HasData={HasData}",
+                normalizedData.CanonicalProductId,
+                normalizedData.PrimaryImageUrl ?? "null",
+                normalizedData.AdditionalImageUrls?.Count ?? 0,
+                normalizedData.OriginalImageUrls?.Count ?? 0,
+                hasImageData);
+
             if (!hasImageData)
             {
                 _logger.LogDebug("No image data provided for product {ProductId}, skipping image update",
@@ -210,13 +223,45 @@ public class PriceDataProcessingService
             _logger.LogInformation("Updating product images for product {ProductId}",
                 normalizedData.CanonicalProductId);
 
-            await _productImageService.UpdateProductImagesAsync(
-                normalizedData.CanonicalProductId,
-                normalizedData.PrimaryImageUrl,
-                normalizedData.AdditionalImageUrls,
-                normalizedData.OriginalImageUrls);
+            // Update images directly using the same UnitOfWork to ensure same transaction
+            var product = await _unitOfWork.Products.GetByIdAsync(normalizedData.CanonicalProductId);
+            if (product == null)
+            {
+                _logger.LogWarning("Product {ProductId} not found, cannot update images",
+                    normalizedData.CanonicalProductId);
+                return;
+            }
 
-            _logger.LogInformation("Successfully updated product images for product {ProductId}",
+            // Update image URLs if provided
+            if (!string.IsNullOrEmpty(normalizedData.PrimaryImageUrl))
+            {
+                product.PrimaryImageUrl = normalizedData.PrimaryImageUrl;
+                _logger.LogDebug("Updated primary image URL for product {ProductId}: {Url}",
+                    normalizedData.CanonicalProductId, normalizedData.PrimaryImageUrl);
+            }
+
+            if (normalizedData.AdditionalImageUrls != null && normalizedData.AdditionalImageUrls.Count > 0)
+            {
+                product.AdditionalImageUrlsList = normalizedData.AdditionalImageUrls;
+                _logger.LogDebug("Updated {Count} additional image URLs for product {ProductId}",
+                    normalizedData.AdditionalImageUrls.Count, normalizedData.CanonicalProductId);
+            }
+
+            if (normalizedData.OriginalImageUrls != null && normalizedData.OriginalImageUrls.Count > 0)
+            {
+                product.OriginalImageUrlsList = normalizedData.OriginalImageUrls;
+                _logger.LogDebug("Updated {Count} original image URLs for product {ProductId}",
+                    normalizedData.OriginalImageUrls.Count, normalizedData.CanonicalProductId);
+            }
+
+            // Update timestamp
+            product.ImageLastUpdated = DateTimeOffset.UtcNow;
+            product.UpdatedAt = DateTimeOffset.UtcNow;
+
+            // Update the product (will be saved with the same SaveChangesAsync call)
+            _unitOfWork.Products.Update(product);
+
+            _logger.LogInformation("Successfully prepared product images update for product {ProductId}",
                 normalizedData.CanonicalProductId);
         }
         catch (Exception ex)
