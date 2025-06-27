@@ -101,6 +101,7 @@ export class SiteConfigsListComponent implements OnInit {
     if (config.priceSelector) count++;
     if (config.stockSelector) count++;
     if (config.sellerNameOnPageSelector) count++;
+    if ((config as any).imageSelector) count++;
     return count;
   }
 
@@ -110,7 +111,8 @@ export class SiteConfigsListComponent implements OnInit {
     if (config.priceSelector) selectors.push('Price');
     if (config.stockSelector) selectors.push('Stock');
     if (config.sellerNameOnPageSelector) selectors.push('Seller');
-    
+    if ((config as any).imageSelector) selectors.push('Image');
+
     return selectors.length > 0 ? selectors.join(', ') : 'None configured';
   }
 }
