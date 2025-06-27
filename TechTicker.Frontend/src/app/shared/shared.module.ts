@@ -8,13 +8,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AppLayoutComponent } from './components/layout/app-layout.component';
+import { ImageGalleryComponent } from './components/image-gallery/image-gallery.component';
 import { RbacModule } from './modules/rbac.module';
 
 @NgModule({
   declarations: [
-    AppLayoutComponent
+    AppLayoutComponent,
+    ImageGalleryComponent
   ],
   imports: [
     CommonModule,
@@ -26,10 +29,12 @@ import { RbacModule } from './modules/rbac.module';
     MatButtonModule,
     MatMenuModule,
     MatDividerModule,
+    MatTooltipModule,
     RbacModule
   ],
   exports: [
     AppLayoutComponent,
+    ImageGalleryComponent,
     RbacModule
   ]
 })

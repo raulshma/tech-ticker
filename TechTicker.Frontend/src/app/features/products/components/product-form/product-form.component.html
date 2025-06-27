@@ -103,6 +103,57 @@
           </div>
         </div>
 
+        <!-- Image Section -->
+        <div class="form-section">
+          <h3 class="section-title">Product Images</h3>
+          <div class="image-section">
+            <!-- Current Images Display -->
+            <div *ngIf="hasImages()" class="current-images">
+              <h4>Current Images</h4>
+              <app-image-gallery
+                [primaryImageUrl]="productForm.get('primaryImageUrl')?.value"
+                [additionalImageUrls]="productForm.get('additionalImageUrls')?.value"
+                [altText]="productForm.get('name')?.value || 'Product image'"
+                [maxHeight]="'300px'"
+                [showThumbnails]="true">
+              </app-image-gallery>
+            </div>
+
+            <!-- Image URL Fields -->
+            <div class="image-url-fields">
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Primary Image URL</mat-label>
+                  <input matInput
+                         formControlName="primaryImageUrl"
+                         placeholder="Enter primary image URL"
+                         maxlength="2048">
+                  <mat-hint>Main product image (automatically populated by scraping)</mat-hint>
+                  <mat-error *ngIf="productForm.get('primaryImageUrl')?.invalid && productForm.get('primaryImageUrl')?.touched">
+                    {{ getFieldErrorMessage('primaryImageUrl') }}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Additional Image URLs</mat-label>
+                  <textarea matInput
+                            formControlName="additionalImageUrlsText"
+                            placeholder="Enter additional image URLs (one per line)"
+                            rows="3"
+                            (blur)="onAdditionalImageUrlsChange()">
+                  </textarea>
+                  <mat-hint>Additional product images, one URL per line (automatically populated by scraping)</mat-hint>
+                  <mat-error *ngIf="productForm.get('additionalImageUrlsText')?.invalid && productForm.get('additionalImageUrlsText')?.touched">
+                    {{ getFieldErrorMessage('additionalImageUrlsText') }}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Form Actions -->
         <div class="form-actions">
           <button mat-button

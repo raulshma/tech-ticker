@@ -118,7 +118,11 @@ public class Worker : BackgroundService
                     ScrapedStockStatus = scrapingResult.StockStatus ?? "Unknown",
                     Timestamp = scrapingResult.ScrapedAt,
                     SourceUrl = command.ExactProductUrl,
-                    ScrapedProductName = scrapingResult.ProductName
+                    ScrapedProductName = scrapingResult.ProductName,
+                    // Include image data
+                    PrimaryImageUrl = scrapingResult.PrimaryImageUrl,
+                    AdditionalImageUrls = scrapingResult.AdditionalImageUrls,
+                    OriginalImageUrls = scrapingResult.OriginalImageUrls
                 };
 
                 await _messagePublisher.PublishAsync(

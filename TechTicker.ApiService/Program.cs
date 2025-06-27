@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TechTicker.ApiService.Services;
@@ -178,6 +179,19 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Configure static file serving for images
+var imageStoragePath = builder.Configuration["ImageStorage:BasePath"] ?? "C:\\TechTicker\\Images\\Products";
+if (Directory.Exists(imageStoragePath))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(imageStoragePath),
+        RequestPath = "/images/products"
+    });
+}
+
+app.UseStaticFiles();
 
 // Initialize database and roles
 await InitializeDatabaseAsync(app);

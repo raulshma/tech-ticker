@@ -33,7 +33,10 @@ export class ProductFormComponent implements OnInit {
       manufacturer: ['', [Validators.maxLength(100)]],
       modelNumber: ['', [Validators.maxLength(100)]],
       categoryId: ['', [Validators.required]],
-      isActive: [true]
+      isActive: [true],
+      primaryImageUrl: ['', [Validators.maxLength(2048)]],
+      additionalImageUrls: [[]],
+      additionalImageUrlsText: [''] // Helper field for textarea input
     });
   }
 
@@ -64,13 +67,17 @@ export class ProductFormComponent implements OnInit {
     this.isLoading = true;
     this.productsService.getProduct(id).subscribe({
       next: (product) => {
+        const productAny = product as any;
         this.productForm.patchValue({
           name: product.name,
           description: product.description,
           manufacturer: product.manufacturer,
           modelNumber: product.modelNumber,
           categoryId: product.categoryId,
-          isActive: product.isActive
+          isActive: product.isActive,
+          primaryImageUrl: productAny.primaryImageUrl || '',
+          additionalImageUrls: productAny.additionalImageUrls || [],
+          additionalImageUrlsText: productAny.additionalImageUrls ? productAny.additionalImageUrls.join('\n') : ''
         });
         this.isLoading = false;
       },
@@ -98,6 +105,10 @@ export class ProductFormComponent implements OnInit {
           isActive: formValue.isActive
         });
 
+        // Add image fields using type assertion until API client is regenerated
+        (updateDto as any).primaryImageUrl = formValue.primaryImageUrl || undefined;
+        (updateDto as any).additionalImageUrls = formValue.additionalImageUrls || undefined;
+
         this.productsService.updateProduct(this.productId, updateDto).subscribe({
           next: () => {
             this.snackBar.open('Product updated successfully', 'Close', { duration: 3000 });
@@ -118,6 +129,10 @@ export class ProductFormComponent implements OnInit {
           categoryId: formValue.categoryId
         });
 
+        // Add image fields using type assertion until API client is regenerated
+        (createDto as any).primaryImageUrl = formValue.primaryImageUrl || undefined;
+        (createDto as any).additionalImageUrls = formValue.additionalImageUrls || undefined;
+
         this.productsService.createProduct(createDto).subscribe({
           next: () => {
             this.snackBar.open('Product created successfully', 'Close', { duration: 3000 });
@@ -137,6 +152,22 @@ export class ProductFormComponent implements OnInit {
 
   onCancel(): void {
     this.router.navigate(['/products']);
+  }
+
+  hasImages(): boolean {
+    const primaryImage = this.productForm.get('primaryImageUrl')?.value;
+    const additionalImages = this.productForm.get('additionalImageUrls')?.value;
+    return !!(primaryImage || (additionalImages && additionalImages.length > 0));
+  }
+
+  onAdditionalImageUrlsChange(): void {
+    const textValue = this.productForm.get('additionalImageUrlsText')?.value || '';
+    const urls = textValue
+      .split('\n')
+      .map((url: string) => url.trim())
+      .filter((url: string) => url.length > 0);
+
+    this.productForm.get('additionalImageUrls')?.setValue(urls);
   }
 
   private markFormGroupTouched(): void {

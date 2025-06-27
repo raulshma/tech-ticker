@@ -35,6 +35,21 @@ export class ProductCardComponent {
     return this.catalogService.extractSellerName(sourceUrl);
   }
 
+  hasProductImages(): boolean {
+    const productAny = this.product as any;
+    return !!(productAny.primaryImageUrl || (productAny.additionalImageUrls && productAny.additionalImageUrls.length > 0));
+  }
+
+  getPrimaryImageUrl(): string | null {
+    const productAny = this.product as any;
+    return productAny.primaryImageUrl || null;
+  }
+
+  getAdditionalImageUrls(): string[] {
+    const productAny = this.product as any;
+    return productAny.additionalImageUrls || [];
+  }
+
   getBestPrice(): number | null {
     return this.product.lowestCurrentPrice || null;
   }

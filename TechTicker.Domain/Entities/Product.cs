@@ -37,6 +37,27 @@ public class Product
 
     public bool IsActive { get; set; } = true;
 
+    /// <summary>
+    /// Primary product image URL from UploadThing
+    /// </summary>
+    [MaxLength(2048)]
+    public string? PrimaryImageUrl { get; set; }
+
+    /// <summary>
+    /// Additional product images as JSON array of UploadThing URLs
+    /// </summary>
+    public string? AdditionalImageUrls { get; set; }
+
+    /// <summary>
+    /// Original scraped image URLs for reference (JSON array)
+    /// </summary>
+    public string? OriginalImageUrls { get; set; }
+
+    /// <summary>
+    /// Last time images were updated
+    /// </summary>
+    public DateTimeOffset? ImageLastUpdated { get; set; }
+
     [Required]
     public DateTimeOffset CreatedAt { get; set; }
 
@@ -54,9 +75,28 @@ public class Product
     [NotMapped]
     public Dictionary<string, object>? SpecificationsDict
     {
-        get => string.IsNullOrEmpty(Specifications) 
-            ? null 
+        get => string.IsNullOrEmpty(Specifications)
+            ? null
             : JsonSerializer.Deserialize<Dictionary<string, object>>(Specifications);
         set => Specifications = value == null ? null : JsonSerializer.Serialize(value);
+    }
+
+    // Helper properties for working with image URLs as JSON arrays
+    [NotMapped]
+    public List<string>? AdditionalImageUrlsList
+    {
+        get => string.IsNullOrEmpty(AdditionalImageUrls)
+            ? null
+            : JsonSerializer.Deserialize<List<string>>(AdditionalImageUrls);
+        set => AdditionalImageUrls = value == null ? null : JsonSerializer.Serialize(value);
+    }
+
+    [NotMapped]
+    public List<string>? OriginalImageUrlsList
+    {
+        get => string.IsNullOrEmpty(OriginalImageUrls)
+            ? null
+            : JsonSerializer.Deserialize<List<string>>(OriginalImageUrls);
+        set => OriginalImageUrls = value == null ? null : JsonSerializer.Serialize(value);
     }
 }

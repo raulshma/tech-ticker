@@ -18,15 +18,21 @@ public partial class WebScrapingService
     private readonly ILogger<WebScrapingService> _logger;
     private readonly HttpClient _httpClient;
     private readonly IScraperRunLogService _scraperRunLogService;
+    private readonly IImageScrapingService _imageScrapingService;
 
     [GeneratedRegex(@"[\d,]+\.?\d*")]
     private static partial Regex PriceRegex();
 
-    public WebScrapingService(ILogger<WebScrapingService> logger, HttpClient httpClient, IScraperRunLogService scraperRunLogService)
+    public WebScrapingService(
+        ILogger<WebScrapingService> logger,
+        HttpClient httpClient,
+        IScraperRunLogService scraperRunLogService,
+        IImageScrapingService imageScrapingService)
     {
         _logger = logger;
         _httpClient = httpClient;
         _scraperRunLogService = scraperRunLogService;
+        _imageScrapingService = imageScrapingService;
     }
 
     public async Task<ScrapingResult> ScrapeProductPageAsync(ScrapeProductPageCommand command)
@@ -149,6 +155,28 @@ public partial class WebScrapingService
             var price = ExtractPrice(document, command.Selectors.PriceSelector);
             var stockStatus = ExtractStockStatus(document, command.Selectors.StockSelector);
             var sellerNameOnPage = ExtractSellerName(document, command.Selectors.SellerNameOnPageSelector);
+
+            // Scrape images if selector is provided
+            ImageScrapingResult? imageResult = null;
+            if (!string.IsNullOrEmpty(command.Selectors.ImageSelector))
+            {
+                try
+                {
+                    imageResult = await _imageScrapingService.ScrapeImagesAsync(
+                        document,
+                        command.Selectors.ImageSelector,
+                        command.ExactProductUrl,
+                        command.CanonicalProductId);
+
+                    _logger.LogInformation("Image scraping completed: {SuccessCount} images uploaded",
+                        imageResult.SuccessfulUploads);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Image scraping failed but continuing with product scraping");
+                }
+            }
+
             parsingStopwatch.Stop();
 
             // Get HTML snippet for debugging (first 1000 characters) and sanitize it
@@ -213,7 +241,10 @@ public partial class WebScrapingService
                 Price = price.Value,
                 StockStatus = stockStatus ?? "Unknown",
                 SellerNameOnPage = sellerNameOnPage,
-                ScrapedAt = DateTimeOffset.UtcNow
+                ScrapedAt = DateTimeOffset.UtcNow,
+                PrimaryImageUrl = imageResult?.PrimaryImageUrl,
+                AdditionalImageUrls = imageResult?.AdditionalImageUrls ?? new List<string>(),
+                OriginalImageUrls = imageResult?.OriginalImageUrls ?? new List<string>()
             };
 
             _logger.LogInformation("Successfully scraped product data for mapping {MappingId}: Price={Price}, Stock={Stock}",
@@ -463,4 +494,9 @@ public class ScrapingResult
     public DateTimeOffset ScrapedAt { get; set; }
     public string? ErrorMessage { get; set; }
     public string? ErrorCode { get; set; }
+
+    // Image-related properties
+    public string? PrimaryImageUrl { get; set; }
+    public List<string> AdditionalImageUrls { get; set; } = new();
+    public List<string> OriginalImageUrls { get; set; } = new();
 }

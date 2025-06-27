@@ -27,6 +27,11 @@ public class ScraperSiteConfiguration
 
     public string? SellerNameOnPageSelector { get; set; }
 
+    /// <summary>
+    /// CSS selector for extracting product images
+    /// </summary>
+    public string? ImageSelector { get; set; }
+
     public string? DefaultUserAgent { get; set; }
 
     /// <summary>

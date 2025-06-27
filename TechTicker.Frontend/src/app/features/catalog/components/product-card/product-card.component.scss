@@ -59,6 +59,28 @@
     object-fit: cover;
   }
 
+  .no-image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #999;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #ccc;
+    }
+
+    span {
+      font-size: 14px;
+      text-align: center;
+    }
+  }
+
   .category-badge {
     position: absolute;
     top: 8px;

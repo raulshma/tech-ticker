@@ -19,6 +19,7 @@ public class ScrapingSelectors
     public string PriceSelector { get; set; } = null!;
     public string StockSelector { get; set; } = null!;
     public string? SellerNameOnPageSelector { get; set; }
+    public string? ImageSelector { get; set; }
 }
 
 public class ScrapingProfile

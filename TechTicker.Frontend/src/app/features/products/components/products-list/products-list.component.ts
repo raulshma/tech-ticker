@@ -19,7 +19,7 @@ import { ProductDeleteDialogComponent } from '../product-delete-dialog/product-d
   standalone: false
 })
 export class ProductsListComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'category', 'manufacturer', 'modelNumber', 'isActive', 'createdAt', 'actions'];
+  displayedColumns: string[] = ['image', 'name', 'category', 'manufacturer', 'modelNumber', 'isActive', 'createdAt', 'actions'];
   dataSource = new MatTableDataSource<ProductDto>();
   isLoading = false;
 

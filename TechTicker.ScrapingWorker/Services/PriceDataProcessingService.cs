@@ -17,17 +17,20 @@ public class PriceDataProcessingService
     private readonly IMessagePublisher _messagePublisher;
     private readonly MessagingConfiguration _messagingConfig;
     private readonly ILogger<PriceDataProcessingService> _logger;
+    private readonly IProductImageService _productImageService;
 
     public PriceDataProcessingService(
         IUnitOfWork unitOfWork,
         IMessagePublisher messagePublisher,
         IOptions<MessagingConfiguration> messagingConfig,
-        ILogger<PriceDataProcessingService> logger)
+        ILogger<PriceDataProcessingService> logger,
+        IProductImageService productImageService)
     {
         _unitOfWork = unitOfWork;
         _messagePublisher = messagePublisher;
         _messagingConfig = messagingConfig.Value;
         _logger = logger;
+        _productImageService = productImageService;
     }
 
     public async Task ProcessRawPriceDataAsync(RawPriceDataEvent rawData)
@@ -70,6 +73,9 @@ public class PriceDataProcessingService
 
             await _unitOfWork.PriceHistory.AddAsync(priceHistory);
             await _unitOfWork.SaveChangesAsync();
+
+            // Update product images if provided
+            await UpdateProductImagesIfProvidedAsync(normalizedData);
 
             // Publish price point recorded event for alert processing
             var pricePointEvent = new PricePointRecordedEvent
@@ -185,5 +191,39 @@ public class PriceDataProcessingService
         }
     }
 
+    private async Task UpdateProductImagesIfProvidedAsync(RawPriceDataEvent normalizedData)
+    {
+        try
+        {
+            // Check if any image data is provided
+            var hasImageData = !string.IsNullOrEmpty(normalizedData.PrimaryImageUrl) ||
+                              (normalizedData.AdditionalImageUrls?.Count > 0) ||
+                              (normalizedData.OriginalImageUrls?.Count > 0);
 
+            if (!hasImageData)
+            {
+                _logger.LogDebug("No image data provided for product {ProductId}, skipping image update",
+                    normalizedData.CanonicalProductId);
+                return;
+            }
+
+            _logger.LogInformation("Updating product images for product {ProductId}",
+                normalizedData.CanonicalProductId);
+
+            await _productImageService.UpdateProductImagesAsync(
+                normalizedData.CanonicalProductId,
+                normalizedData.PrimaryImageUrl,
+                normalizedData.AdditionalImageUrls,
+                normalizedData.OriginalImageUrls);
+
+            _logger.LogInformation("Successfully updated product images for product {ProductId}",
+                normalizedData.CanonicalProductId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating product images for product {ProductId}",
+                normalizedData.CanonicalProductId);
+            // Don't rethrow - image update failure shouldn't fail the entire price processing
+        }
+    }
 }

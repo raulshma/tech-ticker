@@ -5675,6 +5675,8 @@ export class CreateProductDto implements ICreateProductDto {
     categoryId!: string;
     description?: string | undefined;
     specifications?: { [key: string]: any; } | undefined;
+    primaryImageUrl?: string | undefined;
+    additionalImageUrls?: string[] | undefined;
 
     constructor(data?: ICreateProductDto) {
         if (data) {
@@ -5699,6 +5701,12 @@ export class CreateProductDto implements ICreateProductDto {
                     if (_data["specifications"].hasOwnProperty(key))
                         (<any>this.specifications)![key] = _data["specifications"][key];
                 }
+            }
+            this.primaryImageUrl = _data["primaryImageUrl"];
+            if (Array.isArray(_data["additionalImageUrls"])) {
+                this.additionalImageUrls = [] as any;
+                for (let item of _data["additionalImageUrls"])
+                    this.additionalImageUrls!.push(item);
             }
         }
     }
@@ -5725,6 +5733,12 @@ export class CreateProductDto implements ICreateProductDto {
                     (<any>data["specifications"])[key] = (<any>this.specifications)[key];
             }
         }
+        data["primaryImageUrl"] = this.primaryImageUrl;
+        if (Array.isArray(this.additionalImageUrls)) {
+            data["additionalImageUrls"] = [];
+            for (let item of this.additionalImageUrls)
+                data["additionalImageUrls"].push(item);
+        }
         return data;
     }
 }
@@ -5737,6 +5751,8 @@ export interface ICreateProductDto {
     categoryId: string;
     description?: string | undefined;
     specifications?: { [key: string]: any; } | undefined;
+    primaryImageUrl?: string | undefined;
+    additionalImageUrls?: string[] | undefined;
 }
 
 export class CreateProductSellerMappingDto implements ICreateProductSellerMappingDto {
@@ -5837,6 +5853,7 @@ export class CreateScraperSiteConfigurationDto implements ICreateScraperSiteConf
     priceSelector!: string;
     stockSelector!: string;
     sellerNameOnPageSelector?: string | undefined;
+    imageSelector?: string | undefined;
     defaultUserAgent?: string | undefined;
     additionalHeaders?: { [key: string]: string; } | undefined;
     isEnabled?: boolean;
@@ -5857,6 +5874,7 @@ export class CreateScraperSiteConfigurationDto implements ICreateScraperSiteConf
             this.priceSelector = _data["priceSelector"];
             this.stockSelector = _data["stockSelector"];
             this.sellerNameOnPageSelector = _data["sellerNameOnPageSelector"];
+            this.imageSelector = _data["imageSelector"];
             this.defaultUserAgent = _data["defaultUserAgent"];
             if (_data["additionalHeaders"]) {
                 this.additionalHeaders = {} as any;
@@ -5883,6 +5901,7 @@ export class CreateScraperSiteConfigurationDto implements ICreateScraperSiteConf
         data["priceSelector"] = this.priceSelector;
         data["stockSelector"] = this.stockSelector;
         data["sellerNameOnPageSelector"] = this.sellerNameOnPageSelector;
+        data["imageSelector"] = this.imageSelector;
         data["defaultUserAgent"] = this.defaultUserAgent;
         if (this.additionalHeaders) {
             data["additionalHeaders"] = {};
@@ -5902,6 +5921,7 @@ export interface ICreateScraperSiteConfigurationDto {
     priceSelector: string;
     stockSelector: string;
     sellerNameOnPageSelector?: string | undefined;
+    imageSelector?: string | undefined;
     defaultUserAgent?: string | undefined;
     additionalHeaders?: { [key: string]: string; } | undefined;
     isEnabled?: boolean;
@@ -7155,6 +7175,10 @@ export class ProductDto implements IProductDto {
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    primaryImageUrl?: string | undefined;
+    additionalImageUrls?: string[] | undefined;
+    originalImageUrls?: string[] | undefined;
+    imageLastUpdated?: Date | undefined;
     category?: CategoryDto;
 
     constructor(data?: IProductDto) {
@@ -7185,6 +7209,18 @@ export class ProductDto implements IProductDto {
             this.isActive = _data["isActive"];
             this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
             this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.primaryImageUrl = _data["primaryImageUrl"];
+            if (Array.isArray(_data["additionalImageUrls"])) {
+                this.additionalImageUrls = [] as any;
+                for (let item of _data["additionalImageUrls"])
+                    this.additionalImageUrls!.push(item);
+            }
+            if (Array.isArray(_data["originalImageUrls"])) {
+                this.originalImageUrls = [] as any;
+                for (let item of _data["originalImageUrls"])
+                    this.originalImageUrls!.push(item);
+            }
+            this.imageLastUpdated = _data["imageLastUpdated"] ? new Date(_data["imageLastUpdated"].toString()) : <any>undefined;
             this.category = _data["category"] ? CategoryDto.fromJS(_data["category"]) : <any>undefined;
         }
     }
@@ -7215,6 +7251,18 @@ export class ProductDto implements IProductDto {
         data["isActive"] = this.isActive;
         data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
         data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["primaryImageUrl"] = this.primaryImageUrl;
+        if (Array.isArray(this.additionalImageUrls)) {
+            data["additionalImageUrls"] = [];
+            for (let item of this.additionalImageUrls)
+                data["additionalImageUrls"].push(item);
+        }
+        if (Array.isArray(this.originalImageUrls)) {
+            data["originalImageUrls"] = [];
+            for (let item of this.originalImageUrls)
+                data["originalImageUrls"].push(item);
+        }
+        data["imageLastUpdated"] = this.imageLastUpdated ? this.imageLastUpdated.toISOString() : <any>undefined;
         data["category"] = this.category ? this.category.toJSON() : <any>undefined;
         return data;
     }
@@ -7232,6 +7280,10 @@ export interface IProductDto {
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    primaryImageUrl?: string | undefined;
+    additionalImageUrls?: string[] | undefined;
+    originalImageUrls?: string[] | undefined;
+    imageLastUpdated?: Date | undefined;
     category?: CategoryDto;
 }
 
@@ -7699,6 +7751,10 @@ export class ProductWithCurrentPricesDto implements IProductWithCurrentPricesDto
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    primaryImageUrl?: string | undefined;
+    additionalImageUrls?: string[] | undefined;
+    originalImageUrls?: string[] | undefined;
+    imageLastUpdated?: Date | undefined;
     category?: CategoryDto;
     currentPrices?: CurrentPriceDto[] | undefined;
     lowestCurrentPrice?: number | undefined;
@@ -7733,6 +7789,18 @@ export class ProductWithCurrentPricesDto implements IProductWithCurrentPricesDto
             this.isActive = _data["isActive"];
             this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
             this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.primaryImageUrl = _data["primaryImageUrl"];
+            if (Array.isArray(_data["additionalImageUrls"])) {
+                this.additionalImageUrls = [] as any;
+                for (let item of _data["additionalImageUrls"])
+                    this.additionalImageUrls!.push(item);
+            }
+            if (Array.isArray(_data["originalImageUrls"])) {
+                this.originalImageUrls = [] as any;
+                for (let item of _data["originalImageUrls"])
+                    this.originalImageUrls!.push(item);
+            }
+            this.imageLastUpdated = _data["imageLastUpdated"] ? new Date(_data["imageLastUpdated"].toString()) : <any>undefined;
             this.category = _data["category"] ? CategoryDto.fromJS(_data["category"]) : <any>undefined;
             if (Array.isArray(_data["currentPrices"])) {
                 this.currentPrices = [] as any;
@@ -7771,6 +7839,18 @@ export class ProductWithCurrentPricesDto implements IProductWithCurrentPricesDto
         data["isActive"] = this.isActive;
         data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
         data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["primaryImageUrl"] = this.primaryImageUrl;
+        if (Array.isArray(this.additionalImageUrls)) {
+            data["additionalImageUrls"] = [];
+            for (let item of this.additionalImageUrls)
+                data["additionalImageUrls"].push(item);
+        }
+        if (Array.isArray(this.originalImageUrls)) {
+            data["originalImageUrls"] = [];
+            for (let item of this.originalImageUrls)
+                data["originalImageUrls"].push(item);
+        }
+        data["imageLastUpdated"] = this.imageLastUpdated ? this.imageLastUpdated.toISOString() : <any>undefined;
         data["category"] = this.category ? this.category.toJSON() : <any>undefined;
         if (Array.isArray(this.currentPrices)) {
             data["currentPrices"] = [];
@@ -7796,6 +7876,10 @@ export interface IProductWithCurrentPricesDto {
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    primaryImageUrl?: string | undefined;
+    additionalImageUrls?: string[] | undefined;
+    originalImageUrls?: string[] | undefined;
+    imageLastUpdated?: Date | undefined;
     category?: CategoryDto;
     currentPrices?: CurrentPriceDto[] | undefined;
     lowestCurrentPrice?: number | undefined;
@@ -9158,6 +9242,7 @@ export class ScraperSiteConfigurationDto implements IScraperSiteConfigurationDto
     priceSelector?: string | undefined;
     stockSelector?: string | undefined;
     sellerNameOnPageSelector?: string | undefined;
+    imageSelector?: string | undefined;
     defaultUserAgent?: string | undefined;
     additionalHeaders?: { [key: string]: string; } | undefined;
     isEnabled?: boolean;
@@ -9181,6 +9266,7 @@ export class ScraperSiteConfigurationDto implements IScraperSiteConfigurationDto
             this.priceSelector = _data["priceSelector"];
             this.stockSelector = _data["stockSelector"];
             this.sellerNameOnPageSelector = _data["sellerNameOnPageSelector"];
+            this.imageSelector = _data["imageSelector"];
             this.defaultUserAgent = _data["defaultUserAgent"];
             if (_data["additionalHeaders"]) {
                 this.additionalHeaders = {} as any;
@@ -9210,6 +9296,7 @@ export class ScraperSiteConfigurationDto implements IScraperSiteConfigurationDto
         data["priceSelector"] = this.priceSelector;
         data["stockSelector"] = this.stockSelector;
         data["sellerNameOnPageSelector"] = this.sellerNameOnPageSelector;
+        data["imageSelector"] = this.imageSelector;
         data["defaultUserAgent"] = this.defaultUserAgent;
         if (this.additionalHeaders) {
             data["additionalHeaders"] = {};
@@ -9232,6 +9319,7 @@ export interface IScraperSiteConfigurationDto {
     priceSelector?: string | undefined;
     stockSelector?: string | undefined;
     sellerNameOnPageSelector?: string | undefined;
+    imageSelector?: string | undefined;
     defaultUserAgent?: string | undefined;
     additionalHeaders?: { [key: string]: string; } | undefined;
     isEnabled?: boolean;
@@ -9940,6 +10028,8 @@ export class UpdateProductDto implements IUpdateProductDto {
     description?: string | undefined;
     specifications?: { [key: string]: any; } | undefined;
     isActive?: boolean | undefined;
+    primaryImageUrl?: string | undefined;
+    additionalImageUrls?: string[] | undefined;
 
     constructor(data?: IUpdateProductDto) {
         if (data) {
@@ -9966,6 +10056,12 @@ export class UpdateProductDto implements IUpdateProductDto {
                 }
             }
             this.isActive = _data["isActive"];
+            this.primaryImageUrl = _data["primaryImageUrl"];
+            if (Array.isArray(_data["additionalImageUrls"])) {
+                this.additionalImageUrls = [] as any;
+                for (let item of _data["additionalImageUrls"])
+                    this.additionalImageUrls!.push(item);
+            }
         }
     }
 
@@ -9992,6 +10088,12 @@ export class UpdateProductDto implements IUpdateProductDto {
             }
         }
         data["isActive"] = this.isActive;
+        data["primaryImageUrl"] = this.primaryImageUrl;
+        if (Array.isArray(this.additionalImageUrls)) {
+            data["additionalImageUrls"] = [];
+            for (let item of this.additionalImageUrls)
+                data["additionalImageUrls"].push(item);
+        }
         return data;
     }
 }
@@ -10005,6 +10107,8 @@ export interface IUpdateProductDto {
     description?: string | undefined;
     specifications?: { [key: string]: any; } | undefined;
     isActive?: boolean | undefined;
+    primaryImageUrl?: string | undefined;
+    additionalImageUrls?: string[] | undefined;
 }
 
 export class UpdateProductSellerMappingDto implements IUpdateProductSellerMappingDto {
@@ -10065,6 +10169,7 @@ export class UpdateScraperSiteConfigurationDto implements IUpdateScraperSiteConf
     priceSelector?: string | undefined;
     stockSelector?: string | undefined;
     sellerNameOnPageSelector?: string | undefined;
+    imageSelector?: string | undefined;
     defaultUserAgent?: string | undefined;
     additionalHeaders?: { [key: string]: string; } | undefined;
     isEnabled?: boolean | undefined;
@@ -10085,6 +10190,7 @@ export class UpdateScraperSiteConfigurationDto implements IUpdateScraperSiteConf
             this.priceSelector = _data["priceSelector"];
             this.stockSelector = _data["stockSelector"];
             this.sellerNameOnPageSelector = _data["sellerNameOnPageSelector"];
+            this.imageSelector = _data["imageSelector"];
             this.defaultUserAgent = _data["defaultUserAgent"];
             if (_data["additionalHeaders"]) {
                 this.additionalHeaders = {} as any;
@@ -10111,6 +10217,7 @@ export class UpdateScraperSiteConfigurationDto implements IUpdateScraperSiteConf
         data["priceSelector"] = this.priceSelector;
         data["stockSelector"] = this.stockSelector;
         data["sellerNameOnPageSelector"] = this.sellerNameOnPageSelector;
+        data["imageSelector"] = this.imageSelector;
         data["defaultUserAgent"] = this.defaultUserAgent;
         if (this.additionalHeaders) {
             data["additionalHeaders"] = {};
@@ -10130,6 +10237,7 @@ export interface IUpdateScraperSiteConfigurationDto {
     priceSelector?: string | undefined;
     stockSelector?: string | undefined;
     sellerNameOnPageSelector?: string | undefined;
+    imageSelector?: string | undefined;
     defaultUserAgent?: string | undefined;
     additionalHeaders?: { [key: string]: string; } | undefined;
     isEnabled?: boolean | undefined;

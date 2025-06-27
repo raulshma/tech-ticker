@@ -64,6 +64,10 @@ public class MappingService : IMappingService
             IsActive = product.IsActive,
             CreatedAt = product.CreatedAt,
             UpdatedAt = product.UpdatedAt,
+            PrimaryImageUrl = product.PrimaryImageUrl,
+            AdditionalImageUrls = product.AdditionalImageUrlsList,
+            OriginalImageUrls = product.OriginalImageUrlsList,
+            ImageLastUpdated = product.ImageLastUpdated,
             Category = product.Category != null ? MapToDto(product.Category) : null
         };
     }
@@ -80,7 +84,9 @@ public class MappingService : IMappingService
             CategoryId = createDto.CategoryId,
             Description = createDto.Description,
             SpecificationsDict = createDto.Specifications,
-            IsActive = true
+            IsActive = true,
+            PrimaryImageUrl = createDto.PrimaryImageUrl,
+            AdditionalImageUrlsList = createDto.AdditionalImageUrls
         };
     }
 
@@ -109,6 +115,12 @@ public class MappingService : IMappingService
 
         if (updateDto.IsActive.HasValue)
             product.IsActive = updateDto.IsActive.Value;
+
+        if (updateDto.PrimaryImageUrl != null)
+            product.PrimaryImageUrl = updateDto.PrimaryImageUrl;
+
+        if (updateDto.AdditionalImageUrls != null)
+            product.AdditionalImageUrlsList = updateDto.AdditionalImageUrls;
     }
 
     public ProductSellerMappingDto MapToDto(ProductSellerMapping mapping)
@@ -177,6 +189,7 @@ public class MappingService : IMappingService
             PriceSelector = config.PriceSelector,
             StockSelector = config.StockSelector,
             SellerNameOnPageSelector = config.SellerNameOnPageSelector,
+            ImageSelector = config.ImageSelector,
             DefaultUserAgent = config.DefaultUserAgent,
             AdditionalHeaders = config.AdditionalHeadersDict,
             IsEnabled = config.IsEnabled,
@@ -195,6 +208,7 @@ public class MappingService : IMappingService
             PriceSelector = createDto.PriceSelector,
             StockSelector = createDto.StockSelector,
             SellerNameOnPageSelector = createDto.SellerNameOnPageSelector,
+            ImageSelector = createDto.ImageSelector,
             DefaultUserAgent = createDto.DefaultUserAgent,
             AdditionalHeadersDict = createDto.AdditionalHeaders,
             IsEnabled = createDto.IsEnabled
@@ -217,6 +231,9 @@ public class MappingService : IMappingService
 
         if (updateDto.SellerNameOnPageSelector != null)
             config.SellerNameOnPageSelector = updateDto.SellerNameOnPageSelector;
+
+        if (updateDto.ImageSelector != null)
+            config.ImageSelector = updateDto.ImageSelector;
 
         if (updateDto.DefaultUserAgent != null)
             config.DefaultUserAgent = updateDto.DefaultUserAgent;

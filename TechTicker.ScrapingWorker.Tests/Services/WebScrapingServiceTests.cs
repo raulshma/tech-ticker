@@ -40,7 +40,8 @@ public class WebScrapingServiceTests : IDisposable
             .Setup(x => x.FailRunAsync(It.IsAny<Guid>(), It.IsAny<FailScraperRunDto>()))
             .ReturnsAsync(Result<bool>.Success(true));
 
-        _webScrapingService = new WebScrapingService(_mockLogger.Object, _httpClient, _mockScraperRunLogService.Object);
+        var mockImageScrapingService = new Mock<IImageScrapingService>();
+        _webScrapingService = new WebScrapingService(_mockLogger.Object, _httpClient, _mockScraperRunLogService.Object, mockImageScrapingService.Object);
     }
 
     [Fact]

@@ -47,6 +47,28 @@
       <!-- Products table -->
       <div *ngIf="!isLoading" class="table-container">
         <table mat-table [dataSource]="dataSource" matSort class="products-table">
+          <!-- Image Column -->
+          <ng-container matColumnDef="image">
+            <th mat-header-cell *matHeaderCellDef>Image</th>
+            <td mat-cell *matCellDef="let product">
+              <div class="product-image-cell">
+                <app-image-gallery
+                  *ngIf="product.primaryImageUrl || (product.additionalImageUrls && product.additionalImageUrls.length > 0)"
+                  [primaryImageUrl]="product.primaryImageUrl"
+                  [additionalImageUrls]="product.additionalImageUrls"
+                  [altText]="product.name"
+                  [maxHeight]="'80px'"
+                  [maxWidth]="'80px'"
+                  [showThumbnails]="false">
+                </app-image-gallery>
+                <div *ngIf="!product.primaryImageUrl && (!product.additionalImageUrls || product.additionalImageUrls.length === 0)"
+                     class="no-image-cell">
+                  <mat-icon>image_not_supported</mat-icon>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
           <!-- Name Column -->
           <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>

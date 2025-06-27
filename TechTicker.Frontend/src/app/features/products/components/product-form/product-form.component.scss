@@ -28,11 +28,11 @@
 .form-row {
   display: flex;
   gap: 20px;
-  
+
   &.full-width {
     width: 100%;
   }
-  
+
   &.two-columns {
     > * {
       flex: 1;
@@ -49,17 +49,17 @@
   flex-direction: column;
   gap: 8px;
   padding: 8px 0;
-  
+
   .status-label {
     font-size: 0.875rem;
     font-weight: 500;
     color: rgba(0, 0, 0, 0.6);
   }
-  
+
   .status-toggle {
     align-self: flex-start;
   }
-  
+
   .status-hint {
     font-size: 0.75rem;
     color: rgba(0, 0, 0, 0.6);
@@ -80,12 +80,44 @@
   margin-right: 8px;
 }
 
+.form-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+
+  .section-title {
+    margin: 0 0 16px 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #333;
+  }
+}
+
+.image-section {
+  .current-images {
+    margin-bottom: 24px;
+
+    h4 {
+      margin: 0 0 12px 0;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #666;
+    }
+  }
+
+  .image-url-fields {
+    .form-row {
+      margin-bottom: 16px;
+    }
+  }
+}
+
 // Form field customizations
 ::ng-deep .mat-form-field-appearance-outline {
   .mat-form-field-outline {
     border-radius: 8px;
   }
-  
+
   .mat-form-field-outline-thick {
     border-width: 2px;
   }
@@ -96,30 +128,30 @@
   .product-form-container {
     padding: 10px;
   }
-  
+
   .header-section {
     flex-direction: column;
     align-items: stretch;
     gap: 16px;
-    
+
     h1 {
       text-align: center;
     }
   }
-  
+
   .form-row {
     &.two-columns {
       flex-direction: column;
-      
+
       > * {
         flex: none;
       }
     }
   }
-  
+
   .form-actions {
     flex-direction: column-reverse;
-    
+
     button {
       width: 100%;
     }

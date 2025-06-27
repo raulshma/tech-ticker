@@ -24,6 +24,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 // Routing
 import { CatalogRoutingModule } from './catalog-routing.module';
 
+// Shared
+import { SharedModule } from '../../shared/shared.module';
+
 // Components
 import { CatalogComponent } from './components/catalog/catalog.component';
 import { ProductCardComponent } from './components/product-card/product-card.component';
@@ -41,6 +44,7 @@ import { CategoryFilterComponent } from './components/category-filter/category-f
     CommonModule,
     ReactiveFormsModule,
     CatalogRoutingModule,
+    SharedModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,

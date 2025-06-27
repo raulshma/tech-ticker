@@ -13,6 +13,7 @@ public class ScraperSiteConfigurationDto
     public string PriceSelector { get; set; } = null!;
     public string StockSelector { get; set; } = null!;
     public string? SellerNameOnPageSelector { get; set; }
+    public string? ImageSelector { get; set; }
     public string? DefaultUserAgent { get; set; }
     public Dictionary<string, string>? AdditionalHeaders { get; set; }
     public bool IsEnabled { get; set; }
@@ -40,6 +41,8 @@ public class CreateScraperSiteConfigurationDto
 
     public string? SellerNameOnPageSelector { get; set; }
 
+    public string? ImageSelector { get; set; }
+
     public string? DefaultUserAgent { get; set; }
 
     public Dictionary<string, string>? AdditionalHeaders { get; set; }
@@ -62,6 +65,8 @@ public class UpdateScraperSiteConfigurationDto
     public string? StockSelector { get; set; }
 
     public string? SellerNameOnPageSelector { get; set; }
+
+    public string? ImageSelector { get; set; }
 
     public string? DefaultUserAgent { get; set; }
 

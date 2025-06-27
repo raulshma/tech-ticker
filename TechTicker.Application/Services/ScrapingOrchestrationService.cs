@@ -48,7 +48,8 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
                         ProductNameSelector = mapping.SiteConfiguration?.ProductNameSelector ?? "h1",
                         PriceSelector = mapping.SiteConfiguration?.PriceSelector ?? ".price",
                         StockSelector = mapping.SiteConfiguration?.StockSelector ?? ".stock",
-                        SellerNameOnPageSelector = mapping.SiteConfiguration?.SellerNameOnPageSelector
+                        SellerNameOnPageSelector = mapping.SiteConfiguration?.SellerNameOnPageSelector,
+                        ImageSelector = mapping.SiteConfiguration?.ImageSelector
                     },
                     ScrapingProfile = new ScrapingProfile
                     {
@@ -165,7 +166,8 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
                     ProductNameSelector = mapping.SiteConfiguration?.ProductNameSelector ?? "h1",
                     PriceSelector = mapping.SiteConfiguration?.PriceSelector ?? ".price",
                     StockSelector = mapping.SiteConfiguration?.StockSelector ?? ".stock",
-                    SellerNameOnPageSelector = mapping.SiteConfiguration?.SellerNameOnPageSelector
+                    SellerNameOnPageSelector = mapping.SiteConfiguration?.SellerNameOnPageSelector,
+                    ImageSelector = mapping.SiteConfiguration?.ImageSelector
                 },
                 ScrapingProfile = new ScrapingProfile
                 {

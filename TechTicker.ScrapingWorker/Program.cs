@@ -27,6 +27,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IMappingService, MappingService>();
 builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
 builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
+builder.Services.AddScoped<IProductImageService, ProductImageService>();
 
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
@@ -37,6 +38,16 @@ builder.Services.AddHttpClient<WebScrapingService>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
 });
+
+// Add HTTP client for image downloading
+builder.Services.AddHttpClient<ImageScrapingService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(60); // Longer timeout for images
+});
+
+// Add image storage and scraping services
+builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
+builder.Services.AddScoped<IImageScrapingService, ImageScrapingService>();
 
 // Add scraping services
 builder.Services.AddScoped<WebScrapingService>();

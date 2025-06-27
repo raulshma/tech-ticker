@@ -133,6 +133,21 @@
                 </mat-error>
               </mat-form-field>
             </div>
+
+            <div class="form-row">
+              <!-- Image Selector -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Image Selector</mat-label>
+                <input matInput
+                       formControlName="imageSelector"
+                       placeholder=".slick-slide img, .product-image img, .gallery img"
+                       maxlength="500">
+                <mat-hint>CSS selector for product images (optional - enables image scraping)</mat-hint>
+                <mat-error *ngIf="siteConfigForm.get('imageSelector')?.invalid && siteConfigForm.get('imageSelector')?.touched">
+                  {{ getFieldErrorMessage('imageSelector') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
           </div>
         </mat-expansion-panel>
 

@@ -2,7 +2,21 @@
   <div class="card-content">
     <!-- Product Image -->
     <div class="product-image">
-      <img [src]="getProductImage()" [alt]="product.name" />
+      <app-image-gallery
+        *ngIf="hasProductImages()"
+        [primaryImageUrl]="getPrimaryImageUrl()"
+        [additionalImageUrls]="getAdditionalImageUrls()"
+        [altText]="product.name || 'Product image'"
+        [maxHeight]="viewMode === 'grid' ? '200px' : '150px'"
+        [showThumbnails]="false">
+      </app-image-gallery>
+
+      <div *ngIf="!hasProductImages()"
+           class="no-image-placeholder">
+        <mat-icon>image_not_supported</mat-icon>
+        <span>No image available</span>
+      </div>
+
       <div class="category-badge">
         <mat-chip>{{ getCategoryName() }}</mat-chip>
       </div>
@@ -23,7 +37,7 @@
           <span class="price-label">Price:</span>
           <span class="price-value">{{ getPriceRange() }}</span>
         </div>
-        
+
         <div class="sellers-info" *ngIf="hasMultipleSellers()">
           <mat-icon class="sellers-icon">store</mat-icon>
           <span>{{ product.availableSellersCount }} sellers</span>
@@ -59,7 +73,7 @@
             <span *ngFor="let spec of getKeySpecs()" class="spec-item">{{ spec }}</span>
           </div>
         </div>
-        
+
         <div class="price-breakdown" *ngIf="product.currentPrices && product.currentPrices.length > 1">
           <span class="breakdown-label">Price Comparison:</span>
           <div class="price-list">

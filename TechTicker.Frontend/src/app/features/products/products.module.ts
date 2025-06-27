@@ -20,6 +20,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { BaseChartDirective } from 'ng2-charts';
 
 import { ProductsRoutingModule } from './products-routing.module';
+import { SharedModule } from '../../shared/shared.module';
 import { ProductsListComponent } from './components/products-list/products-list.component';
 import { ProductFormComponent } from './components/product-form/product-form.component';
 import { ProductDeleteDialogComponent } from './components/product-delete-dialog/product-delete-dialog.component';
@@ -36,6 +37,7 @@ import { PriceHistoryComponent } from './components/price-history/price-history.
     CommonModule,
     ReactiveFormsModule,
     ProductsRoutingModule,
+    SharedModule,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,

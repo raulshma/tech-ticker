@@ -18,7 +18,13 @@ public class ProductDto
     public bool IsActive { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
-    
+
+    // Image properties
+    public string? PrimaryImageUrl { get; set; }
+    public List<string>? AdditionalImageUrls { get; set; }
+    public List<string>? OriginalImageUrls { get; set; }
+    public DateTimeOffset? ImageLastUpdated { get; set; }
+
     // Navigation properties
     public CategoryDto? Category { get; set; }
 }
@@ -47,6 +53,10 @@ public class CreateProductDto
     public string? Description { get; set; }
 
     public Dictionary<string, object>? Specifications { get; set; }
+
+    // Image properties (optional for creation)
+    public string? PrimaryImageUrl { get; set; }
+    public List<string>? AdditionalImageUrls { get; set; }
 }
 
 /// <summary>
@@ -73,4 +83,8 @@ public class UpdateProductDto
     public Dictionary<string, object>? Specifications { get; set; }
 
     public bool? IsActive { get; set; }
+
+    // Image properties (optional for updates)
+    public string? PrimaryImageUrl { get; set; }
+    public List<string>? AdditionalImageUrls { get; set; }
 }

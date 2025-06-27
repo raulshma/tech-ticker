@@ -13,4 +13,9 @@ public class RawPriceDataEvent
     public DateTimeOffset Timestamp { get; set; }
     public string SourceUrl { get; set; } = null!;
     public string? ScrapedProductName { get; set; }
+
+    // Image-related properties
+    public string? PrimaryImageUrl { get; set; }
+    public List<string> AdditionalImageUrls { get; set; } = new();
+    public List<string> OriginalImageUrls { get; set; } = new();
 }

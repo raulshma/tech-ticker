@@ -39,6 +39,7 @@ export class SiteConfigFormComponent implements OnInit {
       priceSelector: ['', [Validators.maxLength(500)]],
       stockSelector: ['', [Validators.maxLength(500)]],
       sellerNameOnPageSelector: ['', [Validators.maxLength(500)]],
+      imageSelector: ['', [Validators.maxLength(500)]],
       defaultUserAgent: ['', [Validators.maxLength(1000)]],
       additionalHeaders: this.formBuilder.array([]),
       isEnabled: [true]
@@ -67,12 +68,14 @@ export class SiteConfigFormComponent implements OnInit {
     this.isLoading = true;
     this.siteConfigsService.getSiteConfig(id).subscribe({
       next: (config) => {
+        const configAny = config as any;
         this.siteConfigForm.patchValue({
           siteDomain: config.siteDomain,
           productNameSelector: config.productNameSelector,
           priceSelector: config.priceSelector,
           stockSelector: config.stockSelector,
           sellerNameOnPageSelector: config.sellerNameOnPageSelector,
+          imageSelector: configAny.imageSelector,
           defaultUserAgent: config.defaultUserAgent,
           isEnabled: config.isEnabled
         });
@@ -132,6 +135,9 @@ export class SiteConfigFormComponent implements OnInit {
           isEnabled: formValue.isEnabled
         });
 
+        // Add image selector using type assertion until API client is regenerated
+        (updateDto as any).imageSelector = formValue.imageSelector || undefined;
+
         this.siteConfigsService.updateSiteConfig(this.siteConfigId, updateDto).subscribe({
           next: () => {
             this.snackBar.open('Site configuration updated successfully', 'Close', { duration: 3000 });
@@ -154,6 +160,9 @@ export class SiteConfigFormComponent implements OnInit {
           additionalHeaders: Object.keys(headersObject).length > 0 ? headersObject : undefined,
           isEnabled: formValue.isEnabled
         });
+
+        // Add image selector using type assertion until API client is regenerated
+        (createDto as any).imageSelector = formValue.imageSelector || undefined;
 
         this.siteConfigsService.createSiteConfig(createDto).subscribe({
           next: () => {
