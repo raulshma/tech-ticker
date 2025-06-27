@@ -388,4 +388,20 @@ public class MappingService : IMappingService
         if (updateDto.IsActive.HasValue)
             user.IsActive = updateDto.IsActive.Value;
     }
+
+    public UserNotificationPreferencesDto MapToDto(UserNotificationPreferences preferences)
+    {
+        return new UserNotificationPreferencesDto
+        {
+            UserNotificationPreferencesId = preferences.UserNotificationPreferencesId,
+            UserId = preferences.UserId,
+            DiscordWebhookUrl = preferences.DiscordWebhookUrl,
+            IsDiscordNotificationEnabled = preferences.IsDiscordNotificationEnabled,
+            NotificationProductIds = preferences.NotificationProductIdsList,
+            CustomBotName = preferences.CustomBotName,
+            CustomAvatarUrl = preferences.CustomAvatarUrl,
+            CreatedAt = preferences.CreatedAt,
+            UpdatedAt = preferences.UpdatedAt
+        };
+    }
 }

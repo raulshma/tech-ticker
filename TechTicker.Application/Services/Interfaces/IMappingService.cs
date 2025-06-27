@@ -42,4 +42,7 @@ public interface IMappingService
     ApplicationUser MapToEntity(CreateUserDto createDto);
     ApplicationUser MapToEntity(RegisterUserDto registerDto);
     void MapToEntity(UpdateUserDto updateDto, ApplicationUser user);
+
+    // UserNotificationPreferences mappings
+    UserNotificationPreferencesDto MapToDto(UserNotificationPreferences preferences);
 }

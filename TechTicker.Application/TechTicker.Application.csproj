@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.RabbitMQ.Client" Version="9.3.1" />
+    <PackageReference Include="Discord.Net.Webhook" Version="3.17.4" />
   </ItemGroup>
 
   <PropertyGroup>

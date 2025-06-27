@@ -24,6 +24,7 @@ public class ApplicationUser : IdentityUser<Guid>
 
     // Navigation properties
     public ICollection<AlertRule> AlertRules { get; set; } = new List<AlertRule>();
+    public UserNotificationPreferences? NotificationPreferences { get; set; }
 
     // Computed properties
     public string FullName => $"{FirstName} {LastName}".Trim();

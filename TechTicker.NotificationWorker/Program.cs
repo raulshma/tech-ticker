@@ -23,20 +23,22 @@ builder.AddRabbitMQClient("messaging");
 builder.Services.Configure<MessagingConfiguration>(
     builder.Configuration.GetSection(MessagingConfiguration.SectionName));
 
-// Configure email
-builder.Services.Configure<EmailConfiguration>(
-    builder.Configuration.GetSection(EmailConfiguration.SectionName));
+// Configure Discord
+builder.Services.Configure<DiscordConfiguration>(
+    builder.Configuration.GetSection(DiscordConfiguration.SectionName));
 
 // Add repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAlertProcessingService, AlertProcessingService>();
+builder.Services.AddScoped<IMappingService, MappingService>();
+builder.Services.AddScoped<IUserNotificationPreferencesService, UserNotificationPreferencesService>();
 
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
 builder.Services.AddSingleton<IMessageConsumer, RabbitMQConsumer>();
 
 // Add notification services
-builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<DiscordService>();
 
 // Add the worker
 builder.Services.AddHostedService<Worker>();

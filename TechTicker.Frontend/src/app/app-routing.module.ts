@@ -64,6 +64,12 @@ const routes: Routes = [
         data: { roles: ['User', 'Admin'] } // Accessible to Users and Admins
       },
       {
+        path: 'notification-settings',
+        loadChildren: () => import('./features/notification-settings/notification-settings.module').then(m => m.NotificationSettingsModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['User', 'Admin'] } // Accessible to Users and Admins
+      },
+      {
         path: 'rbac-demo',
         loadComponent: () => import('./shared/components/rbac-demo/rbac-demo.component').then(c => c.RbacDemoComponent),
         canActivate: [AuthGuard] // Available to all authenticated users for testing

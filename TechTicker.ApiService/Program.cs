@@ -93,6 +93,7 @@ builder.Services.AddScoped<IPriceHistoryService, PriceHistoryService>();
 builder.Services.AddScoped<IAlertRuleService, AlertRuleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, TechTicker.Application.Services.RoleService>();
+builder.Services.AddScoped<IUserNotificationPreferencesService, UserNotificationPreferencesService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();

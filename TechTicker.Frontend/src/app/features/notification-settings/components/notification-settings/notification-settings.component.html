@@ -1,0 +1,175 @@
+<div class="notification-settings-container">
+  <div class="header-section">
+    <h1>Notification Settings</h1>
+    <p class="subtitle">Configure your Discord notifications for price alerts</p>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Discord Notifications</mat-card-title>
+      <mat-card-subtitle>Set up Discord webhook to receive price alerts for your selected products</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="settingsForm" (ngSubmit)="onSave()" class="settings-form">
+        
+        <!-- Enable Discord Notifications -->
+        <div class="form-section">
+          <div class="toggle-section">
+            <mat-slide-toggle formControlName="isDiscordNotificationEnabled" class="notification-toggle">
+              Enable Discord Notifications
+            </mat-slide-toggle>
+            <p class="toggle-description">
+              {{ settingsForm.get('isDiscordNotificationEnabled')?.value ? 
+                'Discord notifications are enabled' : 
+                'Discord notifications are disabled' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Discord Configuration -->
+        <div class="form-section" *ngIf="settingsForm.get('isDiscordNotificationEnabled')?.value">
+          <h3>Discord Configuration</h3>
+          
+          <!-- Webhook URL -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Discord Webhook URL</mat-label>
+            <input matInput 
+                   formControlName="discordWebhookUrl" 
+                   placeholder="https://discord.com/api/webhooks/..."
+                   type="url">
+            <mat-icon matSuffix>link</mat-icon>
+            <mat-hint>
+              <a href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks" target="_blank">
+                How to create a Discord webhook
+              </a>
+            </mat-hint>
+            <mat-error *ngIf="settingsForm.get('discordWebhookUrl')?.invalid && settingsForm.get('discordWebhookUrl')?.touched">
+              Please enter a valid Discord webhook URL
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Custom Bot Name -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Bot Name (Optional)</mat-label>
+            <input matInput 
+                   formControlName="customBotName" 
+                   placeholder="TechTicker"
+                   maxlength="100">
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-hint>Custom name for the notification bot</mat-hint>
+          </mat-form-field>
+
+          <!-- Custom Avatar URL -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Avatar URL (Optional)</mat-label>
+            <input matInput 
+                   formControlName="customAvatarUrl" 
+                   placeholder="https://example.com/avatar.png"
+                   type="url">
+            <mat-icon matSuffix>image</mat-icon>
+            <mat-hint>Custom avatar for the notification bot</mat-hint>
+          </mat-form-field>
+
+          <!-- Test Webhook Button -->
+          <div class="test-section">
+            <button mat-raised-button 
+                    color="accent" 
+                    type="button"
+                    (click)="testWebhook()"
+                    [disabled]="!settingsForm.get('discordWebhookUrl')?.value || isTestingWebhook">
+              <mat-icon>send</mat-icon>
+              {{ isTestingWebhook ? 'Testing...' : 'Test Webhook' }}
+            </button>
+            <p class="test-description">Send a test notification to verify your webhook configuration</p>
+          </div>
+        </div>
+
+        <!-- Product Selection -->
+        <div class="form-section" *ngIf="settingsForm.get('isDiscordNotificationEnabled')?.value">
+          <h3>Product Notifications</h3>
+          <p class="section-description">
+            Select up to 5 products to receive Discord notifications for. 
+            Only products with active alert rules are shown.
+          </p>
+
+          <div class="product-selection" *ngIf="availableProducts.length > 0; else noProducts">
+            <div class="selected-count">
+              {{ getSelectedProductsCount() }} / 5 products selected
+            </div>
+            
+            <div class="products-grid">
+              <mat-card 
+                *ngFor="let product of availableProducts" 
+                class="product-card"
+                [class.selected]="product.isSelected">
+                <mat-card-content>
+                  <mat-checkbox 
+                    [checked]="product.isSelected"
+                    [disabled]="!product.isSelected && getSelectedProductsCount() >= 5"
+                    (change)="onProductSelectionChange(product, $event)">
+                    <div class="product-info">
+                      <h4>{{ product.productName }}</h4>
+                      <p class="product-details">
+                        <span *ngIf="product.manufacturer">{{ product.manufacturer }} • </span>
+                        <span *ngIf="product.categoryName">{{ product.categoryName }}</span>
+                      </p>
+                    </div>
+                  </mat-checkbox>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+
+          <ng-template #noProducts>
+            <div class="no-products">
+              <mat-icon>info</mat-icon>
+              <p>No products available for notifications.</p>
+              <p>Create some alert rules first to see products here.</p>
+              <button mat-raised-button color="primary" routerLink="/alerts">
+                Manage Alert Rules
+              </button>
+            </div>
+          </ng-template>
+        </div>
+
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-button type="button" (click)="onCancel()">Cancel</button>
+      <button mat-raised-button 
+              color="primary" 
+              (click)="onSave()"
+              [disabled]="!settingsForm.valid || isSaving">
+        <mat-icon>save</mat-icon>
+        {{ isSaving ? 'Saving...' : 'Save Settings' }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Summary Card -->
+  <mat-card class="summary-card" *ngIf="summary">
+    <mat-card-header>
+      <mat-card-title>Notification Summary</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="summary-item">
+        <mat-icon [color]="summary.isDiscordEnabled ? 'primary' : 'warn'">
+          {{ summary.isDiscordEnabled ? 'notifications_active' : 'notifications_off' }}
+        </mat-icon>
+        <span>Discord notifications: {{ summary.isDiscordEnabled ? 'Enabled' : 'Disabled' }}</span>
+      </div>
+      <div class="summary-item">
+        <mat-icon [color]="summary.hasWebhookConfigured ? 'primary' : 'warn'">
+          {{ summary.hasWebhookConfigured ? 'link' : 'link_off' }}
+        </mat-icon>
+        <span>Webhook: {{ summary.hasWebhookConfigured ? 'Configured' : 'Not configured' }}</span>
+      </div>
+      <div class="summary-item">
+        <mat-icon color="primary">shopping_cart</mat-icon>
+        <span>{{ summary.selectedProductsCount }} of {{ summary.maxProductsAllowed }} products selected</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

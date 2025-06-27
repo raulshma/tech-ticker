@@ -1816,6 +1816,271 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
+    getNotificationPreferences(): Observable<UserNotificationPreferencesDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/NotificationPreferences";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetNotificationPreferences(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetNotificationPreferences(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<UserNotificationPreferencesDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<UserNotificationPreferencesDtoApiResponse>;
+        }));
+    }
+
+    protected processGetNotificationPreferences(response: HttpResponseBase): Observable<UserNotificationPreferencesDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserNotificationPreferencesDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    updateNotificationPreferences(body: UpdateUserNotificationPreferencesDto | undefined): Observable<UserNotificationPreferencesDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/NotificationPreferences";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateNotificationPreferences(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateNotificationPreferences(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<UserNotificationPreferencesDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<UserNotificationPreferencesDtoApiResponse>;
+        }));
+    }
+
+    protected processUpdateNotificationPreferences(response: HttpResponseBase): Observable<UserNotificationPreferencesDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserNotificationPreferencesDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getAvailableProductsForNotification(): Observable<NotificationProductSelectionDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/NotificationPreferences/products";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAvailableProductsForNotification(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAvailableProductsForNotification(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<NotificationProductSelectionDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<NotificationProductSelectionDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetAvailableProductsForNotification(response: HttpResponseBase): Observable<NotificationProductSelectionDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = NotificationProductSelectionDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    testDiscordWebhook(body: TestDiscordWebhookDto | undefined): Observable<ApiResponse> {
+        let url_ = this.baseUrl + "/api/NotificationPreferences/test-webhook";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTestDiscordWebhook(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTestDiscordWebhook(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
+        }));
+    }
+
+    protected processTestDiscordWebhook(response: HttpResponseBase): Observable<ApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getNotificationPreferencesSummary(): Observable<NotificationPreferencesSummaryDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/NotificationPreferences/summary";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetNotificationPreferencesSummary(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetNotificationPreferencesSummary(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<NotificationPreferencesSummaryDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<NotificationPreferencesSummaryDtoApiResponse>;
+        }));
+    }
+
+    protected processGetNotificationPreferencesSummary(response: HttpResponseBase): Observable<NotificationPreferencesSummaryDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = NotificationPreferencesSummaryDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
     getAllPermissions(): Observable<PermissionDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Permission";
         url_ = url_.replace(/[?&]$/, "");
@@ -6543,6 +6808,298 @@ export interface ILoginUserDto {
     password: string;
 }
 
+export class NotificationPreferencesSummaryDto implements INotificationPreferencesSummaryDto {
+    isDiscordEnabled?: boolean;
+    hasWebhookConfigured?: boolean;
+    selectedProductsCount?: number;
+    maxProductsAllowed?: number;
+    selectedProductNames?: string[] | undefined;
+
+    constructor(data?: INotificationPreferencesSummaryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isDiscordEnabled = _data["isDiscordEnabled"];
+            this.hasWebhookConfigured = _data["hasWebhookConfigured"];
+            this.selectedProductsCount = _data["selectedProductsCount"];
+            this.maxProductsAllowed = _data["maxProductsAllowed"];
+            if (Array.isArray(_data["selectedProductNames"])) {
+                this.selectedProductNames = [] as any;
+                for (let item of _data["selectedProductNames"])
+                    this.selectedProductNames!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): NotificationPreferencesSummaryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new NotificationPreferencesSummaryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isDiscordEnabled"] = this.isDiscordEnabled;
+        data["hasWebhookConfigured"] = this.hasWebhookConfigured;
+        data["selectedProductsCount"] = this.selectedProductsCount;
+        data["maxProductsAllowed"] = this.maxProductsAllowed;
+        if (Array.isArray(this.selectedProductNames)) {
+            data["selectedProductNames"] = [];
+            for (let item of this.selectedProductNames)
+                data["selectedProductNames"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface INotificationPreferencesSummaryDto {
+    isDiscordEnabled?: boolean;
+    hasWebhookConfigured?: boolean;
+    selectedProductsCount?: number;
+    maxProductsAllowed?: number;
+    selectedProductNames?: string[] | undefined;
+}
+
+export class NotificationPreferencesSummaryDtoApiResponse implements INotificationPreferencesSummaryDtoApiResponse {
+    success?: boolean;
+    data?: NotificationPreferencesSummaryDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: INotificationPreferencesSummaryDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? NotificationPreferencesSummaryDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): NotificationPreferencesSummaryDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new NotificationPreferencesSummaryDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface INotificationPreferencesSummaryDtoApiResponse {
+    success?: boolean;
+    data?: NotificationPreferencesSummaryDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class NotificationProductSelectionDto implements INotificationProductSelectionDto {
+    productId?: string;
+    productName?: string | undefined;
+    categoryName?: string | undefined;
+    manufacturer?: string | undefined;
+    isSelected?: boolean;
+    hasActiveAlerts?: boolean;
+
+    constructor(data?: INotificationProductSelectionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productId = _data["productId"];
+            this.productName = _data["productName"];
+            this.categoryName = _data["categoryName"];
+            this.manufacturer = _data["manufacturer"];
+            this.isSelected = _data["isSelected"];
+            this.hasActiveAlerts = _data["hasActiveAlerts"];
+        }
+    }
+
+    static fromJS(data: any): NotificationProductSelectionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new NotificationProductSelectionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productId"] = this.productId;
+        data["productName"] = this.productName;
+        data["categoryName"] = this.categoryName;
+        data["manufacturer"] = this.manufacturer;
+        data["isSelected"] = this.isSelected;
+        data["hasActiveAlerts"] = this.hasActiveAlerts;
+        return data;
+    }
+}
+
+export interface INotificationProductSelectionDto {
+    productId?: string;
+    productName?: string | undefined;
+    categoryName?: string | undefined;
+    manufacturer?: string | undefined;
+    isSelected?: boolean;
+    hasActiveAlerts?: boolean;
+}
+
+export class NotificationProductSelectionDtoIEnumerableApiResponse implements INotificationProductSelectionDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: NotificationProductSelectionDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: INotificationProductSelectionDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(NotificationProductSelectionDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): NotificationProductSelectionDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new NotificationProductSelectionDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface INotificationProductSelectionDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: NotificationProductSelectionDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class ObjectApiResponse implements IObjectApiResponse {
     success?: boolean;
     data?: any | undefined;
@@ -9923,6 +10480,50 @@ export interface IStringStringArrayDictionaryApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class TestDiscordWebhookDto implements ITestDiscordWebhookDto {
+    discordWebhookUrl!: string;
+    customBotName?: string | undefined;
+    customAvatarUrl?: string | undefined;
+
+    constructor(data?: ITestDiscordWebhookDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.discordWebhookUrl = _data["discordWebhookUrl"];
+            this.customBotName = _data["customBotName"];
+            this.customAvatarUrl = _data["customAvatarUrl"];
+        }
+    }
+
+    static fromJS(data: any): TestDiscordWebhookDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestDiscordWebhookDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["discordWebhookUrl"] = this.discordWebhookUrl;
+        data["customBotName"] = this.customBotName;
+        data["customAvatarUrl"] = this.customAvatarUrl;
+        return data;
+    }
+}
+
+export interface ITestDiscordWebhookDto {
+    discordWebhookUrl: string;
+    customBotName?: string | undefined;
+    customAvatarUrl?: string | undefined;
+}
+
 export class UpdateAlertRuleDto implements IUpdateAlertRuleDto {
     conditionType?: string | undefined;
     thresholdValue?: number | undefined;
@@ -10347,6 +10948,66 @@ export interface IUpdateUserDto {
     isActive?: boolean | undefined;
 }
 
+export class UpdateUserNotificationPreferencesDto implements IUpdateUserNotificationPreferencesDto {
+    discordWebhookUrl?: string | undefined;
+    isDiscordNotificationEnabled?: boolean;
+    notificationProductIds?: string[] | undefined;
+    customBotName?: string | undefined;
+    customAvatarUrl?: string | undefined;
+
+    constructor(data?: IUpdateUserNotificationPreferencesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.discordWebhookUrl = _data["discordWebhookUrl"];
+            this.isDiscordNotificationEnabled = _data["isDiscordNotificationEnabled"];
+            if (Array.isArray(_data["notificationProductIds"])) {
+                this.notificationProductIds = [] as any;
+                for (let item of _data["notificationProductIds"])
+                    this.notificationProductIds!.push(item);
+            }
+            this.customBotName = _data["customBotName"];
+            this.customAvatarUrl = _data["customAvatarUrl"];
+        }
+    }
+
+    static fromJS(data: any): UpdateUserNotificationPreferencesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateUserNotificationPreferencesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["discordWebhookUrl"] = this.discordWebhookUrl;
+        data["isDiscordNotificationEnabled"] = this.isDiscordNotificationEnabled;
+        if (Array.isArray(this.notificationProductIds)) {
+            data["notificationProductIds"] = [];
+            for (let item of this.notificationProductIds)
+                data["notificationProductIds"].push(item);
+        }
+        data["customBotName"] = this.customBotName;
+        data["customAvatarUrl"] = this.customAvatarUrl;
+        return data;
+    }
+}
+
+export interface IUpdateUserNotificationPreferencesDto {
+    discordWebhookUrl?: string | undefined;
+    isDiscordNotificationEnabled?: boolean;
+    notificationProductIds?: string[] | undefined;
+    customBotName?: string | undefined;
+    customAvatarUrl?: string | undefined;
+}
+
 export class UserDto implements IUserDto {
     userId?: string;
     email?: string | undefined;
@@ -10601,6 +11262,178 @@ export interface IUserDtoPagedResponse {
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
     pagination?: PaginationMeta;
+}
+
+export class UserNotificationPreferencesDto implements IUserNotificationPreferencesDto {
+    userNotificationPreferencesId?: string;
+    userId?: string;
+    discordWebhookUrl?: string | undefined;
+    isDiscordNotificationEnabled?: boolean;
+    notificationProductIds?: string[] | undefined;
+    customBotName?: string | undefined;
+    customAvatarUrl?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+    notificationProducts?: ProductDto[] | undefined;
+
+    constructor(data?: IUserNotificationPreferencesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.userNotificationPreferencesId = _data["userNotificationPreferencesId"];
+            this.userId = _data["userId"];
+            this.discordWebhookUrl = _data["discordWebhookUrl"];
+            this.isDiscordNotificationEnabled = _data["isDiscordNotificationEnabled"];
+            if (Array.isArray(_data["notificationProductIds"])) {
+                this.notificationProductIds = [] as any;
+                for (let item of _data["notificationProductIds"])
+                    this.notificationProductIds!.push(item);
+            }
+            this.customBotName = _data["customBotName"];
+            this.customAvatarUrl = _data["customAvatarUrl"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            if (Array.isArray(_data["notificationProducts"])) {
+                this.notificationProducts = [] as any;
+                for (let item of _data["notificationProducts"])
+                    this.notificationProducts!.push(ProductDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): UserNotificationPreferencesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserNotificationPreferencesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["userNotificationPreferencesId"] = this.userNotificationPreferencesId;
+        data["userId"] = this.userId;
+        data["discordWebhookUrl"] = this.discordWebhookUrl;
+        data["isDiscordNotificationEnabled"] = this.isDiscordNotificationEnabled;
+        if (Array.isArray(this.notificationProductIds)) {
+            data["notificationProductIds"] = [];
+            for (let item of this.notificationProductIds)
+                data["notificationProductIds"].push(item);
+        }
+        data["customBotName"] = this.customBotName;
+        data["customAvatarUrl"] = this.customAvatarUrl;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        if (Array.isArray(this.notificationProducts)) {
+            data["notificationProducts"] = [];
+            for (let item of this.notificationProducts)
+                data["notificationProducts"].push(item ? item.toJSON() : <any>undefined);
+        }
+        return data;
+    }
+}
+
+export interface IUserNotificationPreferencesDto {
+    userNotificationPreferencesId?: string;
+    userId?: string;
+    discordWebhookUrl?: string | undefined;
+    isDiscordNotificationEnabled?: boolean;
+    notificationProductIds?: string[] | undefined;
+    customBotName?: string | undefined;
+    customAvatarUrl?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+    notificationProducts?: ProductDto[] | undefined;
+}
+
+export class UserNotificationPreferencesDtoApiResponse implements IUserNotificationPreferencesDtoApiResponse {
+    success?: boolean;
+    data?: UserNotificationPreferencesDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IUserNotificationPreferencesDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? UserNotificationPreferencesDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): UserNotificationPreferencesDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserNotificationPreferencesDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IUserNotificationPreferencesDtoApiResponse {
+    success?: boolean;
+    data?: UserNotificationPreferencesDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class UserRoleInfoDto implements IUserRoleInfoDto {

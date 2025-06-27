@@ -22,6 +22,7 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<PriceHistory> PriceHistory { get; set; } = null!;
     public DbSet<AlertRule> AlertRules { get; set; } = null!;
     public DbSet<ScraperRunLog> ScraperRunLogs { get; set; } = null!;
+    public DbSet<UserNotificationPreferences> UserNotificationPreferences { get; set; } = null!;
 
     // RBAC entities
     public DbSet<Permission> Permissions { get; set; } = null!;
@@ -245,6 +246,29 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt).IsRequired();
             entity.Property(e => e.IsActive).IsRequired().HasDefaultValue(true);
+
+            // Configure one-to-one relationship with UserNotificationPreferences
+            entity.HasOne(e => e.NotificationPreferences)
+                  .WithOne(p => p.User)
+                  .HasForeignKey<UserNotificationPreferences>(p => p.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure UserNotificationPreferences entity
+        modelBuilder.Entity<UserNotificationPreferences>(entity =>
+        {
+            entity.HasKey(e => e.UserNotificationPreferencesId);
+            entity.Property(e => e.UserId).IsRequired();
+            entity.Property(e => e.DiscordWebhookUrl).HasMaxLength(500);
+            entity.Property(e => e.IsDiscordNotificationEnabled).IsRequired().HasDefaultValue(false);
+            entity.Property(e => e.NotificationProductIds).HasColumnType("jsonb"); // PostgreSQL JSONB
+            entity.Property(e => e.CustomBotName).HasMaxLength(100);
+            entity.Property(e => e.CustomAvatarUrl).HasMaxLength(500);
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            // Create index on UserId for performance
+            entity.HasIndex(e => e.UserId).IsUnique();
         });
 
         // Configure Permission entity

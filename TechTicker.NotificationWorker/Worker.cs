@@ -36,7 +36,7 @@ public class Worker : BackgroundService
                 _messagingConfig.PricePointRecordedQueue,
                 HandlePricePointRecordedAsync);
 
-            // Start consuming alert triggered events for email notifications
+            // Start consuming alert triggered events for Discord notifications
             await _messageConsumer.StartConsumingAsync<AlertTriggeredEvent>(
                 _messagingConfig.AlertTriggeredQueue,
                 HandleAlertTriggeredAsync);
@@ -88,8 +88,8 @@ public class Worker : BackgroundService
                 alertEvent.UserId, alertEvent.ProductName);
 
             using var scope = _serviceScopeFactory.CreateScope();
-            var emailService = scope.ServiceProvider.GetRequiredService<EmailService>();
-            await emailService.SendAlertNotificationAsync(alertEvent);
+            var discordService = scope.ServiceProvider.GetRequiredService<DiscordService>();
+            await discordService.SendAlertNotificationAsync(alertEvent);
 
             _logger.LogInformation("Successfully sent alert notification for alert rule {AlertRuleId}",
                 alertEvent.AlertRuleId);

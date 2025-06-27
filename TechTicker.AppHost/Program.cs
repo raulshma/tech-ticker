@@ -30,10 +30,9 @@ var notificationWorker = builder.AddProject<Projects.TechTicker_NotificationWork
     .WaitFor(rabbitmq)
     .WithReference(techtickerDb)
     .WithReference(rabbitmq)
-    .WithEnvironment("Email__SmtpHost", "localhost")
-    .WithEnvironment("Email__SmtpPort", "587")
-    .WithEnvironment("Email__UseSsl", "true")
-    .WithEnvironment("Email__EnableEmailSending", "false"); // Disabled by default for development
+    .WithEnvironment("Discord__WebhookUrl", "")
+    .WithEnvironment("Discord__BotName", "TechTicker")
+    .WithEnvironment("Discord__EnableDiscordNotifications", "false"); // Disabled by default for development
 
 builder.AddNpmApp("angular", "../TechTicker.Frontend")
     .WithReference(apiService)
