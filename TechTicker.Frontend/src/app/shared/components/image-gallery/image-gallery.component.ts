@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-image-gallery',
@@ -33,11 +34,11 @@ export class ImageGalleryComponent implements OnInit {
 
   private buildImageList(): void {
     this.allImageUrls = [];
-    
+
     if (this.primaryImageUrl) {
       this.allImageUrls.push(this.primaryImageUrl);
     }
-    
+
     if (this.additionalImageUrls && this.additionalImageUrls.length > 0) {
       this.allImageUrls.push(...this.additionalImageUrls);
     }
@@ -59,7 +60,7 @@ export class ImageGalleryComponent implements OnInit {
   getImageUrl(imageUrl: string): string {
     // Convert relative paths to absolute URLs
     if (imageUrl && !imageUrl.startsWith('http')) {
-      // Assuming images are served from the API base URL
+      // Use the API base URL from environment
       const baseUrl = this.getApiBaseUrl();
       return `${baseUrl}/${imageUrl}`;
     }
@@ -67,8 +68,8 @@ export class ImageGalleryComponent implements OnInit {
   }
 
   private getApiBaseUrl(): string {
-    // Get the API base URL from environment or current location
-    return window.location.origin;
+    // Get the API base URL from environment, fallback to current location
+    return environment.apiUrl || window.location.origin;
   }
 
   hasImages(): boolean {
