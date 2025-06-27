@@ -18,8 +18,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
-// Chart.js - will be added later for price history charts
-// import { BaseChartDirective } from 'ng2-charts';
+// Chart.js for price history charts
+import { BaseChartDirective } from 'ng2-charts';
 
 // Routing
 import { CatalogRoutingModule } from './catalog-routing.module';
@@ -58,8 +58,8 @@ import { CategoryFilterComponent } from './components/category-filter/category-f
     MatDividerModule,
     MatTabsModule,
     MatTooltipModule,
-    MatSnackBarModule
-    // BaseChartDirective - will be added later for price history charts
+    MatSnackBarModule,
+    BaseChartDirective
   ]
 })
 export class CatalogModule { }

@@ -44,7 +44,11 @@ export class ImageGalleryComponent implements OnInit {
     }
   }
 
-  selectImage(imageUrl: string, index: number): void {
+  selectImage(imageUrl: string, index: number, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
     this.selectedImageUrl = imageUrl;
     this.selectedIndex = index;
   }
@@ -80,14 +84,22 @@ export class ImageGalleryComponent implements OnInit {
     return this.allImageUrls.filter(url => this.isImageValid(url));
   }
 
-  previousImage(): void {
+  previousImage(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
     if (this.allImageUrls.length > 1) {
       this.selectedIndex = this.selectedIndex > 0 ? this.selectedIndex - 1 : this.allImageUrls.length - 1;
       this.selectedImageUrl = this.allImageUrls[this.selectedIndex];
     }
   }
 
-  nextImage(): void {
+  nextImage(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
     if (this.allImageUrls.length > 1) {
       this.selectedIndex = this.selectedIndex < this.allImageUrls.length - 1 ? this.selectedIndex + 1 : 0;
       this.selectedImageUrl = this.allImageUrls[this.selectedIndex];

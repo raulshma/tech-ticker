@@ -2,14 +2,14 @@
   <!-- Main Image Display -->
   <div class="main-image-container" [style.max-height]="maxHeight" [style.max-width]="maxWidth">
     <div class="image-wrapper">
-      <img 
+      <img
         *ngIf="selectedImageUrl && isImageValid(selectedImageUrl)"
-        [src]="getImageUrl(selectedImageUrl)" 
+        [src]="getImageUrl(selectedImageUrl)"
         [alt]="altText"
         class="main-image"
         (error)="onImageError(selectedImageUrl!)"
         loading="lazy">
-      
+
       <!-- Fallback for no valid images -->
       <div *ngIf="!selectedImageUrl || !isImageValid(selectedImageUrl)" class="no-image-placeholder">
         <mat-icon>image</mat-icon>
@@ -18,16 +18,16 @@
 
       <!-- Navigation arrows for multiple images -->
       <div *ngIf="allImageUrls.length > 1" class="image-navigation">
-        <button mat-icon-button 
-                class="nav-button nav-previous" 
-                (click)="previousImage()"
+        <button mat-icon-button
+                class="nav-button nav-previous"
+                (click)="previousImage($event)"
                 matTooltip="Previous image">
           <mat-icon>chevron_left</mat-icon>
         </button>
-        
-        <button mat-icon-button 
-                class="nav-button nav-next" 
-                (click)="nextImage()"
+
+        <button mat-icon-button
+                class="nav-button nav-next"
+                (click)="nextImage($event)"
                 matTooltip="Next image">
           <mat-icon>chevron_right</mat-icon>
         </button>
@@ -43,18 +43,18 @@
   <!-- Thumbnail Strip -->
   <div *ngIf="showThumbnails && allImageUrls.length > 1" class="thumbnails-container">
     <div class="thumbnails-strip">
-      <div *ngFor="let imageUrl of allImageUrls; let i = index" 
+      <div *ngFor="let imageUrl of allImageUrls; let i = index"
            class="thumbnail-wrapper"
            [class.selected]="i === selectedIndex"
-           (click)="selectImage(imageUrl, i)">
-        <img 
+           (click)="selectImage(imageUrl, i, $event)">
+        <img
           *ngIf="isImageValid(imageUrl)"
-          [src]="getImageUrl(imageUrl)" 
+          [src]="getImageUrl(imageUrl)"
           [alt]="altText + ' thumbnail'"
           class="thumbnail-image"
           (error)="onImageError(imageUrl)"
           loading="lazy">
-        
+
         <div *ngIf="!isImageValid(imageUrl)" class="thumbnail-placeholder">
           <mat-icon>broken_image</mat-icon>
         </div>

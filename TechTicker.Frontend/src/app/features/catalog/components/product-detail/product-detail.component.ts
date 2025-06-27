@@ -2,6 +2,34 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTabGroup } from '@angular/material/tabs';
+import {
+  Chart,
+  ChartConfiguration,
+  ChartOptions,
+  ChartType,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  LineController,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
+
+// Register Chart.js components
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  LineController,
+  Title,
+  Tooltip,
+  Legend
+);
+
 import { PriceHistoryDto, ProductWithCurrentPricesDto } from '../../../../shared/api/api-client';
 import { CatalogService } from '../../services/catalog.service';
 import { PriceHistoryService } from '../../../products/services/price-history.service';
@@ -18,7 +46,52 @@ export class ProductDetailComponent implements OnInit {
   isLoading = true;
   isLoadingPriceHistory = false;
 
+  // Chart configuration
+  public lineChartData: ChartConfiguration<'line'>['data'] = {
+    labels: [],
+    datasets: []
+  };
+
+  public lineChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        display: true,
+        title: {
+          display: true,
+          text: 'Date'
+        }
+      },
+      y: {
+        display: true,
+        title: {
+          display: true,
+          text: 'Price ($)'
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top'
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false
+      }
+    },
+    interaction: {
+      mode: 'nearest',
+      axis: 'x',
+      intersect: false
+    }
+  };
+
+  public lineChartType = 'line' as const;
+
   @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
+  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
 
   constructor(
     private route: ActivatedRoute,
@@ -63,6 +136,7 @@ export class ProductDetailComponent implements OnInit {
     }).subscribe({
       next: (history) => {
         this.priceHistory = history;
+        this.updateChart();
         this.isLoadingPriceHistory = false;
       },
       error: (error) => {
@@ -158,5 +232,32 @@ export class ProductDetailComponent implements OnInit {
 
   hasSpecifications(): boolean {
     return this.getSpecificationEntries().length > 0;
+  }
+
+  hasProductImages(): boolean {
+    const productAny = this.product as any;
+    return !!(productAny?.primaryImageUrl || (productAny?.additionalImageUrls && productAny.additionalImageUrls.length > 0));
+  }
+
+  getPrimaryImageUrl(): string | null {
+    const productAny = this.product as any;
+    return productAny?.primaryImageUrl || null;
+  }
+
+  getAdditionalImageUrls(): string[] {
+    const productAny = this.product as any;
+    return productAny?.additionalImageUrls || [];
+  }
+
+  updateChart(): void {
+    const chartData = this.priceHistoryService.transformToChartData(this.priceHistory);
+    this.lineChartData = {
+      labels: chartData.labels,
+      datasets: chartData.datasets
+    };
+
+    if (this.chart) {
+      this.chart.update();
+    }
   }
 }
