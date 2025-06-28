@@ -8,6 +8,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { firstValueFrom } from 'rxjs';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import {
@@ -29,6 +30,7 @@ import {
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
+    ScrollingModule,
     HasPermissionDirective
   ],
   templateUrl: './proxy-list.component.html',
@@ -38,6 +40,12 @@ export class ProxyListComponent implements OnInit {
   proxies: ProxyConfigurationDto[] = [];
   stats: ProxyStatsDto | null = null;
   loading = false;
+
+  // Virtual scrolling configuration
+  readonly itemSize = 72; // Height of each proxy row in pixels
+  readonly minBufferPx = 200; // Minimum buffer size
+  readonly maxBufferPx = 400; // Maximum buffer size
+
   displayedColumns: string[] = [
     'displayName',
     'proxyType',
@@ -194,4 +202,24 @@ export class ProxyListComponent implements OnInit {
     if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
     return `${Math.floor(diffMins / 1440)}d ago`;
   }
+
+  // TrackBy function for better performance with large lists
+  trackByProxyId(_index: number, proxy: ProxyConfigurationDto): string {
+    return proxy.proxyConfigurationId || '';
+  }
+
+  // Check if virtual scrolling should be used
+  shouldUseVirtualScrolling(): boolean {
+    return this.proxies.length > 50; // Use virtual scrolling for 50+ items
+  }
+
+  // Get viewport height for virtual scrolling
+  getVirtualScrollHeight(): number {
+    const maxHeight = 600; // Maximum viewport height
+    const calculatedHeight = Math.min(this.proxies.length * this.itemSize + 20, maxHeight);
+    return Math.max(calculatedHeight, 200); // Minimum height of 200px
+  }
+
+  // Expose Math for template
+  readonly Math = Math;
 }

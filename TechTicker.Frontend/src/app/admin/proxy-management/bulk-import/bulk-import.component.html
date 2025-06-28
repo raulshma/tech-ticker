@@ -37,7 +37,7 @@
         <div class="form-section">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Proxy List</mat-label>
-            <textarea matInput 
+            <textarea matInput
                       formControlName="proxyText"
                       placeholder="Enter proxies (one per line)&#10;Examples:&#10;192.168.1.100:8080&#10;proxy.example.com:3128:username:password&#10;socks5://10.0.0.1:1080"
                       rows="10"
@@ -77,6 +77,21 @@
       </form>
     </mat-card-content>
 
+    <!-- Progress Bar -->
+    <div class="progress-section" *ngIf="parsing">
+      <mat-progress-bar mode="determinate" [value]="parseProgress"></mat-progress-bar>
+      <div class="progress-text">
+        <span>{{ parseProgressMessage }}</span>
+        <div class="progress-actions">
+          <span class="progress-percentage">{{ parseProgress }}%</span>
+          <button mat-button color="warn" (click)="cancelParsing()" class="cancel-button">
+            <mat-icon>cancel</mat-icon>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
     <mat-card-actions>
       <div class="action-buttons">
         <button mat-button (click)="onCancel()" [disabled]="parsing">
@@ -86,7 +101,7 @@
         <button mat-raised-button color="primary" (click)="parseProxies()" [disabled]="parsing || importForm.invalid">
           <mat-spinner diameter="20" *ngIf="parsing"></mat-spinner>
           <mat-icon *ngIf="!parsing">preview</mat-icon>
-          {{ parsing ? 'Parsing...' : 'Parse & Preview' }}
+          {{ parsing ? parseProgressMessage || 'Parsing...' : 'Parse & Preview' }}
         </button>
       </div>
     </mat-card-actions>
@@ -122,59 +137,71 @@
         </div>
       </div>
 
-      <!-- Proxy Table -->
+      <!-- Performance Info for Large Datasets -->
+      <div class="performance-info" *ngIf="parsedProxies.length > 1000">
+        <mat-icon>info</mat-icon>
+        <span>Large dataset detected ({{ parsedProxies.length }} proxies). Using virtual scrolling for optimal performance.</span>
+      </div>
+
+      <!-- Proxy Table with Virtual Scrolling -->
       <div class="table-container">
-        <mat-table [dataSource]="parsedProxies" class="proxy-preview-table">
-          <ng-container matColumnDef="host">
-            <mat-header-cell *matHeaderCellDef>Host</mat-header-cell>
-            <mat-cell *matCellDef="let proxy">{{ proxy.host }}</mat-cell>
-          </ng-container>
+        <div class="table-header">
+          <div class="header-row">
+            <div class="header-cell host-column">Host</div>
+            <div class="header-cell port-column">Port</div>
+            <div class="header-cell type-column">Type</div>
+            <div class="header-cell auth-column">Auth</div>
+            <div class="header-cell status-column">Status</div>
+            <div class="header-cell errors-column">Issues</div>
+          </div>
+        </div>
 
-          <ng-container matColumnDef="port">
-            <mat-header-cell *matHeaderCellDef>Port</mat-header-cell>
-            <mat-cell *matCellDef="let proxy">{{ proxy.port }}</mat-cell>
-          </ng-container>
+        <cdk-virtual-scroll-viewport
+          [itemSize]="itemSize"
+          class="virtual-scroll-viewport"
+          [style.height.px]="Math.min(parsedProxies.length * itemSize + 20, 400)">
 
-          <ng-container matColumnDef="type">
-            <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
-            <mat-cell *matCellDef="let proxy">
+          <div *cdkVirtualFor="let proxy of parsedProxies; trackBy: trackByProxyId"
+               class="proxy-row">
+
+            <div class="proxy-cell host-column">
+              <span class="cell-content">{{ proxy.host }}</span>
+            </div>
+
+            <div class="proxy-cell port-column">
+              <span class="cell-content">{{ proxy.port }}</span>
+            </div>
+
+            <div class="proxy-cell type-column">
               <mat-chip [color]="proxy.proxyType === 'HTTP' ? 'primary' : 'accent'" selected>
                 {{ proxy.proxyType }}
               </mat-chip>
-            </mat-cell>
-          </ng-container>
+            </div>
 
-          <ng-container matColumnDef="auth">
-            <mat-header-cell *matHeaderCellDef>Auth</mat-header-cell>
-            <mat-cell *matCellDef="let proxy">
+            <div class="proxy-cell auth-column">
               <mat-icon *ngIf="hasAuthentication(proxy)" color="primary">lock</mat-icon>
               <mat-icon *ngIf="!hasAuthentication(proxy)" color="disabled">lock_open</mat-icon>
-            </mat-cell>
-          </ng-container>
+            </div>
 
-          <ng-container matColumnDef="status">
-            <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
-            <mat-cell *matCellDef="let proxy">
+            <div class="proxy-cell status-column">
               <mat-chip [color]="getStatusColor(proxy)" selected>
                 {{ getProxyStatus(proxy) }}
               </mat-chip>
-            </mat-cell>
-          </ng-container>
+            </div>
 
-          <ng-container matColumnDef="errors">
-            <mat-header-cell *matHeaderCellDef>Issues</mat-header-cell>
-            <mat-cell *matCellDef="let proxy">
+            <div class="proxy-cell errors-column">
               <div *ngIf="proxy.validationErrors && proxy.validationErrors.length > 0" class="error-list">
-                <mat-chip *ngFor="let error of proxy.validationErrors" color="warn" selected>
+                <mat-chip *ngFor="let error of proxy.validationErrors; trackBy: trackByIndex"
+                          color="warn"
+                          selected
+                          class="error-chip">
                   {{ error }}
                 </mat-chip>
               </div>
-            </mat-cell>
-          </ng-container>
+            </div>
 
-          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-        </mat-table>
+          </div>
+        </cdk-virtual-scroll-viewport>
       </div>
     </mat-card-content>
 
@@ -189,7 +216,7 @@
           <mat-icon *ngIf="!validating">check_circle</mat-icon>
           {{ validating ? 'Validating...' : 'Validate' }}
         </button>
-        <button mat-raised-button color="primary" (click)="performImport()" 
+        <button mat-raised-button color="primary" (click)="performImport()"
                 [disabled]="importing || getValidProxiesCount() === 0">
           <mat-spinner diameter="20" *ngIf="importing"></mat-spinner>
           <mat-icon *ngIf="!importing">upload</mat-icon>

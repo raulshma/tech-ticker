@@ -50,128 +50,262 @@
     <p>Loading proxies...</p>
   </div>
 
+  <!-- Performance Info for Large Datasets -->
+  <div class="performance-info" *ngIf="shouldUseVirtualScrolling() && !loading">
+    <mat-icon>info</mat-icon>
+    <span>Large dataset detected ({{ proxies.length }} proxies). Using virtual scrolling for optimal performance.</span>
+  </div>
+
   <!-- Proxy Table -->
   <div class="table-container" *ngIf="!loading">
-    <mat-table [dataSource]="proxies" class="proxy-table">
 
-      <!-- Display Name Column -->
-      <ng-container matColumnDef="displayName">
-        <mat-header-cell *matHeaderCellDef>Proxy</mat-header-cell>
-        <mat-cell *matCellDef="let proxy">
-          <div class="proxy-info">
-            <div class="proxy-name">{{ proxy.displayName }}</div>
-            <div class="proxy-description" *ngIf="proxy.description">{{ proxy.description }}</div>
-          </div>
-        </mat-cell>
-      </ng-container>
+    <!-- Regular Table for Small Datasets -->
+    <div *ngIf="!shouldUseVirtualScrolling()" class="regular-table">
+      <mat-table [dataSource]="proxies" class="proxy-table">
 
-      <!-- Type Column -->
-      <ng-container matColumnDef="proxyType">
-        <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
-        <mat-cell *matCellDef="let proxy">
-          <mat-chip [color]="proxy.proxyType === 'HTTP' ? 'primary' : 'accent'" selected>
-            {{ proxy.proxyType }}
-          </mat-chip>
-        </mat-cell>
-      </ng-container>
+        <!-- Display Name Column -->
+        <ng-container matColumnDef="displayName">
+          <mat-header-cell *matHeaderCellDef>Proxy</mat-header-cell>
+          <mat-cell *matCellDef="let proxy">
+            <div class="proxy-info">
+              <div class="proxy-name">{{ proxy.displayName }}</div>
+              <div class="proxy-description" *ngIf="proxy.description">{{ proxy.description }}</div>
+            </div>
+          </mat-cell>
+        </ng-container>
 
-      <!-- Status Column -->
-      <ng-container matColumnDef="status">
-        <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
-        <mat-cell *matCellDef="let proxy">
-          <div class="status-container">
-            <mat-chip [color]="getStatusColor(proxy)" selected>
-              {{ proxy.statusDescription }}
+        <!-- Type Column -->
+        <ng-container matColumnDef="proxyType">
+          <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+          <mat-cell *matCellDef="let proxy">
+            <mat-chip [color]="proxy.proxyType === 'HTTP' ? 'primary' : 'accent'" selected>
+              {{ proxy.proxyType }}
             </mat-chip>
-            <div class="status-indicators">
-              <mat-icon *ngIf="!proxy.isActive" class="status-icon inactive" title="Inactive">power_off</mat-icon>
-              <mat-icon *ngIf="proxy.isActive && !proxy.isHealthy" class="status-icon unhealthy" title="Unhealthy">warning</mat-icon>
-              <mat-icon *ngIf="proxy.requiresAuthentication" class="status-icon auth" title="Requires Authentication">lock</mat-icon>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+          <mat-cell *matCellDef="let proxy">
+            <div class="status-container">
+              <mat-chip [color]="getStatusColor(proxy)" selected>
+                {{ proxy.statusDescription }}
+              </mat-chip>
+              <div class="status-indicators">
+                <mat-icon *ngIf="!proxy.isActive" class="status-icon inactive" title="Inactive">power_off</mat-icon>
+                <mat-icon *ngIf="proxy.isActive && !proxy.isHealthy" class="status-icon unhealthy" title="Unhealthy">warning</mat-icon>
+                <mat-icon *ngIf="proxy.requiresAuthentication" class="status-icon auth" title="Requires Authentication">lock</mat-icon>
+              </div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Success Rate Column -->
+        <ng-container matColumnDef="successRate">
+          <mat-header-cell *matHeaderCellDef>Success Rate</mat-header-cell>
+          <mat-cell *matCellDef="let proxy">
+            <div class="success-rate">
+              <div class="rate-value">{{ proxy.successRate | number:'1.1-1' }}%</div>
+              <div class="rate-details">{{ proxy.successfulRequests }}/{{ proxy.totalRequests }}</div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Total Requests Column -->
+        <ng-container matColumnDef="totalRequests">
+          <mat-header-cell *matHeaderCellDef>Requests</mat-header-cell>
+          <mat-cell *matCellDef="let proxy">
+            <div class="request-stats">
+              <div class="total">{{ proxy.totalRequests }}</div>
+              <div class="failures" *ngIf="proxy.consecutiveFailures > 0">
+                {{ proxy.consecutiveFailures }} consecutive failures
+              </div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Last Tested Column -->
+        <ng-container matColumnDef="lastTested">
+          <mat-header-cell *matHeaderCellDef>Last Tested</mat-header-cell>
+          <mat-cell *matCellDef="let proxy">
+            <div class="last-tested">
+              {{ formatLastTested(proxy.lastTestedAt) }}
+              <div class="error-info" *ngIf="proxy.lastErrorMessage">
+                <mat-icon class="error-icon">error_outline</mat-icon>
+                {{ proxy.lastErrorMessage }}
+              </div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+          <mat-cell *matCellDef="let proxy">
+            <div class="action-buttons">
+              <button mat-icon-button
+                      [color]="proxy.isActive ? 'warn' : 'primary'"
+                      (click)="toggleProxyStatus(proxy)"
+                      [title]="proxy.isActive ? 'Disable' : 'Enable'"
+                      *hasPermission="'Proxies.Update'">
+                <mat-icon>{{ proxy.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
+              </button>
+
+              <button mat-icon-button
+                      color="accent"
+                      (click)="testProxy(proxy)"
+                      title="Test Proxy"
+                      *hasPermission="'Proxies.Test'">
+                <mat-icon>network_check</mat-icon>
+              </button>
+
+              <button mat-icon-button
+                      [routerLink]="['/admin/proxies/edit', proxy.proxyConfigurationId]"
+                      title="Edit"
+                      *hasPermission="'Proxies.Update'">
+                <mat-icon>edit</mat-icon>
+              </button>
+
+              <button mat-icon-button
+                      color="warn"
+                      (click)="deleteProxy(proxy)"
+                      title="Delete"
+                      *hasPermission="'Proxies.Delete'">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      </mat-table>
+    </div>
+
+    <!-- Virtual Scrolling Table for Large Datasets -->
+    <div *ngIf="shouldUseVirtualScrolling()" class="virtual-table">
+      <!-- Table Header -->
+      <div class="virtual-table-header">
+        <div class="header-row">
+          <div class="header-cell proxy-column">Proxy</div>
+          <div class="header-cell type-column">Type</div>
+          <div class="header-cell status-column">Status</div>
+          <div class="header-cell rate-column">Success Rate</div>
+          <div class="header-cell requests-column">Requests</div>
+          <div class="header-cell tested-column">Last Tested</div>
+          <div class="header-cell actions-column">Actions</div>
+        </div>
+      </div>
+
+      <!-- Virtual Scroll Viewport -->
+      <cdk-virtual-scroll-viewport
+        [itemSize]="itemSize"
+        [minBufferPx]="minBufferPx"
+        [maxBufferPx]="maxBufferPx"
+        class="virtual-scroll-viewport"
+        [style.height.px]="getVirtualScrollHeight()">
+
+        <div *cdkVirtualFor="let proxy of proxies; trackBy: trackByProxyId"
+             class="proxy-row">
+
+          <!-- Proxy Info -->
+          <div class="proxy-cell proxy-column">
+            <div class="proxy-info">
+              <div class="proxy-name">{{ proxy.displayName }}</div>
+              <div class="proxy-description" *ngIf="proxy.description">{{ proxy.description }}</div>
             </div>
           </div>
-        </mat-cell>
-      </ng-container>
 
-      <!-- Success Rate Column -->
-      <ng-container matColumnDef="successRate">
-        <mat-header-cell *matHeaderCellDef>Success Rate</mat-header-cell>
-        <mat-cell *matCellDef="let proxy">
-          <div class="success-rate">
-            <div class="rate-value">{{ proxy.successRate | number:'1.1-1' }}%</div>
-            <div class="rate-details">{{ proxy.successfulRequests }}/{{ proxy.totalRequests }}</div>
+          <!-- Type -->
+          <div class="proxy-cell type-column">
+            <mat-chip [color]="proxy.proxyType === 'HTTP' ? 'primary' : 'accent'" selected>
+              {{ proxy.proxyType }}
+            </mat-chip>
           </div>
-        </mat-cell>
-      </ng-container>
 
-      <!-- Total Requests Column -->
-      <ng-container matColumnDef="totalRequests">
-        <mat-header-cell *matHeaderCellDef>Requests</mat-header-cell>
-        <mat-cell *matCellDef="let proxy">
-          <div class="request-stats">
-            <div class="total">{{ proxy.totalRequests }}</div>
-            <div class="failures" *ngIf="proxy.consecutiveFailures > 0">
-              {{ proxy.consecutiveFailures }} consecutive failures
+          <!-- Status -->
+          <div class="proxy-cell status-column">
+            <div class="status-container">
+              <mat-chip [color]="getStatusColor(proxy)" selected>
+                {{ proxy.statusDescription }}
+              </mat-chip>
+              <div class="status-indicators">
+                <mat-icon *ngIf="!proxy.isActive" class="status-icon inactive" title="Inactive">power_off</mat-icon>
+                <mat-icon *ngIf="proxy.isActive && !proxy.isHealthy" class="status-icon unhealthy" title="Unhealthy">warning</mat-icon>
+                <mat-icon *ngIf="proxy.requiresAuthentication" class="status-icon auth" title="Requires Authentication">lock</mat-icon>
+              </div>
             </div>
           </div>
-        </mat-cell>
-      </ng-container>
 
-      <!-- Last Tested Column -->
-      <ng-container matColumnDef="lastTested">
-        <mat-header-cell *matHeaderCellDef>Last Tested</mat-header-cell>
-        <mat-cell *matCellDef="let proxy">
-          <div class="last-tested">
-            {{ formatLastTested(proxy.lastTestedAt) }}
-            <div class="error-info" *ngIf="proxy.lastErrorMessage">
-              <mat-icon class="error-icon">error_outline</mat-icon>
-              {{ proxy.lastErrorMessage }}
+          <!-- Success Rate -->
+          <div class="proxy-cell rate-column">
+            <div class="success-rate">
+              <div class="rate-value">{{ proxy.successRate | number:'1.1-1' }}%</div>
+              <div class="rate-details">{{ proxy.successfulRequests }}/{{ proxy.totalRequests }}</div>
             </div>
           </div>
-        </mat-cell>
-      </ng-container>
 
-      <!-- Actions Column -->
-      <ng-container matColumnDef="actions">
-        <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
-        <mat-cell *matCellDef="let proxy">
-          <div class="action-buttons">
-            <button mat-icon-button
-                    [color]="proxy.isActive ? 'warn' : 'primary'"
-                    (click)="toggleProxyStatus(proxy)"
-                    [title]="proxy.isActive ? 'Disable' : 'Enable'"
-                    *hasPermission="'Proxies.Update'">
-              <mat-icon>{{ proxy.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
-            </button>
-
-            <button mat-icon-button
-                    color="accent"
-                    (click)="testProxy(proxy)"
-                    title="Test Proxy"
-                    *hasPermission="'Proxies.Test'">
-              <mat-icon>network_check</mat-icon>
-            </button>
-
-            <button mat-icon-button
-                    [routerLink]="['/admin/proxies/edit', proxy.proxyConfigurationId]"
-                    title="Edit"
-                    *hasPermission="'Proxies.Update'">
-              <mat-icon>edit</mat-icon>
-            </button>
-
-            <button mat-icon-button
-                    color="warn"
-                    (click)="deleteProxy(proxy)"
-                    title="Delete"
-                    *hasPermission="'Proxies.Delete'">
-              <mat-icon>delete</mat-icon>
-            </button>
+          <!-- Requests -->
+          <div class="proxy-cell requests-column">
+            <div class="request-stats">
+              <div class="total">{{ proxy.totalRequests }}</div>
+              <div class="failures" *ngIf="proxy.consecutiveFailures && proxy.consecutiveFailures > 0">
+                {{ proxy.consecutiveFailures }} consecutive failures
+              </div>
+            </div>
           </div>
-        </mat-cell>
-      </ng-container>
 
-      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-    </mat-table>
+          <!-- Last Tested -->
+          <div class="proxy-cell tested-column">
+            <div class="last-tested">
+              {{ formatLastTested(proxy.lastTestedAt?.toISOString() || null) }}
+              <div class="error-info" *ngIf="proxy.lastErrorMessage">
+                <mat-icon class="error-icon">error_outline</mat-icon>
+                {{ proxy.lastErrorMessage }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="proxy-cell actions-column">
+            <div class="action-buttons">
+              <button mat-icon-button
+                      [color]="proxy.isActive ? 'warn' : 'primary'"
+                      (click)="toggleProxyStatus(proxy)"
+                      [title]="proxy.isActive ? 'Disable' : 'Enable'"
+                      *hasPermission="'Proxies.Update'">
+                <mat-icon>{{ proxy.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
+              </button>
+
+              <button mat-icon-button
+                      color="accent"
+                      (click)="testProxy(proxy)"
+                      title="Test Proxy"
+                      *hasPermission="'Proxies.Test'">
+                <mat-icon>network_check</mat-icon>
+              </button>
+
+              <button mat-icon-button
+                      [routerLink]="['/admin/proxies/edit', proxy.proxyConfigurationId]"
+                      title="Edit"
+                      *hasPermission="'Proxies.Update'">
+                <mat-icon>edit</mat-icon>
+              </button>
+
+              <button mat-icon-button
+                      color="warn"
+                      (click)="deleteProxy(proxy)"
+                      title="Delete"
+                      *hasPermission="'Proxies.Delete'">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </cdk-virtual-scroll-viewport>
+    </div>
 
     <!-- Empty State -->
     <div class="empty-state" *ngIf="proxies.length === 0 && !loading">

@@ -13,7 +13,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
-import { firstValueFrom } from 'rxjs';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { firstValueFrom, interval, take } from 'rxjs';
 import {
   ProxyImportItemDto,
   BulkProxyImportDto,
@@ -39,7 +41,9 @@ import {
     MatProgressSpinnerModule,
     MatTableModule,
     MatChipsModule,
-    MatTabsModule
+    MatTabsModule,
+    MatProgressBarModule,
+    ScrollingModule
   ],
   templateUrl: './bulk-import.component.html',
   styleUrls: ['./bulk-import.component.scss']
@@ -51,6 +55,12 @@ export class BulkImportComponent implements OnInit {
   validating = false;
   importing = false;
 
+  // Progress tracking
+  parseProgress = 0;
+  parseProgressMessage = '';
+  totalProxiesToParse = 0;
+  parseAbortController: AbortController | null = null;
+
   parsedProxies: ProxyImportItemDto[] = [];
   validationResult: BulkProxyImportValidationDto | null = null;
   importResult: BulkProxyImportResultDto | null = null;
@@ -58,6 +68,9 @@ export class BulkImportComponent implements OnInit {
   displayedColumns: string[] = ['host', 'port', 'type', 'auth', 'status', 'errors'];
 
   currentStep = 0; // 0: Input, 1: Preview, 2: Results
+
+  // Virtual scrolling
+  readonly itemSize = 48; // Height of each row in pixels
 
   constructor(
     private fb: FormBuilder,
@@ -87,24 +100,107 @@ export class BulkImportComponent implements OnInit {
       return;
     }
 
-    this.parsing = true;
-    try {
-      const response = await firstValueFrom(
-        this.apiClient.parseProxyText(this.importForm.get('proxyText')?.value)
-      );
+    const proxyText = this.importForm.get('proxyText')?.value;
+    const lines = proxyText.split('\n').filter((line: string) => line.trim());
 
-      if (response?.success && response.data) {
-        this.parsedProxies = response.data;
-        this.currentStep = 1;
-        this.snackBar.open(`Parsed ${this.parsedProxies.length} proxies`, 'Close', { duration: 3000 });
+    this.totalProxiesToParse = lines.length;
+    this.parseProgress = 0;
+    this.parseProgressMessage = 'Initializing parser...';
+    this.parsing = true;
+    this.parsedProxies = [];
+    this.parseAbortController = new AbortController();
+
+    try {
+      // For large datasets, process in chunks to avoid UI blocking
+      if (lines.length > 1000) {
+        await this.parseProxiesInChunks(lines);
       } else {
-        this.snackBar.open('Failed to parse proxy data', 'Close', { duration: 3000 });
+        // For smaller datasets, use the API directly
+        await this.parseProxiesViaAPI(proxyText);
       }
+
+      this.currentStep = 1;
+      this.snackBar.open(`Parsed ${this.parsedProxies.length} proxies`, 'Close', { duration: 3000 });
     } catch (error) {
       console.error('Error parsing proxies:', error);
       this.snackBar.open('Failed to parse proxy data', 'Close', { duration: 3000 });
     } finally {
       this.parsing = false;
+      this.parseProgress = 0;
+      this.parseProgressMessage = '';
+      this.parseAbortController = null;
+    }
+  }
+
+  private async parseProxiesViaAPI(proxyText: string): Promise<void> {
+    this.parseProgressMessage = 'Sending data to server for parsing...';
+    this.parseProgress = 50;
+
+    const response = await firstValueFrom(
+      this.apiClient.parseProxyText(proxyText)
+    );
+
+    if (response?.success && response.data) {
+      this.parsedProxies = response.data;
+      this.parseProgress = 100;
+      this.parseProgressMessage = 'Parsing complete!';
+    } else {
+      throw new Error('Failed to parse proxy data');
+    }
+  }
+
+  private async parseProxiesInChunks(lines: string[]): Promise<void> {
+    const chunkSize = 500; // Process 500 lines at a time
+    const chunks = this.chunkArray(lines, chunkSize);
+
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      const chunkText = chunk.join('\n');
+
+      this.parseProgressMessage = `Processing chunk ${i + 1} of ${chunks.length}...`;
+      this.parseProgress = Math.round(((i + 1) / chunks.length) * 100);
+
+      try {
+        const response = await firstValueFrom(
+          this.apiClient.parseProxyText(chunkText)
+        );
+
+        if (response?.success && response.data) {
+          this.parsedProxies.push(...response.data);
+        }
+      } catch (error) {
+        console.warn(`Failed to parse chunk ${i + 1}:`, error);
+        // Continue with other chunks
+      }
+
+      // Allow UI to update between chunks
+      await this.delay(10);
+    }
+
+    this.parseProgressMessage = 'Parsing complete!';
+    this.parseProgress = 100;
+  }
+
+  private chunkArray<T>(array: T[], chunkSize: number): T[][] {
+    const chunks: T[][] = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+      chunks.push(array.slice(i, i + chunkSize));
+    }
+    return chunks;
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  cancelParsing(): void {
+    if (this.parseAbortController) {
+      this.parseAbortController.abort();
+      this.parsing = false;
+      this.parseProgress = 0;
+      this.parseProgressMessage = '';
+      this.parseAbortController = null;
+      this.snackBar.open('Parsing cancelled', 'Close', { duration: 3000 });
     }
   }
 
@@ -250,4 +346,17 @@ export class BulkImportComponent implements OnInit {
   hasAuthentication(proxy: ProxyImportItemDto): boolean {
     return !!(proxy.username && proxy.password);
   }
+
+  // TrackBy function for better performance with large lists
+  trackByProxyId(_index: number, proxy: ProxyImportItemDto): string {
+    return `${proxy.host}:${proxy.port}:${proxy.proxyType}`;
+  }
+
+  // TrackBy function for error arrays
+  trackByIndex(index: number, _item: any): number {
+    return index;
+  }
+
+  // Expose Math for template
+  readonly Math = Math;
 }
