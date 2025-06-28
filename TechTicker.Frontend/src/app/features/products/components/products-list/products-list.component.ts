@@ -11,6 +11,8 @@ import { ProductDto, CategoryDto } from '../../../../shared/api/api-client';
 import { ProductsService, ProductsFilter, PagedResult } from '../../services/products.service';
 import { CategoriesService } from '../../../categories/services/categories.service';
 import { ProductDeleteDialogComponent } from '../product-delete-dialog/product-delete-dialog.component';
+import { environment } from '../../../../../environments/environment';
+
 
 @Component({
   selector: 'app-products-list',
@@ -156,5 +158,11 @@ export class ProductsListComponent implements OnInit {
   getCategoryName(categoryId: string): string {
     const category = this.categories.find(c => c.categoryId === categoryId);
     return category?.name || 'Unknown';
+  }
+
+  getImageUrl(imageUrl?: string | null): string {
+    if (!imageUrl) return '';
+    if (imageUrl.startsWith('http')) return imageUrl;
+    return `${environment.apiUrl}/${imageUrl}`;
   }
 }

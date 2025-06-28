@@ -46,23 +46,14 @@
 
       <!-- Products table -->
       <div *ngIf="!isLoading" class="table-container">
-        <table mat-table [dataSource]="dataSource" matSort class="products-table">
+        <table mat-table [dataSource]="dataSource" matSort class="products-table improved-products-table">
           <!-- Image Column -->
           <ng-container matColumnDef="image">
             <th mat-header-cell *matHeaderCellDef>Image</th>
             <td mat-cell *matCellDef="let product">
-              <div class="product-image-cell">
-                <app-image-gallery
-                  *ngIf="product.primaryImageUrl || (product.additionalImageUrls && product.additionalImageUrls.length > 0)"
-                  [primaryImageUrl]="product.primaryImageUrl"
-                  [additionalImageUrls]="product.additionalImageUrls"
-                  [altText]="product.name"
-                  [maxHeight]="'80px'"
-                  [maxWidth]="'80px'"
-                  [showThumbnails]="false">
-                </app-image-gallery>
-                <div *ngIf="!product.primaryImageUrl && (!product.additionalImageUrls || product.additionalImageUrls.length === 0)"
-                     class="no-image-cell">
+              <div class="product-image-cell compact">
+                <img *ngIf="product.primaryImageUrl" [src]="getImageUrl(product.primaryImageUrl)" [alt]="product.name" class="compact-product-img" />
+                <div *ngIf="!product.primaryImageUrl" class="no-image-cell compact">
                   <mat-icon>image_not_supported</mat-icon>
                 </div>
               </div>
@@ -73,10 +64,10 @@
           <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
             <td mat-cell *matCellDef="let product">
-              <div class="product-name">
-                <strong>{{product.name}}</strong>
-                <small *ngIf="product.description" class="product-description">
-                  {{product.description}}
+              <div class="product-name compact">
+                <strong matTooltip="{{product.name}}">{{product.name}}</strong>
+                <small *ngIf="product.description" class="product-description compact" matTooltip="{{product.description}}">
+                  {{product.description | slice:0:40}}{{product.description && product.description.length > 40 ? '...' : ''}}
                 </small>
               </div>
             </td>
@@ -132,29 +123,22 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let product">
-              <button mat-icon-button
-                      color="accent"
-                      (click)="viewPriceHistory(product)"
-                      matTooltip="View price history">
-                <mat-icon>show_chart</mat-icon>
-              </button>
-              <button mat-icon-button
-                      color="primary"
-                      (click)="editProduct(product)"
-                      matTooltip="Edit product">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button
-                      color="warn"
-                      (click)="deleteProduct(product)"
-                      matTooltip="Delete product">
-                <mat-icon>delete</mat-icon>
-              </button>
+              <div class="actions-group">
+                <button mat-icon-button color="accent" (click)="viewPriceHistory(product)" matTooltip="View price history">
+                  <mat-icon>show_chart</mat-icon>
+                </button>
+                <button mat-icon-button color="primary" (click)="editProduct(product)" matTooltip="Edit product">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteProduct(product)" matTooltip="Delete product">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
             </td>
           </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns" class="sticky-header"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="product-row"></tr>
 
           <!-- No data row -->
           <tr class="mat-row" *matNoDataRow>

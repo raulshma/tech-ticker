@@ -190,3 +190,123 @@
     }
   }
 }
+
+// Improved table appearance
+.products-table.improved-products-table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.product-row {
+  transition: background 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+}
+.product-row:hover {
+  background: #f5f7fa;
+}
+
+.product-image-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  min-height: 60px;
+}
+
+.product-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.product-description {
+  color: #888;
+  font-size: 0.85em;
+}
+
+.actions-group {
+  display: flex;
+  gap: 8px;
+}
+
+.status-active {
+  background: #e6f4ea !important;
+  color: #388e3c !important;
+}
+
+.status-inactive {
+  background: #fbe9e7 !important;
+  color: #d84315 !important;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+}
+
+.no-data {
+  text-align: center;
+  padding: 32px 0;
+  color: #888;
+}
+
+// Responsive improvements
+@media (max-width: 900px) {
+  .products-table, .mat-header-row, .mat-row, .mat-cell, .mat-header-cell {
+    font-size: 0.95em;
+    padding: 8px 4px;
+  }
+  .product-image-cell {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+.product-image-cell.compact {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 2px;
+}
+.compact-product-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+.no-image-cell.compact {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+}
+.product-name.compact {
+  gap: 0;
+  strong {
+    font-size: 1em;
+    font-weight: 500;
+  }
+}
+.product-description.compact {
+  font-size: 0.7em;
+  color: #888;
+  margin-top: 0;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.product-row {
+  min-height: 48px;
+  height: 48px;
+  font-size: 0.97em;
+}
+.products-table.improved-products-table {
+  th, td {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
