@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { RbacModule } from '../../shared/modules/rbac.module';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
     MatGridListModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    RbacModule
   ]
 })
 export class DashboardModule { }

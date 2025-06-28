@@ -5,17 +5,17 @@
       <h1>Proxy Management</h1>
       <p class="subtitle">Configure and monitor HTTP/SOCKS5 proxies for web scraping</p>
     </div>
-    
+
     <div class="action-buttons">
-      <button mat-raised-button color="primary" routerLink="/admin/proxies/add">
+      <button mat-raised-button color="primary" routerLink="/admin/proxies/add" *hasPermission="'Proxies.Create'">
         <mat-icon>add</mat-icon>
         Add Proxy
       </button>
-      <button mat-raised-button color="accent" routerLink="/admin/proxies/bulk-import">
+      <button mat-raised-button color="accent" routerLink="/admin/proxies/bulk-import" *hasPermission="'Proxies.BulkImport'">
         <mat-icon>upload</mat-icon>
         Bulk Import
       </button>
-      <button mat-button (click)="loadProxies()">
+      <button mat-button (click)="loadProxies()" *hasPermission="'Proxies.Read'">
         <mat-icon>refresh</mat-icon>
         Refresh
       </button>
@@ -53,7 +53,7 @@
   <!-- Proxy Table -->
   <div class="table-container" *ngIf="!loading">
     <mat-table [dataSource]="proxies" class="proxy-table">
-      
+
       <!-- Display Name Column -->
       <ng-container matColumnDef="displayName">
         <mat-header-cell *matHeaderCellDef>Proxy</mat-header-cell>
@@ -135,30 +135,34 @@
         <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
         <mat-cell *matCellDef="let proxy">
           <div class="action-buttons">
-            <button mat-icon-button 
+            <button mat-icon-button
                     [color]="proxy.isActive ? 'warn' : 'primary'"
                     (click)="toggleProxyStatus(proxy)"
-                    [title]="proxy.isActive ? 'Disable' : 'Enable'">
+                    [title]="proxy.isActive ? 'Disable' : 'Enable'"
+                    *hasPermission="'Proxies.Update'">
               <mat-icon>{{ proxy.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
             </button>
-            
-            <button mat-icon-button 
+
+            <button mat-icon-button
                     color="accent"
                     (click)="testProxy(proxy)"
-                    title="Test Proxy">
+                    title="Test Proxy"
+                    *hasPermission="'Proxies.Test'">
               <mat-icon>network_check</mat-icon>
             </button>
-            
-            <button mat-icon-button 
+
+            <button mat-icon-button
                     [routerLink]="['/admin/proxies/edit', proxy.proxyConfigurationId]"
-                    title="Edit">
+                    title="Edit"
+                    *hasPermission="'Proxies.Update'">
               <mat-icon>edit</mat-icon>
             </button>
-            
-            <button mat-icon-button 
+
+            <button mat-icon-button
                     color="warn"
                     (click)="deleteProxy(proxy)"
-                    title="Delete">
+                    title="Delete"
+                    *hasPermission="'Proxies.Delete'">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -174,7 +178,7 @@
       <mat-icon class="empty-icon">cloud_off</mat-icon>
       <h3>No Proxies Configured</h3>
       <p>Get started by adding your first proxy configuration.</p>
-      <button mat-raised-button color="primary" routerLink="/admin/proxies/add">
+      <button mat-raised-button color="primary" routerLink="/admin/proxies/add" *hasPermission="'Proxies.Create'">
         <mat-icon>add</mat-icon>
         Add First Proxy
       </button>

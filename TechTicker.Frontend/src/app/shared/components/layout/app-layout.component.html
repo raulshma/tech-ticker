@@ -42,6 +42,15 @@
 
         <mat-divider></mat-divider>
 
+        <h3 matSubheader>Infrastructure</h3>
+
+        <a mat-list-item routerLink="/admin/proxies" routerLinkActive="active-link" *hasPermission="'Proxies.Read'">
+          <mat-icon matListItemIcon>vpn_lock</mat-icon>
+          <span matListItemTitle>Proxy Management</span>
+        </a>
+
+        <mat-divider></mat-divider>
+
         <h3 matSubheader>Monitoring</h3>
 
         <a mat-list-item routerLink="/scraper-logs" routerLinkActive="active-link">

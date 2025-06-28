@@ -4,6 +4,9 @@ using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Shared.Controllers;
 using TechTicker.Shared.Common;
+using TechTicker.Shared.Constants;
+using TechTicker.Shared.Attributes;
+using TechTicker.Shared.Authorization;
 
 namespace TechTicker.ApiService.Controllers;
 
@@ -12,7 +15,7 @@ namespace TechTicker.ApiService.Controllers;
 /// </summary>
 [Route("api/proxies")]
 [ApiController]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")] // Fallback to Admin role for now, individual methods can override with permissions
 public class ProxyController : BaseApiController
 {
     private readonly IProxyService _proxyService;
@@ -26,6 +29,7 @@ public class ProxyController : BaseApiController
     /// Get all proxy configurations
     /// </summary>
     [HttpGet]
+    [RequirePermission(Permissions.ProxiesRead)]
     public async Task<ActionResult<ApiResponse<IEnumerable<ProxyConfigurationDto>>>> GetAllProxies()
     {
         var result = await _proxyService.GetAllProxiesAsync();
@@ -76,6 +80,7 @@ public class ProxyController : BaseApiController
     /// Create a new proxy configuration
     /// </summary>
     [HttpPost]
+    [RequirePermission(Permissions.ProxiesCreate)]
     public async Task<ActionResult<ApiResponse<ProxyConfigurationDto>>> CreateProxy([FromBody] CreateProxyConfigurationDto createDto)
     {
         if (!ModelState.IsValid)
@@ -95,6 +100,7 @@ public class ProxyController : BaseApiController
     /// Update an existing proxy configuration
     /// </summary>
     [HttpPut("{id:guid}")]
+    [RequirePermission(Permissions.ProxiesUpdate)]
     public async Task<ActionResult<ApiResponse<ProxyConfigurationDto>>> UpdateProxy(Guid id, [FromBody] UpdateProxyConfigurationDto updateDto)
     {
         if (!ModelState.IsValid)
@@ -110,6 +116,7 @@ public class ProxyController : BaseApiController
     /// Delete a proxy configuration
     /// </summary>
     [HttpDelete("{id:guid}")]
+    [RequirePermission(Permissions.ProxiesDelete)]
     public async Task<ActionResult<ApiResponse<bool>>> DeleteProxy(Guid id)
     {
         var result = await _proxyService.DeleteProxyAsync(id);
@@ -120,6 +127,7 @@ public class ProxyController : BaseApiController
     /// Test a single proxy configuration
     /// </summary>
     [HttpPost("{id:guid}/test")]
+    [RequirePermission(Permissions.ProxiesTest)]
     public async Task<ActionResult<ApiResponse<ProxyTestResultDto>>> TestProxy(Guid id, [FromQuery] string? testUrl = null, [FromQuery] int timeoutSeconds = 30)
     {
         var result = await _proxyService.TestProxyAsync(id, testUrl, timeoutSeconds);
@@ -160,6 +168,7 @@ public class ProxyController : BaseApiController
     /// Import proxy configurations in bulk
     /// </summary>
     [HttpPost("import-bulk")]
+    [RequirePermission(Permissions.ProxiesBulkImport)]
     public async Task<ActionResult<ApiResponse<BulkProxyImportResultDto>>> BulkImportProxies([FromBody] BulkProxyImportDto importDto)
     {
         if (!ModelState.IsValid)

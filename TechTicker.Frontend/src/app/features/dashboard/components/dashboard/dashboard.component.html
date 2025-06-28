@@ -125,6 +125,14 @@
         </mat-card-content>
       </mat-card>
 
+      <mat-card class="action-card" routerLink="/admin/proxies" *hasPermission="'Proxies.Read'">
+        <mat-card-content>
+          <mat-icon>vpn_lock</mat-icon>
+          <h3>Proxy Management</h3>
+          <p>Configure and monitor proxies</p>
+        </mat-card-content>
+      </mat-card>
+
       <mat-card class="action-card" routerLink="/site-configs">
         <mat-card-content>
           <mat-icon>settings</mat-icon>

@@ -26,6 +26,16 @@ public static class Permissions
     public const string ScrapersViewLogs = "Scrapers.ViewLogs";
     public const string ScrapersManageSites = "Scrapers.ManageSites";
 
+    // Proxy Management
+    public const string ProxiesCreate = "Proxies.Create";
+    public const string ProxiesRead = "Proxies.Read";
+    public const string ProxiesUpdate = "Proxies.Update";
+    public const string ProxiesDelete = "Proxies.Delete";
+    public const string ProxiesTest = "Proxies.Test";
+    public const string ProxiesBulkImport = "Proxies.BulkImport";
+    public const string ProxiesViewStats = "Proxies.ViewStats";
+    public const string ProxiesManage = "Proxies.Manage";
+
     // User Management
     public const string UsersCreate = "Users.Create";
     public const string UsersRead = "Users.Read";
@@ -56,6 +66,10 @@ public static class Permissions
             ["Scrapers"] = new[]
             {
                 ScrapersConfigure, ScrapersRun, ScrapersViewLogs, ScrapersManageSites
+            },
+            ["Proxies"] = new[]
+            {
+                ProxiesCreate, ProxiesRead, ProxiesUpdate, ProxiesDelete, ProxiesTest, ProxiesBulkImport, ProxiesViewStats, ProxiesManage
             },
             ["Users"] = new[]
             {
