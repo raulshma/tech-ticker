@@ -41,6 +41,82 @@
         <div class="stat-value">{{ stats.averageSuccessRate | number:'1.1-1' }}%</div>
         <div class="stat-label">Avg Success Rate</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ filteredProxies.length }}</div>
+        <div class="stat-label">Filtered</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Controls -->
+  <div class="filter-controls" *ngIf="!loading">
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Search</mat-label>
+      <input matInput [(ngModel)]="filterText" (input)="onFilterChange()"
+             placeholder="Search by name, host, or port">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Type</mat-label>
+      <mat-select [(value)]="filterType" (selectionChange)="onFilterChange()">
+        <mat-option *ngFor="let type of typeOptions" [value]="type.value">
+          {{ type.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Status</mat-label>
+      <mat-select [(value)]="filterStatus" (selectionChange)="onFilterChange()">
+        <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+          {{ status.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-button (click)="clearFilters()" class="clear-filters-btn">
+      <mat-icon>clear</mat-icon>
+      Clear Filters
+    </button>
+  </div>
+
+  <!-- Bulk Actions -->
+  <div class="bulk-actions" *ngIf="getSelectedCount() > 0">
+    <div class="selection-info">
+      <span>{{ getSelectedCount() }} proxies selected</span>
+    </div>
+    <div class="action-buttons">
+      <button mat-button color="primary" (click)="bulkTestProxies()"
+              [disabled]="bulkTesting || bulkUpdating"
+              *hasPermission="'Proxies.Test'">
+        <mat-spinner diameter="16" *ngIf="bulkTesting"></mat-spinner>
+        <mat-icon *ngIf="!bulkTesting">play_arrow</mat-icon>
+        {{ bulkTesting ? 'Testing...' : 'Test Selected' }}
+      </button>
+      <button mat-button color="accent" (click)="bulkToggleStatus(true)"
+              [disabled]="bulkTesting || bulkUpdating"
+              *hasPermission="'Proxies.Update'">
+        <mat-spinner diameter="16" *ngIf="bulkUpdating"></mat-spinner>
+        <mat-icon *ngIf="!bulkUpdating">check_circle</mat-icon>
+        {{ bulkUpdating ? 'Updating...' : 'Enable Selected' }}
+      </button>
+      <button mat-button color="warn" (click)="bulkToggleStatus(false)"
+              [disabled]="bulkTesting || bulkUpdating"
+              *hasPermission="'Proxies.Update'">
+        <mat-icon>cancel</mat-icon>
+        Disable Selected
+      </button>
+      <button mat-button color="warn" (click)="bulkDeleteProxies()"
+              [disabled]="bulkTesting || bulkUpdating"
+              *hasPermission="'Proxies.Delete'">
+        <mat-icon>delete</mat-icon>
+        Delete Selected
+      </button>
+      <button mat-button (click)="clearSelection()">
+        <mat-icon>clear</mat-icon>
+        Clear Selection
+      </button>
     </div>
   </div>
 
@@ -61,7 +137,25 @@
 
     <!-- Regular Table for Small Datasets -->
     <div *ngIf="!shouldUseVirtualScrolling()" class="regular-table">
-      <mat-table [dataSource]="proxies" class="proxy-table">
+      <mat-table [dataSource]="filteredProxies" class="proxy-table">
+
+        <!-- Selection Column -->
+        <ng-container matColumnDef="select">
+          <mat-header-cell *matHeaderCellDef>
+            <mat-checkbox
+              [checked]="selectAll"
+              [indeterminate]="getSelectedCount() > 0 && !selectAll"
+              (change)="toggleSelectAll()"
+              matTooltip="Select all">
+            </mat-checkbox>
+          </mat-header-cell>
+          <mat-cell *matCellDef="let proxy">
+            <mat-checkbox
+              [checked]="isProxySelected(proxy)"
+              (change)="toggleProxySelection(proxy)">
+            </mat-checkbox>
+          </mat-cell>
+        </ng-container>
 
         <!-- Display Name Column -->
         <ng-container matColumnDef="displayName">
@@ -188,6 +282,14 @@
       <!-- Table Header -->
       <div class="virtual-table-header">
         <div class="header-row">
+          <div class="header-cell select-column">
+            <mat-checkbox
+              [checked]="selectAll"
+              [indeterminate]="getSelectedCount() > 0 && !selectAll"
+              (change)="toggleSelectAll()"
+              matTooltip="Select all">
+            </mat-checkbox>
+          </div>
           <div class="header-cell proxy-column">Proxy</div>
           <div class="header-cell type-column">Type</div>
           <div class="header-cell status-column">Status</div>
@@ -206,8 +308,16 @@
         class="virtual-scroll-viewport"
         [style.height.px]="getVirtualScrollHeight()">
 
-        <div *cdkVirtualFor="let proxy of proxies; trackBy: trackByProxyId"
+        <div *cdkVirtualFor="let proxy of filteredProxies; trackBy: trackByProxyId"
              class="proxy-row">
+
+          <!-- Selection -->
+          <div class="proxy-cell select-column">
+            <mat-checkbox
+              [checked]="isProxySelected(proxy)"
+              (change)="toggleProxySelection(proxy)">
+            </mat-checkbox>
+          </div>
 
           <!-- Proxy Info -->
           <div class="proxy-cell proxy-column">
@@ -315,6 +425,17 @@
       <button mat-raised-button color="primary" routerLink="/admin/proxies/add" *hasPermission="'Proxies.Create'">
         <mat-icon>add</mat-icon>
         Add First Proxy
+      </button>
+    </div>
+
+    <!-- No Results State -->
+    <div class="empty-state" *ngIf="proxies.length > 0 && filteredProxies.length === 0 && !loading">
+      <mat-icon class="empty-icon">search_off</mat-icon>
+      <h3>No Proxies Match Your Filters</h3>
+      <p>Try adjusting your search criteria or clearing the filters.</p>
+      <button mat-button (click)="clearFilters()">
+        <mat-icon>clear</mat-icon>
+        Clear Filters
       </button>
     </div>
   </div>
