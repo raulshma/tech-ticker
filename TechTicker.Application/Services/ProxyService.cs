@@ -21,7 +21,7 @@ public class ProxyService : IProxyService
 
     // Regex patterns for parsing proxy strings
     private static readonly Regex ProxyRegex = new(
-        @"^(?<type>https?|socks5?)://(?:(?<username>[^:]+):(?<password>[^@]+)@)?(?<host>[^:]+):(?<port>\d+)/?$",
+        @"^(?<type>https?|socks[45]?)://(?:(?<username>[^:]+):(?<password>[^@]+)@)?(?<host>[^:]+):(?<port>\d+)/?$",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private static readonly Regex SimpleProxyRegex = new(
@@ -237,7 +237,9 @@ public class ProxyService : IProxyService
                 return Result<ProxyTestResultDto>.Failure("Proxy configuration not found");
             }
 
-            var result = await TestProxyConnection(proxy, testUrl ?? "https://httpbin.org/ip", timeoutSeconds);
+            var result = string.IsNullOrEmpty(testUrl)
+                ? await TestProxyWithFallbacks(proxy, timeoutSeconds)
+                : await TestProxyConnection(proxy, testUrl, timeoutSeconds);
 
             // Update proxy health status
             proxy.UpdateHealthStatus(result.IsHealthy, result.ErrorMessage, result.ErrorCode);
@@ -263,7 +265,7 @@ public class ProxyService : IProxyService
 
             foreach (var proxy in proxies)
             {
-                var result = await TestProxyConnection(proxy, testDto.TestUrl ?? "https://httpbin.org/ip", testDto.TimeoutSeconds);
+                var result = await TestProxyConnection(proxy, testDto.TestUrl ?? "http://httpbin.org/ip", testDto.TimeoutSeconds);
                 results.Add(result);
                 healthUpdates.Add((proxy.ProxyConfigurationId, result.IsHealthy, result.ErrorMessage, result.ErrorCode));
             }
@@ -367,14 +369,14 @@ public class ProxyService : IProxyService
                 return Result<IEnumerable<ProxyImportItemDto>>.Failure("Proxy text cannot be empty");
             }
 
-            var lines = proxyText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var lines = proxyText.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
             var proxies = new List<ProxyImportItemDto>();
             var errors = new List<string>();
 
             foreach (var line in lines)
             {
                 var trimmedLine = line.Trim();
-                if (string.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith("#"))
+                if (string.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith('#'))
                     continue;
 
                 var parseResult = ParseProxyString(trimmedLine);
@@ -388,7 +390,7 @@ public class ProxyService : IProxyService
                 }
             }
 
-            if (errors.Any())
+            if (errors.Count > 0)
             {
                 return Result<IEnumerable<ProxyImportItemDto>>.Failure($"Parsing errors: {string.Join("; ", errors)}");
             }
@@ -666,16 +668,56 @@ public class ProxyService : IProxyService
 
             // Create HttpClientHandler with proxy configuration
             var handler = new HttpClientHandler();
-            var proxyUri = new Uri($"{proxy.ProxyType.ToLower()}://{proxy.Host}:{proxy.Port}");
-            handler.Proxy = new WebProxy(proxyUri);
 
-            if (!string.IsNullOrEmpty(proxy.Username))
+            // Configure proxy based on type
+            if (proxy.ProxyType.Equals("SOCKS5", StringComparison.OrdinalIgnoreCase))
             {
-                handler.Proxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                // .NET 6+ native SOCKS5 support
+                var socksProxy = new WebProxy($"socks5://{proxy.Host}:{proxy.Port}");
+
+                if (!string.IsNullOrEmpty(proxy.Username))
+                {
+                    socksProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                }
+
+                handler.Proxy = socksProxy;
+                handler.UseProxy = true;
+            }
+            else if (proxy.ProxyType.Equals("SOCKS4", StringComparison.OrdinalIgnoreCase))
+            {
+                // .NET 6+ native SOCKS4 support
+                var socksProxy = new WebProxy($"socks4://{proxy.Host}:{proxy.Port}");
+
+                if (!string.IsNullOrEmpty(proxy.Username))
+                {
+                    socksProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                }
+
+                handler.Proxy = socksProxy;
+                handler.UseProxy = true;
+            }
+            else
+            {
+                // For HTTP/HTTPS proxies, create the proxy URI correctly
+                // Don't include the protocol scheme for WebProxy - it determines this automatically
+                var proxyAddress = $"{proxy.Host}:{proxy.Port}";
+                var webProxy = new WebProxy(proxyAddress);
+
+                if (!string.IsNullOrEmpty(proxy.Username))
+                {
+                    webProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                }
+
+                handler.Proxy = webProxy;
+                handler.UseProxy = true;
             }
 
             using var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
+
+            // Add headers to make the request look more like a real browser
+            client.DefaultRequestHeaders.Add("User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
 
             var response = await client.GetAsync(testUrl);
             var endTime = DateTimeOffset.UtcNow;
@@ -688,16 +730,109 @@ public class ProxyService : IProxyService
                 result.ErrorMessage = $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}";
                 result.ErrorCode = "HTTP_ERROR";
             }
+            else
+            {
+                // Try to read a bit of the response to ensure the proxy is working correctly
+                var content = await response.Content.ReadAsStringAsync();
+                if (string.IsNullOrEmpty(content))
+                {
+                    result.ErrorMessage = "Proxy returned empty response";
+                    result.ErrorCode = "EMPTY_RESPONSE";
+                    result.IsHealthy = false;
+                }
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            result.IsHealthy = false;
+            result.ErrorMessage = $"HTTP request failed: {ex.Message}";
+            result.ErrorCode = "HTTP_REQUEST_ERROR";
+            result.ResponseTimeMs = timeoutSeconds * 1000;
+        }
+        catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+        {
+            result.IsHealthy = false;
+            result.ErrorMessage = "Request timed out";
+            result.ErrorCode = "TIMEOUT";
+            result.ResponseTimeMs = timeoutSeconds * 1000;
+        }
+        catch (TaskCanceledException)
+        {
+            result.IsHealthy = false;
+            result.ErrorMessage = "Request was cancelled or timed out";
+            result.ErrorCode = "CANCELLED";
+            result.ResponseTimeMs = timeoutSeconds * 1000;
         }
         catch (Exception ex)
         {
             result.IsHealthy = false;
             result.ErrorMessage = ex.Message;
             result.ErrorCode = ex.GetType().Name;
-            result.ResponseTimeMs = timeoutSeconds * 1000; // Max timeout
+            result.ResponseTimeMs = timeoutSeconds * 1000;
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Test proxy with multiple fallback URLs for better reliability
+    /// </summary>
+    private async Task<ProxyTestResultDto> TestProxyWithFallbacks(ProxyConfiguration proxy, int timeoutSeconds)
+    {
+        var testUrls = new[]
+        {
+            "http://httpbin.org/ip",
+            "http://icanhazip.com",
+            "http://ipinfo.io/ip",
+            "http://api.ipify.org"
+        };
+
+        ProxyTestResultDto? lastResult = null;
+
+        foreach (var testUrl in testUrls)
+        {
+            try
+            {
+                var result = await TestProxyConnection(proxy, testUrl, timeoutSeconds);
+                if (result.IsHealthy)
+                {
+                    return result; // Return first successful test
+                }
+                lastResult = result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Failed to test proxy {ProxyHost}:{ProxyPort} with URL {TestUrl}",
+                    proxy.Host, proxy.Port, testUrl);
+
+                lastResult = new ProxyTestResultDto
+                {
+                    ProxyConfigurationId = proxy.ProxyConfigurationId,
+                    Host = proxy.Host,
+                    Port = proxy.Port,
+                    ProxyType = proxy.ProxyType,
+                    TestedAt = DateTimeOffset.UtcNow,
+                    IsHealthy = false,
+                    ErrorMessage = ex.Message,
+                    ErrorCode = ex.GetType().Name,
+                    ResponseTimeMs = timeoutSeconds * 1000
+                };
+            }
+        }
+
+        // If all tests failed, return the last result
+        return lastResult ?? new ProxyTestResultDto
+        {
+            ProxyConfigurationId = proxy.ProxyConfigurationId,
+            Host = proxy.Host,
+            Port = proxy.Port,
+            ProxyType = proxy.ProxyType,
+            TestedAt = DateTimeOffset.UtcNow,
+            IsHealthy = false,
+            ErrorMessage = "All test URLs failed",
+            ErrorCode = "ALL_TESTS_FAILED",
+            ResponseTimeMs = timeoutSeconds * 1000
+        };
     }
 
     private static ProxyConfigurationDto MapToDto(ProxyConfiguration proxy)

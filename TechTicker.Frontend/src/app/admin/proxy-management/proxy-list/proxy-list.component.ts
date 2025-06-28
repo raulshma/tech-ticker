@@ -222,4 +222,19 @@ export class ProxyListComponent implements OnInit {
 
   // Expose Math for template
   readonly Math = Math;
+
+  // Get color for proxy type chip
+  getProxyTypeColor(proxyType: string | undefined): string {
+    switch (proxyType?.toUpperCase()) {
+      case 'HTTP':
+      case 'HTTPS':
+        return 'primary';
+      case 'SOCKS4':
+        return 'accent';
+      case 'SOCKS5':
+        return 'warn';
+      default:
+        return 'basic';
+    }
+  }
 }

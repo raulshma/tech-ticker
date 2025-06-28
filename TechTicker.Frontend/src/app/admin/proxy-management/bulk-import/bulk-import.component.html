@@ -39,10 +39,10 @@
             <mat-label>Proxy List</mat-label>
             <textarea matInput
                       formControlName="proxyText"
-                      placeholder="Enter proxies (one per line)&#10;Examples:&#10;192.168.1.100:8080&#10;proxy.example.com:3128:username:password&#10;socks5://10.0.0.1:1080"
+                      placeholder="Enter proxies (one per line)&#10;Examples:&#10;192.168.1.100:8080&#10;proxy.example.com:3128:username:password&#10;socks4://10.0.0.1:1080&#10;socks5://10.0.0.1:1080"
                       rows="10"
                       required></textarea>
-            <mat-hint>Supported formats: host:port, host:port:username:password, protocol://host:port</mat-hint>
+            <mat-hint>Supported formats: host:port, host:port:username:password, http://host:port, socks4://host:port, socks5://host:port</mat-hint>
           </mat-form-field>
         </div>
 
@@ -173,7 +173,7 @@
             </div>
 
             <div class="proxy-cell type-column">
-              <mat-chip [color]="proxy.proxyType === 'HTTP' ? 'primary' : 'accent'" selected>
+              <mat-chip [color]="getProxyTypeColor(proxy.proxyType)" selected>
                 {{ proxy.proxyType }}
               </mat-chip>
             </div>

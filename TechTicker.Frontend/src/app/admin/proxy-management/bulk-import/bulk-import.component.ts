@@ -15,7 +15,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { firstValueFrom, interval, take } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import {
   ProxyImportItemDto,
   BulkProxyImportDto,
@@ -359,4 +359,19 @@ export class BulkImportComponent implements OnInit {
 
   // Expose Math for template
   readonly Math = Math;
+
+  // Get color for proxy type chip
+  getProxyTypeColor(proxyType: string): string {
+    switch (proxyType?.toUpperCase()) {
+      case 'HTTP':
+      case 'HTTPS':
+        return 'primary';
+      case 'SOCKS4':
+        return 'accent';
+      case 'SOCKS5':
+        return 'warn';
+      default:
+        return 'basic';
+    }
+  }
 }

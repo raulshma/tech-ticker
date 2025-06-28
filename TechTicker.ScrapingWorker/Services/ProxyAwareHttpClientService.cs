@@ -193,52 +193,92 @@ public class ProxyAwareHttpClientService
             // Create direct connection client
             var client = _httpClientFactory.CreateClient();
             client.Timeout = TimeSpan.FromSeconds(_config.RequestTimeoutSeconds);
-            
+
             if (!string.IsNullOrEmpty(userAgent))
             {
                 client.DefaultRequestHeaders.Add("User-Agent", userAgent);
             }
-            
+
             return client;
         }
 
         // Create proxy-enabled client
         var handler = new HttpClientHandler();
-        
+
         try
         {
-            var proxyUri = new Uri($"{proxy.ProxyType.ToLower()}://{proxy.Host}:{proxy.Port}");
-            handler.Proxy = new WebProxy(proxyUri);
-            
-            if (!string.IsNullOrEmpty(proxy.Username))
+            // Configure proxy based on type
+            if (proxy.ProxyType.Equals("SOCKS5", StringComparison.OrdinalIgnoreCase))
             {
-                handler.Proxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                // .NET 6+ native SOCKS5 support
+                var socksProxy = new WebProxy($"socks5://{proxy.Host}:{proxy.Port}");
+
+                if (!string.IsNullOrEmpty(proxy.Username))
+                {
+                    socksProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                }
+
+                handler.Proxy = socksProxy;
+                handler.UseProxy = true;
+
+                _logger.LogDebug("Configured SOCKS5 proxy for {ProxyHost}:{ProxyPort}", proxy.Host, proxy.Port);
+            }
+            else if (proxy.ProxyType.Equals("SOCKS4", StringComparison.OrdinalIgnoreCase))
+            {
+                // .NET 6+ native SOCKS4 support
+                var socksProxy = new WebProxy($"socks4://{proxy.Host}:{proxy.Port}");
+
+                if (!string.IsNullOrEmpty(proxy.Username))
+                {
+                    socksProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                }
+
+                handler.Proxy = socksProxy;
+                handler.UseProxy = true;
+
+                _logger.LogDebug("Configured SOCKS4 proxy for {ProxyHost}:{ProxyPort}", proxy.Host, proxy.Port);
+            }
+            else
+            {
+                // For HTTP/HTTPS proxies, create the proxy correctly
+                var proxyAddress = $"{proxy.Host}:{proxy.Port}";
+                var webProxy = new WebProxy(proxyAddress);
+
+                if (!string.IsNullOrEmpty(proxy.Username))
+                {
+                    webProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                }
+
+                handler.Proxy = webProxy;
+                handler.UseProxy = true;
+
+                _logger.LogDebug("Configured HTTP proxy for {ProxyHost}:{ProxyPort}", proxy.Host, proxy.Port);
             }
 
             var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(proxy.TimeoutSeconds);
-            
+
             if (!string.IsNullOrEmpty(userAgent))
             {
                 client.DefaultRequestHeaders.Add("User-Agent", userAgent);
             }
-            
+
             return client;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating proxy client for {ProxyHost}:{ProxyPort}", proxy.Host, proxy.Port);
             handler.Dispose();
-            
+
             // Fallback to direct connection
             var client = _httpClientFactory.CreateClient();
             client.Timeout = TimeSpan.FromSeconds(_config.RequestTimeoutSeconds);
-            
+
             if (!string.IsNullOrEmpty(userAgent))
             {
                 client.DefaultRequestHeaders.Add("User-Agent", userAgent);
             }
-            
+
             return client;
         }
     }

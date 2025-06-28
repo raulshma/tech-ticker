@@ -78,7 +78,7 @@
         <ng-container matColumnDef="proxyType">
           <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
           <mat-cell *matCellDef="let proxy">
-            <mat-chip [color]="proxy.proxyType === 'HTTP' ? 'primary' : 'accent'" selected>
+            <mat-chip [color]="getProxyTypeColor(proxy.proxyType)" selected>
               {{ proxy.proxyType }}
             </mat-chip>
           </mat-cell>
@@ -219,7 +219,7 @@
 
           <!-- Type -->
           <div class="proxy-cell type-column">
-            <mat-chip [color]="proxy.proxyType === 'HTTP' ? 'primary' : 'accent'" selected>
+            <mat-chip [color]="getProxyTypeColor(proxy.proxyType)" selected>
               {{ proxy.proxyType }}
             </mat-chip>
           </div>

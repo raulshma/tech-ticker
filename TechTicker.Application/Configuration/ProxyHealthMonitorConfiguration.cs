@@ -20,7 +20,7 @@ public class ProxyHealthMonitorConfiguration
     /// <summary>
     /// URL to use for testing proxy connectivity
     /// </summary>
-    public string TestUrl { get; set; } = "https://httpbin.org/ip";
+    public string TestUrl { get; set; } = "http://httpbin.org/ip";
 
     /// <summary>
     /// Timeout for proxy tests in seconds

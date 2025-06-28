@@ -47,6 +47,7 @@ export class ProxyFormComponent implements OnInit {
   proxyTypes = [
     { value: 'HTTP', label: 'HTTP' },
     { value: 'HTTPS', label: 'HTTPS' },
+    { value: 'SOCKS4', label: 'SOCKS4' },
     { value: 'SOCKS5', label: 'SOCKS5' }
   ];
 
