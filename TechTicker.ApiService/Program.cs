@@ -82,6 +82,10 @@ builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHand
 builder.Services.Configure<MessagingConfiguration>(
     builder.Configuration.GetSection(MessagingConfiguration.SectionName));
 
+// Configure proxy health monitoring
+builder.Services.Configure<ProxyHealthMonitorConfiguration>(
+    builder.Configuration.GetSection(ProxyHealthMonitorConfiguration.SectionName));
+
 // Add repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IMappingService, MappingService>();
@@ -93,6 +97,16 @@ builder.Services.AddScoped<IPriceHistoryService, PriceHistoryService>();
 builder.Services.AddScoped<IAlertRuleService, AlertRuleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, TechTicker.Application.Services.RoleService>();
+builder.Services.AddScoped<IProxyService, ProxyService>();
+
+// Add HTTP client for proxy testing
+builder.Services.AddHttpClient<ProxyService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(60);
+});
+
+// Add proxy health monitoring service
+builder.Services.AddHostedService<ProxyHealthMonitorService>();
 builder.Services.AddScoped<IUserNotificationPreferencesService, UserNotificationPreferencesService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();

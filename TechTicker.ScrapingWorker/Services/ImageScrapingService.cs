@@ -1,5 +1,7 @@
 using AngleSharp.Dom;
+using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
+using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 
 namespace TechTicker.ScrapingWorker.Services;
@@ -10,7 +12,7 @@ namespace TechTicker.ScrapingWorker.Services;
 public partial class ImageScrapingService : IImageScrapingService
 {
     private readonly ILogger<ImageScrapingService> _logger;
-    private readonly HttpClient _httpClient;
+    private readonly ProxyAwareHttpClientService _proxyHttpClient;
     private readonly IImageStorageService _imageStorageService;
     private readonly IProductImageService _productImageService;
 
@@ -19,12 +21,12 @@ public partial class ImageScrapingService : IImageScrapingService
 
     public ImageScrapingService(
         ILogger<ImageScrapingService> logger,
-        HttpClient httpClient,
+        ProxyAwareHttpClientService proxyHttpClient,
         IImageStorageService imageStorageService,
         IProductImageService productImageService)
     {
         _logger = logger;
-        _httpClient = httpClient;
+        _proxyHttpClient = proxyHttpClient;
         _imageStorageService = imageStorageService;
         _productImageService = productImageService;
     }
@@ -286,18 +288,20 @@ public partial class ImageScrapingService : IImageScrapingService
         {
             _logger.LogDebug("Downloading image from {Url}", imageUrl);
 
-            using var response = await _httpClient.GetAsync(imageUrl);
-            
-            if (!response.IsSuccessStatusCode)
+            var proxyResponse = await _proxyHttpClient.GetBinaryAsync(imageUrl);
+
+            if (!proxyResponse.IsSuccess || proxyResponse.BinaryContent == null)
             {
-                _logger.LogWarning("Failed to download image from {Url}: {StatusCode}", 
-                    imageUrl, response.StatusCode);
+                _logger.LogWarning("Failed to download image from {Url}: {StatusCode}. Proxy: {Proxy}",
+                    imageUrl, proxyResponse.StatusCode, proxyResponse.ProxyUsed ?? "Direct connection");
                 return null;
             }
 
-            var imageData = await response.Content.ReadAsByteArrayAsync();
-            var contentType = response.Content.Headers.ContentType?.MediaType ?? "image/jpeg";
-            
+            var imageData = proxyResponse.BinaryContent;
+            var contentType = proxyResponse.Headers.ContainsKey("content-type")
+                ? proxyResponse.Headers["content-type"]
+                : "image/jpeg";
+
             // Generate filename from URL
             var uri = new Uri(imageUrl);
             var fileName = Path.GetFileName(uri.LocalPath);

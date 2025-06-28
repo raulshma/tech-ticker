@@ -24,6 +24,7 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<AlertHistory> AlertHistories { get; set; } = null!;
     public DbSet<ScraperRunLog> ScraperRunLogs { get; set; } = null!;
     public DbSet<UserNotificationPreferences> UserNotificationPreferences { get; set; } = null!;
+    public DbSet<ProxyConfiguration> ProxyConfigurations { get; set; } = null!;
 
     // RBAC entities
     public DbSet<Permission> Permissions { get; set; } = null!;

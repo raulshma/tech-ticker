@@ -73,6 +73,11 @@ const routes: Routes = [
         path: 'rbac-demo',
         loadComponent: () => import('./shared/components/rbac-demo/rbac-demo.component').then(c => c.RbacDemoComponent),
         canActivate: [AuthGuard] // Available to all authenticated users for testing
+      },
+      {
+        path: 'admin',
+        loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
+        canActivate: [AdminGuard]
       }
     ]
   },

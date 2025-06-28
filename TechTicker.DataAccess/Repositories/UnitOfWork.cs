@@ -20,6 +20,7 @@ public class UnitOfWork : IUnitOfWork
     private IAlertHistoryRepository? _alertHistories;
     private IScraperRunLogRepository? _scraperRunLogs;
     private IUserNotificationPreferencesRepository? _userNotificationPreferences;
+    private IProxyConfigurationRepository? _proxyConfigurations;
 
     public UnitOfWork(TechTickerDbContext context)
     {
@@ -52,6 +53,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IUserNotificationPreferencesRepository UserNotificationPreferences =>
         _userNotificationPreferences ??= new UserNotificationPreferencesRepository(_context);
+
+    public IProxyConfigurationRepository ProxyConfigurations =>
+        _proxyConfigurations ??= new ProxyConfigurationRepository(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

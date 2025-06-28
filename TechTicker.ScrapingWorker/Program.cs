@@ -22,6 +22,10 @@ builder.AddRabbitMQClient("messaging");
 builder.Services.Configure<MessagingConfiguration>(
     builder.Configuration.GetSection(MessagingConfiguration.SectionName));
 
+// Configure proxy pool
+builder.Services.Configure<ProxyPoolConfiguration>(
+    builder.Configuration.GetSection(ProxyPoolConfiguration.SectionName));
+
 // Add repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IMappingService, MappingService>();
@@ -33,16 +37,18 @@ builder.Services.AddScoped<IProductImageService, ProductImageService>();
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
 builder.Services.AddSingleton<IMessageConsumer, RabbitMQConsumer>();
 
-// Add HTTP client for web scraping
-builder.Services.AddHttpClient<WebScrapingService>(client =>
+// Add proxy services
+builder.Services.AddScoped<IProxyPoolService, ProxyPoolService>();
+builder.Services.AddScoped<ProxyAwareHttpClientService>();
+builder.Services.AddMemoryCache();
+
+// Add HTTP client factory for proxy-aware requests
+builder.Services.AddHttpClient();
+
+// Add HTTP client for fallback scenarios
+builder.Services.AddHttpClient("fallback", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
-});
-
-// Add HTTP client for image downloading
-builder.Services.AddHttpClient<ImageScrapingService>(client =>
-{
-    client.Timeout = TimeSpan.FromSeconds(60); // Longer timeout for images
 });
 
 // Add image storage and scraping services

@@ -14,6 +14,7 @@ public interface IUnitOfWork : IDisposable
     IAlertHistoryRepository AlertHistories { get; }
     IScraperRunLogRepository ScraperRunLogs { get; }
     IUserNotificationPreferencesRepository UserNotificationPreferences { get; }
+    IProxyConfigurationRepository ProxyConfigurations { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync();

@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Messages;
 using TechTicker.Application.Services.Interfaces;
+using TechTicker.ScrapingWorker.Services;
 
 namespace TechTicker.ScrapingWorker.Services;
 
@@ -16,7 +17,7 @@ namespace TechTicker.ScrapingWorker.Services;
 public partial class WebScrapingService
 {
     private readonly ILogger<WebScrapingService> _logger;
-    private readonly HttpClient _httpClient;
+    private readonly ProxyAwareHttpClientService _proxyHttpClient;
     private readonly IScraperRunLogService _scraperRunLogService;
     private readonly IImageScrapingService _imageScrapingService;
 
@@ -25,12 +26,12 @@ public partial class WebScrapingService
 
     public WebScrapingService(
         ILogger<WebScrapingService> logger,
-        HttpClient httpClient,
+        ProxyAwareHttpClientService proxyHttpClient,
         IScraperRunLogService scraperRunLogService,
         IImageScrapingService imageScrapingService)
     {
         _logger = logger;
-        _httpClient = httpClient;
+        _proxyHttpClient = proxyHttpClient;
         _scraperRunLogService = scraperRunLogService;
         _imageScrapingService = imageScrapingService;
     }
@@ -70,25 +71,39 @@ public partial class WebScrapingService
                 runId = createResult.Data;
             }
 
-            // Configure HTTP request with comprehensive headers
-            //_httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add("User-Agent", command.ScrapingProfile.UserAgent);
+            // Load the page with timing using proxy-aware HTTP client
+            var pageLoadStopwatch = Stopwatch.StartNew();
+            var proxyResponse = await _proxyHttpClient.GetAsync(
+                command.ExactProductUrl,
+                command.ScrapingProfile.Headers,
+                command.ScrapingProfile.UserAgent);
+            pageLoadStopwatch.Stop();
 
-            // Add custom headers from profile (these can override defaults)
-            if (command.ScrapingProfile.Headers != null)
+            if (!proxyResponse.IsSuccess)
             {
-                foreach (var header in command.ScrapingProfile.Headers)
+                var errorMessage = $"Failed to load page: {proxyResponse.ErrorMessage ?? $"HTTP {proxyResponse.StatusCode}"}";
+
+                if (runId.HasValue)
                 {
-                    _httpClient.DefaultRequestHeaders.Remove(header.Key);
-                    _httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
+                    await _scraperRunLogService.FailRunAsync(runId.Value, new FailScraperRunDto
+                    {
+                        ErrorMessage = errorMessage,
+                        ErrorCode = "HTTP_REQUEST_FAILED",
+                        ErrorCategory = "NETWORK",
+                        PageLoadTime = pageLoadStopwatch.Elapsed,
+                        DebugNotes = $"Proxy used: {proxyResponse.ProxyUsed ?? "Direct connection"}. Status: {proxyResponse.StatusCode}"
+                    });
                 }
+
+                return new ScrapingResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = errorMessage,
+                    ErrorCode = "HTTP_REQUEST_FAILED"
+                };
             }
 
-            // Load the page with timing
-            var pageLoadStopwatch = Stopwatch.StartNew();
-            var response = await _httpClient.GetAsync(command.ExactProductUrl);
-            var htmlContent = await response.Content.ReadAsStringAsync();
-            pageLoadStopwatch.Stop();
+            var htmlContent = proxyResponse.Content!;
 
             // Parse HTML with AngleSharp
             var config = Configuration.Default;
@@ -101,32 +116,11 @@ public partial class WebScrapingService
                 await _scraperRunLogService.UpdateRunLogAsync(runId.Value, new UpdateScraperRunLogDto
                 {
                     PageLoadTime = pageLoadStopwatch.Elapsed,
-                    DebugNotes = $"Page loaded in {pageLoadStopwatch.ElapsedMilliseconds}ms. Status: {response.StatusCode}"
+                    DebugNotes = $"Page loaded in {pageLoadStopwatch.ElapsedMilliseconds}ms. Status: {proxyResponse.StatusCode}. Proxy: {proxyResponse.ProxyUsed ?? "Direct connection"}"
                 });
             }
 
-            // Check if HTTP request was successful
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorMessage = $"HTTP request failed with status {response.StatusCode}";
-                if (runId.HasValue)
-                {
-                    await _scraperRunLogService.FailRunAsync(runId.Value, new FailScraperRunDto
-                    {
-                        ErrorMessage = errorMessage,
-                        ErrorCode = "HTTP_ERROR",
-                        ErrorCategory = "NETWORK",
-                        DebugNotes = $"HTTP status code: {response.StatusCode}, Reason: {response.ReasonPhrase}"
-                    });
-                }
 
-                return new ScrapingResult
-                {
-                    IsSuccess = false,
-                    ErrorMessage = errorMessage,
-                    ErrorCode = "HTTP_ERROR"
-                };
-            }
 
             // Check if we got valid HTML content
             if (string.IsNullOrWhiteSpace(htmlContent))
