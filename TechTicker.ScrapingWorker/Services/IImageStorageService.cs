@@ -51,6 +51,21 @@ public interface IImageStorageService
     /// <param name="productId">Product ID</param>
     /// <returns>List of relative image paths</returns>
     Task<List<string>> GetProductImagePathsAsync(Guid productId);
+
+    /// <summary>
+    /// Check if a product already has sufficient valid images
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <param name="minCount">Minimum number of images required</param>
+    /// <returns>True if product has sufficient valid images</returns>
+    Task<bool> HasSufficientImagesAsync(Guid productId, int minCount = 1);
+
+    /// <summary>
+    /// Get count of valid images for a product
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <returns>Number of valid images</returns>
+    Task<int> GetValidImageCountAsync(Guid productId);
 }
 
 /// <summary>

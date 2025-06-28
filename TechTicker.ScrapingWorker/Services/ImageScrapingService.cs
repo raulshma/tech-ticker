@@ -51,11 +51,66 @@ public partial class ImageScrapingService : IImageScrapingService
 
             _logger.LogInformation("Starting image scraping with selector: {Selector}", imageSelector);
 
-            // Early check: if product already has images, we might want to skip processing
+            // Early check: if product already has recent images, skip processing entirely
+            var shouldSkip = await _productImageService.ShouldSkipImageProcessingAsync(productId, TimeSpan.FromDays(7), maxImages);
+            if (shouldSkip)
+            {
+                _logger.LogInformation("Product {ProductId} has recent images, skipping image scraping", productId);
+                
+                // Get existing valid images to return in result
+                var recentImagePaths = await _imageStorageService.GetProductImagePathsAsync(productId);
+                var validRecentPaths = new List<string>();
+                
+                foreach (var path in recentImagePaths)
+                {
+                    if (await _imageStorageService.ImageExistsAsync(path))
+                    {
+                        validRecentPaths.Add(path);
+                    }
+                }
+
+                result.IsSuccess = true;
+                result.PrimaryImageUrl = validRecentPaths.FirstOrDefault();
+                result.AdditionalImageUrls = validRecentPaths.Skip(1).ToList();
+                result.SuccessfulUploads = validRecentPaths.Count;
+                result.ProcessedCount = 0;
+                return result;
+            }
+
+            // Early check: if product already has sufficient images, skip processing entirely
             var hasExistingImages = await _productImageService.HasAnyImagesAsync(productId);
             if (hasExistingImages)
             {
-                _logger.LogDebug("Product {ProductId} already has images stored, will check for duplicates", productId);
+                var currentImagePaths = await _imageStorageService.GetProductImagePathsAsync(productId);
+                var validCurrentPaths = new List<string>();
+                
+                // Verify that existing images are still valid
+                foreach (var path in currentImagePaths)
+                {
+                    if (await _imageStorageService.ImageExistsAsync(path))
+                    {
+                        validCurrentPaths.Add(path);
+                    }
+                }
+
+                // If we have sufficient valid images, skip processing
+                if (validCurrentPaths.Count >= maxImages)
+                {
+                    _logger.LogInformation("Product {ProductId} already has {Count} valid images (>= {MaxImages}), skipping image scraping", 
+                        productId, validCurrentPaths.Count, maxImages);
+                    
+                    result.IsSuccess = true;
+                    result.PrimaryImageUrl = validCurrentPaths.FirstOrDefault();
+                    result.AdditionalImageUrls = validCurrentPaths.Skip(1).ToList();
+                    result.SuccessfulUploads = validCurrentPaths.Count;
+                    result.ProcessedCount = 0;
+                    return result;
+                }
+                else if (validCurrentPaths.Count > 0)
+                {
+                    _logger.LogInformation("Product {ProductId} has {ExistingCount} valid images, will process up to {RemainingCount} more", 
+                        productId, validCurrentPaths.Count, maxImages - validCurrentPaths.Count);
+                }
             }
 
             // Extract image URLs from HTML
@@ -76,16 +131,40 @@ public partial class ImageScrapingService : IImageScrapingService
             _logger.LogInformation("Found {Count} images to process (limited to {MaxImages})",
                 urlsToProcess.Count, maxImages);
 
-            // Check for existing images to avoid re-downloading
+            // Get existing image mappings and valid local paths
             var existingImageMappings = await _productImageService.GetExistingImageMappingsAsync(productId);
             var existingPaths = new List<string>();
             var urlsToDownload = new List<string>();
 
+            // First, check if we already have valid local images
+            var validLocalPaths = await _imageStorageService.GetProductImagePathsAsync(productId);
+            foreach (var path in validLocalPaths)
+            {
+                if (await _imageStorageService.ImageExistsAsync(path))
+                {
+                    existingPaths.Add(path);
+                }
+            }
+
+            // If we already have enough valid images, skip downloading
+            if (existingPaths.Count >= maxImages)
+            {
+                _logger.LogInformation("Product {ProductId} already has {Count} valid local images (>= {MaxImages}), skipping downloads", 
+                    productId, existingPaths.Count, maxImages);
+                
+                result.IsSuccess = true;
+                result.PrimaryImageUrl = existingPaths.FirstOrDefault();
+                result.AdditionalImageUrls = existingPaths.Skip(1).ToList();
+                result.SuccessfulUploads = existingPaths.Count;
+                return result;
+            }
+
+            // Check which URLs we need to download
             foreach (var imageUrl in urlsToProcess)
             {
+                // Check if we have a mapping for this URL and the file still exists
                 if (existingImageMappings.TryGetValue(imageUrl, out var existingPath))
                 {
-                    // Check if the local file still exists and is valid
                     var fileExists = await _imageStorageService.ImageExistsAsync(existingPath);
                     if (fileExists)
                     {

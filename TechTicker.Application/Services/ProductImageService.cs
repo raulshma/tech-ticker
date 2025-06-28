@@ -244,4 +244,64 @@ public class ProductImageService : IProductImageService
             return false;
         }
     }
+
+    /// <summary>
+    /// Check if a product has recent enough images to skip re-processing
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <param name="maxAge">Maximum age of images to consider recent</param>
+    /// <param name="minImageCount">Minimum number of images required</param>
+    /// <returns>True if product has recent enough images</returns>
+    public async Task<bool> ShouldSkipImageProcessingAsync(Guid productId, TimeSpan maxAge, int minImageCount = 1)
+    {
+        try
+        {
+            var product = await _unitOfWork.Products.GetByIdAsync(productId);
+            if (product == null)
+            {
+                return false;
+            }
+
+            // Check if we have recent images
+            if (product.ImageLastUpdated == null)
+            {
+                return false;
+            }
+
+            var age = DateTimeOffset.UtcNow - product.ImageLastUpdated.Value;
+            if (age > maxAge)
+            {
+                _logger.LogDebug("Product {ProductId} images are too old ({Age}), will re-process", 
+                    productId, age);
+                return false;
+            }
+
+            // Check if we have enough images
+            var imageCount = 0;
+            if (!string.IsNullOrEmpty(product.PrimaryImageUrl))
+            {
+                imageCount++;
+            }
+            if (product.AdditionalImageUrlsList != null)
+            {
+                imageCount += product.AdditionalImageUrlsList.Count;
+            }
+
+            if (imageCount < minImageCount)
+            {
+                _logger.LogDebug("Product {ProductId} has insufficient images ({Count} < {MinCount}), will re-process", 
+                    productId, imageCount, minImageCount);
+                return false;
+            }
+
+            _logger.LogDebug("Product {ProductId} has recent images ({Count} images, {Age} old), skipping re-processing", 
+                productId, imageCount, age);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error checking if product {ProductId} should skip image processing", productId);
+            return false;
+        }
+    }
 }

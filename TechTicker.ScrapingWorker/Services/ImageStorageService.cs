@@ -255,6 +255,69 @@ public class ImageStorageService : IImageStorageService
         }
     }
 
+    /// <summary>
+    /// Check if a product already has sufficient valid images
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <param name="minCount">Minimum number of images required</param>
+    /// <returns>True if product has sufficient valid images</returns>
+    public async Task<bool> HasSufficientImagesAsync(Guid productId, int minCount = 1)
+    {
+        try
+        {
+            var imagePaths = await GetProductImagePathsAsync(productId);
+            var validCount = 0;
+
+            foreach (var path in imagePaths)
+            {
+                if (await ImageExistsAsync(path))
+                {
+                    validCount++;
+                    if (validCount >= minCount)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error checking if product {ProductId} has sufficient images", productId);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Get count of valid images for a product
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <returns>Number of valid images</returns>
+    public async Task<int> GetValidImageCountAsync(Guid productId)
+    {
+        try
+        {
+            var imagePaths = await GetProductImagePathsAsync(productId);
+            var validCount = 0;
+
+            foreach (var path in imagePaths)
+            {
+                if (await ImageExistsAsync(path))
+                {
+                    validCount++;
+                }
+            }
+
+            return validCount;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting valid image count for product {ProductId}", productId);
+            return 0;
+        }
+    }
+
     public string GenerateContentHash(byte[] imageData)
     {
         using var sha256 = SHA256.Create();

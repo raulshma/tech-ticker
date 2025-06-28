@@ -39,4 +39,13 @@ public interface IProductImageService
     /// <param name="productId">Product ID</param>
     /// <returns>True if product has any images</returns>
     Task<bool> HasAnyImagesAsync(Guid productId);
+
+    /// <summary>
+    /// Check if a product has recent enough images to skip re-processing
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <param name="maxAge">Maximum age of images to consider recent</param>
+    /// <param name="minImageCount">Minimum number of images required</param>
+    /// <returns>True if product has recent enough images</returns>
+    Task<bool> ShouldSkipImageProcessingAsync(Guid productId, TimeSpan maxAge, int minImageCount = 1);
 }
