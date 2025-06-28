@@ -95,6 +95,81 @@
         </div>
       </mat-card-content>
     </mat-card>
+
+    <!-- Proxy Statistics -->
+    <mat-card class="stat-card" *ngIf="isAdmin">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>vpn_lock</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{dashboardStats.healthyProxies}}/{{dashboardStats.totalProxies}}</h3>
+            <p>Healthy Proxies ({{dashboardStats.proxyHealthPercentage}}%)</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Scraper Performance -->
+    <mat-card class="stat-card" *ngIf="isAdmin">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>web_asset</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{dashboardStats.recentScraperRuns}}</h3>
+            <p>Recent Scrapes ({{dashboardStats.scraperSuccessRate}}% success)</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Notification Performance -->
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>send</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{dashboardStats.recentNotifications}}</h3>
+            <p>Notifications ({{dashboardStats.notificationSuccessRate}}% delivered)</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- System Health -->
+    <mat-card class="stat-card" *ngIf="isAdmin">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon" [class.healthy]="dashboardStats.systemHealthy" [class.unhealthy]="!dashboardStats.systemHealthy">
+            <mat-icon>{{dashboardStats.systemHealthy ? 'check_circle' : 'error'}}</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{dashboardStats.systemHealthy ? 'Healthy' : 'Issues'}}</h3>
+            <p>System Status</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Alerts -->
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{dashboardStats.recentAlerts}}</h3>
+            <p>Recent Alerts (24h)</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </div>
 
   <!-- Quick actions -->
@@ -138,6 +213,68 @@
           <mat-icon>settings</mat-icon>
           <h3>Site Configurations</h3>
           <p>Configure scraper settings</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/alerts">
+        <mat-card-content>
+          <mat-icon>notifications_active</mat-icon>
+          <h3>Alert Management</h3>
+          <p>Configure price alerts</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/scraper-logs">
+        <mat-card-content>
+          <mat-icon>history</mat-icon>
+          <h3>Scraper Logs</h3>
+          <p>Monitor scraping activity</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/users" *hasPermission="'Users.Read'">
+        <mat-card-content>
+          <mat-icon>people</mat-icon>
+          <h3>User Management</h3>
+          <p>Manage system users</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- User Quick Actions (for non-admin users) -->
+  <div class="quick-actions-section" *ngIf="!isAdmin">
+    <h2>Quick Actions</h2>
+    <div class="actions-grid">
+      <mat-card class="action-card" routerLink="/catalog">
+        <mat-card-content>
+          <mat-icon>shopping_cart</mat-icon>
+          <h3>Browse Products</h3>
+          <p>View product catalog</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/alerts">
+        <mat-card-content>
+          <mat-icon>notifications</mat-icon>
+          <h3>My Alerts</h3>
+          <p>Manage your price alerts</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/notification-settings">
+        <mat-card-content>
+          <mat-icon>tune</mat-icon>
+          <h3>Notification Settings</h3>
+          <p>Configure your preferences</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/mappings">
+        <mat-card-content>
+          <mat-icon>link</mat-icon>
+          <h3>Product Mappings</h3>
+          <p>View product-seller mappings</p>
         </mat-card-content>
       </mat-card>
     </div>

@@ -20,7 +20,16 @@ export class DashboardComponent implements OnInit {
     totalCategories: 0,
     activeMappings: 0,
     activeAlerts: 0,
-    totalUsers: 0
+    totalUsers: 0,
+    totalProxies: 0,
+    healthyProxies: 0,
+    proxyHealthPercentage: 0,
+    recentScraperRuns: 0,
+    scraperSuccessRate: 0,
+    recentNotifications: 0,
+    notificationSuccessRate: 0,
+    systemHealthy: false,
+    recentAlerts: 0
   };
 
   constructor(
@@ -57,7 +66,16 @@ export class DashboardComponent implements OnInit {
           totalCategories: 0,
           activeMappings: 0,
           activeAlerts: 0,
-          totalUsers: 0
+          totalUsers: 0,
+          totalProxies: 0,
+          healthyProxies: 0,
+          proxyHealthPercentage: 0,
+          recentScraperRuns: 0,
+          scraperSuccessRate: 0,
+          recentNotifications: 0,
+          notificationSuccessRate: 0,
+          systemHealthy: false,
+          recentAlerts: 0
         };
       }
     });

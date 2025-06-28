@@ -11,6 +11,15 @@ export interface DashboardStats {
   activeMappings: number;
   activeAlerts: number;
   totalUsers?: number;
+  totalProxies: number;
+  healthyProxies: number;
+  proxyHealthPercentage: number;
+  recentScraperRuns: number;
+  scraperSuccessRate: number;
+  recentNotifications: number;
+  notificationSuccessRate: number;
+  systemHealthy: boolean;
+  recentAlerts: number;
 }
 
 @Injectable({
@@ -32,7 +41,16 @@ export class DashboardService {
             totalCategories: response.data.totalCategories || 0,
             activeMappings: response.data.activeMappings || 0,
             activeAlerts: response.data.activeAlerts || 0,
-            totalUsers: response.data.totalUsers || undefined
+            totalUsers: response.data.totalUsers || undefined,
+            totalProxies: response.data.totalProxies || 0,
+            healthyProxies: response.data.healthyProxies || 0,
+            proxyHealthPercentage: response.data.proxyHealthPercentage || 0,
+            recentScraperRuns: response.data.recentScraperRuns || 0,
+            scraperSuccessRate: response.data.scraperSuccessRate || 0,
+            recentNotifications: response.data.recentNotifications || 0,
+            notificationSuccessRate: response.data.notificationSuccessRate || 0,
+            systemHealthy: response.data.systemHealthy || false,
+            recentAlerts: response.data.recentAlerts || 0
           };
         }),
         catchError(error => {

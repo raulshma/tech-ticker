@@ -56,6 +56,22 @@
       width: 24px;
       height: 24px;
     }
+
+    &.healthy {
+      background-color: #e8f5e8;
+
+      mat-icon {
+        color: #4caf50;
+      }
+    }
+
+    &.unhealthy {
+      background-color: #ffebee;
+
+      mat-icon {
+        color: #f44336;
+      }
+    }
   }
 
   .stat-info {

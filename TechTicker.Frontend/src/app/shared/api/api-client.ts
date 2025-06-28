@@ -12113,6 +12113,15 @@ export class DashboardStatsDto implements IDashboardStatsDto {
     activeMappings?: number;
     activeAlerts?: number;
     totalUsers?: number | undefined;
+    totalProxies?: number;
+    healthyProxies?: number;
+    proxyHealthPercentage?: number;
+    recentScraperRuns?: number;
+    scraperSuccessRate?: number;
+    recentNotifications?: number;
+    notificationSuccessRate?: number;
+    systemHealthy?: boolean;
+    recentAlerts?: number;
 
     constructor(data?: IDashboardStatsDto) {
         if (data) {
@@ -12130,6 +12139,15 @@ export class DashboardStatsDto implements IDashboardStatsDto {
             this.activeMappings = _data["activeMappings"];
             this.activeAlerts = _data["activeAlerts"];
             this.totalUsers = _data["totalUsers"];
+            this.totalProxies = _data["totalProxies"];
+            this.healthyProxies = _data["healthyProxies"];
+            this.proxyHealthPercentage = _data["proxyHealthPercentage"];
+            this.recentScraperRuns = _data["recentScraperRuns"];
+            this.scraperSuccessRate = _data["scraperSuccessRate"];
+            this.recentNotifications = _data["recentNotifications"];
+            this.notificationSuccessRate = _data["notificationSuccessRate"];
+            this.systemHealthy = _data["systemHealthy"];
+            this.recentAlerts = _data["recentAlerts"];
         }
     }
 
@@ -12147,6 +12165,15 @@ export class DashboardStatsDto implements IDashboardStatsDto {
         data["activeMappings"] = this.activeMappings;
         data["activeAlerts"] = this.activeAlerts;
         data["totalUsers"] = this.totalUsers;
+        data["totalProxies"] = this.totalProxies;
+        data["healthyProxies"] = this.healthyProxies;
+        data["proxyHealthPercentage"] = this.proxyHealthPercentage;
+        data["recentScraperRuns"] = this.recentScraperRuns;
+        data["scraperSuccessRate"] = this.scraperSuccessRate;
+        data["recentNotifications"] = this.recentNotifications;
+        data["notificationSuccessRate"] = this.notificationSuccessRate;
+        data["systemHealthy"] = this.systemHealthy;
+        data["recentAlerts"] = this.recentAlerts;
         return data;
     }
 }
@@ -12157,6 +12184,15 @@ export interface IDashboardStatsDto {
     activeMappings?: number;
     activeAlerts?: number;
     totalUsers?: number | undefined;
+    totalProxies?: number;
+    healthyProxies?: number;
+    proxyHealthPercentage?: number;
+    recentScraperRuns?: number;
+    scraperSuccessRate?: number;
+    recentNotifications?: number;
+    notificationSuccessRate?: number;
+    systemHealthy?: boolean;
+    recentAlerts?: number;
 }
 
 export class DashboardStatsDtoApiResponse implements IDashboardStatsDtoApiResponse {

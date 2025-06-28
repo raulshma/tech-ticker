@@ -29,4 +29,49 @@ public class DashboardStatsDto
     /// Total number of users in the system (admin only)
     /// </summary>
     public int? TotalUsers { get; set; }
+
+    /// <summary>
+    /// Total number of proxy configurations
+    /// </summary>
+    public int TotalProxies { get; set; }
+
+    /// <summary>
+    /// Number of healthy proxies
+    /// </summary>
+    public int HealthyProxies { get; set; }
+
+    /// <summary>
+    /// Proxy health percentage
+    /// </summary>
+    public double ProxyHealthPercentage { get; set; }
+
+    /// <summary>
+    /// Number of scraper runs in the last 24 hours
+    /// </summary>
+    public int RecentScraperRuns { get; set; }
+
+    /// <summary>
+    /// Scraper success rate percentage
+    /// </summary>
+    public double ScraperSuccessRate { get; set; }
+
+    /// <summary>
+    /// Number of notifications sent in the last 24 hours
+    /// </summary>
+    public int RecentNotifications { get; set; }
+
+    /// <summary>
+    /// Notification delivery success rate percentage
+    /// </summary>
+    public double NotificationSuccessRate { get; set; }
+
+    /// <summary>
+    /// System health status
+    /// </summary>
+    public bool SystemHealthy { get; set; }
+
+    /// <summary>
+    /// Number of alerts triggered in the last 24 hours
+    /// </summary>
+    public int RecentAlerts { get; set; }
 }
