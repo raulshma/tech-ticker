@@ -732,9 +732,9 @@ public class ProxyService : IProxyService
             else
             {
                 // For HTTP/HTTPS proxies, create the proxy URI correctly
-                // Don't include the protocol scheme for WebProxy - it determines this automatically
-                var proxyAddress = $"{proxy.Host}:{proxy.Port}";
-                var webProxy = new WebProxy(proxyAddress);
+                // Use the full URI format to avoid trailing slash issues
+                var proxyUri = new Uri($"http://{proxy.Host}:{proxy.Port}");
+                var webProxy = new WebProxy(proxyUri);
 
                 if (!string.IsNullOrEmpty(proxy.Username))
                 {
