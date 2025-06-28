@@ -1,0 +1,269 @@
+.proxy-form-container {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header-section {
+  margin-bottom: 32px;
+
+  h1 {
+    margin: 0 0 8px 0;
+    font-size: 2rem;
+    font-weight: 500;
+    color: #1976d2;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: #666;
+    font-size: 1rem;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px;
+  gap: 16px;
+
+  p {
+    color: #666;
+    margin: 0;
+  }
+}
+
+.form-card {
+  margin-bottom: 24px;
+  
+  .mat-mdc-card-header {
+    .mat-mdc-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.25rem;
+      color: #333;
+    }
+  }
+}
+
+.proxy-form {
+  .form-section {
+    margin-bottom: 32px;
+    
+    h3 {
+      margin: 0 0 16px 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #1976d2;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 8px;
+    }
+  }
+
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .half-width {
+    flex: 1;
+    
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+
+  .mat-mdc-form-field {
+    .mat-mdc-form-field-icon-suffix {
+      color: #666;
+    }
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+}
+
+.form-actions {
+  padding: 16px 24px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+  
+  .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    
+    @media (max-width: 768px) {
+      flex-direction: column-reverse;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.help-card {
+  .mat-mdc-card-header {
+    .mat-mdc-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+      color: #333;
+    }
+  }
+
+  .help-section {
+    margin-bottom: 24px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    h4 {
+      margin: 0 0 8px 0;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #1976d2;
+    }
+    
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      
+      li {
+        margin-bottom: 4px;
+        line-height: 1.4;
+        
+        strong {
+          color: #333;
+        }
+      }
+    }
+  }
+}
+
+// Form validation styles
+.mat-mdc-form-field {
+  &.ng-invalid.ng-touched {
+    .mat-mdc-text-field-wrapper {
+      .mat-mdc-form-field-outline {
+        .mat-mdc-form-field-outline-thick {
+          color: #f44336;
+        }
+      }
+    }
+  }
+}
+
+// Button styles
+.mat-mdc-button,
+.mat-mdc-raised-button {
+  .mat-icon {
+    margin-right: 8px;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .proxy-form-container {
+    padding: 16px;
+  }
+
+  .header-section {
+    margin-bottom: 24px;
+    
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .form-card {
+    .mat-mdc-card-content {
+      padding: 16px;
+    }
+  }
+
+  .help-card {
+    .mat-mdc-card-content {
+      padding: 16px;
+    }
+    
+    .help-section {
+      margin-bottom: 16px;
+      
+      ul {
+        padding-left: 16px;
+      }
+    }
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .header-section {
+    h1 {
+      color: #90caf9;
+    }
+    
+    .subtitle {
+      color: #ccc;
+    }
+  }
+
+  .form-section {
+    h3 {
+      color: #90caf9;
+      border-bottom-color: #424242;
+    }
+  }
+
+  .help-section {
+    h4 {
+      color: #90caf9;
+    }
+    
+    ul li strong {
+      color: #fff;
+    }
+  }
+
+  .form-actions {
+    background-color: #303030;
+    border-top-color: #424242;
+  }
+}
+
+// Animation for form transitions
+.proxy-form {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

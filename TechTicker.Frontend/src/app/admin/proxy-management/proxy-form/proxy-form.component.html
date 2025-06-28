@@ -1,0 +1,227 @@
+<div class="proxy-form-container">
+  <!-- Header -->
+  <div class="header-section">
+    <h1>{{ isEditMode ? 'Edit Proxy' : 'Add New Proxy' }}</h1>
+    <p class="subtitle">Configure HTTP/SOCKS5 proxy settings for web scraping</p>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>{{ isEditMode ? 'Loading proxy...' : 'Saving proxy...' }}</p>
+  </div>
+
+  <!-- Form -->
+  <mat-card class="form-card" *ngIf="!loading">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+        Proxy Configuration
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="proxyForm" (ngSubmit)="onSubmit()" class="proxy-form">
+        
+        <!-- Basic Configuration -->
+        <div class="form-section">
+          <h3>Basic Configuration</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Host/IP Address</mat-label>
+              <input matInput 
+                     formControlName="host" 
+                     placeholder="192.168.1.100 or proxy.example.com"
+                     required>
+              <mat-icon matSuffix>dns</mat-icon>
+              <mat-error>{{ getFieldError('host') }}</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Port</mat-label>
+              <input matInput 
+                     type="number" 
+                     formControlName="port" 
+                     placeholder="8080"
+                     min="1" 
+                     max="65535"
+                     required>
+              <mat-icon matSuffix>settings_ethernet</mat-icon>
+              <mat-error>{{ getFieldError('port') }}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Proxy Type</mat-label>
+              <mat-select formControlName="proxyType" required>
+                <mat-option *ngFor="let type of proxyTypes" [value]="type.value">
+                  {{ type.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>swap_horiz</mat-icon>
+              <mat-error>{{ getFieldError('proxyType') }}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Authentication -->
+        <div class="form-section">
+          <h3>Authentication (Optional)</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Username</mat-label>
+              <input matInput 
+                     formControlName="username" 
+                     placeholder="proxy_user"
+                     autocomplete="username">
+              <mat-icon matSuffix>person</mat-icon>
+              <mat-error>{{ getFieldError('username') }}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Password</mat-label>
+              <input matInput 
+                     type="password" 
+                     formControlName="password" 
+                     placeholder="Enter password"
+                     autocomplete="new-password">
+              <mat-icon matSuffix>lock</mat-icon>
+              <mat-error>{{ getFieldError('password') }}</mat-error>
+              <mat-hint *ngIf="isEditMode">Leave blank to keep existing password</mat-hint>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Advanced Settings -->
+        <div class="form-section">
+          <h3>Advanced Settings</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description</mat-label>
+              <textarea matInput 
+                        formControlName="description" 
+                        placeholder="Optional description for this proxy"
+                        rows="2"
+                        maxlength="200"></textarea>
+              <mat-icon matSuffix>description</mat-icon>
+              <mat-error>{{ getFieldError('description') }}</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Timeout (seconds)</mat-label>
+              <input matInput 
+                     type="number" 
+                     formControlName="timeoutSeconds" 
+                     min="1" 
+                     max="300"
+                     required>
+              <mat-icon matSuffix>timer</mat-icon>
+              <mat-error>{{ getFieldError('timeoutSeconds') }}</mat-error>
+              <mat-hint>Connection timeout in seconds (1-300)</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Max Retries</mat-label>
+              <input matInput 
+                     type="number" 
+                     formControlName="maxRetries" 
+                     min="0" 
+                     max="10"
+                     required>
+              <mat-icon matSuffix>refresh</mat-icon>
+              <mat-error>{{ getFieldError('maxRetries') }}</mat-error>
+              <mat-hint>Maximum retry attempts (0-10)</mat-hint>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-checkbox formControlName="isActive" class="full-width">
+              <span class="checkbox-label">
+                <mat-icon>power_settings_new</mat-icon>
+                Enable this proxy for scraping
+              </span>
+            </mat-checkbox>
+          </div>
+        </div>
+
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions class="form-actions">
+      <div class="action-buttons">
+        <button mat-button 
+                type="button" 
+                (click)="onCancel()"
+                [disabled]="loading">
+          <mat-icon>cancel</mat-icon>
+          Cancel
+        </button>
+
+        <button mat-button 
+                type="button" 
+                color="accent"
+                (click)="testConnection()"
+                [disabled]="loading || !isEditMode"
+                *ngIf="isEditMode">
+          <mat-icon>network_check</mat-icon>
+          Test Connection
+        </button>
+
+        <button mat-raised-button 
+                type="submit"
+                color="primary"
+                (click)="onSubmit()"
+                [disabled]="loading || proxyForm.invalid">
+          <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+          {{ isEditMode ? 'Update Proxy' : 'Create Proxy' }}
+        </button>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Help Section -->
+  <mat-card class="help-card" *ngIf="!loading">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>help_outline</mat-icon>
+        Configuration Help
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="help-section">
+        <h4>Proxy Types</h4>
+        <ul>
+          <li><strong>HTTP:</strong> Standard HTTP proxy for web traffic</li>
+          <li><strong>HTTPS:</strong> Secure HTTP proxy with SSL/TLS</li>
+          <li><strong>SOCKS5:</strong> More versatile proxy supporting various protocols</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h4>Common Ports</h4>
+        <ul>
+          <li><strong>HTTP:</strong> 8080, 3128, 80</li>
+          <li><strong>HTTPS:</strong> 8443, 443</li>
+          <li><strong>SOCKS5:</strong> 1080, 1085</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h4>Tips</h4>
+        <ul>
+          <li>Test the connection after saving to verify the proxy works</li>
+          <li>Use descriptive names to easily identify proxies</li>
+          <li>Set appropriate timeouts based on proxy performance</li>
+          <li>Disable proxies that frequently fail to improve scraping efficiency</li>
+        </ul>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

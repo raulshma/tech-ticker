@@ -4921,6 +4921,946 @@ export class TechTickerApiClient {
     /**
      * @return OK
      */
+    getAllProxies(): Observable<ProxyConfigurationDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllProxies(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllProxies(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyConfigurationDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyConfigurationDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetAllProxies(response: HttpResponseBase): Observable<ProxyConfigurationDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyConfigurationDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createProxy(body: CreateProxyConfigurationDto | undefined): Observable<ProxyConfigurationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateProxy(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateProxy(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyConfigurationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyConfigurationDtoApiResponse>;
+        }));
+    }
+
+    protected processCreateProxy(response: HttpResponseBase): Observable<ProxyConfigurationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getProxyById(id: string): Observable<ProxyConfigurationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetProxyById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetProxyById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyConfigurationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyConfigurationDtoApiResponse>;
+        }));
+    }
+
+    protected processGetProxyById(response: HttpResponseBase): Observable<ProxyConfigurationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    updateProxy(id: string, body: UpdateProxyConfigurationDto | undefined): Observable<ProxyConfigurationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateProxy(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateProxy(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyConfigurationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyConfigurationDtoApiResponse>;
+        }));
+    }
+
+    protected processUpdateProxy(response: HttpResponseBase): Observable<ProxyConfigurationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    deleteProxy(id: string): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteProxy(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteProxy(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processDeleteProxy(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getActiveProxies(): Observable<ProxyConfigurationDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/active";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetActiveProxies(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetActiveProxies(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyConfigurationDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyConfigurationDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetActiveProxies(response: HttpResponseBase): Observable<ProxyConfigurationDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyConfigurationDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getHealthyProxies(): Observable<ProxyConfigurationDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/healthy";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHealthyProxies(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHealthyProxies(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyConfigurationDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyConfigurationDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetHealthyProxies(response: HttpResponseBase): Observable<ProxyConfigurationDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyConfigurationDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getProxiesByType(proxyType: string): Observable<ProxyConfigurationDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/by-type/{proxyType}";
+        if (proxyType === undefined || proxyType === null)
+            throw new Error("The parameter 'proxyType' must be defined.");
+        url_ = url_.replace("{proxyType}", encodeURIComponent("" + proxyType));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetProxiesByType(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetProxiesByType(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyConfigurationDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyConfigurationDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetProxiesByType(response: HttpResponseBase): Observable<ProxyConfigurationDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyConfigurationDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param testUrl (optional) 
+     * @param timeoutSeconds (optional) 
+     * @return OK
+     */
+    testProxy(id: string, testUrl: string | undefined, timeoutSeconds: number | undefined): Observable<ProxyTestResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/{id}/test?";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (testUrl === null)
+            throw new Error("The parameter 'testUrl' cannot be null.");
+        else if (testUrl !== undefined)
+            url_ += "testUrl=" + encodeURIComponent("" + testUrl) + "&";
+        if (timeoutSeconds === null)
+            throw new Error("The parameter 'timeoutSeconds' cannot be null.");
+        else if (timeoutSeconds !== undefined)
+            url_ += "timeoutSeconds=" + encodeURIComponent("" + timeoutSeconds) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTestProxy(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTestProxy(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyTestResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyTestResultDtoApiResponse>;
+        }));
+    }
+
+    protected processTestProxy(response: HttpResponseBase): Observable<ProxyTestResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyTestResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkTestProxies(body: BulkProxyTestDto | undefined): Observable<ProxyTestResultDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/test-bulk";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkTestProxies(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkTestProxies(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyTestResultDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyTestResultDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processBulkTestProxies(response: HttpResponseBase): Observable<ProxyTestResultDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyTestResultDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    validateProxyImport(body: BulkProxyImportDto | undefined): Observable<BulkProxyImportValidationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/validate-import";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processValidateProxyImport(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processValidateProxyImport(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BulkProxyImportValidationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BulkProxyImportValidationDtoApiResponse>;
+        }));
+    }
+
+    protected processValidateProxyImport(response: HttpResponseBase): Observable<BulkProxyImportValidationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BulkProxyImportValidationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkImportProxies(body: BulkProxyImportDto | undefined): Observable<BulkProxyImportResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/import-bulk";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkImportProxies(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkImportProxies(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BulkProxyImportResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BulkProxyImportResultDtoApiResponse>;
+        }));
+    }
+
+    protected processBulkImportProxies(response: HttpResponseBase): Observable<BulkProxyImportResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BulkProxyImportResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    parseProxyText(body: string | undefined): Observable<ProxyImportItemDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/parse-text";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processParseProxyText(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processParseProxyText(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyImportItemDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyImportItemDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processParseProxyText(response: HttpResponseBase): Observable<ProxyImportItemDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyImportItemDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getProxyStats(): Observable<ProxyStatsDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/stats";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetProxyStats(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetProxyStats(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyStatsDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyStatsDtoApiResponse>;
+        }));
+    }
+
+    protected processGetProxyStats(response: HttpResponseBase): Observable<ProxyStatsDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyStatsDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    setProxyActiveStatus(id: string, body: boolean | undefined): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/{id}/active";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("patch", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSetProxyActiveStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSetProxyActiveStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processSetProxyActiveStatus(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkSetProxyActiveStatus(body: BulkProxyActiveStatusDto | undefined): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/bulk-active";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("patch", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkSetProxyActiveStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkSetProxyActiveStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processBulkSetProxyActiveStatus(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    updateProxyUsage(body: ProxyUsageUpdateDto | undefined): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/proxies/usage";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateProxyUsage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateProxyUsage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processUpdateProxyUsage(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
     getAllRoles(): Observable<RoleInfoDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Roles";
         url_ = url_.replace(/[?&]$/, "");
@@ -9715,6 +10655,476 @@ export interface IBooleanApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class BulkProxyActiveStatusDto implements IBulkProxyActiveStatusDto {
+    proxyIds?: string[] | undefined;
+    isActive?: boolean;
+
+    constructor(data?: IBulkProxyActiveStatusDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["proxyIds"])) {
+                this.proxyIds = [] as any;
+                for (let item of _data["proxyIds"])
+                    this.proxyIds!.push(item);
+            }
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): BulkProxyActiveStatusDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkProxyActiveStatusDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.proxyIds)) {
+            data["proxyIds"] = [];
+            for (let item of this.proxyIds)
+                data["proxyIds"].push(item);
+        }
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface IBulkProxyActiveStatusDto {
+    proxyIds?: string[] | undefined;
+    isActive?: boolean;
+}
+
+export class BulkProxyImportDto implements IBulkProxyImportDto {
+    proxies!: ProxyImportItemDto[];
+    testBeforeImport?: boolean;
+    overwriteExisting?: boolean;
+
+    constructor(data?: IBulkProxyImportDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.proxies = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["proxies"])) {
+                this.proxies = [] as any;
+                for (let item of _data["proxies"])
+                    this.proxies!.push(ProxyImportItemDto.fromJS(item));
+            }
+            this.testBeforeImport = _data["testBeforeImport"];
+            this.overwriteExisting = _data["overwriteExisting"];
+        }
+    }
+
+    static fromJS(data: any): BulkProxyImportDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkProxyImportDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.proxies)) {
+            data["proxies"] = [];
+            for (let item of this.proxies)
+                data["proxies"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["testBeforeImport"] = this.testBeforeImport;
+        data["overwriteExisting"] = this.overwriteExisting;
+        return data;
+    }
+}
+
+export interface IBulkProxyImportDto {
+    proxies: ProxyImportItemDto[];
+    testBeforeImport?: boolean;
+    overwriteExisting?: boolean;
+}
+
+export class BulkProxyImportResultDto implements IBulkProxyImportResultDto {
+    totalProcessed?: number;
+    successfulImports?: number;
+    failedImports?: number;
+    skippedDuplicates?: number;
+    errors?: string[] | undefined;
+    importedProxies?: ProxyConfigurationDto[] | undefined;
+
+    constructor(data?: IBulkProxyImportResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalProcessed = _data["totalProcessed"];
+            this.successfulImports = _data["successfulImports"];
+            this.failedImports = _data["failedImports"];
+            this.skippedDuplicates = _data["skippedDuplicates"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["importedProxies"])) {
+                this.importedProxies = [] as any;
+                for (let item of _data["importedProxies"])
+                    this.importedProxies!.push(ProxyConfigurationDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): BulkProxyImportResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkProxyImportResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalProcessed"] = this.totalProcessed;
+        data["successfulImports"] = this.successfulImports;
+        data["failedImports"] = this.failedImports;
+        data["skippedDuplicates"] = this.skippedDuplicates;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.importedProxies)) {
+            data["importedProxies"] = [];
+            for (let item of this.importedProxies)
+                data["importedProxies"].push(item ? item.toJSON() : <any>undefined);
+        }
+        return data;
+    }
+}
+
+export interface IBulkProxyImportResultDto {
+    totalProcessed?: number;
+    successfulImports?: number;
+    failedImports?: number;
+    skippedDuplicates?: number;
+    errors?: string[] | undefined;
+    importedProxies?: ProxyConfigurationDto[] | undefined;
+}
+
+export class BulkProxyImportResultDtoApiResponse implements IBulkProxyImportResultDtoApiResponse {
+    success?: boolean;
+    data?: BulkProxyImportResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IBulkProxyImportResultDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? BulkProxyImportResultDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BulkProxyImportResultDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkProxyImportResultDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBulkProxyImportResultDtoApiResponse {
+    success?: boolean;
+    data?: BulkProxyImportResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class BulkProxyImportValidationDto implements IBulkProxyImportValidationDto {
+    totalProxies?: number;
+    validProxies?: number;
+    invalidProxies?: number;
+    duplicateProxies?: number;
+    proxiesToImport?: ProxyImportItemDto[] | undefined;
+    validationErrors?: string[] | undefined;
+
+    constructor(data?: IBulkProxyImportValidationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalProxies = _data["totalProxies"];
+            this.validProxies = _data["validProxies"];
+            this.invalidProxies = _data["invalidProxies"];
+            this.duplicateProxies = _data["duplicateProxies"];
+            if (Array.isArray(_data["proxiesToImport"])) {
+                this.proxiesToImport = [] as any;
+                for (let item of _data["proxiesToImport"])
+                    this.proxiesToImport!.push(ProxyImportItemDto.fromJS(item));
+            }
+            if (Array.isArray(_data["validationErrors"])) {
+                this.validationErrors = [] as any;
+                for (let item of _data["validationErrors"])
+                    this.validationErrors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): BulkProxyImportValidationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkProxyImportValidationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalProxies"] = this.totalProxies;
+        data["validProxies"] = this.validProxies;
+        data["invalidProxies"] = this.invalidProxies;
+        data["duplicateProxies"] = this.duplicateProxies;
+        if (Array.isArray(this.proxiesToImport)) {
+            data["proxiesToImport"] = [];
+            for (let item of this.proxiesToImport)
+                data["proxiesToImport"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.validationErrors)) {
+            data["validationErrors"] = [];
+            for (let item of this.validationErrors)
+                data["validationErrors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IBulkProxyImportValidationDto {
+    totalProxies?: number;
+    validProxies?: number;
+    invalidProxies?: number;
+    duplicateProxies?: number;
+    proxiesToImport?: ProxyImportItemDto[] | undefined;
+    validationErrors?: string[] | undefined;
+}
+
+export class BulkProxyImportValidationDtoApiResponse implements IBulkProxyImportValidationDtoApiResponse {
+    success?: boolean;
+    data?: BulkProxyImportValidationDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IBulkProxyImportValidationDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? BulkProxyImportValidationDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BulkProxyImportValidationDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkProxyImportValidationDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBulkProxyImportValidationDtoApiResponse {
+    success?: boolean;
+    data?: BulkProxyImportValidationDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class BulkProxyTestDto implements IBulkProxyTestDto {
+    proxyIds!: string[];
+    testUrl?: string | undefined;
+    timeoutSeconds?: number;
+
+    constructor(data?: IBulkProxyTestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.proxyIds = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["proxyIds"])) {
+                this.proxyIds = [] as any;
+                for (let item of _data["proxyIds"])
+                    this.proxyIds!.push(item);
+            }
+            this.testUrl = _data["testUrl"];
+            this.timeoutSeconds = _data["timeoutSeconds"];
+        }
+    }
+
+    static fromJS(data: any): BulkProxyTestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkProxyTestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.proxyIds)) {
+            data["proxyIds"] = [];
+            for (let item of this.proxyIds)
+                data["proxyIds"].push(item);
+        }
+        data["testUrl"] = this.testUrl;
+        data["timeoutSeconds"] = this.timeoutSeconds;
+        return data;
+    }
+}
+
+export interface IBulkProxyTestDto {
+    proxyIds: string[];
+    testUrl?: string | undefined;
+    timeoutSeconds?: number;
+}
+
 export class CategoryDto implements ICategoryDto {
     categoryId?: string;
     name?: string | undefined;
@@ -10237,6 +11647,74 @@ export interface ICreateProductSellerMappingDto {
     isActiveForScraping?: boolean;
     scrapingFrequencyOverride?: string | undefined;
     siteConfigId?: string | undefined;
+}
+
+export class CreateProxyConfigurationDto implements ICreateProxyConfigurationDto {
+    host!: string;
+    port!: number;
+    proxyType!: string;
+    username?: string | undefined;
+    password?: string | undefined;
+    description?: string | undefined;
+    timeoutSeconds?: number;
+    maxRetries?: number;
+    isActive?: boolean;
+
+    constructor(data?: ICreateProxyConfigurationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.host = _data["host"];
+            this.port = _data["port"];
+            this.proxyType = _data["proxyType"];
+            this.username = _data["username"];
+            this.password = _data["password"];
+            this.description = _data["description"];
+            this.timeoutSeconds = _data["timeoutSeconds"];
+            this.maxRetries = _data["maxRetries"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): CreateProxyConfigurationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateProxyConfigurationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["host"] = this.host;
+        data["port"] = this.port;
+        data["proxyType"] = this.proxyType;
+        data["username"] = this.username;
+        data["password"] = this.password;
+        data["description"] = this.description;
+        data["timeoutSeconds"] = this.timeoutSeconds;
+        data["maxRetries"] = this.maxRetries;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface ICreateProxyConfigurationDto {
+    host: string;
+    port: number;
+    proxyType: string;
+    username?: string | undefined;
+    password?: string | undefined;
+    description?: string | undefined;
+    timeoutSeconds?: number;
+    maxRetries?: number;
+    isActive?: boolean;
 }
 
 export class CreateRoleDto implements ICreateRoleDto {
@@ -13059,6 +14537,958 @@ export interface IProductWithCurrentPricesDtoPagedResponse {
     pagination?: PaginationMeta;
 }
 
+export class ProxyConfigurationDto implements IProxyConfigurationDto {
+    proxyConfigurationId?: string;
+    host?: string | undefined;
+    port?: number;
+    proxyType?: string | undefined;
+    username?: string | undefined;
+    hasPassword?: boolean;
+    description?: string | undefined;
+    isActive?: boolean;
+    isHealthy?: boolean;
+    lastTestedAt?: Date | undefined;
+    lastUsedAt?: Date | undefined;
+    successRate?: number;
+    totalRequests?: number;
+    successfulRequests?: number;
+    failedRequests?: number;
+    consecutiveFailures?: number;
+    timeoutSeconds?: number;
+    maxRetries?: number;
+    lastErrorMessage?: string | undefined;
+    lastErrorCode?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+    displayName?: string | undefined;
+    requiresAuthentication?: boolean;
+    isReliable?: boolean;
+    statusDescription?: string | undefined;
+
+    constructor(data?: IProxyConfigurationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.proxyConfigurationId = _data["proxyConfigurationId"];
+            this.host = _data["host"];
+            this.port = _data["port"];
+            this.proxyType = _data["proxyType"];
+            this.username = _data["username"];
+            this.hasPassword = _data["hasPassword"];
+            this.description = _data["description"];
+            this.isActive = _data["isActive"];
+            this.isHealthy = _data["isHealthy"];
+            this.lastTestedAt = _data["lastTestedAt"] ? new Date(_data["lastTestedAt"].toString()) : <any>undefined;
+            this.lastUsedAt = _data["lastUsedAt"] ? new Date(_data["lastUsedAt"].toString()) : <any>undefined;
+            this.successRate = _data["successRate"];
+            this.totalRequests = _data["totalRequests"];
+            this.successfulRequests = _data["successfulRequests"];
+            this.failedRequests = _data["failedRequests"];
+            this.consecutiveFailures = _data["consecutiveFailures"];
+            this.timeoutSeconds = _data["timeoutSeconds"];
+            this.maxRetries = _data["maxRetries"];
+            this.lastErrorMessage = _data["lastErrorMessage"];
+            this.lastErrorCode = _data["lastErrorCode"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.displayName = _data["displayName"];
+            this.requiresAuthentication = _data["requiresAuthentication"];
+            this.isReliable = _data["isReliable"];
+            this.statusDescription = _data["statusDescription"];
+        }
+    }
+
+    static fromJS(data: any): ProxyConfigurationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyConfigurationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["proxyConfigurationId"] = this.proxyConfigurationId;
+        data["host"] = this.host;
+        data["port"] = this.port;
+        data["proxyType"] = this.proxyType;
+        data["username"] = this.username;
+        data["hasPassword"] = this.hasPassword;
+        data["description"] = this.description;
+        data["isActive"] = this.isActive;
+        data["isHealthy"] = this.isHealthy;
+        data["lastTestedAt"] = this.lastTestedAt ? this.lastTestedAt.toISOString() : <any>undefined;
+        data["lastUsedAt"] = this.lastUsedAt ? this.lastUsedAt.toISOString() : <any>undefined;
+        data["successRate"] = this.successRate;
+        data["totalRequests"] = this.totalRequests;
+        data["successfulRequests"] = this.successfulRequests;
+        data["failedRequests"] = this.failedRequests;
+        data["consecutiveFailures"] = this.consecutiveFailures;
+        data["timeoutSeconds"] = this.timeoutSeconds;
+        data["maxRetries"] = this.maxRetries;
+        data["lastErrorMessage"] = this.lastErrorMessage;
+        data["lastErrorCode"] = this.lastErrorCode;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["displayName"] = this.displayName;
+        data["requiresAuthentication"] = this.requiresAuthentication;
+        data["isReliable"] = this.isReliable;
+        data["statusDescription"] = this.statusDescription;
+        return data;
+    }
+}
+
+export interface IProxyConfigurationDto {
+    proxyConfigurationId?: string;
+    host?: string | undefined;
+    port?: number;
+    proxyType?: string | undefined;
+    username?: string | undefined;
+    hasPassword?: boolean;
+    description?: string | undefined;
+    isActive?: boolean;
+    isHealthy?: boolean;
+    lastTestedAt?: Date | undefined;
+    lastUsedAt?: Date | undefined;
+    successRate?: number;
+    totalRequests?: number;
+    successfulRequests?: number;
+    failedRequests?: number;
+    consecutiveFailures?: number;
+    timeoutSeconds?: number;
+    maxRetries?: number;
+    lastErrorMessage?: string | undefined;
+    lastErrorCode?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date;
+    displayName?: string | undefined;
+    requiresAuthentication?: boolean;
+    isReliable?: boolean;
+    statusDescription?: string | undefined;
+}
+
+export class ProxyConfigurationDtoApiResponse implements IProxyConfigurationDtoApiResponse {
+    success?: boolean;
+    data?: ProxyConfigurationDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProxyConfigurationDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ProxyConfigurationDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProxyConfigurationDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyConfigurationDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProxyConfigurationDtoApiResponse {
+    success?: boolean;
+    data?: ProxyConfigurationDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProxyConfigurationDtoIEnumerableApiResponse implements IProxyConfigurationDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ProxyConfigurationDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProxyConfigurationDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ProxyConfigurationDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProxyConfigurationDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyConfigurationDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProxyConfigurationDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ProxyConfigurationDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProxyImportItemDto implements IProxyImportItemDto {
+    host!: string;
+    port!: number;
+    proxyType!: string;
+    username?: string | undefined;
+    password?: string | undefined;
+    description?: string | undefined;
+    timeoutSeconds?: number;
+    maxRetries?: number;
+    isValid?: boolean;
+    validationErrors?: string[] | undefined;
+    alreadyExists?: boolean;
+
+    constructor(data?: IProxyImportItemDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.host = _data["host"];
+            this.port = _data["port"];
+            this.proxyType = _data["proxyType"];
+            this.username = _data["username"];
+            this.password = _data["password"];
+            this.description = _data["description"];
+            this.timeoutSeconds = _data["timeoutSeconds"];
+            this.maxRetries = _data["maxRetries"];
+            this.isValid = _data["isValid"];
+            if (Array.isArray(_data["validationErrors"])) {
+                this.validationErrors = [] as any;
+                for (let item of _data["validationErrors"])
+                    this.validationErrors!.push(item);
+            }
+            this.alreadyExists = _data["alreadyExists"];
+        }
+    }
+
+    static fromJS(data: any): ProxyImportItemDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyImportItemDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["host"] = this.host;
+        data["port"] = this.port;
+        data["proxyType"] = this.proxyType;
+        data["username"] = this.username;
+        data["password"] = this.password;
+        data["description"] = this.description;
+        data["timeoutSeconds"] = this.timeoutSeconds;
+        data["maxRetries"] = this.maxRetries;
+        data["isValid"] = this.isValid;
+        if (Array.isArray(this.validationErrors)) {
+            data["validationErrors"] = [];
+            for (let item of this.validationErrors)
+                data["validationErrors"].push(item);
+        }
+        data["alreadyExists"] = this.alreadyExists;
+        return data;
+    }
+}
+
+export interface IProxyImportItemDto {
+    host: string;
+    port: number;
+    proxyType: string;
+    username?: string | undefined;
+    password?: string | undefined;
+    description?: string | undefined;
+    timeoutSeconds?: number;
+    maxRetries?: number;
+    isValid?: boolean;
+    validationErrors?: string[] | undefined;
+    alreadyExists?: boolean;
+}
+
+export class ProxyImportItemDtoIEnumerableApiResponse implements IProxyImportItemDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ProxyImportItemDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProxyImportItemDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ProxyImportItemDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProxyImportItemDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyImportItemDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProxyImportItemDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ProxyImportItemDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProxyStatsDto implements IProxyStatsDto {
+    totalProxies?: number;
+    activeProxies?: number;
+    healthyProxies?: number;
+    averageSuccessRate?: number;
+    proxiesWithErrors?: number;
+    proxiesByType?: { [key: string]: number; } | undefined;
+    proxiesByStatus?: { [key: string]: number; } | undefined;
+
+    constructor(data?: IProxyStatsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalProxies = _data["totalProxies"];
+            this.activeProxies = _data["activeProxies"];
+            this.healthyProxies = _data["healthyProxies"];
+            this.averageSuccessRate = _data["averageSuccessRate"];
+            this.proxiesWithErrors = _data["proxiesWithErrors"];
+            if (_data["proxiesByType"]) {
+                this.proxiesByType = {} as any;
+                for (let key in _data["proxiesByType"]) {
+                    if (_data["proxiesByType"].hasOwnProperty(key))
+                        (<any>this.proxiesByType)![key] = _data["proxiesByType"][key];
+                }
+            }
+            if (_data["proxiesByStatus"]) {
+                this.proxiesByStatus = {} as any;
+                for (let key in _data["proxiesByStatus"]) {
+                    if (_data["proxiesByStatus"].hasOwnProperty(key))
+                        (<any>this.proxiesByStatus)![key] = _data["proxiesByStatus"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProxyStatsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyStatsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalProxies"] = this.totalProxies;
+        data["activeProxies"] = this.activeProxies;
+        data["healthyProxies"] = this.healthyProxies;
+        data["averageSuccessRate"] = this.averageSuccessRate;
+        data["proxiesWithErrors"] = this.proxiesWithErrors;
+        if (this.proxiesByType) {
+            data["proxiesByType"] = {};
+            for (let key in this.proxiesByType) {
+                if (this.proxiesByType.hasOwnProperty(key))
+                    (<any>data["proxiesByType"])[key] = (<any>this.proxiesByType)[key];
+            }
+        }
+        if (this.proxiesByStatus) {
+            data["proxiesByStatus"] = {};
+            for (let key in this.proxiesByStatus) {
+                if (this.proxiesByStatus.hasOwnProperty(key))
+                    (<any>data["proxiesByStatus"])[key] = (<any>this.proxiesByStatus)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProxyStatsDto {
+    totalProxies?: number;
+    activeProxies?: number;
+    healthyProxies?: number;
+    averageSuccessRate?: number;
+    proxiesWithErrors?: number;
+    proxiesByType?: { [key: string]: number; } | undefined;
+    proxiesByStatus?: { [key: string]: number; } | undefined;
+}
+
+export class ProxyStatsDtoApiResponse implements IProxyStatsDtoApiResponse {
+    success?: boolean;
+    data?: ProxyStatsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProxyStatsDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ProxyStatsDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProxyStatsDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyStatsDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProxyStatsDtoApiResponse {
+    success?: boolean;
+    data?: ProxyStatsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProxyTestResultDto implements IProxyTestResultDto {
+    proxyConfigurationId?: string;
+    host?: string | undefined;
+    port?: number;
+    proxyType?: string | undefined;
+    isHealthy?: boolean;
+    responseTimeMs?: number;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    testedAt?: Date;
+
+    constructor(data?: IProxyTestResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.proxyConfigurationId = _data["proxyConfigurationId"];
+            this.host = _data["host"];
+            this.port = _data["port"];
+            this.proxyType = _data["proxyType"];
+            this.isHealthy = _data["isHealthy"];
+            this.responseTimeMs = _data["responseTimeMs"];
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            this.testedAt = _data["testedAt"] ? new Date(_data["testedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProxyTestResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyTestResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["proxyConfigurationId"] = this.proxyConfigurationId;
+        data["host"] = this.host;
+        data["port"] = this.port;
+        data["proxyType"] = this.proxyType;
+        data["isHealthy"] = this.isHealthy;
+        data["responseTimeMs"] = this.responseTimeMs;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        data["testedAt"] = this.testedAt ? this.testedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProxyTestResultDto {
+    proxyConfigurationId?: string;
+    host?: string | undefined;
+    port?: number;
+    proxyType?: string | undefined;
+    isHealthy?: boolean;
+    responseTimeMs?: number;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    testedAt?: Date;
+}
+
+export class ProxyTestResultDtoApiResponse implements IProxyTestResultDtoApiResponse {
+    success?: boolean;
+    data?: ProxyTestResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProxyTestResultDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ProxyTestResultDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProxyTestResultDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyTestResultDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProxyTestResultDtoApiResponse {
+    success?: boolean;
+    data?: ProxyTestResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProxyTestResultDtoIEnumerableApiResponse implements IProxyTestResultDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ProxyTestResultDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProxyTestResultDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ProxyTestResultDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProxyTestResultDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyTestResultDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProxyTestResultDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: ProxyTestResultDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProxyUsageUpdateDto implements IProxyUsageUpdateDto {
+    proxyConfigurationId?: string;
+    success?: boolean;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    responseTimeMs?: number;
+
+    constructor(data?: IProxyUsageUpdateDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.proxyConfigurationId = _data["proxyConfigurationId"];
+            this.success = _data["success"];
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            this.responseTimeMs = _data["responseTimeMs"];
+        }
+    }
+
+    static fromJS(data: any): ProxyUsageUpdateDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyUsageUpdateDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["proxyConfigurationId"] = this.proxyConfigurationId;
+        data["success"] = this.success;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        data["responseTimeMs"] = this.responseTimeMs;
+        return data;
+    }
+}
+
+export interface IProxyUsageUpdateDto {
+    proxyConfigurationId?: string;
+    success?: boolean;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    responseTimeMs?: number;
+}
+
 export class RealTimeAlertMonitoringDto implements IRealTimeAlertMonitoringDto {
     lastUpdated?: Date;
     alertsInLastMinute?: number;
@@ -15741,6 +18171,74 @@ export interface IUpdateProductSellerMappingDto {
     isActiveForScraping?: boolean | undefined;
     scrapingFrequencyOverride?: string | undefined;
     siteConfigId?: string | undefined;
+}
+
+export class UpdateProxyConfigurationDto implements IUpdateProxyConfigurationDto {
+    host!: string;
+    port!: number;
+    proxyType!: string;
+    username?: string | undefined;
+    password?: string | undefined;
+    description?: string | undefined;
+    timeoutSeconds?: number;
+    maxRetries?: number;
+    isActive?: boolean;
+
+    constructor(data?: IUpdateProxyConfigurationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.host = _data["host"];
+            this.port = _data["port"];
+            this.proxyType = _data["proxyType"];
+            this.username = _data["username"];
+            this.password = _data["password"];
+            this.description = _data["description"];
+            this.timeoutSeconds = _data["timeoutSeconds"];
+            this.maxRetries = _data["maxRetries"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): UpdateProxyConfigurationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateProxyConfigurationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["host"] = this.host;
+        data["port"] = this.port;
+        data["proxyType"] = this.proxyType;
+        data["username"] = this.username;
+        data["password"] = this.password;
+        data["description"] = this.description;
+        data["timeoutSeconds"] = this.timeoutSeconds;
+        data["maxRetries"] = this.maxRetries;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface IUpdateProxyConfigurationDto {
+    host: string;
+    port: number;
+    proxyType: string;
+    username?: string | undefined;
+    password?: string | undefined;
+    description?: string | undefined;
+    timeoutSeconds?: number;
+    maxRetries?: number;
+    isActive?: boolean;
 }
 
 export class UpdateScraperSiteConfigurationDto implements IUpdateScraperSiteConfigurationDto {
