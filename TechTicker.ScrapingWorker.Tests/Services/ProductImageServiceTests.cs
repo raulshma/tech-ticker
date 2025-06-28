@@ -1,4 +1,7 @@
 using Microsoft.Extensions.Logging;
+using Moq;
+using FluentAssertions;
+using Xunit;
 using TechTicker.Application.Services;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
@@ -200,6 +203,76 @@ public class ProductImageServiceTests
 
         // Assert
         result.Should().BeEmpty();
+        _mockProductRepository.Verify(x => x.GetByIdAsync(productId), Times.Once);
+    }
+
+    [Fact]
+    public async Task HasAnyImagesAsync_WithProductHavingImages_ShouldReturnTrue()
+    {
+        // Arrange
+        var productId = Guid.NewGuid();
+        var product = new Product
+        {
+            ProductId = productId,
+            Name = "Test Product",
+            CategoryId = Guid.NewGuid(),
+            PrimaryImageUrl = "images/products/test/primary.jpg",
+            AdditionalImageUrls = System.Text.Json.JsonSerializer.Serialize(new List<string> { "images/products/test/additional1.jpg" }),
+            OriginalImageUrls = System.Text.Json.JsonSerializer.Serialize(new List<string> { "https://example.com/image1.jpg" }),
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        _mockProductRepository.Setup(x => x.GetByIdAsync(productId))
+            .ReturnsAsync(product);
+
+        // Act
+        var result = await _productImageService.HasAnyImagesAsync(productId);
+
+        // Assert
+        result.Should().BeTrue();
+        _mockProductRepository.Verify(x => x.GetByIdAsync(productId), Times.Once);
+    }
+
+    [Fact]
+    public async Task HasAnyImagesAsync_WithProductHavingNoImages_ShouldReturnFalse()
+    {
+        // Arrange
+        var productId = Guid.NewGuid();
+        var product = new Product
+        {
+            ProductId = productId,
+            Name = "Test Product",
+            CategoryId = Guid.NewGuid(),
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        _mockProductRepository.Setup(x => x.GetByIdAsync(productId))
+            .ReturnsAsync(product);
+
+        // Act
+        var result = await _productImageService.HasAnyImagesAsync(productId);
+
+        // Assert
+        result.Should().BeFalse();
+        _mockProductRepository.Verify(x => x.GetByIdAsync(productId), Times.Once);
+    }
+
+    [Fact]
+    public async Task HasAnyImagesAsync_WithNonExistentProduct_ShouldReturnFalse()
+    {
+        // Arrange
+        var productId = Guid.NewGuid();
+
+        _mockProductRepository.Setup(x => x.GetByIdAsync(productId))
+            .ReturnsAsync((Product?)null);
+
+        // Act
+        var result = await _productImageService.HasAnyImagesAsync(productId);
+
+        // Assert
+        result.Should().BeFalse();
         _mockProductRepository.Verify(x => x.GetByIdAsync(productId), Times.Once);
     }
 }

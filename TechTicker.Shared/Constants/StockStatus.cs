@@ -66,6 +66,13 @@ public static class StockStatus
         if (string.IsNullOrWhiteSpace(status))
             return Unknown;
 
+        // Check if the status is already a standard constant
+        var upperStatus = status.Trim().ToUpperInvariant();
+        if (GetAllStatuses().Contains(upperStatus))
+        {
+            return upperStatus;
+        }
+
         var normalizedInput = status.Trim().ToLowerInvariant();
 
         // Direct mapping
@@ -119,12 +126,11 @@ public static class StockStatus
     /// <returns>True if the product became available</returns>
     public static bool IsBackInStock(string? previousStatus, string currentStatus)
     {
-        // If no previous status, consider it back in stock if currently available
-        if (string.IsNullOrEmpty(previousStatus))
-            return IsAvailable(currentStatus);
+        var normalizedPrevious = Normalize(previousStatus);
+        var normalizedCurrent = Normalize(currentStatus);
 
-        // Check if transitioned from unavailable to available
-        return IsUnavailable(previousStatus) && IsAvailable(currentStatus);
+        // It is considered back in stock if it was previously out of stock and is now in stock.
+        return IsUnavailable(normalizedPrevious) && IsAvailable(normalizedCurrent);
     }
 
     /// <summary>

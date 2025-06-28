@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using TechTicker.Application.Configuration;
 using Moq;
 using FluentAssertions;
 using Xunit;
@@ -15,13 +16,26 @@ public class WebScrapingServiceTests : IDisposable
     private readonly WebScrapingService _webScrapingService;
     private readonly Mock<ILogger<WebScrapingService>> _mockLogger;
     private readonly Mock<IScraperRunLogService> _mockScraperRunLogService;
-    private readonly HttpClient _httpClient;
+    private readonly ProxyAwareHttpClientService _proxyHttpClientService;
 
     public WebScrapingServiceTests()
     {
         _mockLogger = new Mock<ILogger<WebScrapingService>>();
         _mockScraperRunLogService = new Mock<IScraperRunLogService>();
-        _httpClient = new HttpClient();
+
+        // Mock dependencies for ProxyAwareHttpClientService
+        var mockProxyPoolService = new Mock<IProxyPoolService>();
+        var mockProxyLogger = new Mock<ILogger<ProxyAwareHttpClientService>>();
+        var mockOptions = new Mock<Microsoft.Extensions.Options.IOptions<ProxyPoolConfiguration>>();
+        mockOptions.Setup(o => o.Value).Returns(new ProxyPoolConfiguration());
+        var mockHttpClientFactory = new Mock<IHttpClientFactory>();
+
+        _proxyHttpClientService = new ProxyAwareHttpClientService(
+            mockProxyPoolService.Object,
+            mockProxyLogger.Object,
+            mockOptions.Object,
+            mockHttpClientFactory.Object
+        );
 
         // Setup default mock responses
         _mockScraperRunLogService
@@ -41,7 +55,7 @@ public class WebScrapingServiceTests : IDisposable
             .ReturnsAsync(Result<bool>.Success(true));
 
         var mockImageScrapingService = new Mock<IImageScrapingService>();
-        _webScrapingService = new WebScrapingService(_mockLogger.Object, _httpClient, _mockScraperRunLogService.Object, mockImageScrapingService.Object);
+        _webScrapingService = new WebScrapingService(_mockLogger.Object, _proxyHttpClientService, _mockScraperRunLogService.Object, mockImageScrapingService.Object);
     }
 
     [Fact]
@@ -347,6 +361,6 @@ public class WebScrapingServiceTests : IDisposable
 
     public void Dispose()
     {
-        _httpClient?.Dispose();
+        // No resources to dispose since HttpClient is no longer used.
     }
 }

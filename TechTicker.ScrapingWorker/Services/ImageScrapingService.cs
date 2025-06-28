@@ -51,6 +51,13 @@ public partial class ImageScrapingService : IImageScrapingService
 
             _logger.LogInformation("Starting image scraping with selector: {Selector}", imageSelector);
 
+            // Early check: if product already has images, we might want to skip processing
+            var hasExistingImages = await _productImageService.HasAnyImagesAsync(productId);
+            if (hasExistingImages)
+            {
+                _logger.LogDebug("Product {ProductId} already has images stored, will check for duplicates", productId);
+            }
+
             // Extract image URLs from HTML
             var imageUrls = ExtractImageUrls(document, imageSelector, baseUrl);
             
@@ -98,8 +105,9 @@ public partial class ImageScrapingService : IImageScrapingService
             _logger.LogInformation("Skipping {ExistingCount} existing images, downloading {DownloadCount} new images",
                 existingPaths.Count, urlsToDownload.Count);
 
-            // Download new images
+            // Download new images with enhanced duplicate detection
             var imageUploadData = new List<ImageUploadData>();
+            var newSavedPaths = new List<string>();
 
             foreach (var imageUrl in urlsToDownload)
             {
@@ -108,6 +116,16 @@ public partial class ImageScrapingService : IImageScrapingService
                     var imageData = await DownloadImageAsync(imageUrl);
                     if (imageData != null)
                     {
+                        // Check for duplicate by content before adding to upload list
+                        var duplicatePath = await _imageStorageService.FindDuplicateByContentAsync(imageData.Data, productId);
+                        if (!string.IsNullOrEmpty(duplicatePath))
+                        {
+                            _logger.LogInformation("Found duplicate image content for URL {Url}, reusing existing path: {Path}", 
+                                imageUrl, duplicatePath);
+                            existingPaths.Add(duplicatePath);
+                            continue;
+                        }
+
                         imageUploadData.Add(imageData);
                     }
                 }
@@ -118,7 +136,6 @@ public partial class ImageScrapingService : IImageScrapingService
             }
 
             // Save new images to local storage
-            var newSavedPaths = new List<string>();
             if (imageUploadData.Any())
             {
                 newSavedPaths = await _imageStorageService.SaveImagesAsync(imageUploadData, productId);

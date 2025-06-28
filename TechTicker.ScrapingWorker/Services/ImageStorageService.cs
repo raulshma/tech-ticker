@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+
 namespace TechTicker.ScrapingWorker.Services;
 
 /// <summary>
@@ -53,6 +55,15 @@ public class ImageStorageService : IImageStorageService
                 _logger.LogWarning("Unsupported image type {ContentType} for {FileName}", 
                     contentType, fileName);
                 return null;
+            }
+
+            // Check for duplicate by content before saving
+            var existingPath = await FindDuplicateByContentAsync(imageData, productId);
+            if (!string.IsNullOrEmpty(existingPath))
+            {
+                _logger.LogInformation("Duplicate image content found for {FileName}, reusing existing path: {Path}", 
+                    fileName, existingPath);
+                return existingPath;
             }
 
             // Create directory structure: /images/products/{productId}/
@@ -126,19 +137,6 @@ public class ImageStorageService : IImageStorageService
         return savedPaths;
     }
 
-    private static string GetExtensionFromContentType(string contentType)
-    {
-        return contentType.ToLower() switch
-        {
-            "image/jpeg" or "image/jpg" => ".jpg",
-            "image/png" => ".png",
-            "image/webp" => ".webp",
-            "image/gif" => ".gif",
-            "image/bmp" => ".bmp",
-            _ => ".jpg" // Default fallback
-        };
-    }
-
     public async Task<bool> ImageExistsAsync(string relativePath)
     {
         try
@@ -203,6 +201,112 @@ public class ImageStorageService : IImageStorageService
         }
     }
 
+    public async Task<string?> FindDuplicateByContentAsync(byte[] imageData, Guid productId)
+    {
+        try
+        {
+            if (imageData.Length == 0)
+            {
+                return null;
+            }
+
+            var contentHash = GenerateContentHash(imageData);
+            var productDir = Path.Combine(_baseImagePath, productId.ToString());
+
+            if (!Directory.Exists(productDir))
+            {
+                return null;
+            }
+
+            // Get all image files in the product directory
+            var imageFiles = Directory.GetFiles(productDir, "*.*", SearchOption.TopDirectoryOnly)
+                .Where(file => IsImageFile(file))
+                .ToList();
+
+            foreach (var imageFile in imageFiles)
+            {
+                try
+                {
+                    var fileData = await File.ReadAllBytesAsync(imageFile);
+                    var fileHash = GenerateContentHash(fileData);
+
+                    if (fileHash == contentHash)
+                    {
+                        // Convert to relative path
+                        var relativePath = Path.Combine("images", "products", productId.ToString(), Path.GetFileName(imageFile))
+                            .Replace(Path.DirectorySeparatorChar, '/');
+                        
+                        _logger.LogDebug("Found duplicate image by content hash: {Path}", relativePath);
+                        return relativePath;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error reading image file for duplicate check: {File}", imageFile);
+                }
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error checking for duplicate images by content for product {ProductId}", productId);
+            return null;
+        }
+    }
+
+    public string GenerateContentHash(byte[] imageData)
+    {
+        using var sha256 = SHA256.Create();
+        var hashBytes = sha256.ComputeHash(imageData);
+        return Convert.ToBase64String(hashBytes);
+    }
+
+    public async Task<List<string>> GetProductImagePathsAsync(Guid productId)
+    {
+        try
+        {
+            var productDir = Path.Combine(_baseImagePath, productId.ToString());
+            
+            if (!Directory.Exists(productDir))
+            {
+                return new List<string>();
+            }
+
+            var imageFiles = Directory.GetFiles(productDir, "*.*", SearchOption.TopDirectoryOnly)
+                .Where(file => IsImageFile(file))
+                .ToList();
+
+            var relativePaths = new List<string>();
+            foreach (var imageFile in imageFiles)
+            {
+                var relativePath = Path.Combine("images", "products", productId.ToString(), Path.GetFileName(imageFile))
+                    .Replace(Path.DirectorySeparatorChar, '/');
+                relativePaths.Add(relativePath);
+            }
+
+            return relativePaths;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting image paths for product {ProductId}", productId);
+            return new List<string>();
+        }
+    }
+
+    private static string GetExtensionFromContentType(string contentType)
+    {
+        return contentType.ToLower() switch
+        {
+            "image/jpeg" or "image/jpg" => ".jpg",
+            "image/png" => ".png",
+            "image/webp" => ".webp",
+            "image/gif" => ".gif",
+            "image/bmp" => ".bmp",
+            _ => ".jpg" // Default fallback
+        };
+    }
+
     private static bool IsValidImageSignature(byte[] buffer)
     {
         if (buffer.Length < 4) return false;
@@ -230,5 +334,15 @@ public class ImageStorageService : IImageStorageService
             return true;
 
         return false;
+    }
+
+    private static bool IsImageFile(string filePath)
+    {
+        var extension = Path.GetExtension(filePath).ToLower();
+        return extension switch
+        {
+            ".jpg" or ".jpeg" or ".png" or ".webp" or ".gif" or ".bmp" => true,
+            _ => false
+        };
     }
 }

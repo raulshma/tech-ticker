@@ -32,4 +32,11 @@ public interface IProductImageService
     /// <param name="productId">Product ID</param>
     /// <returns>Dictionary mapping original URLs to local paths</returns>
     Task<Dictionary<string, string>> GetExistingImageMappingsAsync(Guid productId);
+
+    /// <summary>
+    /// Check if a product already has any images stored
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <returns>True if product has any images</returns>
+    Task<bool> HasAnyImagesAsync(Guid productId);
 }

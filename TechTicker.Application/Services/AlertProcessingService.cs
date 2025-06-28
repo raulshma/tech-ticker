@@ -39,9 +39,14 @@ public class AlertProcessingService : IAlertProcessingService
     {
         try
         {
+            _logger.LogInformation("Processing price point for product {ProductId}, seller {SellerName}, price {Price}, stock {StockStatus}",
+                pricePoint.CanonicalProductId, pricePoint.SellerName, pricePoint.Price, pricePoint.StockStatus);
+
             // Get active alert rules for this product
             var alertRules = await _unitOfWork.AlertRules.GetActiveAlertsForProductAsync(
                 pricePoint.CanonicalProductId, pricePoint.SellerName);
+
+            _logger.LogInformation("Found {AlertRuleCount} alert rules for product {ProductId}", alertRules?.Count() ?? 0, pricePoint.CanonicalProductId);
 
             foreach (var alertRule in alertRules)
             {
@@ -63,6 +68,8 @@ public class AlertProcessingService : IAlertProcessingService
                     }
 
                     bool shouldTrigger = await ShouldTriggerAlert(alertRule, pricePoint);
+
+                    _logger.LogInformation("AlertRule {AlertRuleId}: ShouldTriggerAlert={ShouldTrigger}", alertRule.AlertRuleId, shouldTrigger);
 
                     if (shouldTrigger)
                     {
@@ -101,11 +108,18 @@ public class AlertProcessingService : IAlertProcessingService
     {
         try
         {
+            _logger.LogInformation("Publishing alert notification for AlertRuleId={AlertRuleId} to exchange {Exchange} with routing key {RoutingKey}",
+                alertEvent.AlertRuleId, _messagingConfig.AlertsExchange, _messagingConfig.AlertTriggeredRoutingKey);
+
+            _logger.LogWarning("DEBUG: About to call PublishAsync for AlertRuleId={AlertRuleId}", alertEvent.AlertRuleId);
+
             // Publish to notification queue for email processing
             await _messagePublisher.PublishAsync(
                 alertEvent,
                 _messagingConfig.AlertsExchange,
                 _messagingConfig.AlertTriggeredRoutingKey);
+
+            _logger.LogWarning("DEBUG: Finished calling PublishAsync for AlertRuleId={AlertRuleId}", alertEvent.AlertRuleId);
 
             _logger.LogInformation("Sent alert notification for user {UserId} and product {ProductId}",
                 alertEvent.UserId, alertEvent.CanonicalProductId);
@@ -119,44 +133,45 @@ public class AlertProcessingService : IAlertProcessingService
 
     private async Task<bool> ShouldTriggerAlert(AlertRule alertRule, PricePointRecordedEvent pricePoint)
     {
-        switch (alertRule.ConditionType)
+        // First, check for a specific seller if one is defined in the rule
+        if (!string.IsNullOrEmpty(alertRule.SpecificSellerName) && 
+            !alertRule.SpecificSellerName.Equals(pricePoint.SellerName, StringComparison.OrdinalIgnoreCase))
         {
-            case "PRICE_BELOW":
-                return alertRule.ThresholdValue.HasValue && pricePoint.Price <= alertRule.ThresholdValue.Value;
-
-            case "PERCENT_DROP_FROM_LAST":
-                if (!alertRule.PercentageValue.HasValue)
-                    return false;
-
-                var lastPrice = await _unitOfWork.PriceHistory.GetLastPriceAsync(
-                    pricePoint.CanonicalProductId, pricePoint.SellerName);
-
-                if (lastPrice == null)
-                    return false;
-
-                var percentageChange = ((lastPrice.Price - pricePoint.Price) / lastPrice.Price) * 100;
-                return percentageChange >= alertRule.PercentageValue.Value;
-
-            case "BACK_IN_STOCK":
-                var lastStockStatus = await _unitOfWork.PriceHistory.GetLastStockStatusAsync(
-                    pricePoint.CanonicalProductId, pricePoint.SellerName);
-
-                // Normalize both current and previous stock statuses
-                var normalizedCurrentStatus = StockStatus.Normalize(pricePoint.StockStatus);
-                var normalizedLastStatus = StockStatus.Normalize(lastStockStatus);
-
-                // Use the improved stock status logic
-                return StockStatus.IsBackInStock(normalizedLastStatus, normalizedCurrentStatus);
-
-            default:
-                return false;
+            return false; // This price point is from a different seller than the one specified in the alert
         }
+
+        return alertRule.ConditionType switch
+        {
+            "PRICE_BELOW" => alertRule.ThresholdValue.HasValue && pricePoint.Price < alertRule.ThresholdValue.Value,
+            "PERCENT_DROP_FROM_LAST" => await EvaluatePercentDrop(alertRule, pricePoint),
+            "BACK_IN_STOCK" => await EvaluateBackInStock(alertRule, pricePoint),
+            _ => false
+        };
+    }
+
+    private async Task<bool> EvaluatePercentDrop(AlertRule alertRule, PricePointRecordedEvent pricePoint)
+    {
+        if (!alertRule.PercentageValue.HasValue) return false;
+
+        var lastPrice = await _unitOfWork.PriceHistory.GetLastPriceAsync(pricePoint.CanonicalProductId, pricePoint.SellerName);
+        if (lastPrice == null || lastPrice.Price <= 0) return false;
+
+        var percentageChange = ((lastPrice.Price - pricePoint.Price) / lastPrice.Price) * 100;
+        return percentageChange >= alertRule.PercentageValue.Value;
+    }
+
+    private async Task<bool> EvaluateBackInStock(AlertRule alertRule, PricePointRecordedEvent pricePoint)
+    {
+        var lastStockStatus = await _unitOfWork.PriceHistory.GetLastStockStatusAsync(pricePoint.CanonicalProductId, pricePoint.SellerName);
+        return StockStatus.IsBackInStock(lastStockStatus, pricePoint.StockStatus);
     }
 
     private async Task TriggerAlertAsync(AlertRule alertRule, PricePointRecordedEvent pricePoint)
     {
         try
         {
+            _logger.LogInformation("Triggering alert for AlertRuleId={AlertRuleId}, UserId={UserId}", alertRule.AlertRuleId, alertRule.UserId);
+
             var alertEvent = new AlertTriggeredEvent
             {
                 AlertRuleId = alertRule.AlertRuleId,
@@ -199,6 +214,8 @@ public class AlertProcessingService : IAlertProcessingService
             await _unitOfWork.AlertHistories.AddAsync(alertHistory);
 
             await SendAlertNotificationAsync(alertEvent);
+
+            _logger.LogInformation("Called SendAlertNotificationAsync for AlertRuleId={AlertRuleId}", alertRule.AlertRuleId);
 
             // Update last notified time and handle deactivation
             alertRule.LastNotifiedAt = DateTimeOffset.UtcNow;

@@ -29,6 +29,28 @@ public interface IImageStorageService
     /// <param name="relativePath">Relative path to the image file</param>
     /// <returns>True if file exists and is valid</returns>
     Task<bool> ImageExistsAsync(string relativePath);
+
+    /// <summary>
+    /// Check if an image with the same content hash already exists for a product
+    /// </summary>
+    /// <param name="imageData">Image data to check</param>
+    /// <param name="productId">Product ID</param>
+    /// <returns>Existing image path if found, null otherwise</returns>
+    Task<string?> FindDuplicateByContentAsync(byte[] imageData, Guid productId);
+
+    /// <summary>
+    /// Generate a content hash for image data
+    /// </summary>
+    /// <param name="imageData">Image data</param>
+    /// <returns>Content hash string</returns>
+    string GenerateContentHash(byte[] imageData);
+
+    /// <summary>
+    /// Get all image paths for a product
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <returns>List of relative image paths</returns>
+    Task<List<string>> GetProductImagePathsAsync(Guid productId);
 }
 
 /// <summary>
