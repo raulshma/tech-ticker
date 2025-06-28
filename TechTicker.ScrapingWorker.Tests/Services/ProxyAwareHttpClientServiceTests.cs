@@ -32,10 +32,9 @@ public class ProxyAwareHttpClientServiceTests
             RetryDelayMs = 1000
         };
 
-        // Setup mock for CreateClient method
+        // Setup mock for CreateClient method - only mock the method that actually exists
         var mockHttpClient = new Mock<HttpClient>();
         _mockHttpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(mockHttpClient.Object);
-        _mockHttpClientFactory.Setup(x => x.CreateClient()).Returns(mockHttpClient.Object);
 
         _service = new ProxyAwareHttpClientService(
             _mockProxyPoolService.Object,
