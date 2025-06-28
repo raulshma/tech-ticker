@@ -108,6 +108,18 @@ public class UpdateProxyConfigurationDto
 }
 
 /// <summary>
+/// DTO for proxy text parsing request
+/// </summary>
+public class ProxyTextParseDto
+{
+    [Required]
+    public string ProxyText { get; set; } = null!;
+
+    [MaxLength(20)]
+    public string DefaultProxyType { get; set; } = "HTTP";
+}
+
+/// <summary>
 /// DTO for bulk proxy import
 /// </summary>
 public class BulkProxyImportDto

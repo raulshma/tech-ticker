@@ -102,12 +102,12 @@ public interface IProxyService
     /// <summary>
     /// Parse proxy string in various formats
     /// </summary>
-    Result<ProxyImportItemDto> ParseProxyString(string proxyString);
+    Result<ProxyImportItemDto> ParseProxyString(string proxyString, string defaultProxyType = "HTTP");
 
     /// <summary>
     /// Parse multiple proxy strings from text
     /// </summary>
-    Result<IEnumerable<ProxyImportItemDto>> ParseProxyText(string proxyText);
+    Result<IEnumerable<ProxyImportItemDto>> ParseProxyText(string proxyText, string defaultProxyType = "HTTP");
 }
 
 /// <summary>

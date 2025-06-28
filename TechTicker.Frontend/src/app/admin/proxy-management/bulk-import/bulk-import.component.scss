@@ -131,6 +131,20 @@
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
   }
+
+  // Proxy type selector styling
+  .mat-mdc-select-panel .mat-mdc-option {
+    .type-chip {
+      margin: 0;
+      font-size: 0.75rem;
+      height: 24px;
+
+      .mat-mdc-chip-label {
+        font-size: 0.75rem;
+        line-height: 1;
+      }
+    }
+  }
 }
 
 .summary-stats {

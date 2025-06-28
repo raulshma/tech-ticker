@@ -47,6 +47,20 @@
         </div>
 
         <div class="form-section">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Default Proxy Type</mat-label>
+            <mat-select formControlName="defaultProxyType" required>
+              <mat-option *ngFor="let type of proxyTypes" [value]="type.value">
+                <mat-chip [color]="getProxyTypeColor(type.value)" selected class="type-chip">
+                  {{ type.label }}
+                </mat-chip>
+              </mat-option>
+            </mat-select>
+            <mat-hint>Type used for proxies without explicit protocol (e.g., host:port format)</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="form-section">
           <h3>Import Options</h3>
           <div class="options-grid">
             <mat-checkbox formControlName="testAfterImport">

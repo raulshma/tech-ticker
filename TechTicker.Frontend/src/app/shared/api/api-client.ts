@@ -5584,7 +5584,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    parseProxyText(body: string | undefined): Observable<ProxyImportItemDtoIEnumerableApiResponse> {
+    parseProxyText(body: ProxyTextParseDto | undefined): Observable<ProxyImportItemDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/proxies/parse-text";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -15435,6 +15435,46 @@ export interface IProxyTestResultDtoIEnumerableApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProxyTextParseDto implements IProxyTextParseDto {
+    proxyText!: string;
+    defaultProxyType?: string | undefined;
+
+    constructor(data?: IProxyTextParseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.proxyText = _data["proxyText"];
+            this.defaultProxyType = _data["defaultProxyType"];
+        }
+    }
+
+    static fromJS(data: any): ProxyTextParseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyTextParseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["proxyText"] = this.proxyText;
+        data["defaultProxyType"] = this.defaultProxyType;
+        return data;
+    }
+}
+
+export interface IProxyTextParseDto {
+    proxyText: string;
+    defaultProxyType?: string | undefined;
 }
 
 export class ProxyUsageUpdateDto implements IProxyUsageUpdateDto {

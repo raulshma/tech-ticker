@@ -312,7 +312,7 @@ public class ProxyService : IProxyService
         }
     }
 
-    public Result<ProxyImportItemDto> ParseProxyString(string proxyString)
+    public Result<ProxyImportItemDto> ParseProxyString(string proxyString, string defaultProxyType = "HTTP")
     {
         try
         {
@@ -345,7 +345,7 @@ public class ProxyService : IProxyService
                 {
                     Host = match.Groups["host"].Value,
                     Port = int.Parse(match.Groups["port"].Value),
-                    ProxyType = "HTTP", // Default to HTTP
+                    ProxyType = defaultProxyType.ToUpper(), // Use provided default type
                     Username = match.Groups["username"].Success ? match.Groups["username"].Value : null,
                     Password = match.Groups["password"].Success ? match.Groups["password"].Value : null
                 });
@@ -360,7 +360,7 @@ public class ProxyService : IProxyService
         }
     }
 
-    public Result<IEnumerable<ProxyImportItemDto>> ParseProxyText(string proxyText)
+    public Result<IEnumerable<ProxyImportItemDto>> ParseProxyText(string proxyText, string defaultProxyType = "HTTP")
     {
         try
         {
@@ -379,7 +379,7 @@ public class ProxyService : IProxyService
                 if (string.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith('#'))
                     continue;
 
-                var parseResult = ParseProxyString(trimmedLine);
+                var parseResult = ParseProxyString(trimmedLine, defaultProxyType);
                 if (parseResult.IsSuccess)
                 {
                     proxies.Add(parseResult.Data!);

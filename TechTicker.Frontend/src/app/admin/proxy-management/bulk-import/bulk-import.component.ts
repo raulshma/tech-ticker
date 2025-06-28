@@ -14,6 +14,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -22,6 +23,7 @@ import {
   BulkProxyImportValidationDto,
   BulkProxyImportResultDto,
   CreateProxyConfigurationDto,
+  ProxyTextParseDto,
   TechTickerApiClient
 } from '../../../shared/api/api-client';
 
@@ -43,6 +45,7 @@ import {
     MatChipsModule,
     MatTabsModule,
     MatProgressBarModule,
+    MatSelectModule,
     ScrollingModule
   ],
   templateUrl: './bulk-import.component.html',
@@ -72,6 +75,14 @@ export class BulkImportComponent implements OnInit {
   // Virtual scrolling
   readonly itemSize = 48; // Height of each row in pixels
 
+  // Proxy type options for bulk import
+  proxyTypes = [
+    { value: 'HTTP', label: 'HTTP' },
+    { value: 'HTTPS', label: 'HTTPS' },
+    { value: 'SOCKS4', label: 'SOCKS4' },
+    { value: 'SOCKS5', label: 'SOCKS5' }
+  ];
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -86,6 +97,7 @@ export class BulkImportComponent implements OnInit {
   private createForm(): FormGroup {
     return this.fb.group({
       proxyText: ['', [Validators.required]],
+      defaultProxyType: ['HTTP', [Validators.required]],
       testAfterImport: [true],
       skipDuplicates: [true],
       defaultTimeoutSeconds: [30, [Validators.min(1), Validators.max(300)]],
@@ -136,11 +148,20 @@ export class BulkImportComponent implements OnInit {
     this.parseProgressMessage = 'Sending data to server for parsing...';
     this.parseProgress = 50;
 
+    const defaultProxyType = this.importForm.get('defaultProxyType')?.value || 'HTTP';
+
+    // Create the DTO object as expected by the API
+    const parseDto = new ProxyTextParseDto({
+      proxyText: proxyText,
+      defaultProxyType: defaultProxyType
+    });
+
     const response = await firstValueFrom(
-      this.apiClient.parseProxyText(proxyText)
+      this.apiClient.parseProxyText(parseDto)
     );
 
     if (response?.success && response.data) {
+      // The backend now handles the default proxy type, so we can use the data directly
       this.parsedProxies = response.data;
       this.parseProgress = 100;
       this.parseProgressMessage = 'Parsing complete!';
@@ -149,9 +170,12 @@ export class BulkImportComponent implements OnInit {
     }
   }
 
+
+
   private async parseProxiesInChunks(lines: string[]): Promise<void> {
     const chunkSize = 500; // Process 500 lines at a time
     const chunks = this.chunkArray(lines, chunkSize);
+    const defaultProxyType = this.importForm.get('defaultProxyType')?.value || 'HTTP';
 
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
@@ -161,11 +185,18 @@ export class BulkImportComponent implements OnInit {
       this.parseProgress = Math.round(((i + 1) / chunks.length) * 100);
 
       try {
+        // Create the DTO object for this chunk
+        const parseDto = new ProxyTextParseDto({
+          proxyText: chunkText,
+          defaultProxyType: defaultProxyType
+        });
+
         const response = await firstValueFrom(
-          this.apiClient.parseProxyText(chunkText)
+          this.apiClient.parseProxyText(parseDto)
         );
 
         if (response?.success && response.data) {
+          // The backend now handles the default proxy type, so we can use the data directly
           this.parsedProxies.push(...response.data);
         }
       } catch (error) {

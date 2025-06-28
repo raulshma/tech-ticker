@@ -184,9 +184,9 @@ public class ProxyController : BaseApiController
     /// Parse proxy text into import format
     /// </summary>
     [HttpPost("parse-text")]
-    public ActionResult<ApiResponse<IEnumerable<ProxyImportItemDto>>> ParseProxyText([FromBody] string proxyText)
+    public ActionResult<ApiResponse<IEnumerable<ProxyImportItemDto>>> ParseProxyText([FromBody] ProxyTextParseDto parseDto)
     {
-        var result = _proxyService.ParseProxyText(proxyText);
+        var result = _proxyService.ParseProxyText(parseDto.ProxyText, parseDto.DefaultProxyType);
         return HandleResult(result);
     }
 
