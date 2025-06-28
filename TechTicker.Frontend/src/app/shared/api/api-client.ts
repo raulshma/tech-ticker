@@ -319,7 +319,7 @@ export class TechTickerApiClient {
      * @param pageSize (optional) 
      * @return OK
      */
-    getAllAlerts(userId: string | undefined, productId: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<AlertRuleDtoPagedResponse> {
+    adminGetAllAlerts(userId: string | undefined, productId: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<AlertRuleDtoPagedResponse> {
         let url_ = this.baseUrl + "/api/Admin/alerts?";
         if (userId === null)
             throw new Error("The parameter 'userId' cannot be null.");
@@ -348,11 +348,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAllAlerts(response_);
+            return this.processAdminGetAllAlerts(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetAllAlerts(response_ as any);
+                    return this.processAdminGetAllAlerts(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<AlertRuleDtoPagedResponse>;
                 }
@@ -361,7 +361,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processGetAllAlerts(response: HttpResponseBase): Observable<AlertRuleDtoPagedResponse> {
+    protected processAdminGetAllAlerts(response: HttpResponseBase): Observable<AlertRuleDtoPagedResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -373,6 +373,599 @@ export class TechTickerApiClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = AlertRuleDtoPagedResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param startDate (optional) 
+     * @param endDate (optional) 
+     * @return OK
+     */
+    getSystemPerformance(startDate: Date | undefined, endDate: Date | undefined): Observable<AlertSystemPerformanceDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-performance/system?";
+        if (startDate === null)
+            throw new Error("The parameter 'startDate' cannot be null.");
+        else if (startDate !== undefined)
+            url_ += "startDate=" + encodeURIComponent(startDate ? "" + startDate.toISOString() : "") + "&";
+        if (endDate === null)
+            throw new Error("The parameter 'endDate' cannot be null.");
+        else if (endDate !== undefined)
+            url_ += "endDate=" + encodeURIComponent(endDate ? "" + endDate.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSystemPerformance(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSystemPerformance(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertSystemPerformanceDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertSystemPerformanceDtoApiResponse>;
+        }));
+    }
+
+    protected processGetSystemPerformance(response: HttpResponseBase): Observable<AlertSystemPerformanceDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertSystemPerformanceDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getAlertRulePerformance(alertRuleId: string): Observable<AlertRulePerformanceAnalysisDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-performance/alert-rule/{alertRuleId}";
+        if (alertRuleId === undefined || alertRuleId === null)
+            throw new Error("The parameter 'alertRuleId' must be defined.");
+        url_ = url_.replace("{alertRuleId}", encodeURIComponent("" + alertRuleId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAlertRulePerformance(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAlertRulePerformance(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertRulePerformanceAnalysisDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertRulePerformanceAnalysisDtoApiResponse>;
+        }));
+    }
+
+    protected processGetAlertRulePerformance(response: HttpResponseBase): Observable<AlertRulePerformanceAnalysisDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRulePerformanceAnalysisDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getRealTimeMonitoring(): Observable<RealTimeAlertMonitoringDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-performance/real-time";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetRealTimeMonitoring(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetRealTimeMonitoring(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RealTimeAlertMonitoringDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RealTimeAlertMonitoringDtoApiResponse>;
+        }));
+    }
+
+    protected processGetRealTimeMonitoring(response: HttpResponseBase): Observable<RealTimeAlertMonitoringDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RealTimeAlertMonitoringDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param startDate (optional) 
+     * @param endDate (optional) 
+     * @param intervalHours (optional) 
+     * @return OK
+     */
+    getPerformanceTrends(startDate: Date | undefined, endDate: Date | undefined, intervalHours: number | undefined): Observable<AlertPerformanceTrendDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-performance/trends?";
+        if (startDate === null)
+            throw new Error("The parameter 'startDate' cannot be null.");
+        else if (startDate !== undefined)
+            url_ += "startDate=" + encodeURIComponent(startDate ? "" + startDate.toISOString() : "") + "&";
+        if (endDate === null)
+            throw new Error("The parameter 'endDate' cannot be null.");
+        else if (endDate !== undefined)
+            url_ += "endDate=" + encodeURIComponent(endDate ? "" + endDate.toISOString() : "") + "&";
+        if (intervalHours === null)
+            throw new Error("The parameter 'intervalHours' cannot be null.");
+        else if (intervalHours !== undefined)
+            url_ += "intervalHours=" + encodeURIComponent("" + intervalHours) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPerformanceTrends(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPerformanceTrends(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertPerformanceTrendDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertPerformanceTrendDtoListApiResponse>;
+        }));
+    }
+
+    protected processGetPerformanceTrends(response: HttpResponseBase): Observable<AlertPerformanceTrendDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertPerformanceTrendDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getSystemHealth(): Observable<AlertSystemHealthDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-performance/health";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSystemHealth(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSystemHealth(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertSystemHealthDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertSystemHealthDtoApiResponse>;
+        }));
+    }
+
+    protected processGetSystemHealth(response: HttpResponseBase): Observable<AlertSystemHealthDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertSystemHealthDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param count (optional) 
+     * @param startDate (optional) 
+     * @param endDate (optional) 
+     * @return OK
+     */
+    getTopPerformingAlertRules(count: number | undefined, startDate: Date | undefined, endDate: Date | undefined): Observable<AlertRulePerformanceAnalysisDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-performance/top-performers?";
+        if (count === null)
+            throw new Error("The parameter 'count' cannot be null.");
+        else if (count !== undefined)
+            url_ += "count=" + encodeURIComponent("" + count) + "&";
+        if (startDate === null)
+            throw new Error("The parameter 'startDate' cannot be null.");
+        else if (startDate !== undefined)
+            url_ += "startDate=" + encodeURIComponent(startDate ? "" + startDate.toISOString() : "") + "&";
+        if (endDate === null)
+            throw new Error("The parameter 'endDate' cannot be null.");
+        else if (endDate !== undefined)
+            url_ += "endDate=" + encodeURIComponent(endDate ? "" + endDate.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTopPerformingAlertRules(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTopPerformingAlertRules(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertRulePerformanceAnalysisDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertRulePerformanceAnalysisDtoListApiResponse>;
+        }));
+    }
+
+    protected processGetTopPerformingAlertRules(response: HttpResponseBase): Observable<AlertRulePerformanceAnalysisDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRulePerformanceAnalysisDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param count (optional) 
+     * @param startDate (optional) 
+     * @param endDate (optional) 
+     * @return OK
+     */
+    getPoorlyPerformingAlertRules(count: number | undefined, startDate: Date | undefined, endDate: Date | undefined): Observable<AlertRulePerformanceAnalysisDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-performance/poor-performers?";
+        if (count === null)
+            throw new Error("The parameter 'count' cannot be null.");
+        else if (count !== undefined)
+            url_ += "count=" + encodeURIComponent("" + count) + "&";
+        if (startDate === null)
+            throw new Error("The parameter 'startDate' cannot be null.");
+        else if (startDate !== undefined)
+            url_ += "startDate=" + encodeURIComponent(startDate ? "" + startDate.toISOString() : "") + "&";
+        if (endDate === null)
+            throw new Error("The parameter 'endDate' cannot be null.");
+        else if (endDate !== undefined)
+            url_ += "endDate=" + encodeURIComponent(endDate ? "" + endDate.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPoorlyPerformingAlertRules(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPoorlyPerformingAlertRules(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertRulePerformanceAnalysisDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertRulePerformanceAnalysisDtoListApiResponse>;
+        }));
+    }
+
+    protected processGetPoorlyPerformingAlertRules(response: HttpResponseBase): Observable<AlertRulePerformanceAnalysisDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRulePerformanceAnalysisDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param startDate (optional) 
+     * @param endDate (optional) 
+     * @return OK
+     */
+    generatePerformanceReport(startDate: Date | undefined, endDate: Date | undefined): Observable<AlertPerformanceReportDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-performance/report?";
+        if (startDate === null)
+            throw new Error("The parameter 'startDate' cannot be null.");
+        else if (startDate !== undefined)
+            url_ += "startDate=" + encodeURIComponent(startDate ? "" + startDate.toISOString() : "") + "&";
+        if (endDate === null)
+            throw new Error("The parameter 'endDate' cannot be null.");
+        else if (endDate !== undefined)
+            url_ += "endDate=" + encodeURIComponent(endDate ? "" + endDate.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGeneratePerformanceReport(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGeneratePerformanceReport(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertPerformanceReportDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertPerformanceReportDtoApiResponse>;
+        }));
+    }
+
+    protected processGeneratePerformanceReport(response: HttpResponseBase): Observable<AlertPerformanceReportDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertPerformanceReportDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param startDate (optional) 
+     * @param endDate (optional) 
+     * @return OK
+     */
+    getNotificationChannelStats(startDate: Date | undefined, endDate: Date | undefined): Observable<StringNotificationChannelStatsDtoDictionaryApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-performance/notification-channels?";
+        if (startDate === null)
+            throw new Error("The parameter 'startDate' cannot be null.");
+        else if (startDate !== undefined)
+            url_ += "startDate=" + encodeURIComponent(startDate ? "" + startDate.toISOString() : "") + "&";
+        if (endDate === null)
+            throw new Error("The parameter 'endDate' cannot be null.");
+        else if (endDate !== undefined)
+            url_ += "endDate=" + encodeURIComponent(endDate ? "" + endDate.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetNotificationChannelStats(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetNotificationChannelStats(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StringNotificationChannelStatsDtoDictionaryApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StringNotificationChannelStatsDtoDictionaryApiResponse>;
+        }));
+    }
+
+    protected processGetNotificationChannelStats(response: HttpResponseBase): Observable<StringNotificationChannelStatsDtoDictionaryApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StringNotificationChannelStatsDtoDictionaryApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    recordSystemEvent(body: SystemEventRequestDto | undefined): Observable<ApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-performance/system-event";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRecordSystemEvent(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRecordSystemEvent(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
+        }));
+    }
+
+    protected processRecordSystemEvent(response: HttpResponseBase): Observable<ApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -647,6 +1240,935 @@ export class TechTickerApiClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param userId (optional) 
+     * @param productId (optional) 
+     * @param pageNumber (optional) 
+     * @param pageSize (optional) 
+     * @return OK
+     */
+    alertsAdminGetAll(userId: string | undefined, productId: string | undefined, pageNumber: number | undefined, pageSize: number | undefined): Observable<AlertRuleDtoPagedResponse> {
+        let url_ = this.baseUrl + "/api/Alerts/admin?";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        if (productId === null)
+            throw new Error("The parameter 'productId' cannot be null.");
+        else if (productId !== undefined)
+            url_ += "productId=" + encodeURIComponent("" + productId) + "&";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "pageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "pageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAlertsAdminGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAlertsAdminGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertRuleDtoPagedResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertRuleDtoPagedResponse>;
+        }));
+    }
+
+    protected processAlertsAdminGetAll(response: HttpResponseBase): Observable<AlertRuleDtoPagedResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRuleDtoPagedResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getAlertById(alertRuleId: string): Observable<AlertRuleDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Alerts/admin/{alertRuleId}";
+        if (alertRuleId === undefined || alertRuleId === null)
+            throw new Error("The parameter 'alertRuleId' must be defined.");
+        url_ = url_.replace("{alertRuleId}", encodeURIComponent("" + alertRuleId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAlertById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAlertById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertRuleDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertRuleDtoApiResponse>;
+        }));
+    }
+
+    protected processGetAlertById(response: HttpResponseBase): Observable<AlertRuleDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRuleDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    adminUpdateAlert(alertRuleId: string, body: UpdateAlertRuleDto | undefined): Observable<AlertRuleDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Alerts/admin/{alertRuleId}";
+        if (alertRuleId === undefined || alertRuleId === null)
+            throw new Error("The parameter 'alertRuleId' must be defined.");
+        url_ = url_.replace("{alertRuleId}", encodeURIComponent("" + alertRuleId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAdminUpdateAlert(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAdminUpdateAlert(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertRuleDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertRuleDtoApiResponse>;
+        }));
+    }
+
+    protected processAdminUpdateAlert(response: HttpResponseBase): Observable<AlertRuleDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRuleDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    adminDeleteAlert(alertRuleId: string): Observable<ApiResponse> {
+        let url_ = this.baseUrl + "/api/Alerts/admin/{alertRuleId}";
+        if (alertRuleId === undefined || alertRuleId === null)
+            throw new Error("The parameter 'alertRuleId' must be defined.");
+        url_ = url_.replace("{alertRuleId}", encodeURIComponent("" + alertRuleId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAdminDeleteAlert(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAdminDeleteAlert(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ApiResponse>;
+        }));
+    }
+
+    protected processAdminDeleteAlert(response: HttpResponseBase): Observable<ApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkOperation(body: AlertBulkOperationRequestDto | undefined): Observable<AlertBulkOperationResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Alerts/admin/bulk-operation";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkOperation(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkOperation(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertBulkOperationResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertBulkOperationResultDtoApiResponse>;
+        }));
+    }
+
+    protected processBulkOperation(response: HttpResponseBase): Observable<AlertBulkOperationResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertBulkOperationResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkOperationWithFilters(body: AlertBulkOperationWithFiltersRequestDto | undefined): Observable<AlertBulkOperationResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Alerts/admin/bulk-operation-filtered";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkOperationWithFilters(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkOperationWithFilters(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertBulkOperationResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertBulkOperationResultDtoApiResponse>;
+        }));
+    }
+
+    protected processBulkOperationWithFilters(response: HttpResponseBase): Observable<AlertBulkOperationResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertBulkOperationResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    previewBulkOperation(body: AlertBulkOperationWithFiltersRequestDto | undefined): Observable<AlertBulkOperationPreviewDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Alerts/admin/bulk-operation-preview";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processPreviewBulkOperation(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processPreviewBulkOperation(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertBulkOperationPreviewDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertBulkOperationPreviewDtoApiResponse>;
+        }));
+    }
+
+    protected processPreviewBulkOperation(response: HttpResponseBase): Observable<AlertBulkOperationPreviewDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertBulkOperationPreviewDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkEnable(body: string[] | undefined): Observable<AlertBulkOperationResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Alerts/bulk-enable";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkEnable(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkEnable(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertBulkOperationResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertBulkOperationResultDtoApiResponse>;
+        }));
+    }
+
+    protected processBulkEnable(response: HttpResponseBase): Observable<AlertBulkOperationResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertBulkOperationResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkDisable(body: string[] | undefined): Observable<AlertBulkOperationResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Alerts/bulk-disable";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkDisable(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkDisable(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertBulkOperationResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertBulkOperationResultDtoApiResponse>;
+        }));
+    }
+
+    protected processBulkDisable(response: HttpResponseBase): Observable<AlertBulkOperationResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertBulkOperationResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    testAlertRule(alertRuleId: string, body: TestPricePointDto | undefined): Observable<AlertTestResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-testing/{alertRuleId}/test-point";
+        if (alertRuleId === undefined || alertRuleId === null)
+            throw new Error("The parameter 'alertRuleId' must be defined.");
+        url_ = url_.replace("{alertRuleId}", encodeURIComponent("" + alertRuleId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTestAlertRule(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTestAlertRule(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertTestResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertTestResultDtoApiResponse>;
+        }));
+    }
+
+    protected processTestAlertRule(response: HttpResponseBase): Observable<AlertTestResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertTestResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    testAlertRuleAgainstHistory(body: AlertTestRequestDto | undefined): Observable<AlertTestResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-testing/test-history";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTestAlertRuleAgainstHistory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTestAlertRuleAgainstHistory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertTestResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertTestResultDtoApiResponse>;
+        }));
+    }
+
+    protected processTestAlertRuleAgainstHistory(response: HttpResponseBase): Observable<AlertTestResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertTestResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    simulateAlertRule(body: AlertRuleSimulationRequestDto | undefined): Observable<AlertTestResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-testing/simulate";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSimulateAlertRule(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSimulateAlertRule(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertTestResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertTestResultDtoApiResponse>;
+        }));
+    }
+
+    protected processSimulateAlertRule(response: HttpResponseBase): Observable<AlertTestResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertTestResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param startDate (optional) 
+     * @param endDate (optional) 
+     * @return OK
+     */
+    getAlertRulePerformance2(alertRuleId: string, startDate: Date | undefined, endDate: Date | undefined): Observable<AlertPerformanceMetricsDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-testing/{alertRuleId}/performance?";
+        if (alertRuleId === undefined || alertRuleId === null)
+            throw new Error("The parameter 'alertRuleId' must be defined.");
+        url_ = url_.replace("{alertRuleId}", encodeURIComponent("" + alertRuleId));
+        if (startDate === null)
+            throw new Error("The parameter 'startDate' cannot be null.");
+        else if (startDate !== undefined)
+            url_ += "startDate=" + encodeURIComponent(startDate ? "" + startDate.toISOString() : "") + "&";
+        if (endDate === null)
+            throw new Error("The parameter 'endDate' cannot be null.");
+        else if (endDate !== undefined)
+            url_ += "endDate=" + encodeURIComponent(endDate ? "" + endDate.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAlertRulePerformance2(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAlertRulePerformance2(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertPerformanceMetricsDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertPerformanceMetricsDtoApiResponse>;
+        }));
+    }
+
+    protected processGetAlertRulePerformance2(response: HttpResponseBase): Observable<AlertPerformanceMetricsDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertPerformanceMetricsDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    validateAlertRule(body: TestAlertRuleDto | undefined): Observable<AlertRuleValidationResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-testing/validate";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processValidateAlertRule(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processValidateAlertRule(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertRuleValidationResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertRuleValidationResultDtoApiResponse>;
+        }));
+    }
+
+    protected processValidateAlertRule(response: HttpResponseBase): Observable<AlertRuleValidationResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertRuleValidationResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    testAllAlertRulesForProduct(productId: string, body: TestPricePointDto | undefined): Observable<AlertTestResultDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-testing/admin/test-all/{productId}";
+        if (productId === undefined || productId === null)
+            throw new Error("The parameter 'productId' must be defined.");
+        url_ = url_.replace("{productId}", encodeURIComponent("" + productId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTestAllAlertRulesForProduct(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTestAllAlertRulesForProduct(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertTestResultDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertTestResultDtoListApiResponse>;
+        }));
+    }
+
+    protected processTestAllAlertRulesForProduct(response: HttpResponseBase): Observable<AlertTestResultDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertTestResultDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param startDate (optional) 
+     * @param endDate (optional) 
+     * @return OK
+     */
+    getAlertTestingStatistics(startDate: Date | undefined, endDate: Date | undefined): Observable<AlertTestingStatsDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/alert-testing/admin/statistics?";
+        if (startDate === null)
+            throw new Error("The parameter 'startDate' cannot be null.");
+        else if (startDate !== undefined)
+            url_ += "startDate=" + encodeURIComponent(startDate ? "" + startDate.toISOString() : "") + "&";
+        if (endDate === null)
+            throw new Error("The parameter 'endDate' cannot be null.");
+        else if (endDate !== undefined)
+            url_ += "endDate=" + encodeURIComponent(endDate ? "" + endDate.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAlertTestingStatistics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAlertTestingStatistics(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertTestingStatsDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertTestingStatsDtoApiResponse>;
+        }));
+    }
+
+    protected processGetAlertTestingStatistics(response: HttpResponseBase): Observable<AlertTestingStatsDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertTestingStatsDtoApiResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -5024,11 +6546,1226 @@ export class TechTickerApiClient {
     }
 }
 
+export class AlertBulkFilterDto implements IAlertBulkFilterDto {
+    userId?: string | undefined;
+    productId?: string | undefined;
+    conditionType?: string | undefined;
+    alertType?: string | undefined;
+    isActive?: boolean | undefined;
+    createdAfter?: Date | undefined;
+    createdBefore?: Date | undefined;
+    lastNotifiedAfter?: Date | undefined;
+    lastNotifiedBefore?: Date | undefined;
+    minNotificationFrequency?: number | undefined;
+    maxNotificationFrequency?: number | undefined;
+
+    constructor(data?: IAlertBulkFilterDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.userId = _data["userId"];
+            this.productId = _data["productId"];
+            this.conditionType = _data["conditionType"];
+            this.alertType = _data["alertType"];
+            this.isActive = _data["isActive"];
+            this.createdAfter = _data["createdAfter"] ? new Date(_data["createdAfter"].toString()) : <any>undefined;
+            this.createdBefore = _data["createdBefore"] ? new Date(_data["createdBefore"].toString()) : <any>undefined;
+            this.lastNotifiedAfter = _data["lastNotifiedAfter"] ? new Date(_data["lastNotifiedAfter"].toString()) : <any>undefined;
+            this.lastNotifiedBefore = _data["lastNotifiedBefore"] ? new Date(_data["lastNotifiedBefore"].toString()) : <any>undefined;
+            this.minNotificationFrequency = _data["minNotificationFrequency"];
+            this.maxNotificationFrequency = _data["maxNotificationFrequency"];
+        }
+    }
+
+    static fromJS(data: any): AlertBulkFilterDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertBulkFilterDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["userId"] = this.userId;
+        data["productId"] = this.productId;
+        data["conditionType"] = this.conditionType;
+        data["alertType"] = this.alertType;
+        data["isActive"] = this.isActive;
+        data["createdAfter"] = this.createdAfter ? this.createdAfter.toISOString() : <any>undefined;
+        data["createdBefore"] = this.createdBefore ? this.createdBefore.toISOString() : <any>undefined;
+        data["lastNotifiedAfter"] = this.lastNotifiedAfter ? this.lastNotifiedAfter.toISOString() : <any>undefined;
+        data["lastNotifiedBefore"] = this.lastNotifiedBefore ? this.lastNotifiedBefore.toISOString() : <any>undefined;
+        data["minNotificationFrequency"] = this.minNotificationFrequency;
+        data["maxNotificationFrequency"] = this.maxNotificationFrequency;
+        return data;
+    }
+}
+
+export interface IAlertBulkFilterDto {
+    userId?: string | undefined;
+    productId?: string | undefined;
+    conditionType?: string | undefined;
+    alertType?: string | undefined;
+    isActive?: boolean | undefined;
+    createdAfter?: Date | undefined;
+    createdBefore?: Date | undefined;
+    lastNotifiedAfter?: Date | undefined;
+    lastNotifiedBefore?: Date | undefined;
+    minNotificationFrequency?: number | undefined;
+    maxNotificationFrequency?: number | undefined;
+}
+
+export class AlertBulkOperationItemResultDto implements IAlertBulkOperationItemResultDto {
+    alertRuleId?: string;
+    success?: boolean;
+    errorMessage?: string | undefined;
+    previousValue?: string | undefined;
+    newValue?: string | undefined;
+
+    constructor(data?: IAlertBulkOperationItemResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.alertRuleId = _data["alertRuleId"];
+            this.success = _data["success"];
+            this.errorMessage = _data["errorMessage"];
+            this.previousValue = _data["previousValue"];
+            this.newValue = _data["newValue"];
+        }
+    }
+
+    static fromJS(data: any): AlertBulkOperationItemResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertBulkOperationItemResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["alertRuleId"] = this.alertRuleId;
+        data["success"] = this.success;
+        data["errorMessage"] = this.errorMessage;
+        data["previousValue"] = this.previousValue;
+        data["newValue"] = this.newValue;
+        return data;
+    }
+}
+
+export interface IAlertBulkOperationItemResultDto {
+    alertRuleId?: string;
+    success?: boolean;
+    errorMessage?: string | undefined;
+    previousValue?: string | undefined;
+    newValue?: string | undefined;
+}
+
+export class AlertBulkOperationPreviewDto implements IAlertBulkOperationPreviewDto {
+    filters?: AlertBulkFilterDto;
+    operation?: string | undefined;
+    totalMatchingRules?: number;
+    rulesWouldBeAffected?: number;
+    sampleAffectedRules?: AlertRuleDto[] | undefined;
+    warnings?: string[] | undefined;
+    isSafeToExecute?: boolean;
+    safetyMessage?: string | undefined;
+
+    constructor(data?: IAlertBulkOperationPreviewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.filters = _data["filters"] ? AlertBulkFilterDto.fromJS(_data["filters"]) : <any>undefined;
+            this.operation = _data["operation"];
+            this.totalMatchingRules = _data["totalMatchingRules"];
+            this.rulesWouldBeAffected = _data["rulesWouldBeAffected"];
+            if (Array.isArray(_data["sampleAffectedRules"])) {
+                this.sampleAffectedRules = [] as any;
+                for (let item of _data["sampleAffectedRules"])
+                    this.sampleAffectedRules!.push(AlertRuleDto.fromJS(item));
+            }
+            if (Array.isArray(_data["warnings"])) {
+                this.warnings = [] as any;
+                for (let item of _data["warnings"])
+                    this.warnings!.push(item);
+            }
+            this.isSafeToExecute = _data["isSafeToExecute"];
+            this.safetyMessage = _data["safetyMessage"];
+        }
+    }
+
+    static fromJS(data: any): AlertBulkOperationPreviewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertBulkOperationPreviewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["filters"] = this.filters ? this.filters.toJSON() : <any>undefined;
+        data["operation"] = this.operation;
+        data["totalMatchingRules"] = this.totalMatchingRules;
+        data["rulesWouldBeAffected"] = this.rulesWouldBeAffected;
+        if (Array.isArray(this.sampleAffectedRules)) {
+            data["sampleAffectedRules"] = [];
+            for (let item of this.sampleAffectedRules)
+                data["sampleAffectedRules"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.warnings)) {
+            data["warnings"] = [];
+            for (let item of this.warnings)
+                data["warnings"].push(item);
+        }
+        data["isSafeToExecute"] = this.isSafeToExecute;
+        data["safetyMessage"] = this.safetyMessage;
+        return data;
+    }
+}
+
+export interface IAlertBulkOperationPreviewDto {
+    filters?: AlertBulkFilterDto;
+    operation?: string | undefined;
+    totalMatchingRules?: number;
+    rulesWouldBeAffected?: number;
+    sampleAffectedRules?: AlertRuleDto[] | undefined;
+    warnings?: string[] | undefined;
+    isSafeToExecute?: boolean;
+    safetyMessage?: string | undefined;
+}
+
+export class AlertBulkOperationPreviewDtoApiResponse implements IAlertBulkOperationPreviewDtoApiResponse {
+    success?: boolean;
+    data?: AlertBulkOperationPreviewDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertBulkOperationPreviewDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertBulkOperationPreviewDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertBulkOperationPreviewDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertBulkOperationPreviewDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertBulkOperationPreviewDtoApiResponse {
+    success?: boolean;
+    data?: AlertBulkOperationPreviewDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertBulkOperationRequestDto implements IAlertBulkOperationRequestDto {
+    alertRuleIds!: string[];
+    operation!: string;
+    newNotificationFrequencyMinutes?: number | undefined;
+    newAlertType?: string | undefined;
+    reason?: string | undefined;
+
+    constructor(data?: IAlertBulkOperationRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.alertRuleIds = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["alertRuleIds"])) {
+                this.alertRuleIds = [] as any;
+                for (let item of _data["alertRuleIds"])
+                    this.alertRuleIds!.push(item);
+            }
+            this.operation = _data["operation"];
+            this.newNotificationFrequencyMinutes = _data["newNotificationFrequencyMinutes"];
+            this.newAlertType = _data["newAlertType"];
+            this.reason = _data["reason"];
+        }
+    }
+
+    static fromJS(data: any): AlertBulkOperationRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertBulkOperationRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.alertRuleIds)) {
+            data["alertRuleIds"] = [];
+            for (let item of this.alertRuleIds)
+                data["alertRuleIds"].push(item);
+        }
+        data["operation"] = this.operation;
+        data["newNotificationFrequencyMinutes"] = this.newNotificationFrequencyMinutes;
+        data["newAlertType"] = this.newAlertType;
+        data["reason"] = this.reason;
+        return data;
+    }
+}
+
+export interface IAlertBulkOperationRequestDto {
+    alertRuleIds: string[];
+    operation: string;
+    newNotificationFrequencyMinutes?: number | undefined;
+    newAlertType?: string | undefined;
+    reason?: string | undefined;
+}
+
+export class AlertBulkOperationResultDto implements IAlertBulkOperationResultDto {
+    operation?: string | undefined;
+    totalRequested?: number;
+    successfulOperations?: number;
+    failedOperations?: number;
+    results?: AlertBulkOperationItemResultDto[] | undefined;
+    processedAt?: Date;
+    reason?: string | undefined;
+
+    constructor(data?: IAlertBulkOperationResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.operation = _data["operation"];
+            this.totalRequested = _data["totalRequested"];
+            this.successfulOperations = _data["successfulOperations"];
+            this.failedOperations = _data["failedOperations"];
+            if (Array.isArray(_data["results"])) {
+                this.results = [] as any;
+                for (let item of _data["results"])
+                    this.results!.push(AlertBulkOperationItemResultDto.fromJS(item));
+            }
+            this.processedAt = _data["processedAt"] ? new Date(_data["processedAt"].toString()) : <any>undefined;
+            this.reason = _data["reason"];
+        }
+    }
+
+    static fromJS(data: any): AlertBulkOperationResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertBulkOperationResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["operation"] = this.operation;
+        data["totalRequested"] = this.totalRequested;
+        data["successfulOperations"] = this.successfulOperations;
+        data["failedOperations"] = this.failedOperations;
+        if (Array.isArray(this.results)) {
+            data["results"] = [];
+            for (let item of this.results)
+                data["results"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["processedAt"] = this.processedAt ? this.processedAt.toISOString() : <any>undefined;
+        data["reason"] = this.reason;
+        return data;
+    }
+}
+
+export interface IAlertBulkOperationResultDto {
+    operation?: string | undefined;
+    totalRequested?: number;
+    successfulOperations?: number;
+    failedOperations?: number;
+    results?: AlertBulkOperationItemResultDto[] | undefined;
+    processedAt?: Date;
+    reason?: string | undefined;
+}
+
+export class AlertBulkOperationResultDtoApiResponse implements IAlertBulkOperationResultDtoApiResponse {
+    success?: boolean;
+    data?: AlertBulkOperationResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertBulkOperationResultDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertBulkOperationResultDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertBulkOperationResultDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertBulkOperationResultDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertBulkOperationResultDtoApiResponse {
+    success?: boolean;
+    data?: AlertBulkOperationResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertBulkOperationWithFiltersRequestDto implements IAlertBulkOperationWithFiltersRequestDto {
+    filters!: AlertBulkFilterDto;
+    operation!: string;
+    newNotificationFrequencyMinutes?: number | undefined;
+    newAlertType?: string | undefined;
+    reason?: string | undefined;
+    maxAffectedRules?: number;
+    previewOnly?: boolean;
+
+    constructor(data?: IAlertBulkOperationWithFiltersRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.filters = new AlertBulkFilterDto();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.filters = _data["filters"] ? AlertBulkFilterDto.fromJS(_data["filters"]) : new AlertBulkFilterDto();
+            this.operation = _data["operation"];
+            this.newNotificationFrequencyMinutes = _data["newNotificationFrequencyMinutes"];
+            this.newAlertType = _data["newAlertType"];
+            this.reason = _data["reason"];
+            this.maxAffectedRules = _data["maxAffectedRules"];
+            this.previewOnly = _data["previewOnly"];
+        }
+    }
+
+    static fromJS(data: any): AlertBulkOperationWithFiltersRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertBulkOperationWithFiltersRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["filters"] = this.filters ? this.filters.toJSON() : <any>undefined;
+        data["operation"] = this.operation;
+        data["newNotificationFrequencyMinutes"] = this.newNotificationFrequencyMinutes;
+        data["newAlertType"] = this.newAlertType;
+        data["reason"] = this.reason;
+        data["maxAffectedRules"] = this.maxAffectedRules;
+        data["previewOnly"] = this.previewOnly;
+        return data;
+    }
+}
+
+export interface IAlertBulkOperationWithFiltersRequestDto {
+    filters: AlertBulkFilterDto;
+    operation: string;
+    newNotificationFrequencyMinutes?: number | undefined;
+    newAlertType?: string | undefined;
+    reason?: string | undefined;
+    maxAffectedRules?: number;
+    previewOnly?: boolean;
+}
+
+export class AlertEvaluationMetricsDto implements IAlertEvaluationMetricsDto {
+    totalPricePointsProcessed?: number;
+    totalAlertsEvaluated?: number;
+    totalAlertsTriggered?: number;
+    alertTriggerRate?: number;
+    averageEvaluationTime?: string;
+    maxEvaluationTime?: string;
+    minEvaluationTime?: string;
+    evaluationErrors?: number;
+    errorRate?: number;
+    triggersByConditionType?: { [key: string]: number; } | undefined;
+    averageEvaluationTimeByCondition?: { [key: string]: string; } | undefined;
+
+    constructor(data?: IAlertEvaluationMetricsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalPricePointsProcessed = _data["totalPricePointsProcessed"];
+            this.totalAlertsEvaluated = _data["totalAlertsEvaluated"];
+            this.totalAlertsTriggered = _data["totalAlertsTriggered"];
+            this.alertTriggerRate = _data["alertTriggerRate"];
+            this.averageEvaluationTime = _data["averageEvaluationTime"];
+            this.maxEvaluationTime = _data["maxEvaluationTime"];
+            this.minEvaluationTime = _data["minEvaluationTime"];
+            this.evaluationErrors = _data["evaluationErrors"];
+            this.errorRate = _data["errorRate"];
+            if (_data["triggersByConditionType"]) {
+                this.triggersByConditionType = {} as any;
+                for (let key in _data["triggersByConditionType"]) {
+                    if (_data["triggersByConditionType"].hasOwnProperty(key))
+                        (<any>this.triggersByConditionType)![key] = _data["triggersByConditionType"][key];
+                }
+            }
+            if (_data["averageEvaluationTimeByCondition"]) {
+                this.averageEvaluationTimeByCondition = {} as any;
+                for (let key in _data["averageEvaluationTimeByCondition"]) {
+                    if (_data["averageEvaluationTimeByCondition"].hasOwnProperty(key))
+                        (<any>this.averageEvaluationTimeByCondition)![key] = _data["averageEvaluationTimeByCondition"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertEvaluationMetricsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertEvaluationMetricsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalPricePointsProcessed"] = this.totalPricePointsProcessed;
+        data["totalAlertsEvaluated"] = this.totalAlertsEvaluated;
+        data["totalAlertsTriggered"] = this.totalAlertsTriggered;
+        data["alertTriggerRate"] = this.alertTriggerRate;
+        data["averageEvaluationTime"] = this.averageEvaluationTime;
+        data["maxEvaluationTime"] = this.maxEvaluationTime;
+        data["minEvaluationTime"] = this.minEvaluationTime;
+        data["evaluationErrors"] = this.evaluationErrors;
+        data["errorRate"] = this.errorRate;
+        if (this.triggersByConditionType) {
+            data["triggersByConditionType"] = {};
+            for (let key in this.triggersByConditionType) {
+                if (this.triggersByConditionType.hasOwnProperty(key))
+                    (<any>data["triggersByConditionType"])[key] = (<any>this.triggersByConditionType)[key];
+            }
+        }
+        if (this.averageEvaluationTimeByCondition) {
+            data["averageEvaluationTimeByCondition"] = {};
+            for (let key in this.averageEvaluationTimeByCondition) {
+                if (this.averageEvaluationTimeByCondition.hasOwnProperty(key))
+                    (<any>data["averageEvaluationTimeByCondition"])[key] = (<any>this.averageEvaluationTimeByCondition)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertEvaluationMetricsDto {
+    totalPricePointsProcessed?: number;
+    totalAlertsEvaluated?: number;
+    totalAlertsTriggered?: number;
+    alertTriggerRate?: number;
+    averageEvaluationTime?: string;
+    maxEvaluationTime?: string;
+    minEvaluationTime?: string;
+    evaluationErrors?: number;
+    errorRate?: number;
+    triggersByConditionType?: { [key: string]: number; } | undefined;
+    averageEvaluationTimeByCondition?: { [key: string]: string; } | undefined;
+}
+
+export class AlertPerformanceMetricsDto implements IAlertPerformanceMetricsDto {
+    alertRuleId?: string;
+    ruleDescription?: string | undefined;
+    analysisPeriodStart?: Date | undefined;
+    analysisPeriodEnd?: Date | undefined;
+    totalPricePointsAnalyzed?: number;
+    timesWouldHaveTriggered?: number;
+    triggerRate?: number;
+    lowestTriggeringPrice?: number | undefined;
+    highestTriggeringPrice?: number | undefined;
+    averageTriggeringPrice?: number | undefined;
+    recentTriggers?: AlertTestMatchDto[] | undefined;
+    triggersByMonth?: { [key: string]: number; } | undefined;
+    triggersBySeller?: { [key: string]: number; } | undefined;
+
+    constructor(data?: IAlertPerformanceMetricsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.alertRuleId = _data["alertRuleId"];
+            this.ruleDescription = _data["ruleDescription"];
+            this.analysisPeriodStart = _data["analysisPeriodStart"] ? new Date(_data["analysisPeriodStart"].toString()) : <any>undefined;
+            this.analysisPeriodEnd = _data["analysisPeriodEnd"] ? new Date(_data["analysisPeriodEnd"].toString()) : <any>undefined;
+            this.totalPricePointsAnalyzed = _data["totalPricePointsAnalyzed"];
+            this.timesWouldHaveTriggered = _data["timesWouldHaveTriggered"];
+            this.triggerRate = _data["triggerRate"];
+            this.lowestTriggeringPrice = _data["lowestTriggeringPrice"];
+            this.highestTriggeringPrice = _data["highestTriggeringPrice"];
+            this.averageTriggeringPrice = _data["averageTriggeringPrice"];
+            if (Array.isArray(_data["recentTriggers"])) {
+                this.recentTriggers = [] as any;
+                for (let item of _data["recentTriggers"])
+                    this.recentTriggers!.push(AlertTestMatchDto.fromJS(item));
+            }
+            if (_data["triggersByMonth"]) {
+                this.triggersByMonth = {} as any;
+                for (let key in _data["triggersByMonth"]) {
+                    if (_data["triggersByMonth"].hasOwnProperty(key))
+                        (<any>this.triggersByMonth)![key] = _data["triggersByMonth"][key];
+                }
+            }
+            if (_data["triggersBySeller"]) {
+                this.triggersBySeller = {} as any;
+                for (let key in _data["triggersBySeller"]) {
+                    if (_data["triggersBySeller"].hasOwnProperty(key))
+                        (<any>this.triggersBySeller)![key] = _data["triggersBySeller"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertPerformanceMetricsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertPerformanceMetricsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["alertRuleId"] = this.alertRuleId;
+        data["ruleDescription"] = this.ruleDescription;
+        data["analysisPeriodStart"] = this.analysisPeriodStart ? this.analysisPeriodStart.toISOString() : <any>undefined;
+        data["analysisPeriodEnd"] = this.analysisPeriodEnd ? this.analysisPeriodEnd.toISOString() : <any>undefined;
+        data["totalPricePointsAnalyzed"] = this.totalPricePointsAnalyzed;
+        data["timesWouldHaveTriggered"] = this.timesWouldHaveTriggered;
+        data["triggerRate"] = this.triggerRate;
+        data["lowestTriggeringPrice"] = this.lowestTriggeringPrice;
+        data["highestTriggeringPrice"] = this.highestTriggeringPrice;
+        data["averageTriggeringPrice"] = this.averageTriggeringPrice;
+        if (Array.isArray(this.recentTriggers)) {
+            data["recentTriggers"] = [];
+            for (let item of this.recentTriggers)
+                data["recentTriggers"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (this.triggersByMonth) {
+            data["triggersByMonth"] = {};
+            for (let key in this.triggersByMonth) {
+                if (this.triggersByMonth.hasOwnProperty(key))
+                    (<any>data["triggersByMonth"])[key] = (<any>this.triggersByMonth)[key];
+            }
+        }
+        if (this.triggersBySeller) {
+            data["triggersBySeller"] = {};
+            for (let key in this.triggersBySeller) {
+                if (this.triggersBySeller.hasOwnProperty(key))
+                    (<any>data["triggersBySeller"])[key] = (<any>this.triggersBySeller)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertPerformanceMetricsDto {
+    alertRuleId?: string;
+    ruleDescription?: string | undefined;
+    analysisPeriodStart?: Date | undefined;
+    analysisPeriodEnd?: Date | undefined;
+    totalPricePointsAnalyzed?: number;
+    timesWouldHaveTriggered?: number;
+    triggerRate?: number;
+    lowestTriggeringPrice?: number | undefined;
+    highestTriggeringPrice?: number | undefined;
+    averageTriggeringPrice?: number | undefined;
+    recentTriggers?: AlertTestMatchDto[] | undefined;
+    triggersByMonth?: { [key: string]: number; } | undefined;
+    triggersBySeller?: { [key: string]: number; } | undefined;
+}
+
+export class AlertPerformanceMetricsDtoApiResponse implements IAlertPerformanceMetricsDtoApiResponse {
+    success?: boolean;
+    data?: AlertPerformanceMetricsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertPerformanceMetricsDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertPerformanceMetricsDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertPerformanceMetricsDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertPerformanceMetricsDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertPerformanceMetricsDtoApiResponse {
+    success?: boolean;
+    data?: AlertPerformanceMetricsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertPerformanceReportDto implements IAlertPerformanceReportDto {
+    generatedAt?: Date;
+    periodStart?: Date;
+    periodEnd?: Date;
+    overallPerformance?: AlertSystemPerformanceDto;
+    topPerformers?: AlertRulePerformanceAnalysisDto[] | undefined;
+    poorPerformers?: AlertRulePerformanceAnalysisDto[] | undefined;
+    keyInsights?: string[] | undefined;
+    recommendations?: string[] | undefined;
+    rawMetrics?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertPerformanceReportDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.generatedAt = _data["generatedAt"] ? new Date(_data["generatedAt"].toString()) : <any>undefined;
+            this.periodStart = _data["periodStart"] ? new Date(_data["periodStart"].toString()) : <any>undefined;
+            this.periodEnd = _data["periodEnd"] ? new Date(_data["periodEnd"].toString()) : <any>undefined;
+            this.overallPerformance = _data["overallPerformance"] ? AlertSystemPerformanceDto.fromJS(_data["overallPerformance"]) : <any>undefined;
+            if (Array.isArray(_data["topPerformers"])) {
+                this.topPerformers = [] as any;
+                for (let item of _data["topPerformers"])
+                    this.topPerformers!.push(AlertRulePerformanceAnalysisDto.fromJS(item));
+            }
+            if (Array.isArray(_data["poorPerformers"])) {
+                this.poorPerformers = [] as any;
+                for (let item of _data["poorPerformers"])
+                    this.poorPerformers!.push(AlertRulePerformanceAnalysisDto.fromJS(item));
+            }
+            if (Array.isArray(_data["keyInsights"])) {
+                this.keyInsights = [] as any;
+                for (let item of _data["keyInsights"])
+                    this.keyInsights!.push(item);
+            }
+            if (Array.isArray(_data["recommendations"])) {
+                this.recommendations = [] as any;
+                for (let item of _data["recommendations"])
+                    this.recommendations!.push(item);
+            }
+            if (_data["rawMetrics"]) {
+                this.rawMetrics = {} as any;
+                for (let key in _data["rawMetrics"]) {
+                    if (_data["rawMetrics"].hasOwnProperty(key))
+                        (<any>this.rawMetrics)![key] = _data["rawMetrics"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertPerformanceReportDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertPerformanceReportDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["generatedAt"] = this.generatedAt ? this.generatedAt.toISOString() : <any>undefined;
+        data["periodStart"] = this.periodStart ? this.periodStart.toISOString() : <any>undefined;
+        data["periodEnd"] = this.periodEnd ? this.periodEnd.toISOString() : <any>undefined;
+        data["overallPerformance"] = this.overallPerformance ? this.overallPerformance.toJSON() : <any>undefined;
+        if (Array.isArray(this.topPerformers)) {
+            data["topPerformers"] = [];
+            for (let item of this.topPerformers)
+                data["topPerformers"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.poorPerformers)) {
+            data["poorPerformers"] = [];
+            for (let item of this.poorPerformers)
+                data["poorPerformers"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.keyInsights)) {
+            data["keyInsights"] = [];
+            for (let item of this.keyInsights)
+                data["keyInsights"].push(item);
+        }
+        if (Array.isArray(this.recommendations)) {
+            data["recommendations"] = [];
+            for (let item of this.recommendations)
+                data["recommendations"].push(item);
+        }
+        if (this.rawMetrics) {
+            data["rawMetrics"] = {};
+            for (let key in this.rawMetrics) {
+                if (this.rawMetrics.hasOwnProperty(key))
+                    (<any>data["rawMetrics"])[key] = (<any>this.rawMetrics)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertPerformanceReportDto {
+    generatedAt?: Date;
+    periodStart?: Date;
+    periodEnd?: Date;
+    overallPerformance?: AlertSystemPerformanceDto;
+    topPerformers?: AlertRulePerformanceAnalysisDto[] | undefined;
+    poorPerformers?: AlertRulePerformanceAnalysisDto[] | undefined;
+    keyInsights?: string[] | undefined;
+    recommendations?: string[] | undefined;
+    rawMetrics?: { [key: string]: any; } | undefined;
+}
+
+export class AlertPerformanceReportDtoApiResponse implements IAlertPerformanceReportDtoApiResponse {
+    success?: boolean;
+    data?: AlertPerformanceReportDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertPerformanceReportDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertPerformanceReportDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertPerformanceReportDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertPerformanceReportDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertPerformanceReportDtoApiResponse {
+    success?: boolean;
+    data?: AlertPerformanceReportDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertPerformanceTrendDto implements IAlertPerformanceTrendDto {
+    timestamp?: Date;
+    alertsTriggered?: number;
+    notificationsSent?: number;
+    successRate?: number;
+    averageResponseTime?: string;
+    errorCount?: number;
+
+    constructor(data?: IAlertPerformanceTrendDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.alertsTriggered = _data["alertsTriggered"];
+            this.notificationsSent = _data["notificationsSent"];
+            this.successRate = _data["successRate"];
+            this.averageResponseTime = _data["averageResponseTime"];
+            this.errorCount = _data["errorCount"];
+        }
+    }
+
+    static fromJS(data: any): AlertPerformanceTrendDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertPerformanceTrendDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["alertsTriggered"] = this.alertsTriggered;
+        data["notificationsSent"] = this.notificationsSent;
+        data["successRate"] = this.successRate;
+        data["averageResponseTime"] = this.averageResponseTime;
+        data["errorCount"] = this.errorCount;
+        return data;
+    }
+}
+
+export interface IAlertPerformanceTrendDto {
+    timestamp?: Date;
+    alertsTriggered?: number;
+    notificationsSent?: number;
+    successRate?: number;
+    averageResponseTime?: string;
+    errorCount?: number;
+}
+
+export class AlertPerformanceTrendDtoListApiResponse implements IAlertPerformanceTrendDtoListApiResponse {
+    success?: boolean;
+    data?: AlertPerformanceTrendDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertPerformanceTrendDtoListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(AlertPerformanceTrendDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertPerformanceTrendDtoListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertPerformanceTrendDtoListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertPerformanceTrendDtoListApiResponse {
+    success?: boolean;
+    data?: AlertPerformanceTrendDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class AlertRuleDto implements IAlertRuleDto {
     alertRuleId?: string;
     userId?: string;
     canonicalProductId?: string;
     conditionType?: string | undefined;
+    alertType?: string | undefined;
     thresholdValue?: number | undefined;
     percentageValue?: number | undefined;
     specificSellerName?: string | undefined;
@@ -5056,6 +7793,7 @@ export class AlertRuleDto implements IAlertRuleDto {
             this.userId = _data["userId"];
             this.canonicalProductId = _data["canonicalProductId"];
             this.conditionType = _data["conditionType"];
+            this.alertType = _data["alertType"];
             this.thresholdValue = _data["thresholdValue"];
             this.percentageValue = _data["percentageValue"];
             this.specificSellerName = _data["specificSellerName"];
@@ -5083,6 +7821,7 @@ export class AlertRuleDto implements IAlertRuleDto {
         data["userId"] = this.userId;
         data["canonicalProductId"] = this.canonicalProductId;
         data["conditionType"] = this.conditionType;
+        data["alertType"] = this.alertType;
         data["thresholdValue"] = this.thresholdValue;
         data["percentageValue"] = this.percentageValue;
         data["specificSellerName"] = this.specificSellerName;
@@ -5103,6 +7842,7 @@ export interface IAlertRuleDto {
     userId?: string;
     canonicalProductId?: string;
     conditionType?: string | undefined;
+    alertType?: string | undefined;
     thresholdValue?: number | undefined;
     percentageValue?: number | undefined;
     specificSellerName?: string | undefined;
@@ -5386,6 +8126,1425 @@ export interface IAlertRuleDtoPagedResponse {
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
     pagination?: PaginationMeta;
+}
+
+export class AlertRulePerformanceAnalysisDto implements IAlertRulePerformanceAnalysisDto {
+    alertRuleId?: string;
+    ruleDescription?: string | undefined;
+    conditionType?: string | undefined;
+    isActive?: boolean;
+    timesTriggered?: number;
+    notificationsSent?: number;
+    notificationSuccessRate?: number;
+    averageEvaluationTime?: string;
+    averageNotificationTime?: string;
+    lastTriggered?: Date | undefined;
+    lastSuccessfulNotification?: Date | undefined;
+    recentErrors?: string[] | undefined;
+    performanceRating?: PerformanceRating;
+    optimizationSuggestions?: string[] | undefined;
+
+    constructor(data?: IAlertRulePerformanceAnalysisDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.alertRuleId = _data["alertRuleId"];
+            this.ruleDescription = _data["ruleDescription"];
+            this.conditionType = _data["conditionType"];
+            this.isActive = _data["isActive"];
+            this.timesTriggered = _data["timesTriggered"];
+            this.notificationsSent = _data["notificationsSent"];
+            this.notificationSuccessRate = _data["notificationSuccessRate"];
+            this.averageEvaluationTime = _data["averageEvaluationTime"];
+            this.averageNotificationTime = _data["averageNotificationTime"];
+            this.lastTriggered = _data["lastTriggered"] ? new Date(_data["lastTriggered"].toString()) : <any>undefined;
+            this.lastSuccessfulNotification = _data["lastSuccessfulNotification"] ? new Date(_data["lastSuccessfulNotification"].toString()) : <any>undefined;
+            if (Array.isArray(_data["recentErrors"])) {
+                this.recentErrors = [] as any;
+                for (let item of _data["recentErrors"])
+                    this.recentErrors!.push(item);
+            }
+            this.performanceRating = _data["performanceRating"];
+            if (Array.isArray(_data["optimizationSuggestions"])) {
+                this.optimizationSuggestions = [] as any;
+                for (let item of _data["optimizationSuggestions"])
+                    this.optimizationSuggestions!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertRulePerformanceAnalysisDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertRulePerformanceAnalysisDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["alertRuleId"] = this.alertRuleId;
+        data["ruleDescription"] = this.ruleDescription;
+        data["conditionType"] = this.conditionType;
+        data["isActive"] = this.isActive;
+        data["timesTriggered"] = this.timesTriggered;
+        data["notificationsSent"] = this.notificationsSent;
+        data["notificationSuccessRate"] = this.notificationSuccessRate;
+        data["averageEvaluationTime"] = this.averageEvaluationTime;
+        data["averageNotificationTime"] = this.averageNotificationTime;
+        data["lastTriggered"] = this.lastTriggered ? this.lastTriggered.toISOString() : <any>undefined;
+        data["lastSuccessfulNotification"] = this.lastSuccessfulNotification ? this.lastSuccessfulNotification.toISOString() : <any>undefined;
+        if (Array.isArray(this.recentErrors)) {
+            data["recentErrors"] = [];
+            for (let item of this.recentErrors)
+                data["recentErrors"].push(item);
+        }
+        data["performanceRating"] = this.performanceRating;
+        if (Array.isArray(this.optimizationSuggestions)) {
+            data["optimizationSuggestions"] = [];
+            for (let item of this.optimizationSuggestions)
+                data["optimizationSuggestions"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IAlertRulePerformanceAnalysisDto {
+    alertRuleId?: string;
+    ruleDescription?: string | undefined;
+    conditionType?: string | undefined;
+    isActive?: boolean;
+    timesTriggered?: number;
+    notificationsSent?: number;
+    notificationSuccessRate?: number;
+    averageEvaluationTime?: string;
+    averageNotificationTime?: string;
+    lastTriggered?: Date | undefined;
+    lastSuccessfulNotification?: Date | undefined;
+    recentErrors?: string[] | undefined;
+    performanceRating?: PerformanceRating;
+    optimizationSuggestions?: string[] | undefined;
+}
+
+export class AlertRulePerformanceAnalysisDtoApiResponse implements IAlertRulePerformanceAnalysisDtoApiResponse {
+    success?: boolean;
+    data?: AlertRulePerformanceAnalysisDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertRulePerformanceAnalysisDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertRulePerformanceAnalysisDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertRulePerformanceAnalysisDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertRulePerformanceAnalysisDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertRulePerformanceAnalysisDtoApiResponse {
+    success?: boolean;
+    data?: AlertRulePerformanceAnalysisDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertRulePerformanceAnalysisDtoListApiResponse implements IAlertRulePerformanceAnalysisDtoListApiResponse {
+    success?: boolean;
+    data?: AlertRulePerformanceAnalysisDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertRulePerformanceAnalysisDtoListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(AlertRulePerformanceAnalysisDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertRulePerformanceAnalysisDtoListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertRulePerformanceAnalysisDtoListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertRulePerformanceAnalysisDtoListApiResponse {
+    success?: boolean;
+    data?: AlertRulePerformanceAnalysisDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertRuleSimulationRequestDto implements IAlertRuleSimulationRequestDto {
+    alertRule!: TestAlertRuleDto;
+    testPricePoint?: TestPricePointDto;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
+    maxRecords?: number | undefined;
+
+    constructor(data?: IAlertRuleSimulationRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.alertRule = new TestAlertRuleDto();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.alertRule = _data["alertRule"] ? TestAlertRuleDto.fromJS(_data["alertRule"]) : new TestAlertRuleDto();
+            this.testPricePoint = _data["testPricePoint"] ? TestPricePointDto.fromJS(_data["testPricePoint"]) : <any>undefined;
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : <any>undefined;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : <any>undefined;
+            this.maxRecords = _data["maxRecords"];
+        }
+    }
+
+    static fromJS(data: any): AlertRuleSimulationRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertRuleSimulationRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["alertRule"] = this.alertRule ? this.alertRule.toJSON() : <any>undefined;
+        data["testPricePoint"] = this.testPricePoint ? this.testPricePoint.toJSON() : <any>undefined;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
+        data["maxRecords"] = this.maxRecords;
+        return data;
+    }
+}
+
+export interface IAlertRuleSimulationRequestDto {
+    alertRule: TestAlertRuleDto;
+    testPricePoint?: TestPricePointDto;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
+    maxRecords?: number | undefined;
+}
+
+export class AlertRuleValidationResultDto implements IAlertRuleValidationResultDto {
+    isValid?: boolean;
+    validationErrors?: string[] | undefined;
+    warnings?: string[] | undefined;
+    suggestions?: string[] | undefined;
+    productExists?: boolean;
+    productName?: string | undefined;
+    currentLowestPrice?: number | undefined;
+    currentHighestPrice?: number | undefined;
+    mostCommonStockStatus?: string | undefined;
+
+    constructor(data?: IAlertRuleValidationResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isValid = _data["isValid"];
+            if (Array.isArray(_data["validationErrors"])) {
+                this.validationErrors = [] as any;
+                for (let item of _data["validationErrors"])
+                    this.validationErrors!.push(item);
+            }
+            if (Array.isArray(_data["warnings"])) {
+                this.warnings = [] as any;
+                for (let item of _data["warnings"])
+                    this.warnings!.push(item);
+            }
+            if (Array.isArray(_data["suggestions"])) {
+                this.suggestions = [] as any;
+                for (let item of _data["suggestions"])
+                    this.suggestions!.push(item);
+            }
+            this.productExists = _data["productExists"];
+            this.productName = _data["productName"];
+            this.currentLowestPrice = _data["currentLowestPrice"];
+            this.currentHighestPrice = _data["currentHighestPrice"];
+            this.mostCommonStockStatus = _data["mostCommonStockStatus"];
+        }
+    }
+
+    static fromJS(data: any): AlertRuleValidationResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertRuleValidationResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isValid"] = this.isValid;
+        if (Array.isArray(this.validationErrors)) {
+            data["validationErrors"] = [];
+            for (let item of this.validationErrors)
+                data["validationErrors"].push(item);
+        }
+        if (Array.isArray(this.warnings)) {
+            data["warnings"] = [];
+            for (let item of this.warnings)
+                data["warnings"].push(item);
+        }
+        if (Array.isArray(this.suggestions)) {
+            data["suggestions"] = [];
+            for (let item of this.suggestions)
+                data["suggestions"].push(item);
+        }
+        data["productExists"] = this.productExists;
+        data["productName"] = this.productName;
+        data["currentLowestPrice"] = this.currentLowestPrice;
+        data["currentHighestPrice"] = this.currentHighestPrice;
+        data["mostCommonStockStatus"] = this.mostCommonStockStatus;
+        return data;
+    }
+}
+
+export interface IAlertRuleValidationResultDto {
+    isValid?: boolean;
+    validationErrors?: string[] | undefined;
+    warnings?: string[] | undefined;
+    suggestions?: string[] | undefined;
+    productExists?: boolean;
+    productName?: string | undefined;
+    currentLowestPrice?: number | undefined;
+    currentHighestPrice?: number | undefined;
+    mostCommonStockStatus?: string | undefined;
+}
+
+export class AlertRuleValidationResultDtoApiResponse implements IAlertRuleValidationResultDtoApiResponse {
+    success?: boolean;
+    data?: AlertRuleValidationResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertRuleValidationResultDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertRuleValidationResultDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertRuleValidationResultDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertRuleValidationResultDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertRuleValidationResultDtoApiResponse {
+    success?: boolean;
+    data?: AlertRuleValidationResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertSystemEventDto implements IAlertSystemEventDto {
+    timestamp?: Date;
+    eventType?: string | undefined;
+    message?: string | undefined;
+    component?: string | undefined;
+    metadata?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertSystemEventDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.eventType = _data["eventType"];
+            this.message = _data["message"];
+            this.component = _data["component"];
+            if (_data["metadata"]) {
+                this.metadata = {} as any;
+                for (let key in _data["metadata"]) {
+                    if (_data["metadata"].hasOwnProperty(key))
+                        (<any>this.metadata)![key] = _data["metadata"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertSystemEventDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertSystemEventDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["eventType"] = this.eventType;
+        data["message"] = this.message;
+        data["component"] = this.component;
+        if (this.metadata) {
+            data["metadata"] = {};
+            for (let key in this.metadata) {
+                if (this.metadata.hasOwnProperty(key))
+                    (<any>data["metadata"])[key] = (<any>this.metadata)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertSystemEventDto {
+    timestamp?: Date;
+    eventType?: string | undefined;
+    message?: string | undefined;
+    component?: string | undefined;
+    metadata?: { [key: string]: any; } | undefined;
+}
+
+export class AlertSystemHealthDto implements IAlertSystemHealthDto {
+    isHealthy?: boolean;
+    healthIssues?: string[] | undefined;
+    activeAlertRules?: number;
+    inactiveAlertRules?: number;
+    alertRulesWithErrors?: number;
+    systemUptime?: string;
+    memoryUsageMB?: number;
+    cpuUsagePercent?: number;
+    queueBacklog?: number;
+    averageProcessingDelay?: string;
+
+    constructor(data?: IAlertSystemHealthDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isHealthy = _data["isHealthy"];
+            if (Array.isArray(_data["healthIssues"])) {
+                this.healthIssues = [] as any;
+                for (let item of _data["healthIssues"])
+                    this.healthIssues!.push(item);
+            }
+            this.activeAlertRules = _data["activeAlertRules"];
+            this.inactiveAlertRules = _data["inactiveAlertRules"];
+            this.alertRulesWithErrors = _data["alertRulesWithErrors"];
+            this.systemUptime = _data["systemUptime"];
+            this.memoryUsageMB = _data["memoryUsageMB"];
+            this.cpuUsagePercent = _data["cpuUsagePercent"];
+            this.queueBacklog = _data["queueBacklog"];
+            this.averageProcessingDelay = _data["averageProcessingDelay"];
+        }
+    }
+
+    static fromJS(data: any): AlertSystemHealthDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertSystemHealthDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isHealthy"] = this.isHealthy;
+        if (Array.isArray(this.healthIssues)) {
+            data["healthIssues"] = [];
+            for (let item of this.healthIssues)
+                data["healthIssues"].push(item);
+        }
+        data["activeAlertRules"] = this.activeAlertRules;
+        data["inactiveAlertRules"] = this.inactiveAlertRules;
+        data["alertRulesWithErrors"] = this.alertRulesWithErrors;
+        data["systemUptime"] = this.systemUptime;
+        data["memoryUsageMB"] = this.memoryUsageMB;
+        data["cpuUsagePercent"] = this.cpuUsagePercent;
+        data["queueBacklog"] = this.queueBacklog;
+        data["averageProcessingDelay"] = this.averageProcessingDelay;
+        return data;
+    }
+}
+
+export interface IAlertSystemHealthDto {
+    isHealthy?: boolean;
+    healthIssues?: string[] | undefined;
+    activeAlertRules?: number;
+    inactiveAlertRules?: number;
+    alertRulesWithErrors?: number;
+    systemUptime?: string;
+    memoryUsageMB?: number;
+    cpuUsagePercent?: number;
+    queueBacklog?: number;
+    averageProcessingDelay?: string;
+}
+
+export class AlertSystemHealthDtoApiResponse implements IAlertSystemHealthDtoApiResponse {
+    success?: boolean;
+    data?: AlertSystemHealthDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertSystemHealthDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertSystemHealthDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertSystemHealthDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertSystemHealthDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertSystemHealthDtoApiResponse {
+    success?: boolean;
+    data?: AlertSystemHealthDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertSystemPerformanceDto implements IAlertSystemPerformanceDto {
+    metricsGeneratedAt?: Date;
+    periodStart?: Date | undefined;
+    periodEnd?: Date | undefined;
+    evaluationMetrics?: AlertEvaluationMetricsDto;
+    notificationMetrics?: NotificationDeliveryMetricsDto;
+    systemHealth?: AlertSystemHealthDto;
+    performanceTrends?: AlertPerformanceTrendDto[] | undefined;
+
+    constructor(data?: IAlertSystemPerformanceDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.metricsGeneratedAt = _data["metricsGeneratedAt"] ? new Date(_data["metricsGeneratedAt"].toString()) : <any>undefined;
+            this.periodStart = _data["periodStart"] ? new Date(_data["periodStart"].toString()) : <any>undefined;
+            this.periodEnd = _data["periodEnd"] ? new Date(_data["periodEnd"].toString()) : <any>undefined;
+            this.evaluationMetrics = _data["evaluationMetrics"] ? AlertEvaluationMetricsDto.fromJS(_data["evaluationMetrics"]) : <any>undefined;
+            this.notificationMetrics = _data["notificationMetrics"] ? NotificationDeliveryMetricsDto.fromJS(_data["notificationMetrics"]) : <any>undefined;
+            this.systemHealth = _data["systemHealth"] ? AlertSystemHealthDto.fromJS(_data["systemHealth"]) : <any>undefined;
+            if (Array.isArray(_data["performanceTrends"])) {
+                this.performanceTrends = [] as any;
+                for (let item of _data["performanceTrends"])
+                    this.performanceTrends!.push(AlertPerformanceTrendDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertSystemPerformanceDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertSystemPerformanceDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["metricsGeneratedAt"] = this.metricsGeneratedAt ? this.metricsGeneratedAt.toISOString() : <any>undefined;
+        data["periodStart"] = this.periodStart ? this.periodStart.toISOString() : <any>undefined;
+        data["periodEnd"] = this.periodEnd ? this.periodEnd.toISOString() : <any>undefined;
+        data["evaluationMetrics"] = this.evaluationMetrics ? this.evaluationMetrics.toJSON() : <any>undefined;
+        data["notificationMetrics"] = this.notificationMetrics ? this.notificationMetrics.toJSON() : <any>undefined;
+        data["systemHealth"] = this.systemHealth ? this.systemHealth.toJSON() : <any>undefined;
+        if (Array.isArray(this.performanceTrends)) {
+            data["performanceTrends"] = [];
+            for (let item of this.performanceTrends)
+                data["performanceTrends"].push(item ? item.toJSON() : <any>undefined);
+        }
+        return data;
+    }
+}
+
+export interface IAlertSystemPerformanceDto {
+    metricsGeneratedAt?: Date;
+    periodStart?: Date | undefined;
+    periodEnd?: Date | undefined;
+    evaluationMetrics?: AlertEvaluationMetricsDto;
+    notificationMetrics?: NotificationDeliveryMetricsDto;
+    systemHealth?: AlertSystemHealthDto;
+    performanceTrends?: AlertPerformanceTrendDto[] | undefined;
+}
+
+export class AlertSystemPerformanceDtoApiResponse implements IAlertSystemPerformanceDtoApiResponse {
+    success?: boolean;
+    data?: AlertSystemPerformanceDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertSystemPerformanceDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertSystemPerformanceDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertSystemPerformanceDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertSystemPerformanceDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertSystemPerformanceDtoApiResponse {
+    success?: boolean;
+    data?: AlertSystemPerformanceDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertTestMatchDto implements IAlertTestMatchDto {
+    price?: number;
+    stockStatus?: string | undefined;
+    sellerName?: string | undefined;
+    timestamp?: Date;
+    sourceUrl?: string | undefined;
+    triggerReason?: string | undefined;
+    wouldTrigger?: boolean;
+
+    constructor(data?: IAlertTestMatchDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.price = _data["price"];
+            this.stockStatus = _data["stockStatus"];
+            this.sellerName = _data["sellerName"];
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.sourceUrl = _data["sourceUrl"];
+            this.triggerReason = _data["triggerReason"];
+            this.wouldTrigger = _data["wouldTrigger"];
+        }
+    }
+
+    static fromJS(data: any): AlertTestMatchDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertTestMatchDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["price"] = this.price;
+        data["stockStatus"] = this.stockStatus;
+        data["sellerName"] = this.sellerName;
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["sourceUrl"] = this.sourceUrl;
+        data["triggerReason"] = this.triggerReason;
+        data["wouldTrigger"] = this.wouldTrigger;
+        return data;
+    }
+}
+
+export interface IAlertTestMatchDto {
+    price?: number;
+    stockStatus?: string | undefined;
+    sellerName?: string | undefined;
+    timestamp?: Date;
+    sourceUrl?: string | undefined;
+    triggerReason?: string | undefined;
+    wouldTrigger?: boolean;
+}
+
+export class AlertTestRequestDto implements IAlertTestRequestDto {
+    alertRuleId!: string;
+    testPricePoint?: TestPricePointDto;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
+    maxRecords?: number | undefined;
+
+    constructor(data?: IAlertTestRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.alertRuleId = _data["alertRuleId"];
+            this.testPricePoint = _data["testPricePoint"] ? TestPricePointDto.fromJS(_data["testPricePoint"]) : <any>undefined;
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : <any>undefined;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : <any>undefined;
+            this.maxRecords = _data["maxRecords"];
+        }
+    }
+
+    static fromJS(data: any): AlertTestRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertTestRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["alertRuleId"] = this.alertRuleId;
+        data["testPricePoint"] = this.testPricePoint ? this.testPricePoint.toJSON() : <any>undefined;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
+        data["maxRecords"] = this.maxRecords;
+        return data;
+    }
+}
+
+export interface IAlertTestRequestDto {
+    alertRuleId: string;
+    testPricePoint?: TestPricePointDto;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
+    maxRecords?: number | undefined;
+}
+
+export class AlertTestResultDto implements IAlertTestResultDto {
+    alertRuleId?: string;
+    alertRuleDescription?: string | undefined;
+    wouldTrigger?: boolean;
+    testType?: string | undefined;
+    totalPointsTested?: number;
+    triggeredCount?: number;
+    matches?: AlertTestMatchDto[] | undefined;
+    errorMessage?: string | undefined;
+    testedAt?: Date;
+
+    constructor(data?: IAlertTestResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.alertRuleId = _data["alertRuleId"];
+            this.alertRuleDescription = _data["alertRuleDescription"];
+            this.wouldTrigger = _data["wouldTrigger"];
+            this.testType = _data["testType"];
+            this.totalPointsTested = _data["totalPointsTested"];
+            this.triggeredCount = _data["triggeredCount"];
+            if (Array.isArray(_data["matches"])) {
+                this.matches = [] as any;
+                for (let item of _data["matches"])
+                    this.matches!.push(AlertTestMatchDto.fromJS(item));
+            }
+            this.errorMessage = _data["errorMessage"];
+            this.testedAt = _data["testedAt"] ? new Date(_data["testedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): AlertTestResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertTestResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["alertRuleId"] = this.alertRuleId;
+        data["alertRuleDescription"] = this.alertRuleDescription;
+        data["wouldTrigger"] = this.wouldTrigger;
+        data["testType"] = this.testType;
+        data["totalPointsTested"] = this.totalPointsTested;
+        data["triggeredCount"] = this.triggeredCount;
+        if (Array.isArray(this.matches)) {
+            data["matches"] = [];
+            for (let item of this.matches)
+                data["matches"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["errorMessage"] = this.errorMessage;
+        data["testedAt"] = this.testedAt ? this.testedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IAlertTestResultDto {
+    alertRuleId?: string;
+    alertRuleDescription?: string | undefined;
+    wouldTrigger?: boolean;
+    testType?: string | undefined;
+    totalPointsTested?: number;
+    triggeredCount?: number;
+    matches?: AlertTestMatchDto[] | undefined;
+    errorMessage?: string | undefined;
+    testedAt?: Date;
+}
+
+export class AlertTestResultDtoApiResponse implements IAlertTestResultDtoApiResponse {
+    success?: boolean;
+    data?: AlertTestResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertTestResultDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertTestResultDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertTestResultDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertTestResultDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertTestResultDtoApiResponse {
+    success?: boolean;
+    data?: AlertTestResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertTestResultDtoListApiResponse implements IAlertTestResultDtoListApiResponse {
+    success?: boolean;
+    data?: AlertTestResultDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertTestResultDtoListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(AlertTestResultDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertTestResultDtoListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertTestResultDtoListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertTestResultDtoListApiResponse {
+    success?: boolean;
+    data?: AlertTestResultDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AlertTestingStatsDto implements IAlertTestingStatsDto {
+    totalTestsRun?: number;
+    totalSimulationsRun?: number;
+    totalValidationsRun?: number;
+    testsByConditionType?: { [key: string]: number; } | undefined;
+    testsByUser?: { [key: string]: number; } | undefined;
+    lastTestRun?: Date | undefined;
+
+    constructor(data?: IAlertTestingStatsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalTestsRun = _data["totalTestsRun"];
+            this.totalSimulationsRun = _data["totalSimulationsRun"];
+            this.totalValidationsRun = _data["totalValidationsRun"];
+            if (_data["testsByConditionType"]) {
+                this.testsByConditionType = {} as any;
+                for (let key in _data["testsByConditionType"]) {
+                    if (_data["testsByConditionType"].hasOwnProperty(key))
+                        (<any>this.testsByConditionType)![key] = _data["testsByConditionType"][key];
+                }
+            }
+            if (_data["testsByUser"]) {
+                this.testsByUser = {} as any;
+                for (let key in _data["testsByUser"]) {
+                    if (_data["testsByUser"].hasOwnProperty(key))
+                        (<any>this.testsByUser)![key] = _data["testsByUser"][key];
+                }
+            }
+            this.lastTestRun = _data["lastTestRun"] ? new Date(_data["lastTestRun"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): AlertTestingStatsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertTestingStatsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalTestsRun"] = this.totalTestsRun;
+        data["totalSimulationsRun"] = this.totalSimulationsRun;
+        data["totalValidationsRun"] = this.totalValidationsRun;
+        if (this.testsByConditionType) {
+            data["testsByConditionType"] = {};
+            for (let key in this.testsByConditionType) {
+                if (this.testsByConditionType.hasOwnProperty(key))
+                    (<any>data["testsByConditionType"])[key] = (<any>this.testsByConditionType)[key];
+            }
+        }
+        if (this.testsByUser) {
+            data["testsByUser"] = {};
+            for (let key in this.testsByUser) {
+                if (this.testsByUser.hasOwnProperty(key))
+                    (<any>data["testsByUser"])[key] = (<any>this.testsByUser)[key];
+            }
+        }
+        data["lastTestRun"] = this.lastTestRun ? this.lastTestRun.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IAlertTestingStatsDto {
+    totalTestsRun?: number;
+    totalSimulationsRun?: number;
+    totalValidationsRun?: number;
+    testsByConditionType?: { [key: string]: number; } | undefined;
+    testsByUser?: { [key: string]: number; } | undefined;
+    lastTestRun?: Date | undefined;
+}
+
+export class AlertTestingStatsDtoApiResponse implements IAlertTestingStatsDtoApiResponse {
+    success?: boolean;
+    data?: AlertTestingStatsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertTestingStatsDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertTestingStatsDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertTestingStatsDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertTestingStatsDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertTestingStatsDtoApiResponse {
+    success?: boolean;
+    data?: AlertTestingStatsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class ApiResponse implements IApiResponse {
@@ -5791,6 +9950,7 @@ export interface ICategoryDtoIEnumerableApiResponse {
 export class CreateAlertRuleDto implements ICreateAlertRuleDto {
     canonicalProductId!: string;
     conditionType!: string;
+    alertType!: string;
     thresholdValue?: number | undefined;
     percentageValue?: number | undefined;
     specificSellerName?: string | undefined;
@@ -5809,6 +9969,7 @@ export class CreateAlertRuleDto implements ICreateAlertRuleDto {
         if (_data) {
             this.canonicalProductId = _data["canonicalProductId"];
             this.conditionType = _data["conditionType"];
+            this.alertType = _data["alertType"];
             this.thresholdValue = _data["thresholdValue"];
             this.percentageValue = _data["percentageValue"];
             this.specificSellerName = _data["specificSellerName"];
@@ -5827,6 +9988,7 @@ export class CreateAlertRuleDto implements ICreateAlertRuleDto {
         data = typeof data === 'object' ? data : {};
         data["canonicalProductId"] = this.canonicalProductId;
         data["conditionType"] = this.conditionType;
+        data["alertType"] = this.alertType;
         data["thresholdValue"] = this.thresholdValue;
         data["percentageValue"] = this.percentageValue;
         data["specificSellerName"] = this.specificSellerName;
@@ -5838,6 +10000,7 @@ export class CreateAlertRuleDto implements ICreateAlertRuleDto {
 export interface ICreateAlertRuleDto {
     canonicalProductId: string;
     conditionType: string;
+    alertType: string;
     thresholdValue?: number | undefined;
     percentageValue?: number | undefined;
     specificSellerName?: string | undefined;
@@ -6808,6 +10971,270 @@ export interface ILoginUserDto {
     password: string;
 }
 
+export class NotificationChannelStatsDto implements INotificationChannelStatsDto {
+    channelName?: string | undefined;
+    totalNotifications?: number;
+    successfulDeliveries?: number;
+    failedDeliveries?: number;
+    successRate?: number;
+    averageDeliveryTime?: string;
+    maxDeliveryTime?: string;
+    minDeliveryTime?: string;
+    topFailureReasons?: NotificationFailureReasonDto[] | undefined;
+    deliveriesByHour?: { [key: string]: number; } | undefined;
+    isHealthy?: boolean;
+    healthIssues?: string[] | undefined;
+
+    constructor(data?: INotificationChannelStatsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.channelName = _data["channelName"];
+            this.totalNotifications = _data["totalNotifications"];
+            this.successfulDeliveries = _data["successfulDeliveries"];
+            this.failedDeliveries = _data["failedDeliveries"];
+            this.successRate = _data["successRate"];
+            this.averageDeliveryTime = _data["averageDeliveryTime"];
+            this.maxDeliveryTime = _data["maxDeliveryTime"];
+            this.minDeliveryTime = _data["minDeliveryTime"];
+            if (Array.isArray(_data["topFailureReasons"])) {
+                this.topFailureReasons = [] as any;
+                for (let item of _data["topFailureReasons"])
+                    this.topFailureReasons!.push(NotificationFailureReasonDto.fromJS(item));
+            }
+            if (_data["deliveriesByHour"]) {
+                this.deliveriesByHour = {} as any;
+                for (let key in _data["deliveriesByHour"]) {
+                    if (_data["deliveriesByHour"].hasOwnProperty(key))
+                        (<any>this.deliveriesByHour)![key] = _data["deliveriesByHour"][key];
+                }
+            }
+            this.isHealthy = _data["isHealthy"];
+            if (Array.isArray(_data["healthIssues"])) {
+                this.healthIssues = [] as any;
+                for (let item of _data["healthIssues"])
+                    this.healthIssues!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): NotificationChannelStatsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new NotificationChannelStatsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["channelName"] = this.channelName;
+        data["totalNotifications"] = this.totalNotifications;
+        data["successfulDeliveries"] = this.successfulDeliveries;
+        data["failedDeliveries"] = this.failedDeliveries;
+        data["successRate"] = this.successRate;
+        data["averageDeliveryTime"] = this.averageDeliveryTime;
+        data["maxDeliveryTime"] = this.maxDeliveryTime;
+        data["minDeliveryTime"] = this.minDeliveryTime;
+        if (Array.isArray(this.topFailureReasons)) {
+            data["topFailureReasons"] = [];
+            for (let item of this.topFailureReasons)
+                data["topFailureReasons"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (this.deliveriesByHour) {
+            data["deliveriesByHour"] = {};
+            for (let key in this.deliveriesByHour) {
+                if (this.deliveriesByHour.hasOwnProperty(key))
+                    (<any>data["deliveriesByHour"])[key] = (<any>this.deliveriesByHour)[key];
+            }
+        }
+        data["isHealthy"] = this.isHealthy;
+        if (Array.isArray(this.healthIssues)) {
+            data["healthIssues"] = [];
+            for (let item of this.healthIssues)
+                data["healthIssues"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface INotificationChannelStatsDto {
+    channelName?: string | undefined;
+    totalNotifications?: number;
+    successfulDeliveries?: number;
+    failedDeliveries?: number;
+    successRate?: number;
+    averageDeliveryTime?: string;
+    maxDeliveryTime?: string;
+    minDeliveryTime?: string;
+    topFailureReasons?: NotificationFailureReasonDto[] | undefined;
+    deliveriesByHour?: { [key: string]: number; } | undefined;
+    isHealthy?: boolean;
+    healthIssues?: string[] | undefined;
+}
+
+export class NotificationDeliveryMetricsDto implements INotificationDeliveryMetricsDto {
+    totalNotificationsSent?: number;
+    successfulDeliveries?: number;
+    failedDeliveries?: number;
+    pendingDeliveries?: number;
+    deliverySuccessRate?: number;
+    averageDeliveryTime?: string;
+    maxDeliveryTime?: string;
+    minDeliveryTime?: string;
+    deliveriesByChannel?: { [key: string]: number; } | undefined;
+    successRateByChannel?: { [key: string]: number; } | undefined;
+    topFailureReasons?: NotificationFailureReasonDto[] | undefined;
+
+    constructor(data?: INotificationDeliveryMetricsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalNotificationsSent = _data["totalNotificationsSent"];
+            this.successfulDeliveries = _data["successfulDeliveries"];
+            this.failedDeliveries = _data["failedDeliveries"];
+            this.pendingDeliveries = _data["pendingDeliveries"];
+            this.deliverySuccessRate = _data["deliverySuccessRate"];
+            this.averageDeliveryTime = _data["averageDeliveryTime"];
+            this.maxDeliveryTime = _data["maxDeliveryTime"];
+            this.minDeliveryTime = _data["minDeliveryTime"];
+            if (_data["deliveriesByChannel"]) {
+                this.deliveriesByChannel = {} as any;
+                for (let key in _data["deliveriesByChannel"]) {
+                    if (_data["deliveriesByChannel"].hasOwnProperty(key))
+                        (<any>this.deliveriesByChannel)![key] = _data["deliveriesByChannel"][key];
+                }
+            }
+            if (_data["successRateByChannel"]) {
+                this.successRateByChannel = {} as any;
+                for (let key in _data["successRateByChannel"]) {
+                    if (_data["successRateByChannel"].hasOwnProperty(key))
+                        (<any>this.successRateByChannel)![key] = _data["successRateByChannel"][key];
+                }
+            }
+            if (Array.isArray(_data["topFailureReasons"])) {
+                this.topFailureReasons = [] as any;
+                for (let item of _data["topFailureReasons"])
+                    this.topFailureReasons!.push(NotificationFailureReasonDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): NotificationDeliveryMetricsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new NotificationDeliveryMetricsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalNotificationsSent"] = this.totalNotificationsSent;
+        data["successfulDeliveries"] = this.successfulDeliveries;
+        data["failedDeliveries"] = this.failedDeliveries;
+        data["pendingDeliveries"] = this.pendingDeliveries;
+        data["deliverySuccessRate"] = this.deliverySuccessRate;
+        data["averageDeliveryTime"] = this.averageDeliveryTime;
+        data["maxDeliveryTime"] = this.maxDeliveryTime;
+        data["minDeliveryTime"] = this.minDeliveryTime;
+        if (this.deliveriesByChannel) {
+            data["deliveriesByChannel"] = {};
+            for (let key in this.deliveriesByChannel) {
+                if (this.deliveriesByChannel.hasOwnProperty(key))
+                    (<any>data["deliveriesByChannel"])[key] = (<any>this.deliveriesByChannel)[key];
+            }
+        }
+        if (this.successRateByChannel) {
+            data["successRateByChannel"] = {};
+            for (let key in this.successRateByChannel) {
+                if (this.successRateByChannel.hasOwnProperty(key))
+                    (<any>data["successRateByChannel"])[key] = (<any>this.successRateByChannel)[key];
+            }
+        }
+        if (Array.isArray(this.topFailureReasons)) {
+            data["topFailureReasons"] = [];
+            for (let item of this.topFailureReasons)
+                data["topFailureReasons"].push(item ? item.toJSON() : <any>undefined);
+        }
+        return data;
+    }
+}
+
+export interface INotificationDeliveryMetricsDto {
+    totalNotificationsSent?: number;
+    successfulDeliveries?: number;
+    failedDeliveries?: number;
+    pendingDeliveries?: number;
+    deliverySuccessRate?: number;
+    averageDeliveryTime?: string;
+    maxDeliveryTime?: string;
+    minDeliveryTime?: string;
+    deliveriesByChannel?: { [key: string]: number; } | undefined;
+    successRateByChannel?: { [key: string]: number; } | undefined;
+    topFailureReasons?: NotificationFailureReasonDto[] | undefined;
+}
+
+export class NotificationFailureReasonDto implements INotificationFailureReasonDto {
+    reason?: string | undefined;
+    count?: number;
+    percentage?: number;
+    suggestedAction?: string | undefined;
+
+    constructor(data?: INotificationFailureReasonDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.reason = _data["reason"];
+            this.count = _data["count"];
+            this.percentage = _data["percentage"];
+            this.suggestedAction = _data["suggestedAction"];
+        }
+    }
+
+    static fromJS(data: any): NotificationFailureReasonDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new NotificationFailureReasonDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["reason"] = this.reason;
+        data["count"] = this.count;
+        data["percentage"] = this.percentage;
+        data["suggestedAction"] = this.suggestedAction;
+        return data;
+    }
+}
+
+export interface INotificationFailureReasonDto {
+    reason?: string | undefined;
+    count?: number;
+    percentage?: number;
+    suggestedAction?: string | undefined;
+}
+
 export class NotificationPreferencesSummaryDto implements INotificationPreferencesSummaryDto {
     isDiscordEnabled?: boolean;
     hasWebhookConfigured?: boolean;
@@ -7342,6 +11769,14 @@ export interface IPaginationMeta {
     hasNextPage?: boolean;
     firstItemOnPage?: number;
     lastItemOnPage?: number;
+}
+
+export enum PerformanceRating {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
 }
 
 export class PermissionDto implements IPermissionDto {
@@ -8622,6 +13057,234 @@ export interface IProductWithCurrentPricesDtoPagedResponse {
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
     pagination?: PaginationMeta;
+}
+
+export class RealTimeAlertMonitoringDto implements IRealTimeAlertMonitoringDto {
+    lastUpdated?: Date;
+    alertsInLastMinute?: number;
+    alertsInLastHour?: number;
+    notificationsInLastMinute?: number;
+    notificationsInLastHour?: number;
+    currentQueueSize?: number;
+    averageProcessingTime?: string;
+    recentActivity?: RecentAlertActivityDto[] | undefined;
+    recentEvents?: AlertSystemEventDto[] | undefined;
+
+    constructor(data?: IRealTimeAlertMonitoringDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.lastUpdated = _data["lastUpdated"] ? new Date(_data["lastUpdated"].toString()) : <any>undefined;
+            this.alertsInLastMinute = _data["alertsInLastMinute"];
+            this.alertsInLastHour = _data["alertsInLastHour"];
+            this.notificationsInLastMinute = _data["notificationsInLastMinute"];
+            this.notificationsInLastHour = _data["notificationsInLastHour"];
+            this.currentQueueSize = _data["currentQueueSize"];
+            this.averageProcessingTime = _data["averageProcessingTime"];
+            if (Array.isArray(_data["recentActivity"])) {
+                this.recentActivity = [] as any;
+                for (let item of _data["recentActivity"])
+                    this.recentActivity!.push(RecentAlertActivityDto.fromJS(item));
+            }
+            if (Array.isArray(_data["recentEvents"])) {
+                this.recentEvents = [] as any;
+                for (let item of _data["recentEvents"])
+                    this.recentEvents!.push(AlertSystemEventDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RealTimeAlertMonitoringDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RealTimeAlertMonitoringDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["lastUpdated"] = this.lastUpdated ? this.lastUpdated.toISOString() : <any>undefined;
+        data["alertsInLastMinute"] = this.alertsInLastMinute;
+        data["alertsInLastHour"] = this.alertsInLastHour;
+        data["notificationsInLastMinute"] = this.notificationsInLastMinute;
+        data["notificationsInLastHour"] = this.notificationsInLastHour;
+        data["currentQueueSize"] = this.currentQueueSize;
+        data["averageProcessingTime"] = this.averageProcessingTime;
+        if (Array.isArray(this.recentActivity)) {
+            data["recentActivity"] = [];
+            for (let item of this.recentActivity)
+                data["recentActivity"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.recentEvents)) {
+            data["recentEvents"] = [];
+            for (let item of this.recentEvents)
+                data["recentEvents"].push(item ? item.toJSON() : <any>undefined);
+        }
+        return data;
+    }
+}
+
+export interface IRealTimeAlertMonitoringDto {
+    lastUpdated?: Date;
+    alertsInLastMinute?: number;
+    alertsInLastHour?: number;
+    notificationsInLastMinute?: number;
+    notificationsInLastHour?: number;
+    currentQueueSize?: number;
+    averageProcessingTime?: string;
+    recentActivity?: RecentAlertActivityDto[] | undefined;
+    recentEvents?: AlertSystemEventDto[] | undefined;
+}
+
+export class RealTimeAlertMonitoringDtoApiResponse implements IRealTimeAlertMonitoringDtoApiResponse {
+    success?: boolean;
+    data?: RealTimeAlertMonitoringDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IRealTimeAlertMonitoringDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? RealTimeAlertMonitoringDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): RealTimeAlertMonitoringDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new RealTimeAlertMonitoringDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IRealTimeAlertMonitoringDtoApiResponse {
+    success?: boolean;
+    data?: RealTimeAlertMonitoringDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class RecentAlertActivityDto implements IRecentAlertActivityDto {
+    timestamp?: Date;
+    alertRuleId?: string;
+    productName?: string | undefined;
+    conditionType?: string | undefined;
+    triggeringPrice?: number;
+    status?: string | undefined;
+    processingTime?: string;
+
+    constructor(data?: IRecentAlertActivityDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.alertRuleId = _data["alertRuleId"];
+            this.productName = _data["productName"];
+            this.conditionType = _data["conditionType"];
+            this.triggeringPrice = _data["triggeringPrice"];
+            this.status = _data["status"];
+            this.processingTime = _data["processingTime"];
+        }
+    }
+
+    static fromJS(data: any): RecentAlertActivityDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RecentAlertActivityDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["alertRuleId"] = this.alertRuleId;
+        data["productName"] = this.productName;
+        data["conditionType"] = this.conditionType;
+        data["triggeringPrice"] = this.triggeringPrice;
+        data["status"] = this.status;
+        data["processingTime"] = this.processingTime;
+        return data;
+    }
+}
+
+export interface IRecentAlertActivityDto {
+    timestamp?: Date;
+    alertRuleId?: string;
+    productName?: string | undefined;
+    conditionType?: string | undefined;
+    triggeringPrice?: number;
+    status?: string | undefined;
+    processingTime?: string;
 }
 
 export class RegisterUserDto implements IRegisterUserDto {
@@ -10384,6 +15047,102 @@ export interface IStringApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class StringNotificationChannelStatsDtoDictionaryApiResponse implements IStringNotificationChannelStatsDtoDictionaryApiResponse {
+    success?: boolean;
+    data?: { [key: string]: NotificationChannelStatsDto; } | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IStringNotificationChannelStatsDtoDictionaryApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (_data["data"]) {
+                this.data = {} as any;
+                for (let key in _data["data"]) {
+                    if (_data["data"].hasOwnProperty(key))
+                        (<any>this.data)![key] = _data["data"][key] ? NotificationChannelStatsDto.fromJS(_data["data"][key]) : new NotificationChannelStatsDto();
+                }
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): StringNotificationChannelStatsDtoDictionaryApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new StringNotificationChannelStatsDtoDictionaryApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (this.data) {
+            data["data"] = {};
+            for (let key in this.data) {
+                if (this.data.hasOwnProperty(key))
+                    (<any>data["data"])[key] = this.data[key] ? this.data[key].toJSON() : <any>undefined;
+            }
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IStringNotificationChannelStatsDtoDictionaryApiResponse {
+    success?: boolean;
+    data?: { [key: string]: NotificationChannelStatsDto; } | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class StringStringArrayDictionaryApiResponse implements IStringStringArrayDictionaryApiResponse {
     success?: boolean;
     data?: { [key: string]: string[]; } | undefined;
@@ -10480,6 +15239,126 @@ export interface IStringStringArrayDictionaryApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class SystemEventRequestDto implements ISystemEventRequestDto {
+    eventType?: string | undefined;
+    message?: string | undefined;
+    component?: string | undefined;
+    metadata?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISystemEventRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.eventType = _data["eventType"];
+            this.message = _data["message"];
+            this.component = _data["component"];
+            if (_data["metadata"]) {
+                this.metadata = {} as any;
+                for (let key in _data["metadata"]) {
+                    if (_data["metadata"].hasOwnProperty(key))
+                        (<any>this.metadata)![key] = _data["metadata"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SystemEventRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SystemEventRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["eventType"] = this.eventType;
+        data["message"] = this.message;
+        data["component"] = this.component;
+        if (this.metadata) {
+            data["metadata"] = {};
+            for (let key in this.metadata) {
+                if (this.metadata.hasOwnProperty(key))
+                    (<any>data["metadata"])[key] = (<any>this.metadata)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISystemEventRequestDto {
+    eventType?: string | undefined;
+    message?: string | undefined;
+    component?: string | undefined;
+    metadata?: { [key: string]: any; } | undefined;
+}
+
+export class TestAlertRuleDto implements ITestAlertRuleDto {
+    canonicalProductId!: string;
+    conditionType!: string;
+    alertType!: string;
+    thresholdValue?: number | undefined;
+    percentageValue?: number | undefined;
+    specificSellerName?: string | undefined;
+    notificationFrequencyMinutes?: number;
+
+    constructor(data?: ITestAlertRuleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.canonicalProductId = _data["canonicalProductId"];
+            this.conditionType = _data["conditionType"];
+            this.alertType = _data["alertType"];
+            this.thresholdValue = _data["thresholdValue"];
+            this.percentageValue = _data["percentageValue"];
+            this.specificSellerName = _data["specificSellerName"];
+            this.notificationFrequencyMinutes = _data["notificationFrequencyMinutes"];
+        }
+    }
+
+    static fromJS(data: any): TestAlertRuleDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestAlertRuleDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["canonicalProductId"] = this.canonicalProductId;
+        data["conditionType"] = this.conditionType;
+        data["alertType"] = this.alertType;
+        data["thresholdValue"] = this.thresholdValue;
+        data["percentageValue"] = this.percentageValue;
+        data["specificSellerName"] = this.specificSellerName;
+        data["notificationFrequencyMinutes"] = this.notificationFrequencyMinutes;
+        return data;
+    }
+}
+
+export interface ITestAlertRuleDto {
+    canonicalProductId: string;
+    conditionType: string;
+    alertType: string;
+    thresholdValue?: number | undefined;
+    percentageValue?: number | undefined;
+    specificSellerName?: string | undefined;
+    notificationFrequencyMinutes?: number;
+}
+
 export class TestDiscordWebhookDto implements ITestDiscordWebhookDto {
     discordWebhookUrl!: string;
     customBotName?: string | undefined;
@@ -10524,8 +15403,61 @@ export interface ITestDiscordWebhookDto {
     customAvatarUrl?: string | undefined;
 }
 
+export class TestPricePointDto implements ITestPricePointDto {
+    price!: number;
+    stockStatus!: string;
+    sellerName?: string | undefined;
+    sourceUrl?: string | undefined;
+    timestamp?: Date | undefined;
+
+    constructor(data?: ITestPricePointDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.price = _data["price"];
+            this.stockStatus = _data["stockStatus"];
+            this.sellerName = _data["sellerName"];
+            this.sourceUrl = _data["sourceUrl"];
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): TestPricePointDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestPricePointDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["price"] = this.price;
+        data["stockStatus"] = this.stockStatus;
+        data["sellerName"] = this.sellerName;
+        data["sourceUrl"] = this.sourceUrl;
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ITestPricePointDto {
+    price: number;
+    stockStatus: string;
+    sellerName?: string | undefined;
+    sourceUrl?: string | undefined;
+    timestamp?: Date | undefined;
+}
+
 export class UpdateAlertRuleDto implements IUpdateAlertRuleDto {
     conditionType?: string | undefined;
+    alertType?: string | undefined;
     thresholdValue?: number | undefined;
     percentageValue?: number | undefined;
     specificSellerName?: string | undefined;
@@ -10544,6 +15476,7 @@ export class UpdateAlertRuleDto implements IUpdateAlertRuleDto {
     init(_data?: any) {
         if (_data) {
             this.conditionType = _data["conditionType"];
+            this.alertType = _data["alertType"];
             this.thresholdValue = _data["thresholdValue"];
             this.percentageValue = _data["percentageValue"];
             this.specificSellerName = _data["specificSellerName"];
@@ -10562,6 +15495,7 @@ export class UpdateAlertRuleDto implements IUpdateAlertRuleDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["conditionType"] = this.conditionType;
+        data["alertType"] = this.alertType;
         data["thresholdValue"] = this.thresholdValue;
         data["percentageValue"] = this.percentageValue;
         data["specificSellerName"] = this.specificSellerName;
@@ -10573,6 +15507,7 @@ export class UpdateAlertRuleDto implements IUpdateAlertRuleDto {
 
 export interface IUpdateAlertRuleDto {
     conditionType?: string | undefined;
+    alertType?: string | undefined;
     thresholdValue?: number | undefined;
     percentageValue?: number | undefined;
     specificSellerName?: string | undefined;

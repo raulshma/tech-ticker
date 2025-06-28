@@ -117,4 +117,17 @@ export class ProductsService {
         })
       );
   }
+
+  // Helper method for alert form autocomplete
+  getAllProducts(): Observable<ProductDto[]> {
+    return this.getProducts({ pageSize: 1000 }).pipe(
+      map(result => result.items)
+    );
+  }
+
+  searchProducts(query: string): Observable<ProductDto[]> {
+    return this.getProducts({ search: query, pageSize: 20 }).pipe(
+      map(result => result.items)
+    );
+  }
 }
