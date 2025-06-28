@@ -296,13 +296,12 @@ public class ImageScrapingOptimizationTests
     }
 
     [Fact]
-    public async Task ScrapeImagesAsync_WithDuplicateContent_ShouldReuseExistingImage()
+    public void ScrapeImagesAsync_WithDuplicateContent_ShouldReuseExistingImage()
     {
         // Arrange
         var productId = Guid.NewGuid();
         var document = Mock.Of<AngleSharp.Dom.IDocument>();
         var imageSelector = "img.product-image";
-        var baseUrl = "https://example.com";
         var maxImages = 5;
 
         var imageUrl = "https://example.com/image.jpg";

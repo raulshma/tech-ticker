@@ -28,10 +28,10 @@ public class PermissionServiceTests : IDisposable
         _context = new TechTickerDbContext(options);
 
         _roleManagerMock = new Mock<RoleManager<IdentityRole<Guid>>>(
-            Mock.Of<IRoleStore<IdentityRole<Guid>>>(), null, null, null, null);
+            Mock.Of<IRoleStore<IdentityRole<Guid>>>(), null!, null!, null!, null!);
 
         _userManagerMock = new Mock<UserManager<ApplicationUser>>(
-            Mock.Of<IUserStore<ApplicationUser>>(), null, null, null, null, null, null, null, null);
+            Mock.Of<IUserStore<ApplicationUser>>(), null!, null!, null!, null!, null!, null!, null!, null!);
 
         _loggerMock = new Mock<ILogger<PermissionService>>();
 

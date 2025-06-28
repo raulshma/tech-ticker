@@ -325,7 +325,7 @@ public class ImageStorageService : IImageStorageService
         return Convert.ToBase64String(hashBytes);
     }
 
-    public async Task<List<string>> GetProductImagePathsAsync(Guid productId)
+    public Task<List<string>> GetProductImagePathsAsync(Guid productId)
     {
         try
         {
@@ -333,7 +333,7 @@ public class ImageStorageService : IImageStorageService
             
             if (!Directory.Exists(productDir))
             {
-                return new List<string>();
+                return Task.FromResult(new List<string>());
             }
 
             var imageFiles = Directory.GetFiles(productDir, "*.*", SearchOption.TopDirectoryOnly)
@@ -348,12 +348,12 @@ public class ImageStorageService : IImageStorageService
                 relativePaths.Add(relativePath);
             }
 
-            return relativePaths;
+            return Task.FromResult(relativePaths);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting image paths for product {ProductId}", productId);
-            return new List<string>();
+            return Task.FromResult(new List<string>());
         }
     }
 

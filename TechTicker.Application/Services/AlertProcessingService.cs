@@ -48,52 +48,55 @@ public class AlertProcessingService : IAlertProcessingService
 
             _logger.LogInformation("Found {AlertRuleCount} alert rules for product {ProductId}", alertRules?.Count() ?? 0, pricePoint.CanonicalProductId);
 
-            foreach (var alertRule in alertRules)
+            if (alertRules != null)
             {
-                var stopwatch = Stopwatch.StartNew();
-                bool wasTriggered = false;
-                bool hadError = false;
-                string? errorMessage = null;
-
-                try
+                foreach (var alertRule in alertRules)
                 {
-                    // Check if enough time has passed since last notification
-                    if (alertRule.LastNotifiedAt.HasValue)
+                    var stopwatch = Stopwatch.StartNew();
+                    bool wasTriggered = false;
+                    bool hadError = false;
+                    string? errorMessage = null;
+
+                    try
                     {
-                        var timeSinceLastNotification = DateTimeOffset.UtcNow - alertRule.LastNotifiedAt.Value;
-                        if (timeSinceLastNotification.TotalMinutes < alertRule.NotificationFrequencyMinutes)
+                        // Check if enough time has passed since last notification
+                        if (alertRule.LastNotifiedAt.HasValue)
                         {
-                            continue; // Skip this alert rule
+                            var timeSinceLastNotification = DateTimeOffset.UtcNow - alertRule.LastNotifiedAt.Value;
+                            if (timeSinceLastNotification.TotalMinutes < alertRule.NotificationFrequencyMinutes)
+                            {
+                                continue; // Skip this alert rule
+                            }
+                        }
+
+                        bool shouldTrigger = await ShouldTriggerAlert(alertRule, pricePoint);
+
+                        _logger.LogInformation("AlertRule {AlertRuleId}: ShouldTriggerAlert={ShouldTrigger}", alertRule.AlertRuleId, shouldTrigger);
+
+                        if (shouldTrigger)
+                        {
+                            wasTriggered = true;
+                            await TriggerAlertAsync(alertRule, pricePoint);
                         }
                     }
-
-                    bool shouldTrigger = await ShouldTriggerAlert(alertRule, pricePoint);
-
-                    _logger.LogInformation("AlertRule {AlertRuleId}: ShouldTriggerAlert={ShouldTrigger}", alertRule.AlertRuleId, shouldTrigger);
-
-                    if (shouldTrigger)
+                    catch (Exception ex)
                     {
-                        wasTriggered = true;
-                        await TriggerAlertAsync(alertRule, pricePoint);
+                        hadError = true;
+                        errorMessage = ex.Message;
+                        _logger.LogError(ex, "Error evaluating alert rule {AlertRuleId}", alertRule.AlertRuleId);
                     }
-                }
-                catch (Exception ex)
-                {
-                    hadError = true;
-                    errorMessage = ex.Message;
-                    _logger.LogError(ex, "Error evaluating alert rule {AlertRuleId}", alertRule.AlertRuleId);
-                }
-                finally
-                {
-                    stopwatch.Stop();
+                    finally
+                    {
+                        stopwatch.Stop();
 
-                    // Record performance metrics
-                    await _performanceMonitoring.RecordAlertEvaluationMetricsAsync(
-                        alertRule.AlertRuleId,
-                        stopwatch.Elapsed,
-                        wasTriggered,
-                        hadError,
-                        errorMessage);
+                        // Record performance metrics
+                        await _performanceMonitoring.RecordAlertEvaluationMetricsAsync(
+                            alertRule.AlertRuleId,
+                            stopwatch.Elapsed,
+                            wasTriggered,
+                            hadError,
+                            errorMessage);
+                    }
                 }
             }
         }

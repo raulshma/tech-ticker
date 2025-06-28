@@ -354,7 +354,7 @@ public class AlertPerformanceMonitoringService : IAlertPerformanceMonitoringServ
             foreach (var alertRule in alertRules)
             {
                 var analysis = await GetAlertRulePerformanceAsync(alertRule.AlertRuleId);
-                if (analysis.IsSuccess)
+                if (analysis.IsSuccess && analysis.Data != null)
                 {
                     performanceAnalyses.Add(analysis.Data);
                 }
@@ -389,7 +389,7 @@ public class AlertPerformanceMonitoringService : IAlertPerformanceMonitoringServ
             foreach (var alertRule in alertRules)
             {
                 var analysis = await GetAlertRulePerformanceAsync(alertRule.AlertRuleId);
-                if (analysis.IsSuccess)
+                if (analysis.IsSuccess && analysis.Data != null)
                 {
                     performanceAnalyses.Add(analysis.Data);
                 }
@@ -419,7 +419,7 @@ public class AlertPerformanceMonitoringService : IAlertPerformanceMonitoringServ
         {
             var overallPerformance = await GetSystemPerformanceAsync(startDate, endDate);
             if (!overallPerformance.IsSuccess)
-                return Result<AlertPerformanceReportDto>.Failure(overallPerformance.ErrorMessage, overallPerformance.ErrorCode);
+                return Result<AlertPerformanceReportDto>.Failure(overallPerformance.ErrorMessage ?? "Unknown error", overallPerformance.ErrorCode);
 
             var topPerformers = await GetTopPerformingAlertRulesAsync(5, startDate, endDate);
             var poorPerformers = await GetPoorlyPerformingAlertRulesAsync(5, startDate, endDate);
@@ -428,11 +428,11 @@ public class AlertPerformanceMonitoringService : IAlertPerformanceMonitoringServ
             {
                 PeriodStart = startDate,
                 PeriodEnd = endDate,
-                OverallPerformance = overallPerformance.Data,
-                TopPerformers = topPerformers.IsSuccess ? topPerformers.Data : new List<AlertRulePerformanceAnalysisDto>(),
-                PoorPerformers = poorPerformers.IsSuccess ? poorPerformers.Data : new List<AlertRulePerformanceAnalysisDto>(),
-                KeyInsights = GenerateKeyInsights(overallPerformance.Data),
-                Recommendations = GenerateRecommendations(overallPerformance.Data)
+                OverallPerformance = overallPerformance.Data ?? new AlertSystemPerformanceDto(),
+                TopPerformers = topPerformers.IsSuccess && topPerformers.Data != null ? topPerformers.Data : new List<AlertRulePerformanceAnalysisDto>(),
+                PoorPerformers = poorPerformers.IsSuccess && poorPerformers.Data != null ? poorPerformers.Data : new List<AlertRulePerformanceAnalysisDto>(),
+                KeyInsights = GenerateKeyInsights(overallPerformance.Data ?? new AlertSystemPerformanceDto()),
+                Recommendations = GenerateRecommendations(overallPerformance.Data ?? new AlertSystemPerformanceDto())
             };
 
             return Result<AlertPerformanceReportDto>.Success(report);
@@ -501,7 +501,7 @@ public class AlertPerformanceMonitoringService : IAlertPerformanceMonitoringServ
         }
     }
 
-    public async Task RecordSystemEventAsync(string eventType, string message, string? component = null, Dictionary<string, object>? metadata = null)
+    public Task RecordSystemEventAsync(string eventType, string message, string? component = null, Dictionary<string, object>? metadata = null)
     {
         try
         {
@@ -529,6 +529,8 @@ public class AlertPerformanceMonitoringService : IAlertPerformanceMonitoringServ
         {
             _logger.LogError(ex, "Error recording system event");
         }
+
+        return Task.CompletedTask;
     }
 
     // Helper methods
