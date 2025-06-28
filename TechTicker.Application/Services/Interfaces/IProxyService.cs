@@ -60,6 +60,11 @@ public interface IProxyService
     Task<Result<IEnumerable<ProxyTestResultDto>>> BulkTestProxiesAsync(BulkProxyTestDto testDto);
 
     /// <summary>
+    /// Test a proxy configuration without saving it
+    /// </summary>
+    Task<Result<ProxyTestResultDto>> TestProxyConfigurationAsync(CreateProxyConfigurationDto proxyDto, string? testUrl = null, int timeoutSeconds = 30);
+
+    /// <summary>
     /// Import proxy configurations in bulk
     /// </summary>
     Task<Result<BulkProxyImportResultDto>> BulkImportProxiesAsync(BulkProxyImportDto importDto);

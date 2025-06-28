@@ -283,6 +283,39 @@ public class ProxyService : IProxyService
         }
     }
 
+    public async Task<Result<ProxyTestResultDto>> TestProxyConfigurationAsync(CreateProxyConfigurationDto proxyDto, string? testUrl = null, int timeoutSeconds = 30)
+    {
+        try
+        {
+            // Create a temporary proxy configuration object for testing
+            var tempProxy = new ProxyConfiguration
+            {
+                ProxyConfigurationId = Guid.NewGuid(), // Temporary ID for testing
+                Host = proxyDto.Host,
+                Port = proxyDto.Port,
+                ProxyType = proxyDto.ProxyType.ToUpper(),
+                Username = proxyDto.Username,
+                Password = proxyDto.Password,
+                TimeoutSeconds = proxyDto.TimeoutSeconds,
+                MaxRetries = proxyDto.MaxRetries,
+                IsActive = proxyDto.IsActive,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+
+            var result = string.IsNullOrEmpty(testUrl)
+                ? await TestProxyWithFallbacks(tempProxy, timeoutSeconds)
+                : await TestProxyConnection(tempProxy, testUrl, timeoutSeconds);
+
+            return Result<ProxyTestResultDto>.Success(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error testing proxy configuration {Host}:{Port}", proxyDto.Host, proxyDto.Port);
+            return Result<ProxyTestResultDto>.Failure($"Failed to test proxy configuration: {ex.Message}");
+        }
+    }
+
     public async Task<Result<ProxyStatsDto>> GetProxyStatsAsync()
     {
         try

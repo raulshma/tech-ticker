@@ -134,20 +134,84 @@
       <!-- Summary Stats -->
       <div class="summary-stats">
         <div class="stat-card valid">
-          <div class="stat-number">{{ getValidProxiesCount() }}</div>
+          <div class="stat-number">{{ getFilteredValidProxiesCount() }}</div>
           <div class="stat-label">Valid</div>
         </div>
         <div class="stat-card duplicate">
-          <div class="stat-number">{{ getDuplicateProxiesCount() }}</div>
+          <div class="stat-number">{{ getFilteredDuplicateProxiesCount() }}</div>
           <div class="stat-label">Duplicates</div>
         </div>
         <div class="stat-card invalid">
-          <div class="stat-number">{{ getInvalidProxiesCount() }}</div>
+          <div class="stat-number">{{ getFilteredInvalidProxiesCount() }}</div>
           <div class="stat-label">Invalid</div>
+        </div>
+        <div class="stat-card total">
+          <div class="stat-number">{{ filteredProxies.length }}</div>
+          <div class="stat-label">Filtered</div>
         </div>
         <div class="stat-card total">
           <div class="stat-number">{{ parsedProxies.length }}</div>
           <div class="stat-label">Total</div>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-controls">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Search</mat-label>
+          <input matInput [(ngModel)]="filterText" (input)="onFilterChange()"
+                 placeholder="Search by host or port">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Type</mat-label>
+          <mat-select [(value)]="filterType" (selectionChange)="onFilterChange()">
+            <mat-option *ngFor="let type of typeOptions" [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Status</mat-label>
+          <mat-select [(value)]="filterStatus" (selectionChange)="onFilterChange()">
+            <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+              {{ status.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-button (click)="clearFilters()" class="clear-filters-btn">
+          <mat-icon>clear</mat-icon>
+          Clear Filters
+        </button>
+      </div>
+
+      <!-- Bulk Actions -->
+      <div class="bulk-actions" *ngIf="getSelectedCount() > 0">
+        <div class="selection-info">
+          <span>{{ getSelectedCount() }} proxies selected</span>
+        </div>
+        <div class="action-buttons">
+          <button mat-button color="primary" (click)="testSelectedProxies()"
+                  [disabled]="bulkTesting">
+            <mat-spinner diameter="16" *ngIf="bulkTesting"></mat-spinner>
+            <mat-icon *ngIf="!bulkTesting">play_arrow</mat-icon>
+            {{ bulkTesting ? 'Testing...' : 'Test Selected' }}
+          </button>
+          <button mat-button color="accent" (click)="toggleSelectedProxiesActive(true)">
+            <mat-icon>check_circle</mat-icon>
+            Enable Selected
+          </button>
+          <button mat-button color="warn" (click)="toggleSelectedProxiesActive(false)">
+            <mat-icon>cancel</mat-icon>
+            Disable Selected
+          </button>
+          <button mat-button color="warn" (click)="removeSelectedProxies()">
+            <mat-icon>delete</mat-icon>
+            Remove Selected
+          </button>
         </div>
       </div>
 
@@ -161,11 +225,20 @@
       <div class="table-container">
         <div class="table-header">
           <div class="header-row">
+            <div class="header-cell select-column">
+              <mat-checkbox
+                [checked]="selectAll"
+                [indeterminate]="getSelectedCount() > 0 && !selectAll"
+                (change)="toggleSelectAll()"
+                matTooltip="Select all">
+              </mat-checkbox>
+            </div>
             <div class="header-cell host-column">Host</div>
             <div class="header-cell port-column">Port</div>
             <div class="header-cell type-column">Type</div>
             <div class="header-cell auth-column">Auth</div>
             <div class="header-cell status-column">Status</div>
+            <div class="header-cell test-column">Test</div>
             <div class="header-cell errors-column">Issues</div>
           </div>
         </div>
@@ -173,10 +246,17 @@
         <cdk-virtual-scroll-viewport
           [itemSize]="itemSize"
           class="virtual-scroll-viewport"
-          [style.height.px]="Math.min(parsedProxies.length * itemSize + 20, 400)">
+          [style.height.px]="Math.min(filteredProxies.length * itemSize + 20, 400)">
 
-          <div *cdkVirtualFor="let proxy of parsedProxies; trackBy: trackByProxyId"
+          <div *cdkVirtualFor="let proxy of filteredProxies; trackBy: trackByProxyId"
                class="proxy-row">
+
+            <div class="proxy-cell select-column">
+              <mat-checkbox
+                [checked]="isProxySelected(proxy)"
+                (change)="toggleProxySelection(proxy)">
+              </mat-checkbox>
+            </div>
 
             <div class="proxy-cell host-column">
               <span class="cell-content">{{ proxy.host }}</span>
@@ -203,6 +283,18 @@
               </mat-chip>
             </div>
 
+            <div class="proxy-cell test-column">
+              <button mat-icon-button
+                      (click)="testProxy(proxy)"
+                      [disabled]="isProxyTesting(proxy) || !proxy.isValid"
+                      matTooltip="Test proxy connection">
+                <mat-spinner diameter="16" *ngIf="isProxyTesting(proxy)"></mat-spinner>
+                <mat-icon *ngIf="!isProxyTesting(proxy) && !getTestResult(proxy)">play_arrow</mat-icon>
+                <mat-icon *ngIf="!isProxyTesting(proxy) && getTestResult(proxy)?.isHealthy" color="primary">check_circle</mat-icon>
+                <mat-icon *ngIf="!isProxyTesting(proxy) && getTestResult(proxy) && !getTestResult(proxy)?.isHealthy" color="warn">error</mat-icon>
+              </button>
+            </div>
+
             <div class="proxy-cell errors-column">
               <div *ngIf="proxy.validationErrors && proxy.validationErrors.length > 0" class="error-list">
                 <mat-chip *ngFor="let error of proxy.validationErrors; trackBy: trackByIndex"
@@ -210,6 +302,12 @@
                           selected
                           class="error-chip">
                   {{ error }}
+                </mat-chip>
+              </div>
+              <!-- Show test results if available -->
+              <div *ngIf="getTestResult(proxy) && !getTestResult(proxy)?.isHealthy" class="test-error">
+                <mat-chip color="warn" selected class="error-chip">
+                  Test: {{ getTestResult(proxy)?.errorMessage }}
                 </mat-chip>
               </div>
             </div>

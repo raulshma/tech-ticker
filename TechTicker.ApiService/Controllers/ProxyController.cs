@@ -150,6 +150,22 @@ public class ProxyController : BaseApiController
     }
 
     /// <summary>
+    /// Test a proxy configuration without saving it
+    /// </summary>
+    [HttpPost("test-configuration")]
+    [RequirePermission(Permissions.ProxiesTest)]
+    public async Task<ActionResult<ApiResponse<ProxyTestResultDto>>> TestProxyConfiguration([FromBody] CreateProxyConfigurationDto proxyDto, [FromQuery] string? testUrl = null, [FromQuery] int timeoutSeconds = 30)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var result = await _proxyService.TestProxyConfigurationAsync(proxyDto, testUrl, timeoutSeconds);
+        return HandleResult(result);
+    }
+
+    /// <summary>
     /// Validate proxy import data
     /// </summary>
     [HttpPost("validate-import")]

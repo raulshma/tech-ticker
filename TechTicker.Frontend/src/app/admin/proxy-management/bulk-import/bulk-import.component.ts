@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,7 +15,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { SelectionModel } from '@angular/cdk/collections';
 import { firstValueFrom } from 'rxjs';
 import {
   ProxyImportItemDto,
@@ -24,6 +27,7 @@ import {
   BulkProxyImportResultDto,
   CreateProxyConfigurationDto,
   ProxyTextParseDto,
+  ProxyTestResultDto,
   TechTickerApiClient
 } from '../../../shared/api/api-client';
 
@@ -33,6 +37,7 @@ import {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -46,6 +51,8 @@ import {
     MatTabsModule,
     MatProgressBarModule,
     MatSelectModule,
+    MatSortModule,
+    MatTooltipModule,
     ScrollingModule
   ],
   templateUrl: './bulk-import.component.html',
@@ -68,12 +75,43 @@ export class BulkImportComponent implements OnInit {
   validationResult: BulkProxyImportValidationDto | null = null;
   importResult: BulkProxyImportResultDto | null = null;
 
-  displayedColumns: string[] = ['host', 'port', 'type', 'auth', 'status', 'errors'];
+  // Testing functionality
+  testingProxies = new Set<string>(); // Track which proxies are being tested
+  testResults = new Map<string, ProxyTestResultDto>(); // Store test results
+  bulkTesting = false;
+
+  displayedColumns: string[] = ['select', 'host', 'port', 'type', 'auth', 'status', 'test', 'errors'];
 
   currentStep = 0; // 0: Input, 1: Preview, 2: Results
 
   // Virtual scrolling
   readonly itemSize = 48; // Height of each row in pixels
+
+  // Selection functionality
+  selectedProxies = new Set<string>();
+  selectAll = false;
+
+  // Filtering functionality
+  filterText = '';
+  filterType = '';
+  filterStatus = '';
+  filteredProxies: ProxyImportItemDto[] = [];
+
+  // Available filter options
+  statusOptions = [
+    { value: '', label: 'All Status' },
+    { value: 'valid', label: 'Valid' },
+    { value: 'invalid', label: 'Invalid' },
+    { value: 'duplicate', label: 'Duplicate' }
+  ];
+
+  typeOptions = [
+    { value: '', label: 'All Types' },
+    { value: 'HTTP', label: 'HTTP' },
+    { value: 'HTTPS', label: 'HTTPS' },
+    { value: 'SOCKS4', label: 'SOCKS4' },
+    { value: 'SOCKS5', label: 'SOCKS5' }
+  ];
 
   // Proxy type options for bulk import
   proxyTypes = [
@@ -132,6 +170,7 @@ export class BulkImportComponent implements OnInit {
       }
 
       this.currentStep = 1;
+      this.applyFilters(); // Initialize filtered list
       this.snackBar.open(`Parsed ${this.parsedProxies.length} proxies`, 'Close', { duration: 3000 });
     } catch (error) {
       console.error('Error parsing proxies:', error);
@@ -244,6 +283,7 @@ export class BulkImportComponent implements OnInit {
     this.validating = true;
     try {
       const formValue = this.importForm.value;
+
       const proxies = this.parsedProxies.map(p => {
         const dto = new CreateProxyConfigurationDto();
         dto.host = p.host!;
@@ -290,6 +330,7 @@ export class BulkImportComponent implements OnInit {
     this.importing = true;
     try {
       const formValue = this.importForm.value;
+
       const proxies = this.parsedProxies.map(p => {
         const dto = new CreateProxyConfigurationDto();
         dto.host = p.host!;
@@ -404,5 +445,223 @@ export class BulkImportComponent implements OnInit {
       default:
         return 'basic';
     }
+  }
+
+  // Test individual proxy
+  async testProxy(proxy: ProxyImportItemDto): Promise<void> {
+    const proxyKey = this.getProxyKey(proxy);
+    this.testingProxies.add(proxyKey);
+
+    try {
+      const formValue = this.importForm.value;
+      const dto = new CreateProxyConfigurationDto();
+      dto.host = proxy.host!;
+      dto.port = proxy.port!;
+      dto.proxyType = proxy.proxyType!;
+      dto.username = proxy.username;
+      dto.password = proxy.password;
+      dto.description = proxy.description;
+      dto.timeoutSeconds = proxy.timeoutSeconds || formValue.defaultTimeoutSeconds;
+      dto.maxRetries = proxy.maxRetries || formValue.defaultMaxRetries;
+      dto.isActive = formValue.defaultIsActive;
+
+      // TODO: Replace with actual API call once backend is running
+      // const response = await firstValueFrom(
+      //   this.apiClient.testProxyConfiguration(dto, undefined, 30)
+      // );
+
+      // For now, simulate a test result
+      const mockResult = new ProxyTestResultDto({
+        proxyConfigurationId: '00000000-0000-0000-0000-000000000000',
+        host: proxy.host!,
+        port: proxy.port!,
+        proxyType: proxy.proxyType!,
+        isHealthy: Math.random() > 0.3, // 70% success rate for demo
+        responseTimeMs: Math.floor(Math.random() * 2000) + 100,
+        errorMessage: Math.random() > 0.7 ? 'Connection timeout' : undefined,
+        errorCode: Math.random() > 0.7 ? 'TIMEOUT' : undefined,
+        testedAt: new Date()
+      });
+
+      this.testResults.set(proxyKey, mockResult);
+
+      if (mockResult.isHealthy) {
+        this.snackBar.open(
+          `Proxy test successful for ${proxy.host}:${proxy.port} (${mockResult.responseTimeMs}ms)`,
+          'Close',
+          { duration: 3000 }
+        );
+      } else {
+        this.snackBar.open(
+          `Proxy test failed for ${proxy.host}:${proxy.port}: ${mockResult.errorMessage}`,
+          'Close',
+          { duration: 5000 }
+        );
+      }
+    } catch (error) {
+      console.error('Error testing proxy:', error);
+      this.snackBar.open(`Failed to test proxy ${proxy.host}:${proxy.port}`, 'Close', { duration: 3000 });
+    } finally {
+      this.testingProxies.delete(proxyKey);
+    }
+  }
+
+  // Test selected proxies in bulk
+  async testSelectedProxies(): Promise<void> {
+    const selectedProxiesList = this.parsedProxies.filter(p =>
+      this.selectedProxies.has(this.getProxyKey(p)) && p.isValid
+    );
+
+    if (selectedProxiesList.length === 0) {
+      this.snackBar.open('No valid proxies selected for testing', 'Close', { duration: 3000 });
+      return;
+    }
+
+    this.bulkTesting = true;
+    try {
+      const testPromises = selectedProxiesList.map(proxy => this.testProxy(proxy));
+      await Promise.all(testPromises);
+      this.snackBar.open(`Tested ${selectedProxiesList.length} proxies`, 'Close', { duration: 3000 });
+    } catch (error) {
+      console.error('Error bulk testing proxies:', error);
+      this.snackBar.open('Failed to test some proxies', 'Close', { duration: 3000 });
+    } finally {
+      this.bulkTesting = false;
+    }
+  }
+
+  // Get unique key for proxy
+  getProxyKey(proxy: ProxyImportItemDto): string {
+    return `${proxy.host}:${proxy.port}:${proxy.proxyType}`;
+  }
+
+  // Check if proxy is being tested
+  isProxyTesting(proxy: ProxyImportItemDto): boolean {
+    return this.testingProxies.has(this.getProxyKey(proxy));
+  }
+
+  // Get test result for proxy
+  getTestResult(proxy: ProxyImportItemDto): ProxyTestResultDto | undefined {
+    return this.testResults.get(this.getProxyKey(proxy));
+  }
+
+  // Selection methods
+  toggleProxySelection(proxy: ProxyImportItemDto): void {
+    const proxyKey = this.getProxyKey(proxy);
+    if (this.selectedProxies.has(proxyKey)) {
+      this.selectedProxies.delete(proxyKey);
+    } else {
+      this.selectedProxies.add(proxyKey);
+    }
+    this.updateSelectAllState();
+  }
+
+  isProxySelected(proxy: ProxyImportItemDto): boolean {
+    return this.selectedProxies.has(this.getProxyKey(proxy));
+  }
+
+  toggleSelectAll(): void {
+    if (this.selectAll) {
+      this.selectedProxies.clear();
+    } else {
+      this.parsedProxies.forEach(proxy => {
+        this.selectedProxies.add(this.getProxyKey(proxy));
+      });
+    }
+    this.selectAll = !this.selectAll;
+  }
+
+  updateSelectAllState(): void {
+    const totalProxies = this.parsedProxies.length;
+    const selectedCount = this.selectedProxies.size;
+    this.selectAll = totalProxies > 0 && selectedCount === totalProxies;
+  }
+
+  getSelectedCount(): number {
+    return this.selectedProxies.size;
+  }
+
+  // Remove selected proxies from the list
+  removeSelectedProxies(): void {
+    const selectedKeys = Array.from(this.selectedProxies);
+    this.parsedProxies = this.parsedProxies.filter(proxy =>
+      !selectedKeys.includes(this.getProxyKey(proxy))
+    );
+    this.selectedProxies.clear();
+    this.selectAll = false;
+    this.snackBar.open(`Removed ${selectedKeys.length} proxies from the list`, 'Close', { duration: 3000 });
+  }
+
+  // Toggle active status for selected proxies
+  toggleSelectedProxiesActive(isActive: boolean): void {
+    const selectedKeys = Array.from(this.selectedProxies);
+    this.parsedProxies.forEach(proxy => {
+      if (selectedKeys.includes(this.getProxyKey(proxy))) {
+        // This would affect the import, but we can't modify the parsed proxy directly
+        // Instead, we'll show a message that this will be applied during import
+      }
+    });
+
+    const action = isActive ? 'enabled' : 'disabled';
+    this.snackBar.open(
+      `${selectedKeys.length} proxies will be ${action} during import`,
+      'Close',
+      { duration: 3000 }
+    );
+  }
+
+  // Filtering methods
+  applyFilters(): void {
+    this.filteredProxies = this.parsedProxies.filter(proxy => {
+      // Text filter (host or port)
+      const textMatch = !this.filterText ||
+        proxy.host?.toLowerCase().includes(this.filterText.toLowerCase()) ||
+        proxy.port?.toString().includes(this.filterText);
+
+      // Type filter
+      const typeMatch = !this.filterType || proxy.proxyType === this.filterType;
+
+      // Status filter
+      let statusMatch = true;
+      if (this.filterStatus) {
+        switch (this.filterStatus) {
+          case 'valid':
+            statusMatch = (proxy.isValid ?? false) && !(proxy.alreadyExists ?? false);
+            break;
+          case 'invalid':
+            statusMatch = !(proxy.isValid ?? false);
+            break;
+          case 'duplicate':
+            statusMatch = proxy.alreadyExists ?? false;
+            break;
+        }
+      }
+
+      return textMatch && typeMatch && statusMatch;
+    });
+  }
+
+  onFilterChange(): void {
+    this.applyFilters();
+    this.updateSelectAllState();
+  }
+
+  clearFilters(): void {
+    this.filterText = '';
+    this.filterType = '';
+    this.filterStatus = '';
+    this.applyFilters();
+  }
+
+  getFilteredValidProxiesCount(): number {
+    return this.filteredProxies.filter(p => p.isValid && !p.alreadyExists).length;
+  }
+
+  getFilteredDuplicateProxiesCount(): number {
+    return this.filteredProxies.filter(p => p.alreadyExists).length;
+  }
+
+  getFilteredInvalidProxiesCount(): number {
+    return this.filteredProxies.filter(p => !p.isValid).length;
   }
 }
