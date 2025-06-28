@@ -29,7 +29,6 @@ builder.Services.Configure<DiscordConfiguration>(
 
 // Add repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IAlertProcessingService, AlertProcessingService>();
 builder.Services.AddScoped<IMappingService, MappingService>();
 builder.Services.AddScoped<IUserNotificationPreferencesService, UserNotificationPreferencesService>();
 

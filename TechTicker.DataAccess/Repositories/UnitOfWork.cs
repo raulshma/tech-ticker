@@ -17,6 +17,7 @@ public class UnitOfWork : IUnitOfWork
     private IScraperSiteConfigurationRepository? _scraperSiteConfigurations;
     private IPriceHistoryRepository? _priceHistory;
     private IAlertRuleRepository? _alertRules;
+    private IAlertHistoryRepository? _alertHistories;
     private IScraperRunLogRepository? _scraperRunLogs;
     private IUserNotificationPreferencesRepository? _userNotificationPreferences;
 
@@ -42,6 +43,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IAlertRuleRepository AlertRules =>
         _alertRules ??= new AlertRuleRepository(_context);
+
+    public IAlertHistoryRepository AlertHistories =>
+        _alertHistories ??= new AlertHistoryRepository(_context);
 
     public IScraperRunLogRepository ScraperRunLogs =>
         _scraperRunLogs ??= new ScraperRunLogRepository(_context);

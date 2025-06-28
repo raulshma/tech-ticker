@@ -98,11 +98,17 @@ builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
 builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
+builder.Services.AddScoped<IAlertTestingService, AlertTestingService>();
+builder.Services.AddScoped<IAlertPerformanceMonitoringService, AlertPerformanceMonitoringService>();
 
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
+builder.Services.AddSingleton<IMessageConsumer, RabbitMQConsumer>();
 
 
+
+// Add background services
+builder.Services.AddHostedService<PricePointConsumerService>();
 
 // Add controllers
 builder.Services.AddControllers();

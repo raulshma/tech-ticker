@@ -21,6 +21,7 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<ScraperSiteConfiguration> ScraperSiteConfigurations { get; set; } = null!;
     public DbSet<PriceHistory> PriceHistory { get; set; } = null!;
     public DbSet<AlertRule> AlertRules { get; set; } = null!;
+    public DbSet<AlertHistory> AlertHistories { get; set; } = null!;
     public DbSet<ScraperRunLog> ScraperRunLogs { get; set; } = null!;
     public DbSet<UserNotificationPreferences> UserNotificationPreferences { get; set; } = null!;
 

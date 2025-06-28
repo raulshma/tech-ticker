@@ -63,6 +63,16 @@ public class PriceHistoryRepository : Repository<PriceHistory>, IPriceHistoryRep
             .FirstOrDefaultAsync();
     }
 
+    public async Task<string?> GetLastStockStatusAsync(Guid productId, string sellerName)
+    {
+        var lastRecord = await _dbSet
+            .Where(ph => ph.CanonicalProductId == productId && ph.SellerName == sellerName)
+            .OrderByDescending(ph => ph.Timestamp)
+            .FirstOrDefaultAsync();
+
+        return lastRecord?.StockStatus;
+    }
+
     public async Task<IEnumerable<PriceHistory>> GetCurrentPricesAsync(Guid productId)
     {
         // Get the latest price from each seller for the product

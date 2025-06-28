@@ -98,7 +98,7 @@ public class AdminController : BaseApiController
     /// <param name="page">Page number</param>
     /// <param name="pageSize">Page size</param>
     /// <returns>Paginated list of alert rules</returns>
-    [HttpGet("alerts", Name = "GetAllAlerts")]
+    [HttpGet("alerts", Name = "AdminGetAllAlerts")]
     public async Task<ActionResult<PagedResponse<AlertRuleDto>>> GetAllAlerts(
         [FromQuery] Guid? userId = null,
         [FromQuery] Guid? productId = null,

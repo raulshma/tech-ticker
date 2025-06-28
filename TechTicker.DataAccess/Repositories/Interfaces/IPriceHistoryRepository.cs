@@ -16,6 +16,7 @@ public interface IPriceHistoryRepository : IRepository<PriceHistory>
 
     Task<PriceHistory?> GetLastPriceAsync(Guid productId, string sellerName);
     Task<PriceHistory?> GetLastRecordedPriceAsync(Guid productId, string sellerName);
+    Task<string?> GetLastStockStatusAsync(Guid productId, string sellerName);
 
     /// <summary>
     /// Get current prices for a product from all sellers (latest price from each seller)

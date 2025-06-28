@@ -21,6 +21,10 @@ public class AlertRule
     [MaxLength(50)]
     public string ConditionType { get; set; } = null!; // PRICE_BELOW, PERCENT_DROP_FROM_LAST, BACK_IN_STOCK
 
+    [Required]
+    [MaxLength(20)]
+    public string AlertType { get; set; } = "RECURRING"; // RECURRING, ONE_SHOT
+
     [Column(TypeName = "decimal(10,2)")]
     public decimal? ThresholdValue { get; set; }
 

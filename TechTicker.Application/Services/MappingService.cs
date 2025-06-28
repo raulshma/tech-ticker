@@ -278,6 +278,7 @@ public class MappingService : IMappingService
             UserId = alertRule.UserId,
             CanonicalProductId = alertRule.CanonicalProductId,
             ConditionType = alertRule.ConditionType,
+            AlertType = alertRule.AlertType,
             ThresholdValue = alertRule.ThresholdValue,
             PercentageValue = alertRule.PercentageValue,
             SpecificSellerName = alertRule.SpecificSellerName,
@@ -300,6 +301,7 @@ public class MappingService : IMappingService
             UserId = userId,
             CanonicalProductId = createDto.CanonicalProductId,
             ConditionType = createDto.ConditionType,
+            AlertType = createDto.AlertType,
             ThresholdValue = createDto.ThresholdValue,
             PercentageValue = createDto.PercentageValue,
             SpecificSellerName = createDto.SpecificSellerName,
@@ -312,6 +314,9 @@ public class MappingService : IMappingService
     {
         if (!string.IsNullOrWhiteSpace(updateDto.ConditionType))
             alertRule.ConditionType = updateDto.ConditionType;
+
+        if (!string.IsNullOrWhiteSpace(updateDto.AlertType))
+            alertRule.AlertType = updateDto.AlertType;
 
         if (updateDto.ThresholdValue.HasValue)
             alertRule.ThresholdValue = updateDto.ThresholdValue;

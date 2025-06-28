@@ -5,6 +5,7 @@ using TechTicker.Application.Messages;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
 using TechTicker.Domain.Entities;
+using TechTicker.Shared.Constants;
 
 namespace TechTicker.ScrapingWorker.Services;
 
@@ -158,20 +159,7 @@ public class PriceDataProcessingService
 
     private string NormalizeStockStatus(string stockStatus)
     {
-        if (string.IsNullOrWhiteSpace(stockStatus))
-            return "Unknown";
-
-        var lowerStatus = stockStatus.ToLower().Trim();
-
-        return lowerStatus switch
-        {
-            var s when s.Contains("in stock") || s.Contains("available") || s.Contains("in-stock") => "In Stock",
-            var s when s.Contains("out of stock") || s.Contains("unavailable") || s.Contains("sold out") => "Out of Stock",
-            var s when s.Contains("limited") || s.Contains("few left") || s.Contains("low stock") => "Limited Stock",
-            var s when s.Contains("pre-order") || s.Contains("preorder") => "Pre-Order",
-            var s when s.Contains("backorder") || s.Contains("back order") => "Backorder",
-            _ => stockStatus.Trim()
-        };
+        return StockStatus.Normalize(stockStatus);
     }
 
     private async Task<bool> IsDuplicatePricePointAsync(RawPriceDataEvent normalizedData)

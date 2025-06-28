@@ -18,6 +18,7 @@ public static class Permissions
     public const string AlertRulesRead = "AlertRules.Read";
     public const string AlertRulesUpdate = "AlertRules.Update";
     public const string AlertRulesDelete = "AlertRules.Delete";
+    public const string AlertRulesManage = "AlertRules.Manage";
 
     // Scraper Management
     public const string ScrapersConfigure = "Scrapers.Configure";
@@ -50,7 +51,7 @@ public static class Permissions
             },
             ["PriceMonitoring"] = new[]
             {
-                PriceHistoryRead, AlertRulesCreate, AlertRulesRead, AlertRulesUpdate, AlertRulesDelete
+                PriceHistoryRead, AlertRulesCreate, AlertRulesRead, AlertRulesUpdate, AlertRulesDelete, AlertRulesManage
             },
             ["Scrapers"] = new[]
             {

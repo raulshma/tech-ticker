@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TechTicker.DataAccess;
@@ -11,9 +12,11 @@ using TechTicker.DataAccess;
 namespace TechTicker.DataAccess.Migrations
 {
     [DbContext(typeof(TechTickerDbContext))]
-    partial class TechTickerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250628050326_AddAlertTypeToAlertRule")]
+    partial class AddAlertTypeToAlertRule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,92 +153,6 @@ namespace TechTicker.DataAccess.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("TechTicker.Domain.Entities.AlertHistory", b =>
-                {
-                    b.Property<Guid>("AlertHistoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AlertRuleId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("AlertType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<Guid>("CanonicalProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ConditionType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("NotificationError")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<DateTimeOffset?>("NotificationSentAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("NotificationStatus")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<decimal?>("PercentageValue")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<string>("ProductPageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("RuleDescription")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("SellerName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("SpecificSellerName")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<decimal?>("ThresholdValue")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<DateTimeOffset>("TriggeredAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("TriggeringPrice")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<string>("TriggeringStockStatus")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("WasAlertDeactivated")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("AlertHistoryId");
-
-                    b.HasIndex("AlertRuleId");
-
-                    b.HasIndex("CanonicalProductId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AlertHistories");
                 });
 
             modelBuilder.Entity("TechTicker.Domain.Entities.AlertRule", b =>
@@ -960,33 +877,6 @@ namespace TechTicker.DataAccess.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("TechTicker.Domain.Entities.AlertHistory", b =>
-                {
-                    b.HasOne("TechTicker.Domain.Entities.AlertRule", "AlertRule")
-                        .WithMany()
-                        .HasForeignKey("AlertRuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TechTicker.Domain.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("CanonicalProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TechTicker.Domain.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AlertRule");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TechTicker.Domain.Entities.AlertRule", b =>

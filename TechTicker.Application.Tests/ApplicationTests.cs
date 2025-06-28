@@ -13,6 +13,7 @@ public class AlertProcessingServiceTests
 {
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly Mock<IMessagePublisher> _mockMessagePublisher;
+    private readonly Mock<IAlertPerformanceMonitoringService> _mockPerformanceMonitoring;
     private readonly Mock<ILogger<AlertProcessingService>> _mockLogger;
     private readonly MessagingConfiguration _messagingConfig;
     private readonly AlertProcessingService _alertProcessingService;
@@ -21,6 +22,7 @@ public class AlertProcessingServiceTests
     {
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockMessagePublisher = new Mock<IMessagePublisher>();
+        _mockPerformanceMonitoring = new Mock<IAlertPerformanceMonitoringService>();
         _mockLogger = new Mock<ILogger<AlertProcessingService>>();
         
         _messagingConfig = new MessagingConfiguration
@@ -33,6 +35,7 @@ public class AlertProcessingServiceTests
         _alertProcessingService = new AlertProcessingService(
             _mockUnitOfWork.Object,
             _mockMessagePublisher.Object,
+            _mockPerformanceMonitoring.Object,
             options,
             _mockLogger.Object);
     }

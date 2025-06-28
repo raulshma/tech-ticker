@@ -11,6 +11,7 @@ public interface IUnitOfWork : IDisposable
     IScraperSiteConfigurationRepository ScraperSiteConfigurations { get; }
     IPriceHistoryRepository PriceHistory { get; }
     IAlertRuleRepository AlertRules { get; }
+    IAlertHistoryRepository AlertHistories { get; }
     IScraperRunLogRepository ScraperRunLogs { get; }
     IUserNotificationPreferencesRepository UserNotificationPreferences { get; }
 

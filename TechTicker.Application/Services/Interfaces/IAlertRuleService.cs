@@ -21,4 +21,12 @@ public interface IAlertRuleService
         Guid? productId = null,
         int pageNumber = 1,
         int pageSize = 10);
+    Task<Result<AlertRuleDto>> GetAlertRuleByIdAsync(Guid alertRuleId);
+    Task<Result<AlertRuleDto>> AdminUpdateAlertRuleAsync(Guid alertRuleId, UpdateAlertRuleDto updateDto);
+    Task<Result> AdminDeleteAlertRuleAsync(Guid alertRuleId);
+
+    // Bulk operations
+    Task<Result<AlertBulkOperationResultDto>> BulkOperationAsync(AlertBulkOperationRequestDto request);
+    Task<Result<AlertBulkOperationResultDto>> BulkOperationWithFiltersAsync(AlertBulkOperationWithFiltersRequestDto request);
+    Task<Result<AlertBulkOperationPreviewDto>> PreviewBulkOperationAsync(AlertBulkOperationWithFiltersRequestDto request);
 }

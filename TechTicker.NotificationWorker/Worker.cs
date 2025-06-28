@@ -31,11 +31,6 @@ public class Worker : BackgroundService
 
         try
         {
-            // Start consuming price point recorded events for alert processing
-            await _messageConsumer.StartConsumingAsync<PricePointRecordedEvent>(
-                _messagingConfig.PricePointRecordedQueue,
-                HandlePricePointRecordedAsync);
-
             // Start consuming alert triggered events for Discord notifications
             await _messageConsumer.StartConsumingAsync<AlertTriggeredEvent>(
                 _messagingConfig.AlertTriggeredQueue,
@@ -62,21 +57,6 @@ public class Worker : BackgroundService
         {
             await _messageConsumer.StopConsumingAsync();
             _logger.LogInformation("TechTicker Notification Worker stopped");
-        }
-    }    private async Task HandlePricePointRecordedAsync(PricePointRecordedEvent pricePoint)
-    {
-        try
-        {
-            _logger.LogDebug("Processing price point for alert evaluation: Product {ProductId}, Price ${Price}",
-                pricePoint.CanonicalProductId, pricePoint.Price);
-
-            using var scope = _serviceScopeFactory.CreateScope();
-            var alertProcessingService = scope.ServiceProvider.GetRequiredService<IAlertProcessingService>();
-            await alertProcessingService.ProcessPricePointAsync(pricePoint);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error processing price point for product {ProductId}", pricePoint.CanonicalProductId);
         }
     }
 
