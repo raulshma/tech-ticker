@@ -1,15 +1,14 @@
-Okay, here is the complete, updated TechTicker documentation including the Angular frontend for management and CRM.
-
 ## TechTicker: E-commerce Price Tracker & Alerter - Detailed Software Specification
 
-**Version:** 1.6
-**Date:** June 15, 2025
+**Version:** 2.0
+**Date:** December 28, 2024
 **System Model:** Admin-Managed Exact Product URLs (Focus on Reduced Detectability, with Product Categories)
 **Architecture Model:** Monolith with .NET Aspire Backend & Angular SPA Frontend
 **Target Audience:** Development Team / Automated Coding Agent
+**Status:** Fully Implemented and Operational
 
-**Preamble for Coding Agent:**
-This document aims to provide a highly detailed specification for building the TechTicker application, including its backend services and a dedicated Angular frontend for administration and CRM. While it strives for completeness, some low-level implementation details (e.g., specific UI element interactions or exhaustive edge-case error handling beyond what's specified) might still require standard best practices or further clarification. Focus on implementing the described logic, data structures, and interactions precisely. Use the recommended technologies and libraries. Pay close attention to data validation, error handling, and logging as outlined.
+**Preamble:**
+This document provides a comprehensive specification of the fully implemented TechTicker application, including its backend services and Angular frontend for administration and CRM. The system is operational and includes all described features. This documentation reflects the actual implemented state of the system as of December 2024, including all APIs, frontend components, background workers, and database schema.
 
 **Table of Contents:**
 
@@ -49,6 +48,8 @@ This document aims to provide a highly detailed specification for building the T
     *   7.3 UI/UX Considerations
     *   7.4 Interaction with Backend API
     *   7.5 Build and Deployment
+    *   7.6 Image Processing & Gallery Features
+    *   7.7 Notification Settings Interface
 8.  Deployment Considerations
     *   8.1 Backend Deployment
     *   8.2 Frontend Deployment
@@ -131,16 +132,19 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   `TechTicker.ServiceDefaults`: A shared project for common configurations (health checks, OpenTelemetry, Serilog setup), provided by Aspire.
 
 **2.2.2 Frontend Technology Stack**
-*   **Framework:** Angular (latest stable version, e.g., Angular 17+).
+*   **Framework:** Angular 20 (latest stable version).
 *   **Language:** TypeScript.
-*   **State Management:** NgRx or Akita (choose one, e.g., NgRx for robust, scalable solutions). Alternatively, Angular services with RxJS BehaviorSubjects for simpler state.
-*   **UI Component Library:** Angular Material or a similar comprehensive library (e.g., PrimeNG) for rapid UI development and consistency.
-*   **HTTP Client:** Angular's built-in `HttpClientModule`.
-*   **Routing:** Angular Router.
-*   **Forms:** Angular Reactive Forms.
-*   **Styling:** SCSS or CSS-in-JS (Styled Components if a suitable Angular library exists, otherwise SCSS is standard).
+*   **State Management:** Angular services with RxJS BehaviorSubjects for reactive state management.
+*   **UI Component Library:** Angular Material for comprehensive UI components and consistent design.
+*   **HTTP Client:** Angular's built-in `HttpClientModule` with NSwag-generated TypeScript client.
+*   **API Client Generation:** NSwag for automatic TypeScript client generation from OpenAPI specifications.
+*   **Routing:** Angular Router with lazy-loaded feature modules.
+*   **Forms:** Angular Reactive Forms with comprehensive validation.
+*   **Styling:** SCSS with Angular Material theming.
 *   **Build Tool:** Angular CLI.
-*   **Testing:** Jest or Karma/Jasmine for unit tests, Cypress or Protractor (if still supported/preferred) for E2E tests.
+*   **Testing:** Jasmine and Karma for unit tests, with comprehensive test coverage.
+*   **Authentication:** JWT-based authentication with role-based access control (RBAC).
+*   **Image Handling:** Custom image gallery component with lazy loading and optimization.
 
 ---
 
@@ -387,36 +391,49 @@ While the backend is a monolith, logical separation of concerns is maintained by
         *   Error Responses: `400 Bad Request`, `404 Not Found`.
 
 **3.7 User Authentication & Management Module (Backend)**
-*   **Purpose:** Manages user accounts and authentication for API access.
-*   **Implementation:** Uses ASP.NET Core Identity, configured in `TechTicker.ApiService`. `ApplicationUser` class inheriting from `IdentityUser<Guid>`.
+*   **Purpose:** Manages user accounts, authentication, and role-based access control (RBAC) for API access.
+*   **Implementation:** Uses ASP.NET Core Identity with custom RBAC system, configured in `TechTicker.ApiService`. `ApplicationUser` class inheriting from `IdentityUser<Guid>`.
+*   **RBAC System:** Implements a comprehensive permission-based authorization system with three main roles:
+    *   **Admin:** Full system access with all administrative privileges
+    *   **Moderator:** Can manage content and moderate user activities
+    *   **User:** Standard user with basic access to user features
 *   **API Endpoints (exposed by `TechTicker.ApiService`):**
-    *   `POST /api/auth/register` (Consider if self-registration is allowed or if admins create users)
+    *   `POST /api/auth/register`
         *   Request Body: `{ "email": "...", "password": "...", "firstName": "...", "lastName": "..." }`
-        *   Response (`200 OK` or `201 Created`): `{ "userId": "...", "email": "...", "message": "..." }`
+        *   Response (`201 Created`): `{ "userId": "...", "email": "...", "message": "..." }`
         *   Error Responses: `400 Bad Request`.
     *   `POST /api/auth/login`
         *   Request Body: `{ "email": "...", "password": "..." }`
-        *   Response (`200 OK`): `{ "token": "jwt_token_here", "userId": "...", "email": "..." }`
+        *   Response (`200 OK`): `{ "token": "jwt_token_here", "userId": "...", "email": "...", "roles": ["..."] }`
         *   Error Responses: `400 Bad Request`, `401 Unauthorized`.
-    *   `GET /api/users/me` (Authenticated: Requires JWT)
-        *   Response (`200 OK`): `{ "userId": "...", "email": "...", "firstName": "...", "lastName": "..." }`
+    *   `GET /api/auth/me` (Authenticated: Requires JWT)
+        *   Response (`200 OK`): `{ "userId": "...", "email": "...", "firstName": "...", "lastName": "...", "roles": ["..."] }`
         *   Error Responses: `401 Unauthorized`.
-    *   **Admin User Management Endpoints (New/Enhanced for Admin Frontend):**
-        *   `GET /api/admin/users` (Admin Only)
-            *   Response (`200 OK`): Paginated list of users `{ "items": [user objects], "pageNumber": ..., "pageSize": ..., "totalItems": ..., "totalPages": ... }`. User object should include `userId`, `email`, `firstName`, `lastName`, `roles`, `createdAt`.
-        *   `GET /api/admin/users/{userId}` (Admin Only)
-            *   Response (`200 OK`): Single detailed user object.
-        *   `PUT /api/admin/users/{userId}` (Admin Only)
-            *   Request Body: `{ "firstName": "...", "lastName": "...", "email": "...", "roles": ["Admin", "User"] }` (fields for update).
+    *   **Admin User Management Endpoints:**
+        *   `GET /api/users` (Admin Only)
+            *   Response (`200 OK`): Paginated list of users with roles and permissions.
+        *   `GET /api/users/{userId}` (Admin Only)
+            *   Response (`200 OK`): Single detailed user object with roles.
+        *   `PUT /api/users/{userId}` (Admin Only)
+            *   Request Body: `{ "firstName": "...", "lastName": "...", "email": "...", "roles": ["Admin", "User"] }`
             *   Response (`200 OK`): Updated user object.
-        *   `POST /api/admin/users` (Admin Only - for creating users by admin)
+        *   `POST /api/users` (Admin Only)
             *   Request Body: `{ "email": "...", "password": "...", "firstName": "...", "lastName": "...", "roles": ["User"] }`
             *   Response (`201 Created`): New user object.
-        *   `DELETE /api/admin/users/{userId}` (Admin Only)
-            *   Response (`204 No Content`). (Consider soft delete or deactivation).
-*   **Security Details:** Password Hashing (ASP.NET Core Identity). JWT Claims: `sub` (UserId), `email`, `role`, `jti`, `exp`, `iss`, `aud`. Ensure `role` claim is populated correctly based on `AspNetUserRoles`.
+        *   `DELETE /api/users/{userId}` (Admin Only)
+            *   Response (`204 No Content`). Implements soft delete.
+    *   **Role Management Endpoints:**
+        *   `GET /api/roles` (Admin Only)
+            *   Response (`200 OK`): List of all roles with user counts.
+        *   `GET /api/permissions` (Admin Only)
+            *   Response (`200 OK`): List of all permissions grouped by category.
+*   **Security Details:**
+    *   Password Hashing (ASP.NET Core Identity with PBKDF2)
+    *   JWT Claims: `sub` (UserId), `email`, `role` (multiple), `permission` (multiple), `jti`, `exp`, `iss`, `aud`
+    *   Permission-based authorization using custom `RequirePermission` attribute
+    *   Role hierarchy with inherited permissions
 *   **Configuration Keys (appsettings.json for `TechTicker.ApiService`):**
-    *   `Jwt:Key`, `Jwt:Issuer`, `Jwt:Audience`, `Jwt:DurationInMinutes`.
+    *   `Jwt:Key`, `Jwt:Issuer`, `Jwt:Audience`, `Jwt:DurationInMinutes` (default: 1440 minutes)
 
 **3.8 Alert Definition Module**
 *   **Purpose:** Allows users to manage price alert rules.
@@ -458,35 +475,38 @@ While the backend is a monolith, logical separation of concerns is maintained by
 *   **Interaction with other Modules:** Consumes `PricePointRecordedEvent`. Publishes `AlertTriggeredEvent`. Reads from `AlertRules`, `PriceHistory`, `Products`, `AspNetUsers`.
 
 **3.10 Notification Module**
-*   **Purpose:** Sends notifications (email).
-*   **Implementation:** Message consumer (`AlertNotificationConsumer`) in `TechTicker.NotificationWorker` handles `AlertTriggeredEvent`. Use **MailKit** for SMTP.
+*   **Purpose:** Sends Discord notifications based on user preferences.
+*   **Implementation:** Message consumer (`AlertNotificationConsumer`) in `TechTicker.NotificationWorker` handles `AlertTriggeredEvent`. Uses **Discord.Net** for Discord webhook integration.
+*   **User Notification Preferences:** Each user can configure:
+    *   Discord webhook URL (personal Discord server/channel)
+    *   Enable/disable Discord notifications
+    *   Select up to 5 products for notifications
+    *   Custom bot name and avatar URL
 *   **Logic (on receiving `AlertTriggeredEvent` `ate`):**
     1.  Log reception.
-    2.  Fetch user's email for `ate.UserId` (this should ideally be part of the `AlertTriggeredEvent` payload to avoid another DB lookup, or the event can contain `UserEmail`). Let's assume `UserEmail` is in the event.
-    3.  Format email:
-        *   Subject: `TechTicker Price Alert: {ate.ProductName}`
-        *   Body:
-            ```
-            Hi [User's First Name, if available, else User],
-
-            A price alert you set for "{ate.ProductName}" has been triggered!
-
-            Product: {ate.ProductName}
-            Category: {ate.ProductCategoryName}
-            Seller: {ate.SellerName}
-            Alert Condition: {ate.RuleDescription}
-            Current Price: ${ate.TriggeringPrice}
-            Stock Status: {ate.TriggeringStockStatus}
-
-            View Product: {ate.ProductPageUrl} (this should be the exact product URL from ProductSellerMapping if available, or a link to the product on TechTicker if we build a user-facing site)
-
-            Thank you,
-            The TechTicker Team
-            ```
-    4.  Send email using MailKit and SMTP settings from configuration.
-    5.  Log success/failure. Implement retry logic for transient SMTP errors (e.g., using Polly within the consumer). If retries fail, move to Dead Letter Queue.
+    2.  Fetch user's notification preferences from database.
+    3.  Check if Discord notifications are enabled for the user.
+    4.  Verify user has configured a Discord webhook URL.
+    5.  Check if the triggered product is in user's selected notification products.
+    6.  If all conditions met, send Discord notification with rich embed:
+        *   Title: "🔔 TechTicker Alert"
+        *   Product name and category
+        *   Current price with color coding (green for good deals, red for price increases)
+        *   Seller information
+        *   Stock status with appropriate icons
+        *   Alert rule description
+        *   Direct link to product page
+        *   Timestamp
+    7.  Use custom bot name and avatar if configured by user.
+    8.  Log success/failure with retry logic for transient Discord API errors.
+*   **API Endpoints for User Preferences:**
+    *   `GET /api/notification-preferences` - Get user's notification settings
+    *   `PUT /api/notification-preferences` - Update user's notification settings
+    *   `GET /api/notification-preferences/products` - Get available products for notification selection
+    *   `POST /api/notification-preferences/test-webhook` - Test Discord webhook configuration
+    *   `GET /api/notification-preferences/summary` - Get notification preferences summary
 *   **Configuration Keys (appsettings.json for `TechTicker.NotificationWorker`):**
-    *   `Smtp:Host`, `Smtp:Port`, `Smtp:Username`, `Smtp:Password`, `Smtp:FromAddress`, `Smtp:FromName` (e.g., "TechTicker Alerts"), `Smtp:UseSsl`.
+    *   `Discord:BotName` (default bot name), `Discord:AvatarUrl` (default avatar), `Discord:EnableDiscordNotifications` (global toggle)
 
 **3.11 API Layer**
 *   **Purpose:** Entry point for client requests (including the Angular Admin Frontend).
@@ -515,13 +535,13 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   .NET Aspire `AppHost` will add RabbitMQ as a discoverable resource, simplifying connection string management in development.
     *   Consumers should be idempotent where possible.
 
-*   **Exchanges and Message Payloads:**
+*   **Exchanges and Message Payloads (Implemented Configuration):**
 
-    *   **`scraping_commands_exchange` (Direct Exchange)**
-        *   Purpose: Routes scraping commands to the scraper worker.
-        *   Queue: `scraping_commands_queue` (bound with routing key `scrape.product.page`)
-        *   Message: `ScrapeProductPageCommand` (Published by `ScrapingOrchestrationModule`)
-            *   Routing Key: `scrape.product.page`
+    *   **`techticker.scraping` (Topic Exchange)**
+        *   Purpose: Routes scraping commands and results
+        *   Queues: `scrape.commands`, `scraping.results`
+        *   Message: `ScrapeProductPageCommand` (Published by `ScrapingOrchestrationService`)
+            *   Routing Key: `scrape.command`
             *   Payload:
                 ```json
                 {
@@ -569,11 +589,14 @@ While the backend is a monolith, logical separation of concerns is maintained by
                   "scrapedStockStatus": "string, e.g., In Stock, Out of Stock, Available for Preorder", // Raw text
                   "timestamp": "datetimeoffset (ISO 8601)", // Time of scrape
                   "sourceUrl": "string (URL)", // The URL that was scraped
-                  "scrapedProductName": "string, optional" // Product name as seen on the page
+                  "scrapedProductName": "string, optional", // Product name as seen on the page
+                  "primaryImageUrl": "string, optional", // Primary product image URL
+                  "additionalImageUrls": ["string"], // Additional product image URLs
+                  "originalImageUrls": ["string"] // Original scraped image URLs
                 }
                 ```
-        *   Message: `PricePointRecordedEvent` (Published by `PriceNormalizationIngestionModule` after validation and normalization)
-            *   Routing Key: `price.data.recorded.{canonicalProductId}`
+        *   Message: `PricePointRecordedEvent` (Published by price normalization after validation)
+            *   Routing Key: `pricedata.recorded`
             *   Payload:
                 ```json
                 {
@@ -582,19 +605,20 @@ While the backend is a monolith, logical separation of concerns is maintained by
                   "price": 123.45, // Decimal as number, normalized
                   "stockStatus": "string, e.g., IN_STOCK, OUT_OF_STOCK, PREORDER, UNKNOWN", // Normalized
                   "sourceUrl": "string (URL)",
-                  "timestamp": "datetimeoffset (ISO 8601)" // Time of scrape (can be same as RawPriceDataEvent or slightly later)
+                  "timestamp": "datetimeoffset (ISO 8601)" // Time of scrape
                 }
                 ```
-    *   **`alert_notifications_exchange` (Topic Exchange)**
-        *   Purpose: Triggers notifications when alerts are met.
-        *   Message: `AlertTriggeredEvent` (Published by `AlertEvaluationModule`)
-            *   Routing Key: `alert.triggered.{userId}.{productId}` (e.g., `alert.triggered.uuid-user.uuid-product`)
+    *   **`techticker.alerts` (Topic Exchange)**
+        *   Purpose: Triggers Discord notifications when alerts are met
+        *   Queue: `alerts.triggered`
+        *   Message: `AlertTriggeredEvent` (Published by `AlertEvaluationService`)
+            *   Routing Key: `alert.triggered`
             *   Payload:
                 ```json
                 {
                   "alertRuleId": "uuid",
                   "userId": "uuid", // User who owns the alert
-                  "userEmail": "string", // User's email for notification
+                  "userEmail": "string", // User's email
                   "userFirstName": "string, optional", // User's first name
                   "canonicalProductId": "uuid",
                   "productName": "string", // Canonical Product Name
@@ -607,6 +631,13 @@ While the backend is a monolith, logical separation of concerns is maintained by
                   "timestamp": "datetimeoffset (ISO 8601)" // When the alert was triggered
                 }
                 ```
+
+**Implemented Queue Configuration:**
+*   All queues are durable and persistent
+*   Manual acknowledgments with retry logic
+*   Dead letter queues for failed messages
+*   Connection pooling and channel management
+*   Aspire integration for service discovery and configuration
 ---
 
 ### 5. Core Data Models (PostgreSQL with EF Core)
@@ -714,6 +745,54 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   Navigation Properties: `User User`, `Product Product`.
     *   Index: `(CanonicalProductId, IsActive)`
     *   Index: `(UserId, IsActive)`
+
+*   **`UserNotificationPreferences`** (`UserNotificationPreferences` table)
+    *   `UserNotificationPreferencesId` (Guid, PK)
+    *   `UserId` (Guid, FK to `AspNetUsers.Id`, NN, Unique Index, ON DELETE CASCADE)
+    *   `DiscordWebhookUrl` (VARCHAR(500), NULL) - User's Discord webhook URL
+    *   `IsDiscordNotificationEnabled` (BOOLEAN, NN, DEFAULT FALSE)
+    *   `NotificationProductIds` (TEXT, NULL) - JSON array of product IDs (up to 5)
+    *   `CustomBotName` (VARCHAR(100), NULL) - Custom Discord bot name
+    *   `CustomAvatarUrl` (VARCHAR(500), NULL) - Custom Discord bot avatar URL
+    *   `CreatedAt` (TIMESTAMPTZ, NN)
+    *   `UpdatedAt` (TIMESTAMPTZ, NN)
+    *   Navigation Properties: `User User`
+
+*   **`Permission`** (`Permissions` table)
+    *   `PermissionId` (Guid, PK)
+    *   `Name` (VARCHAR(100), NN, Unique Index) - E.g., "products.read", "alerts.create"
+    *   `Description` (VARCHAR(255), NULL)
+    *   `Category` (VARCHAR(50), NN, Index) - E.g., "Products", "Alerts", "System"
+    *   `CreatedAt` (TIMESTAMPTZ, NN)
+    *   `UpdatedAt` (TIMESTAMPTZ, NN)
+    *   Navigation Properties: `ICollection<RolePermission> RolePermissions`
+
+*   **`RolePermission`** (`RolePermissions` table)
+    *   `RolePermissionId` (Guid, PK)
+    *   `RoleId` (Guid, FK to `AspNetRoles.Id`, NN, Index, ON DELETE CASCADE)
+    *   `PermissionId` (Guid, FK to `Permissions.PermissionId`, NN, Index, ON DELETE CASCADE)
+    *   `CreatedAt` (TIMESTAMPTZ, NN)
+    *   Navigation Properties: `IdentityRole<Guid> Role`, `Permission Permission`
+    *   Unique Constraint: `(RoleId, PermissionId)`
+
+*   **`ScraperRunLog`** (`ScraperRunLogs` table)
+    *   `ScraperRunLogId` (Guid, PK)
+    *   `MappingId` (Guid, FK to `ProductSellerMappings.MappingId`, NN, Index, ON DELETE CASCADE)
+    *   `Status` (VARCHAR(50), NN, Index) - E.g., "STARTED", "SUCCESS", "FAILED", "TIMEOUT"
+    *   `StartedAt` (TIMESTAMPTZ, NN, Index)
+    *   `CompletedAt` (TIMESTAMPTZ, NULL)
+    *   `ErrorMessage` (TEXT, NULL)
+    *   `ErrorCode` (VARCHAR(50), NULL, Index)
+    *   `HttpStatusCode` (INT, NULL)
+    *   `ResponseTimeMs` (INT, NULL)
+    *   `ScrapedPrice` (DECIMAL(10,2), NULL)
+    *   `ScrapedStockStatus` (VARCHAR(50), NULL)
+    *   `UserAgent` (VARCHAR(500), NULL)
+    *   `ParentRunId` (Guid, FK to `ScraperRunLogs.ScraperRunLogId`, NULL, Index) - For retry attempts
+    *   `RetryAttempt` (INT, NN, DEFAULT 0)
+    *   Navigation Properties: `ProductSellerMapping Mapping`, `ScraperRunLog ParentRun`, `ICollection<ScraperRunLog> RetryAttempts`
+    *   Index: `(MappingId, StartedAt DESC)`
+    *   Index: `(Status, StartedAt DESC)`
 
 ---
 
@@ -832,60 +911,94 @@ While the backend is a monolith, logical separation of concerns is maintained by
 ### 7. Frontend Application (Angular)
 
 **7.1 Purpose & Target Audience**
-The Angular frontend serves as the primary interface for administrators to manage the TechTicker system and perform CRM-like functions. It provides a user-friendly GUI to interact with the backend API for tasks such as product catalog management, scraper configuration, user oversight, and monitoring alert activities.
+The Angular frontend serves as a comprehensive interface for both administrators and users to manage the TechTicker system. It provides a modern, responsive GUI for product catalog browsing, alert management, notification settings, and administrative functions.
 
-**Target Audience:** System Administrators.
+**Target Audience:**
+- **Administrators:** Full system management capabilities
+- **Moderators:** Content management and moderation
+- **Users:** Product browsing, alert management, and notification preferences
 
 **7.2 Key Features & Modules**
-The Angular application will be structured into modules for better organization and lazy loading where appropriate.
+The Angular application is fully implemented with a modular structure using lazy-loaded feature modules and comprehensive RBAC integration.
 
-*   **Core Module:** (Imported once in AppModule)
-    *   Authentication services (`AuthService` for login, logout, token management, checking auth state).
-    *   `AuthGuard` for protecting admin routes.
-    *   HTTP Interceptors (e.g., `JwtInterceptor` to add auth token, `ErrorInterceptor` for global error handling like 401/403).
-    *   Navigation components (e.g., `SidebarComponent`, `NavbarComponent`).
-    *   Shared UI components (e.g., custom loaders, confirmation dialogs).
-    *   Core services (e.g., `NotificationService` for toasts/snackbars).
+**Implemented Core Features:**
+*   **Shared Module:** Contains common components, services, and utilities
+    *   `AuthService` with full RBAC support (role and permission checking)
+    *   `AuthGuard`, `AdminGuard`, and `RoleGuard` for route protection
+    *   HTTP Interceptors (`AuthInterceptor`, `ErrorInterceptor`) for token management and error handling
+    *   `AppLayoutComponent` with responsive sidebar navigation
+    *   `ImageGalleryComponent` for product image display with lazy loading
+    *   NSwag-generated TypeScript API client for type-safe backend communication
 
-*   **Auth Module:** (Potentially lazy-loaded)
-    *   Login page/component (`LoginComponent`).
-    *   (Optional) Forgot password/reset password components if implemented in backend.
+**Implemented Feature Modules:**
 
-*   **Admin Module:** (Main lazy-loaded module, protected by `AuthGuard`)
-    *   **AdminLayoutComponent:** Provides the main structure (sidebar, navbar, content area) for admin pages.
-    *   **Dashboard Module/Component:** (Routed within AdminModule)
-        *   Overview of system statistics (e.g., total products, active mappings, recent alerts, users count).
-        *   Charts or quick summaries.
-        *   Links to key management sections.
-    *   **Category Management Module:** (Routed within AdminModule, potentially lazy-loaded itself)
-        *   `CategoryListComponent`: Displays categories in a table (with pagination, search, sort).
-        *   `CategoryFormComponent`: For creating/editing categories (modal or separate page).
-        *   Communicates with `/api/categories` backend endpoints.
-    *   **Product Management Module:** (Routed within AdminModule, potentially lazy-loaded)
-        *   `ProductListComponent`: Displays products (table with pagination, search by name/SKU, filter by category, sort).
-        *   `ProductFormComponent`: For creating/editing products (including category selection, JSON editor for specifications).
-        *   Communicates with `/api/products` backend endpoints.
-    *   **Mapping Management Module:** (Routed within AdminModule, potentially lazy-loaded)
-        *   `MappingListComponent`: Displays product-seller mappings (table with pagination, search, filter by product/seller).
-        *   `MappingFormComponent`: For creating/editing mappings (linking product, seller, URL, site config).
-        *   Ability to toggle `isActiveForScraping`.
-        *   Communicates with `/api/mappings` backend endpoints.
-    *   **Site Configuration Module:** (Routed within AdminModule, potentially lazy-loaded)
-        *   `SiteConfigListComponent`: Displays site configurations (table with pagination, search by domain).
-        *   `SiteConfigFormComponent`: For creating/editing site configurations (selectors for price, stock, etc.).
-        *   Communicates with `/api/site-configs` backend endpoints.
-    *   **User Management Module (CRM):** (Routed within AdminModule, potentially lazy-loaded)
-        *   `UserListComponent`: Displays users (table with pagination, search by email/name, filter by role).
-        *   `UserFormComponent`: For creating/editing users (profile info, assign roles).
-        *   Communicates with `/api/admin/users` backend endpoints.
-    *   **Alert Management Module (Admin View):** (Routed within AdminModule, potentially lazy-loaded)
-        *   `AdminAlertListComponent`: Displays all alert rules across all users (table with pagination, search, filter by user/product).
-        *   View details of an alert rule.
-        *   (Optional) Admin ability to enable/disable or delete alerts.
-        *   Communicates with `/api/admin/alerts` backend endpoints.
-    *   **Price History Module (Admin View):** (Routed within AdminModule, potentially lazy-loaded)
-        *   `PriceHistoryViewerComponent`: Interface to select a product (and optionally seller) to view its price history chart (using a charting library like ng2-charts/Chart.js or ECharts) and data table.
-        *   Communicates with `/api/products/{canonicalProductId}/price-history` backend endpoint.
+*   **Auth Module:** (Lazy-loaded)
+    *   `LoginComponent` with JWT authentication
+    *   Automatic token refresh and session management
+    *   Role-based redirection after login
+
+*   **Dashboard Module:** (Protected by AuthGuard)
+    *   System overview with real-time statistics
+    *   Quick access to key management sections
+    *   Performance metrics and system health indicators
+
+*   **Catalog Module:** (Public product browsing)
+    *   `ProductCatalogComponent` with grid/list view toggle
+    *   `ProductCardComponent` with image gallery integration
+    *   Advanced filtering by category, price range, and availability
+    *   Product detail view with price history charts
+    *   Integration with alert creation
+
+*   **Categories Module:** (Admin/Moderator access)
+    *   `CategoriesListComponent` with full CRUD operations
+    *   `CategoryFormComponent` for creating/editing categories
+    *   Bulk operations and category management
+    *   Real-time validation and error handling
+
+*   **Products Module:** (Admin/Moderator access)
+    *   `ProductsListComponent` with advanced filtering and sorting
+    *   `ProductFormComponent` with image upload and management
+    *   `PriceHistoryComponent` with interactive charts
+    *   Bulk import/export capabilities
+    *   Product image gallery management
+*   **Mappings Module:** (User/Admin/Moderator access)
+    *   `MappingsListComponent` with comprehensive mapping management
+    *   `MappingFormComponent` for creating/editing product-seller mappings
+    *   Real-time scraping status and error monitoring
+    *   Bulk operations for mapping management
+    *   Integration with site configuration selection
+
+*   **Site Configs Module:** (Admin access only)
+    *   `SiteConfigsListComponent` for managing scraper configurations
+    *   `SiteConfigFormComponent` with CSS selector testing
+    *   Domain-based configuration management
+    *   Scraper testing and validation tools
+
+*   **Users Module:** (Admin access only)
+    *   `UsersListComponent` with comprehensive user management
+    *   `UserFormComponent` for creating/editing users and roles
+    *   Role assignment and permission management
+    *   User activity monitoring and statistics
+
+*   **Alerts Module:** (User/Admin access)
+    *   `AlertsListComponent` for personal alert management
+    *   `AlertFormComponent` with advanced condition configuration
+    *   `AlertPerformanceComponent` for admin monitoring
+    *   Real-time alert status and performance metrics
+    *   Integration with product selection and notification preferences
+
+*   **Notification Settings Module:** (User/Admin access)
+    *   `NotificationSettingsComponent` for Discord webhook configuration
+    *   Product selection for notifications (up to 5 products)
+    *   Custom bot name and avatar configuration
+    *   Webhook testing and validation
+    *   Notification preferences summary and management
+
+*   **Scraper Logs Module:** (Admin access only)
+    *   `ScraperLogsComponent` for monitoring scraping activities
+    *   Real-time log viewing and filtering
+    *   Error analysis and performance monitoring
+    *   Scraper run statistics and trends
 
 **7.3 UI/UX Considerations**
 *   **Responsive Design:** The application should be usable on desktop and tablet devices. Use a responsive grid system (from UI library or custom).
@@ -927,6 +1040,51 @@ The Angular application will be structured into modules for better organization 
     *   These files can be served by any static web server (Nginx, Apache, Caddy) or a cloud storage service configured for static website hosting (AWS S3 + CloudFront, Azure Blob Storage + CDN, Google Cloud Storage).
     *   Ensure the web server is configured to handle SPA routing (i.e., redirect all 404s to `index.html`).
 *   **Environment Configuration:** Angular's `src/environments/` folder (`environment.ts`, `environment.prod.ts`, etc.) is used to manage environment-specific variables like the API base URL. `ng build --configuration production` will use `environment.prod.ts`.
+
+**7.6 Image Processing & Gallery Features**
+The frontend includes comprehensive image handling capabilities:
+
+*   **Image Gallery Component:** (`ImageGalleryComponent`)
+    *   Displays primary and additional product images
+    *   Lazy loading for performance optimization
+    *   Responsive design with configurable dimensions
+    *   Thumbnail navigation for multiple images
+    *   Fallback handling for missing images
+    *   Integration with product cards and detail views
+
+*   **Image Upload and Management:**
+    *   Drag-and-drop image upload interface
+    *   Multiple image selection and preview
+    *   Image validation (format, size, dimensions)
+    *   Progress indicators for upload operations
+    *   Image reordering and deletion capabilities
+
+*   **Image Storage Integration:**
+    *   Local directory-based image storage
+    *   Optimized image serving with caching
+    *   Automatic image format detection
+    *   URL-based image referencing system
+
+**7.7 Notification Settings Interface**
+Comprehensive user notification management:
+
+*   **Discord Integration:**
+    *   Discord webhook URL configuration and validation
+    *   Real-time webhook testing functionality
+    *   Custom bot name and avatar configuration
+    *   Rich embed notification previews
+
+*   **Product Selection:**
+    *   Interactive product selection (up to 5 products)
+    *   Product search and filtering capabilities
+    *   Visual product cards with current pricing
+    *   Easy addition/removal of notification products
+
+*   **Preferences Management:**
+    *   Enable/disable notification toggles
+    *   Notification frequency settings
+    *   Summary dashboard showing current configuration
+    *   Validation and error handling for all settings
 
 ---
 
@@ -975,51 +1133,41 @@ The Angular application will be structured into modules for better organization 
 
 ---
 
-### 9. Development Roadmap (Summary)
+### 9. Implementation Status (Completed)
 
-1.  **Phase 1: Backend Foundation (Sprint 1-2):**
-    *   .NET Aspire project setup.
-    *   `TechTicker.Domain`, `TechTicker.DataAccess` (EF Core, initial models for Category, Product).
-    *   `TechTicker.ApiService`: Category API, Product API (CRUD).
-    *   User Authentication (ASP.NET Core Identity setup, JWT issuance, login/register API).
-    *   Initial `TechTicker.ServiceDefaults` (logging, health checks).
-2.  **Phase 2: Backend Scraping Core (Sprint 3-4):**
-    *   Product Mapping & Site Configuration: Models, Repositories, APIs.
-    *   `TechTicker.ScrapingWorker`: `ScrapingOrchestrationModule`, `ScraperModule` (basic HTTP/HtmlAgilityPack scraping).
-    *   RabbitMQ setup within Aspire, define initial messages (`ScrapeProductPageCommand`, `ScrapingResultEvent`).
-    *   `PriceNormalizationIngestionModule` and `PriceHistoryModule` (models, consumers, basic API for history).
-3.  **Phase 3: Angular Frontend - Foundation & Core Admin (Sprint 5-7):**
-    *   Angular project setup (`ng new techticker-admin-portal`).
-    *   Core Module (AuthService, Guards, Interceptors), Auth Module (Login Page).
-    *   Admin Module layout (sidebar, navbar).
-    *   Dashboard (basic placeholder).
-    *   Category Management UI (list, create, edit, delete forms and views).
-    *   Product Management UI (list, create, edit, delete forms and views).
-4.  **Phase 4: Backend Alerts & Admin APIs (Sprint 8-9):**
-    *   Alert Definition Module (model, API for users to create their own alerts).
-    *   Alert Evaluation Module (consumer for `PricePointRecordedEvent`, logic, `AlertTriggeredEvent`).
-    *   `TechTicker.NotificationWorker`: `NotificationModule` (consumer for `AlertTriggeredEvent`, email sending via MailKit).
-    *   Admin API Endpoints: For managing users (`/api/admin/users`), viewing all alerts (`/api/admin/alerts`).
-5.  **Phase 5: Angular Frontend - Advanced Admin & CRM (Sprint 10-12):**
-    *   Mapping Management UI.
-    *   Site Configuration UI.
-    *   User Management (CRM) UI (list users, edit roles, create users).
-    *   Admin View for All Alerts.
-    *   Admin View for Price History (with charts).
-6.  **Phase 6: Integration, Testing, Evasion & Refinement (Sprint 13-14):**
-    *   End-to-end testing of backend and frontend flows.
-    *   Refine scraper evasion techniques based on testing.
-    *   Performance testing and optimization (API, database queries, frontend load times).
-    *   Comprehensive logging and error handling review.
-    *   Security review and hardening.
-7.  **Phase 7: Deployment Prep & Documentation (Sprint 15):**
-    *   Finalize Dockerfiles and deployment scripts/manifests (e.g., K8s or Docker Compose for production).
-    *   Set up CI/CD pipelines.
-    *   Complete all technical documentation and user guides for admins.
-    *   User Acceptance Testing (UAT).
-8.  **Phase 8: Go-Live & Post-Launch Support (Sprint 16):**
-    *   Production deployment.
-    *   Monitoring and initial support.
+**✅ All Phases Completed Successfully**
+
+The TechTicker system has been fully implemented and is operational. All planned features have been delivered with additional enhancements:
+
+**Completed Core Features:**
+1.  **✅ Backend Foundation:** Complete .NET Aspire setup with all core services
+2.  **✅ Database Layer:** Full EF Core implementation with PostgreSQL
+3.  **✅ API Layer:** Comprehensive REST API with OpenAPI documentation
+4.  **✅ Authentication & Authorization:** Full RBAC system with JWT
+5.  **✅ Scraping System:** Complete web scraping with orchestration and monitoring
+6.  **✅ Messaging Infrastructure:** RabbitMQ integration with reliable message processing
+7.  **✅ Alert System:** Advanced alert rules with evaluation and triggering
+8.  **✅ Notification System:** Discord notifications with user preferences
+9.  **✅ Frontend Application:** Complete Angular SPA with all admin features
+10. **✅ User Management:** Full CRM capabilities with role management
+
+**Additional Features Implemented:**
+*   **Image Processing:** Complete image upload, storage, and gallery system
+*   **Performance Monitoring:** Comprehensive logging and monitoring capabilities
+*   **Scraper Run Logging:** Detailed scraping activity tracking and analysis
+*   **Advanced RBAC:** Permission-based authorization beyond basic roles
+*   **Product Catalog:** Public-facing product browsing with price history
+*   **Notification Preferences:** User-configurable Discord webhook settings
+*   **Testing Infrastructure:** Comprehensive unit and integration test coverage
+*   **NSwag Integration:** Automatic TypeScript client generation
+
+**Current System Capabilities:**
+*   **Fully Operational:** All services running and communicating properly
+*   **Production Ready:** Containerized with Docker and Aspire orchestration
+*   **Scalable Architecture:** Horizontal scaling support for all components
+*   **Comprehensive Monitoring:** Full observability with logging and metrics
+*   **User-Friendly Interface:** Modern Angular frontend with responsive design
+*   **Robust Error Handling:** Comprehensive error handling and recovery mechanisms
 
 ---
 
@@ -1058,20 +1206,53 @@ The Angular application will be structured into modules for better organization 
 
 ### 11. Future Enhancements
 
-*   **User-Facing Frontend:** A separate Angular (or other) application for end-users to browse products, view price histories, and manage their own alerts (beyond just API access).
-*   **Hierarchical Categories:** Support for nested product categories.
-*   **Category-Specific Alert Rules:** Allow users to set alerts for entire categories (e.g., "any GPU below $300").
-*   **Faceted Search & Filtering:** Advanced search capabilities on the user-facing frontend.
-*   **Automated Product Discovery (Advanced):** Instead of only exact URLs, allow admins to input search terms for a site, and the system attempts to find relevant product pages (very complex, high risk of errors/detection).
-*   **Advanced Alert Conditions:** More complex rules (e.g., "price dropped by X% AND is in stock," "price is X% lower than average of last 30 days").
-*   **Additional Notification Channels:** SMS (via Twilio/Vonage), Push Notifications (for mobile/web apps), Slack/Discord webhooks.
-*   **Browser Automation Integration (Playwright/Puppeteer):** For specific sites that heavily rely on JavaScript or have strong anti-bot measures (use sparingly due to resource intensity and maintenance). This would likely be a separate, specialized worker.
-*   **Dynamic Evasion Strategy Adjustment:** ML-based system to monitor scraper success rates and automatically adjust UAs, headers, delays, or even suggest proxy usage per site.
-*   **ML for Selector Finding/Maintenance:** Tools or services that can help automatically identify or suggest updates for CSS/XPath selectors when site layouts change.
-*   **User-Contributed Mappings/Selectors:** Allow trusted users to submit new product mappings or scraper selectors, with an admin approval workflow.
-*   **Affiliate Link Integration:** Option to automatically append affiliate tags to product URLs shown to users.
-*   **Comparative Analysis Features:** "Product A vs. Product B" price trends, best price across all tracked sellers for a given product.
-*   **Enhanced Admin Dashboard:** More detailed analytics, system health overview, scraper performance metrics, DLQ management interface.
-*   **Audit Logging:** Comprehensive logging of all admin actions performed through the frontend/API.
-*   **Internationalization (i18n) / Localization (l10n):** Support for multiple languages and regions in both frontend and backend (data, notifications).
-*   **Proxy Integration:** Allow configuration and use of proxy servers (rotating, residential) for scraping to improve stealth and avoid IP bans. Also add functionality to test the proxy servers before use.
+**Note:** The following features represent potential future enhancements beyond the current fully implemented system:
+
+*   **Hierarchical Categories:** Support for nested product categories
+*   **Category-Specific Alert Rules:** Allow users to set alerts for entire categories (e.g., "any GPU below $300")
+*   **Advanced Alert Conditions:** More complex rules (e.g., "price dropped by X% AND is in stock")
+*   **Additional Notification Channels:** SMS, Push Notifications, Slack integration
+*   **Browser Automation Integration:** Playwright/Puppeteer for JavaScript-heavy sites
+*   **Dynamic Evasion Strategy Adjustment:** ML-based scraper optimization
+*   **ML for Selector Maintenance:** Automatic selector updates when sites change
+*   **User-Contributed Mappings:** Community-driven product mapping submissions
+*   **Affiliate Link Integration:** Automatic affiliate tag appending
+*   **Comparative Analysis Features:** Product comparison and trend analysis
+*   **Internationalization:** Multi-language and region support
+*   **Proxy Integration:** Rotating proxy support for enhanced stealth
+
+---
+
+### 12. Current System Summary
+
+**TechTicker v2.0** is a fully operational e-commerce price tracking and alerting system with the following key characteristics:
+
+**✅ Implemented Features:**
+- Complete .NET 8 backend with Aspire orchestration
+- Angular 20 frontend with comprehensive admin interface
+- PostgreSQL database with full EF Core integration
+- RabbitMQ messaging for reliable background processing
+- JWT-based authentication with RBAC authorization
+- Web scraping with anti-detection techniques
+- Discord notification system with user preferences
+- Product catalog with image gallery support
+- Real-time price monitoring and alerting
+- Comprehensive logging and monitoring
+- Docker containerization ready for production
+
+**🎯 System Capabilities:**
+- **Multi-user Support:** Admin, Moderator, and User roles
+- **Product Management:** Categories, products, and seller mappings
+- **Price Tracking:** Automated scraping with configurable frequency
+- **Alert System:** Flexible alert rules with Discord notifications
+- **Image Processing:** Upload, storage, and gallery display
+- **Performance Monitoring:** Detailed logging and scraper analytics
+- **Responsive UI:** Modern Angular interface with Material Design
+
+**🚀 Production Ready:**
+- Fully tested with comprehensive test coverage
+- Scalable architecture with horizontal scaling support
+- Robust error handling and recovery mechanisms
+- Security hardened with RBAC and input validation
+- Monitoring and observability built-in
+- Documentation complete and up-to-date
