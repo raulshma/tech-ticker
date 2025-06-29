@@ -119,8 +119,6 @@ builder.Services.AddScoped<IAlertPerformanceMonitoringService, AlertPerformanceM
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
 builder.Services.AddSingleton<IMessageConsumer, RabbitMQConsumer>();
 
-
-
 // Add background services
 builder.Services.AddHostedService<PricePointConsumerService>();
 
@@ -178,6 +176,9 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+
+// Add Alert Processing Service
+builder.Services.AddScoped<IAlertProcessingService, AlertProcessingService>();
 
 var app = builder.Build();
 
