@@ -61,9 +61,9 @@ The solution is organized into the following main projects:
 
 *   **Product Catalog Management:** Administer products, including categorization.
 *   **Price Tracking:** Scrape and store historical price data for specified products.
-*   **Alerting System:** Notify users of price changes based on defined rules.
+*   **Alerting System:** Notify users of price changes based on defined rules, with full alert history and audit trails.
 *   **User Management:** Secure authentication and authorization for administrators.
-*   **Stealthy Scraping:** Implements techniques to reduce detectability, including proxy integration.
+*   **Stealthy Scraping:** Implements techniques to reduce detectability, including advanced proxy integration and analytics.
 *   **Admin & CRM Portal:** Angular-based frontend for system management.
 
 ## API Endpoints Overview
@@ -135,4 +135,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for more 
 
 ## Documentation
 
-For more detailed information on the system's design, modules, and specifications, please refer to the [Detailed Software Specification](docs/Documentation.md).
+For more detailed information on the system's design, modules, and specifications (including all new features in v2.2), please refer to the [Detailed Software Specification](docs/Documentation.md).

@@ -1,14 +1,14 @@
 ## TechTicker: E-commerce Price Tracker & Alerter - Detailed Software Specification
 
-**Version:** 2.1
-**Date:** June 28, 2025
+**Version:** 2.2
+**Date:** June 29, 2025
 **System Model:** Admin-Managed Exact Product URLs (Focus on Reduced Detectability, with Product Categories)
 **Architecture Model:** Monolith with .NET Aspire Backend & Angular SPA Frontend
 **Target Audience:** Development Team / Automated Coding Agent
 **Status:** Fully Implemented and Operational with Advanced Features
 
 **Preamble:**
-This document provides a comprehensive specification of the fully implemented TechTicker application, including its backend services and Angular frontend for administration and CRM. The system is operational and includes all described features plus recent enhancements. This documentation reflects the actual implemented state of the system as of June 2025, including all APIs, frontend components, background workers, database schema, proxy management, bulk operations, and comprehensive testing infrastructure.
+This document provides a comprehensive specification of the fully implemented TechTicker application, including its backend services and Angular frontend for administration and CRM. The system is operational and includes all described features plus recent enhancements. This documentation reflects the actual implemented state of the system as of July 2025, including all APIs, frontend components, background workers, database schema, proxy management, bulk operations, and comprehensive testing infrastructure.
 
 **Table of Contents:**
 
@@ -835,43 +835,53 @@ While the backend is a monolith, logical separation of concerns is maintained by
 
 *   **`ProxyConfiguration`** (`ProxyConfigurations` table)
     *   `ProxyConfigurationId` (Guid, PK)
-    *   `Name` (VARCHAR(255), NN) - Friendly name for the proxy
-    *   `Host` (VARCHAR(255), NN, Index) - Proxy server hostname or IP
-    *   `Port` (INT, NN, Index) - Proxy server port
-    *   `ProxyType` (VARCHAR(20), NN, Index) - HTTP, HTTPS, SOCKS4, SOCKS5
-    *   `Username` (VARCHAR(255), NULL) - Authentication username
-    *   `Password` (VARCHAR(255), NULL) - Authentication password (encrypted)
-    *   `IsActive` (BOOLEAN, NN, DEFAULT TRUE, Index) - Whether proxy is enabled
-    *   `IsHealthy` (BOOLEAN, NN, DEFAULT TRUE, Index) - Current health status
-    *   `LastHealthCheck` (TIMESTAMPTZ, NULL) - Last health check timestamp
-    *   `HealthCheckUrl` (VARCHAR(2048), NULL) - Custom health check URL
-    *   `ResponseTimeMs` (INT, NULL) - Last response time in milliseconds
-    *   `SuccessCount` (INT, NN, DEFAULT 0) - Total successful requests
-    *   `FailureCount` (INT, NN, DEFAULT 0) - Total failed requests
-    *   `LastUsedAt` (TIMESTAMPTZ, NULL) - Last time proxy was used
-    *   `Notes` (TEXT, NULL) - Additional notes or comments
+    *   `Host` (VARCHAR(255), NN, Index)
+    *   `Port` (INT, NN, Index)
+    *   `ProxyType` (VARCHAR(20), NN, Index)
+    *   `Username` (VARCHAR(100), NULL)
+    *   `Password` (VARCHAR(500), NULL)
+    *   `Description` (VARCHAR(200), NULL)
+    *   `IsActive` (BOOLEAN, NN)
+    *   `IsHealthy` (BOOLEAN, NN)
+    *   `LastTestedAt` (TIMESTAMPTZ, NULL)
+    *   `LastUsedAt` (TIMESTAMPTZ, NULL)
+    *   `SuccessRate` (DECIMAL(5,2), NN)
+    *   `TotalRequests` (INT, NN)
+    *   `SuccessfulRequests` (INT, NN)
+    *   `FailedRequests` (INT, NN)
+    *   `ConsecutiveFailures` (INT, NN)
+    *   `TimeoutSeconds` (INT, NN)
+    *   `MaxRetries` (INT, NN)
+    *   `LastErrorMessage` (VARCHAR(500), NULL)
+    *   `LastErrorCode` (VARCHAR(50), NULL)
     *   `CreatedAt` (TIMESTAMPTZ, NN)
     *   `UpdatedAt` (TIMESTAMPTZ, NN)
-    *   Unique Constraint: `(Host, Port, ProxyType)` to prevent duplicate proxy configurations
-    *   Index: `(IsActive, IsHealthy)` for efficient proxy pool queries
-    *   Index: `(LastHealthCheck)` for health monitoring
+    *   Unique Constraint: `(Host, Port, ProxyType)`
+    *   Index: `(IsActive, IsHealthy)`
+    *   Index: `(LastTestedAt)`
 
 *   **`AlertHistory`** (`AlertHistories` table)
     *   `AlertHistoryId` (Guid, PK)
-    *   `AlertRuleId` (Guid, FK to `AlertRules.AlertRuleId`, NN, Index, ON DELETE CASCADE)
-    *   `UserId` (Guid, FK to `AspNetUsers.Id`, NN, Index, ON DELETE CASCADE)
-    *   `CanonicalProductId` (Guid, FK to `Products.ProductId`, NN, Index, ON DELETE CASCADE)
-    *   `TriggeredAt` (TIMESTAMPTZ, NN, Index)
+    *   `AlertRuleId` (Guid, FK)
+    *   `UserId` (Guid, FK)
+    *   `CanonicalProductId` (Guid, FK)
+    *   `ConditionType` (VARCHAR(50), NN)
+    *   `AlertType` (VARCHAR(20), NN)
+    *   `ThresholdValue` (DECIMAL(10,2), NULL)
+    *   `PercentageValue` (DECIMAL(5,2), NULL)
+    *   `SpecificSellerName` (VARCHAR(100), NULL)
     *   `SellerName` (VARCHAR(100), NN)
     *   `TriggeringPrice` (DECIMAL(10,2), NN)
     *   `TriggeringStockStatus` (VARCHAR(50), NN)
-    *   `RuleDescription` (VARCHAR(500), NN)
-    *   `NotificationSent` (BOOLEAN, NN, DEFAULT FALSE)
+    *   `ProductPageUrl` (VARCHAR(500), NULL)
+    *   `RuleDescription` (VARCHAR(200), NN)
+    *   `TriggeredAt` (TIMESTAMPTZ, NN)
+    *   `NotificationStatus` (VARCHAR(20), NN)
+    *   `NotificationError` (VARCHAR(500), NULL)
     *   `NotificationSentAt` (TIMESTAMPTZ, NULL)
-    *   `ProductPageUrl` (VARCHAR(2048), NN)
-    *   Navigation Properties: `AlertRule AlertRule`, `ApplicationUser User`, `Product Product`
-    *   Index: `(UserId, TriggeredAt DESC)` for user alert history
-    *   Index: `(CanonicalProductId, TriggeredAt DESC)` for product alert history
+    *   `WasAlertDeactivated` (BOOLEAN, NN)
+    *   Index: `(UserId, TriggeredAt DESC)`
+    *   Index: `(CanonicalProductId, TriggeredAt DESC)`
 
 *   **`ScraperRunLog`** (`ScraperRunLogs` table)
     *   `ScraperRunLogId` (Guid, PK)
@@ -886,9 +896,10 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   `ScrapedPrice` (DECIMAL(10,2), NULL)
     *   `ScrapedStockStatus` (VARCHAR(50), NULL)
     *   `UserAgent` (VARCHAR(500), NULL)
-    *   `ProxyUsed` (VARCHAR(255), NULL) - Proxy that was used (if any)
+    *   `ProxyUsed` (VARCHAR(100), NULL) - Proxy that was used (if any)
     *   `ParentRunId` (Guid, FK to `ScraperRunLogs.ScraperRunLogId`, NULL, Index) - For retry attempts
     *   `RetryAttempt` (INT, NN, DEFAULT 0)
+    *   `ProxyId` (Guid, FK, NULL)
     *   Navigation Properties: `ProductSellerMapping Mapping`, `ScraperRunLog ParentRun`, `ICollection<ScraperRunLog> RetryAttempts`
     *   Index: `(MappingId, StartedAt DESC)`
     *   Index: `(Status, StartedAt DESC)`
@@ -1395,7 +1406,7 @@ The TechTicker application includes a robust testing infrastructure with over 23
 
 ### 12. Current System Summary
 
-**TechTicker v2.1** is a fully operational e-commerce price tracking and alerting system with the following key characteristics:
+**TechTicker v2.2** is a fully operational e-commerce price tracking and alerting system with the following key characteristics:
 
 **✅ Implemented Features:**
 - Complete .NET 9.0 backend with Aspire 9.3.1 orchestration
@@ -1436,13 +1447,17 @@ The TechTicker application includes a robust testing infrastructure with over 23
 
 ## 📝 Documentation Update Summary
 
-**Last Updated:** June 28, 2025
-**Version:** 2.1
+**Last Updated:** June 29, 2025
+**Version:** 2.2
 **Status:** Current and Accurate
 
-This documentation has been updated to reflect the current state of the TechTicker application as of June 2025. All features described are fully implemented and operational. Key updates include:
+This documentation has been updated to reflect the current state of the TechTicker application as of July 2025. All features described are fully implemented and operational. Key updates include:
 
 **✅ Recently Completed Features:**
+- Dedicated ProxyConfigurations table with advanced proxy analytics, health, and usage tracking
+- AlertHistories table for comprehensive alert trigger and notification audit trails
+- AlertType field on AlertRules for categorization and extensibility
+- ProxyId and ProxyUsed fields in ScraperRunLogs for detailed proxy usage tracking
 - Comprehensive proxy management system with bulk operations
 - Advanced testing infrastructure with 230+ test cases covering all critical components
 - Real-time performance monitoring and analytics dashboards
@@ -1452,6 +1467,10 @@ This documentation has been updated to reflect the current state of the TechTick
 - Upgraded to .NET 9.0 and Angular 20 with latest dependencies
 
 **🔧 Technical Improvements:**
+- Enhanced proxy analytics and health monitoring
+- Alert history and notification audit trail support
+- Support for new alert types and extensibility
+- Improved proxy usage diagnostics in scraping logs
 - Enhanced error handling and recovery mechanisms
 - Optimized database queries and performance
 - Improved security with comprehensive RBAC implementation
