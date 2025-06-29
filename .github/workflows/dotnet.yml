@@ -12,12 +12,12 @@ on:
 jobs:
   build:
 
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
-      uses: useblacksmith/setup-dotnet@v5
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.x
     - name: Restore dependencies
