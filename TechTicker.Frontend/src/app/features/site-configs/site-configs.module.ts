@@ -21,6 +21,7 @@ import { SiteConfigsRoutingModule } from './site-configs-routing.module';
 import { SiteConfigsListComponent } from './components/site-configs-list/site-configs-list.component';
 import { SiteConfigFormComponent } from './components/site-config-form/site-config-form.component';
 import { SiteConfigDeleteDialogComponent } from './components/site-config-delete-dialog/site-config-delete-dialog.component';
+import { BrowserAutomationProfileBuilderComponent } from '../../shared/components/browser-automation-profile-builder/browser-automation-profile-builder.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { SiteConfigDeleteDialogComponent } from './components/site-config-delete
     MatTooltipModule,
     MatSlideToggleModule,
     MatExpansionModule,
-    MatChipsModule
+    MatChipsModule,
+    BrowserAutomationProfileBuilderComponent
   ]
 })
 export class SiteConfigsModule { }

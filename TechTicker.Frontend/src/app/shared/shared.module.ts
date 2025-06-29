@@ -17,7 +17,7 @@ import { RbacModule } from './modules/rbac.module';
 @NgModule({
   declarations: [
     AppLayoutComponent,
-    ImageGalleryComponent
+    ImageGalleryComponent,
   ],
   imports: [
     CommonModule,
@@ -35,7 +35,7 @@ import { RbacModule } from './modules/rbac.module';
   exports: [
     AppLayoutComponent,
     ImageGalleryComponent,
-    RbacModule
+    RbacModule,
   ]
 })
 export class SharedModule { }

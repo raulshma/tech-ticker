@@ -142,6 +142,8 @@ export class SiteConfigFormComponent implements OnInit {
       requiresBrowserAutomation: [false],
       browserAutomationProfile: [''],
     });
+
+    // Note: Browser automation profile handles its own object/string conversion
   }
 
   ngOnInit(): void {
@@ -213,7 +215,10 @@ export class SiteConfigFormComponent implements OnInit {
     if (this.siteConfigForm.valid && !this.isLoading) {
       this.isLoading = true;
 
-      const formValue = this.siteConfigForm.value;
+      const formValue = { ...this.siteConfigForm.value };
+      if (typeof formValue.browserAutomationProfile === 'object') {
+        formValue.browserAutomationProfile = JSON.stringify(formValue.browserAutomationProfile);
+      }
 
       // Convert headers array to object
       const headersObject: { [key: string]: string } = {};
@@ -326,5 +331,9 @@ export class SiteConfigFormComponent implements OnInit {
 
   toggleExamples() {
     this.showExamples = !this.showExamples;
+  }
+
+  get browserAutomationProfileControl() {
+    return this.siteConfigForm.get('browserAutomationProfile') as import('@angular/forms').FormControl;
   }
 }

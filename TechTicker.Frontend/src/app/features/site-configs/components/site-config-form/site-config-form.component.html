@@ -218,14 +218,10 @@
               </mat-hint>
             </div>
             <div class="form-row">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Browser Automation Profile (JSON)</mat-label>
-                <textarea matInput
-                          formControlName="browserAutomationProfile"
-                          placeholder='{"preferredBrowser":"chromium","timeoutSeconds":30,"actions":[{"actionType":"scroll"}]}'
-                          rows="5"></textarea>
-                <mat-hint>Advanced: JSON for Playwright profile (actions, proxy, user-agent, etc.)</mat-hint>
-              </mat-form-field>
+              <app-browser-automation-profile-builder
+                [formControl]="browserAutomationProfileControl"
+                [parentForm]="siteConfigForm">
+              </app-browser-automation-profile-builder>
             </div>
           </div>
         </mat-expansion-panel>

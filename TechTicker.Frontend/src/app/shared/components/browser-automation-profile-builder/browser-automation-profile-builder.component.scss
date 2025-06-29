@@ -1,0 +1,51 @@
+.browser-automation-profile-builder {
+  padding: 1rem;
+  background: #fafbfc;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.builder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.profile-form .form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.profile-form .full-width {
+  flex: 1 1 100%;
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.json-preview {
+  background: #f5f5f5;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.95em;
+  color: #333;
+}
+
+.validation-error {
+  color: #b71c1c;
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.raw-json-section {
+  margin-top: 1rem;
+} 
