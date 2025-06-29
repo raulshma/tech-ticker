@@ -25,6 +25,7 @@ export class MappingsListComponent implements OnInit {
 
   // Filters
   productControl = new FormControl('');
+  showAllMappings = false;
   products: ProductDto[] = [];
 
   // Track scraping progress
@@ -78,8 +79,9 @@ export class MappingsListComponent implements OnInit {
   loadMappings(): void {
     this.isLoading = true;
     const productId = this.productControl.value || undefined;
+    const isActiveForScraping = this.showAllMappings ? undefined : true;
 
-    this.mappingsService.getMappings(productId).subscribe({
+    this.mappingsService.getMappings(productId, isActiveForScraping).subscribe({
       next: (mappings) => {
         this.dataSource.data = mappings;
         this.isLoading = false;

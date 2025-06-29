@@ -43,13 +43,14 @@ public class MappingsController : BaseApiController
     /// Get mappings by product ID
     /// </summary>
     /// <param name="canonicalProductId">Product ID</param>
+    /// <param name="isActiveForScraping">Filter by active for scraping (optional)</param>
     /// <returns>List of mappings for the product</returns>
     [HttpGet(Name = "GetMappings")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<ProductSellerMappingDto>>>> GetMappings([FromQuery] Guid? canonicalProductId = null)
+    public async Task<ActionResult<ApiResponse<IEnumerable<ProductSellerMappingDto>>>> GetMappings([FromQuery] Guid? canonicalProductId = null, [FromQuery] bool? isActiveForScraping = null)
     {
         if (canonicalProductId.HasValue)
         {
-            var result = await _mappingService.GetMappingsByProductIdAsync(canonicalProductId.Value);
+            var result = await _mappingService.GetMappingsByProductIdAsync(canonicalProductId.Value, isActiveForScraping);
             return HandleResult(result);
         }
 

@@ -3063,14 +3063,19 @@ export class TechTickerApiClient {
 
     /**
      * @param canonicalProductId (optional) 
+     * @param isActiveForScraping (optional) 
      * @return OK
      */
-    getMappings(canonicalProductId: string | undefined): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
+    getMappings(canonicalProductId: string | undefined, isActiveForScraping: boolean | undefined): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
         let url_ = this.baseUrl + "/api/Mappings?";
         if (canonicalProductId === null)
             throw new Error("The parameter 'canonicalProductId' cannot be null.");
         else if (canonicalProductId !== undefined)
             url_ += "canonicalProductId=" + encodeURIComponent("" + canonicalProductId) + "&";
+        if (isActiveForScraping === null)
+            throw new Error("The parameter 'isActiveForScraping' cannot be null.");
+        else if (isActiveForScraping !== undefined)
+            url_ += "isActiveForScraping=" + encodeURIComponent("" + isActiveForScraping) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

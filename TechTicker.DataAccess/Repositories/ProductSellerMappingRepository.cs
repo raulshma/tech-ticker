@@ -13,13 +13,16 @@ public class ProductSellerMappingRepository : Repository<ProductSellerMapping>, 
     {
     }
 
-    public async Task<IEnumerable<ProductSellerMapping>> GetByProductIdAsync(Guid productId)
+    public async Task<IEnumerable<ProductSellerMapping>> GetByProductIdAsync(Guid productId, bool? isActiveForScraping = null)
     {
-        return await _dbSet
+        var query = _dbSet
             .Include(m => m.SiteConfiguration)
-            .Where(m => m.CanonicalProductId == productId)
-            .OrderBy(m => m.SellerName)
-            .ToListAsync();
+            .Where(m => m.CanonicalProductId == productId);
+        if (isActiveForScraping.HasValue)
+        {
+            query = query.Where(m => m.IsActiveForScraping == isActiveForScraping.Value);
+        }
+        return await query.OrderBy(m => m.SellerName).ToListAsync();
     }
 
     public async Task<IEnumerable<ProductSellerMapping>> GetActiveMappingsAsync()

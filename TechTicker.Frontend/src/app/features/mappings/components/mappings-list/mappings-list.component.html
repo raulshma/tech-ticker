@@ -26,6 +26,10 @@
           </mat-select>
         </mat-form-field>
 
+        <mat-checkbox [(ngModel)]="showAllMappings" (change)="loadMappings()">
+          Show all mappings (including inactive)
+        </mat-checkbox>
+
         <button mat-button (click)="clearFilters()" class="clear-filters-btn">
           <mat-icon>clear</mat-icon>
           Clear Filters

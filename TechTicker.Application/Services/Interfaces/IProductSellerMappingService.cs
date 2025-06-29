@@ -9,7 +9,7 @@ namespace TechTicker.Application.Services.Interfaces;
 public interface IProductSellerMappingService
 {
     Task<Result<ProductSellerMappingDto>> CreateMappingAsync(CreateProductSellerMappingDto createDto);
-    Task<Result<IEnumerable<ProductSellerMappingDto>>> GetMappingsByProductIdAsync(Guid productId);
+    Task<Result<IEnumerable<ProductSellerMappingDto>>> GetMappingsByProductIdAsync(Guid productId, bool? isActiveForScraping = null);
     Task<Result<IEnumerable<ProductSellerMappingDto>>> GetActiveMappingsAsync();
     Task<Result<ProductSellerMappingDto>> UpdateMappingAsync(Guid mappingId, UpdateProductSellerMappingDto updateDto);
     Task<Result> DeleteMappingAsync(Guid mappingId);

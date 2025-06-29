@@ -77,11 +77,11 @@ public class ProductSellerMappingService : IProductSellerMappingService
         }
     }
 
-    public async Task<Result<IEnumerable<ProductSellerMappingDto>>> GetMappingsByProductIdAsync(Guid productId)
+    public async Task<Result<IEnumerable<ProductSellerMappingDto>>> GetMappingsByProductIdAsync(Guid productId, bool? isActiveForScraping = null)
     {
         try
         {
-            var mappings = await _unitOfWork.ProductSellerMappings.GetByProductIdAsync(productId);
+            var mappings = await _unitOfWork.ProductSellerMappings.GetByProductIdAsync(productId, isActiveForScraping);
             var mappingDtos = mappings.Select(_mappingService.MapToDto);
 
             return Result<IEnumerable<ProductSellerMappingDto>>.Success(mappingDtos);

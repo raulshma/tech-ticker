@@ -23,8 +23,8 @@ export class MappingsService {
     private http: HttpClient
   ) {}
 
-  getMappings(canonicalProductId?: string): Observable<ProductSellerMappingDto[]> {
-    return this.apiClient.getMappings(canonicalProductId)
+  getMappings(canonicalProductId?: string, isActiveForScraping?: boolean): Observable<ProductSellerMappingDto[]> {
+    return this.apiClient.getMappings(canonicalProductId, isActiveForScraping)
       .pipe(
         map((response: ProductSellerMappingDtoIEnumerableApiResponse) => {
           if (!response.success || !response.data) {
