@@ -1,3 +1,19 @@
+// Custom sidebar color variables
+:host {
+  // Sidebar navigation item colors
+  --sidebar-item-hover-bg: var(--mat-sys-color-tertiary-container);
+  --sidebar-item-hover-text: var(--mat-sys-color-on-tertiary-container);
+  --sidebar-item-hover-icon: var(--mat-sys-color-on-tertiary-container);
+  --sidebar-item-hover-indicator: var(--mat-sys-color-tertiary);
+  
+  --sidebar-item-active-bg: var(--mat-sys-color-secondary-container);
+  --sidebar-item-active-border: var(--mat-sys-color-secondary);
+  --sidebar-item-active-text: var(--mat-sys-color-on-secondary-container);
+  --sidebar-item-active-icon: var(--mat-sys-color-secondary);
+  --sidebar-item-active-indicator: linear-gradient(to bottom, var(--mat-sys-color-secondary), var(--mat-sys-color-tertiary));
+  --sidebar-item-active-shadow: rgba(var(--mat-sys-color-secondary-rgb), 0.3);
+}
+
 // Global mobile fixes
 :host {
   display: block;
@@ -423,22 +439,22 @@ mat-sidenav-content {
   
   &:hover {
     transform: translateX(4px);
-    background-color: rgba(var(--mat-sys-color-secondary-container-rgb), 0.7);
+    background-color: var(--sidebar-item-hover-bg);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     
     .nav-icon {
-      color: var(--mat-sys-color-on-secondary-container);
+      color: var(--sidebar-item-hover-icon);
       transform: scale(1.1);
     }
     
     .nav-label {
-      color: var(--mat-sys-color-on-secondary-container);
+      color: var(--sidebar-item-hover-text);
       font-weight: 600;
     }
     
     .nav-indicator {
       width: 4px;
-      background-color: var(--mat-sys-color-secondary);
+      background-color: var(--sidebar-item-hover-indicator);
     }
   }
   
@@ -538,37 +554,33 @@ mat-sidenav-content {
 
 // Active Link Styling
 .nav-item.active {
-  background: var(--mat-sys-color-primary-container, #ede7f6) !important;
-  border: 1px solid var(--mat-sys-color-primary) !important;
+  background: var(--sidebar-item-active-bg) !important;
+  border: 1px solid var(--sidebar-item-active-border) !important;
   transform: translateX(6px);
   box-shadow: 
-    0 4px 12px rgba(var(--mat-sys-color-primary-rgb), 0.3),
+    0 4px 12px var(--sidebar-item-active-shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   
   .nav-icon {
-    color: var(--mat-sys-color-primary, #6c63ff) !important;
+    color: var(--sidebar-item-active-icon) !important;
     transform: scale(1.15);
   }
   
   .nav-label {
-    color: var(--mat-sys-color-on-primary-container) !important;
+    color: var(--sidebar-item-active-text) !important;
     font-weight: 700;
   }
   
   .nav-indicator {
     width: 4px !important;
-    background: linear-gradient(
-      to bottom,
-      var(--mat-sys-color-primary),
-      var(--mat-sys-color-tertiary)
-    ) !important;
-    box-shadow: 0 0 8px rgba(var(--mat-sys-color-primary-rgb), 0.5);
+    background: var(--sidebar-item-active-indicator) !important;
+    box-shadow: 0 0 8px var(--sidebar-item-active-shadow);
   }
   
   &:hover {
     transform: translateX(6px) !important;
     box-shadow: 
-      0 6px 20px rgba(var(--mat-sys-color-primary-rgb), 0.4),
+      0 6px 20px var(--sidebar-item-active-shadow),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
   
@@ -580,13 +592,9 @@ mat-sidenav-content {
     transform: translateY(-50%);
     width: 4px;
     height: 32px;
-    background: linear-gradient(
-      to bottom,
-      var(--mat-sys-color-primary),
-      var(--mat-sys-color-tertiary)
-    );
+    background: var(--sidebar-item-active-indicator);
     border-radius: 0 4px 4px 0;
-    box-shadow: 2px 0 8px rgba(var(--mat-sys-color-primary-rgb), 0.4);
+    box-shadow: 2px 0 8px var(--sidebar-item-active-shadow);
   }
 }
 
