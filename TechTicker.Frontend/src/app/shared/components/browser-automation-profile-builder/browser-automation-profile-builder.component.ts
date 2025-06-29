@@ -18,6 +18,8 @@ import { MatListModule } from '@angular/material/list';
 import { MatError } from '@angular/material/form-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatCardModule } from '@angular/material/card';
 
 export interface BrowserAutomationAction {
   actionType: string;
@@ -67,7 +69,8 @@ export interface BrowserAutomationProfile {
     MatTooltipModule,
     MatDividerModule,
     MatSlideToggleModule,
-    MatChipsModule
+    MatChipsModule,
+    MatCardModule
   ]
 })
 export class BrowserAutomationProfileBuilderComponent implements ControlValueAccessor, OnInit {
@@ -105,7 +108,7 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
   private onChange: any = () => {};
   private onTouched: any = () => {};
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
     this.headersArray = this.fb.array([]);
     
     this.profileForm = this.fb.group({
@@ -443,5 +446,82 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
       case 'setValue': return 'Value to set';
       default: return 'Value';
     }
+  }
+
+  /**
+   * Copy the current JSON configuration to clipboard
+   */
+  copyToClipboard(): void {
+    try {
+      // Get the current form value and transform it to the profile format
+      const currentValue = this.profileForm.value;
+      const transformedValue = this.transformFormToProfile(currentValue);
+      const jsonString = JSON.stringify(transformedValue, null, 2);
+      
+      // Use the modern Clipboard API if available
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(jsonString).then(() => {
+          this.showCopySuccessMessage();
+        }).catch((err) => {
+          console.error('Failed to copy to clipboard:', err);
+          this.fallbackCopyToClipboard(jsonString);
+        });
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        this.fallbackCopyToClipboard(jsonString);
+      }
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      this.snackBar.open('Failed to copy configuration to clipboard', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+    }
+  }
+
+  /**
+   * Fallback method for copying to clipboard in older browsers
+   */
+  private fallbackCopyToClipboard(text: string): void {
+    try {
+      // Create a temporary textarea element
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      
+      // Select and copy the text
+      textArea.focus();
+      textArea.select();
+      
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      if (successful) {
+        this.showCopySuccessMessage();
+      } else {
+        throw new Error('execCommand failed');
+      }
+    } catch (err) {
+      console.error('Fallback copy failed:', err);
+      this.snackBar.open('Failed to copy configuration to clipboard', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+    }
+  }
+
+  /**
+   * Show success message when copy operation is successful
+   */
+  private showCopySuccessMessage(): void {
+    this.snackBar.open('Configuration copied to clipboard!', 'Close', {
+      duration: 3000,
+      panelClass: ['success-snackbar'],
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 } 
