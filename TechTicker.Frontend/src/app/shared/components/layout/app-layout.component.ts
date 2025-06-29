@@ -16,6 +16,16 @@ import { ThemeService } from '../../services/theme.service';
 export class AppLayoutComponent implements OnInit, OnDestroy {
   currentUser: CurrentUser | null = null;
   private destroy$ = new Subject<void>();
+  
+  // Track expanded sections for collapsible navigation
+  expandedSections: { [key: string]: boolean } = {
+    productManagement: true,
+    infrastructure: false,
+    monitoring: false,
+    userManagement: false,
+    contentManagement: true,
+    personal: true
+  };
 
   constructor(
     private authService: AuthService, 
@@ -43,6 +53,10 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
 
   navigateTo(route: string): void {
     this.router.navigate([route]);
+  }
+
+  toggleSection(sectionKey: string): void {
+    this.expandedSections[sectionKey] = !this.expandedSections[sectionKey];
   }
 
   toggleTheme(): void {

@@ -1,10 +1,12 @@
 <mat-sidenav-container class="sidenav-container">
   <!-- Sidebar -->
-  <mat-sidenav #drawer class="sidenav" fixedInViewport="true" mode="side" opened="true">
+  <mat-sidenav #drawer class="sidenav modern-sidenav" fixedInViewport="true" mode="side" opened="true">
     <!-- Brand Header -->
     <div class="sidenav-header">
       <div class="brand-container">
-        <mat-icon class="brand-icon">trending_up</mat-icon>
+        <div class="brand-icon-wrapper">
+          <mat-icon class="brand-icon">trending_up</mat-icon>
+        </div>
         <div class="brand-text">
           <span class="brand-title">TechTicker</span>
           <span class="brand-subtitle">Price Tracker</span>
@@ -15,186 +17,255 @@
     <!-- Navigation Content -->
     <div class="nav-content">
       <nav class="primary-nav">
-        <!-- Main Navigation -->
-        <div class="nav-section">
-          <a mat-list-item 
-             class="nav-item" 
-             routerLink="/dashboard" 
-             routerLinkActive="active-link" 
-             [routerLinkActiveOptions]="{exact: true}">
-            <div class="nav-item-content">
-              <mat-icon class="nav-icon">dashboard</mat-icon>
-              <span class="nav-label">Dashboard</span>
-            </div>
-            <div class="state-layer"></div>
-          </a>
+        <!-- Quick Access -->
+        <div class="nav-section quick-access">
+          <div class="section-title">
+            <mat-icon class="section-icon">flash_on</mat-icon>
+            <span>Quick Access</span>
+          </div>
+          
+          <div class="nav-items">
+            <a class="nav-item primary-item" 
+               routerLink="/dashboard" 
+               routerLinkActive="active" 
+               [routerLinkActiveOptions]="{exact: true}">
+              <div class="nav-item-wrapper">
+                <mat-icon class="nav-icon">dashboard</mat-icon>
+                <span class="nav-label">Dashboard</span>
+                <div class="nav-indicator"></div>
+              </div>
+            </a>
 
-          <a mat-list-item 
-             class="nav-item" 
-             routerLink="/catalog" 
-             routerLinkActive="active-link">
-            <div class="nav-item-content">
-              <mat-icon class="nav-icon">storefront</mat-icon>
-              <span class="nav-label">Product Catalog</span>
-            </div>
-            <div class="state-layer"></div>
-          </a>
+            <a class="nav-item primary-item" 
+               routerLink="/catalog" 
+               routerLinkActive="active">
+              <div class="nav-item-wrapper">
+                <mat-icon class="nav-icon">storefront</mat-icon>
+                <span class="nav-label">Product Catalog</span>
+                <div class="nav-indicator"></div>
+              </div>
+            </a>
+          </div>
         </div>
 
         <!-- Admin and Moderator sections -->
         <ng-container *hasAnyRole="['Admin', 'Moderator']">
-          <div class="nav-section">
-            <h3 class="section-header">Product Management</h3>
+          <div class="nav-section expandable-section">
+            <button class="section-title expandable-header" 
+                    (click)="toggleSection('productManagement')"
+                    [class.expanded]="expandedSections['productManagement']">
+              <div class="section-header-content">
+                <mat-icon class="section-icon">inventory_2</mat-icon>
+                <span>Product Management</span>
+              </div>
+              <mat-icon class="expand-icon">{{expandedSections['productManagement'] ? 'expand_less' : 'expand_more'}}</mat-icon>
+            </button>
             
-            <a mat-list-item 
-               class="nav-item" 
-               routerLink="/categories" 
-               routerLinkActive="active-link">
-              <div class="nav-item-content">
-                <mat-icon class="nav-icon">category</mat-icon>
-                <span class="nav-label">Categories</span>
-              </div>
-              <div class="state-layer"></div>
-            </a>
+            <div class="nav-items" [class.expanded]="expandedSections['productManagement']">
+              <a class="nav-item" 
+                 routerLink="/categories" 
+                 routerLinkActive="active">
+                <div class="nav-item-wrapper">
+                  <mat-icon class="nav-icon">category</mat-icon>
+                  <span class="nav-label">Categories</span>
+                  <div class="nav-indicator"></div>
+                </div>
+              </a>
 
-            <a mat-list-item 
-               class="nav-item" 
-               routerLink="/products" 
-               routerLinkActive="active-link">
-              <div class="nav-item-content">
-                <mat-icon class="nav-icon">inventory</mat-icon>
-                <span class="nav-label">Products</span>
-              </div>
-              <div class="state-layer"></div>
-            </a>
+              <a class="nav-item" 
+                 routerLink="/products" 
+                 routerLinkActive="active">
+                <div class="nav-item-wrapper">
+                  <mat-icon class="nav-icon">inventory</mat-icon>
+                  <span class="nav-label">Products</span>
+                  <div class="nav-indicator"></div>
+                </div>
+              </a>
+            </div>
           </div>
         </ng-container>
 
         <!-- Admin-only sections -->
         <ng-container *hasRole="'Admin'">
-          <div class="nav-section">
-            <a mat-list-item 
-               class="nav-item" 
+          <div class="nav-section single-item-section">
+            <a class="nav-item featured-item" 
                routerLink="/site-configs" 
-               routerLinkActive="active-link">
-              <div class="nav-item-content">
-                <mat-icon class="nav-icon">settings</mat-icon>
+               routerLinkActive="active">
+              <div class="nav-item-wrapper">
+                <mat-icon class="nav-icon">tune</mat-icon>
                 <span class="nav-label">Site Configurations</span>
+                <div class="nav-indicator"></div>
               </div>
-              <div class="state-layer"></div>
             </a>
           </div>
 
-          <div class="nav-section">
-            <h3 class="section-header">Infrastructure</h3>
-            
-            <a mat-list-item 
-               class="nav-item" 
-               routerLink="/admin/proxies" 
-               routerLinkActive="active-link" 
-               *hasPermission="'Proxies.Read'">
-              <div class="nav-item-content">
-                <mat-icon class="nav-icon">vpn_lock</mat-icon>
-                <span class="nav-label">Proxy Management</span>
+          <div class="nav-section expandable-section">
+            <button class="section-title expandable-header" 
+                    (click)="toggleSection('infrastructure')"
+                    [class.expanded]="expandedSections['infrastructure']">
+              <div class="section-header-content">
+                <mat-icon class="section-icon">cloud_queue</mat-icon>
+                <span>Infrastructure</span>
               </div>
-              <div class="state-layer"></div>
-            </a>
+              <mat-icon class="expand-icon">{{expandedSections['infrastructure'] ? 'expand_less' : 'expand_more'}}</mat-icon>
+            </button>
+            
+            <div class="nav-items" [class.expanded]="expandedSections['infrastructure']">
+              <a class="nav-item" 
+                 routerLink="/admin/proxies" 
+                 routerLinkActive="active" 
+                 *hasPermission="'Proxies.Read'">
+                <div class="nav-item-wrapper">
+                  <mat-icon class="nav-icon">vpn_lock</mat-icon>
+                  <span class="nav-label">Proxy Management</span>
+                  <div class="nav-indicator"></div>
+                </div>
+              </a>
+            </div>
           </div>
 
-          <div class="nav-section">
-            <h3 class="section-header">Monitoring</h3>
-            
-            <a mat-list-item 
-               class="nav-item" 
-               routerLink="/scraper-logs" 
-               routerLinkActive="active-link">
-              <div class="nav-item-content">
-                <mat-icon class="nav-icon">history</mat-icon>
-                <span class="nav-label">Scraper Logs</span>
+          <div class="nav-section expandable-section">
+            <button class="section-title expandable-header" 
+                    (click)="toggleSection('monitoring')"
+                    [class.expanded]="expandedSections['monitoring']">
+              <div class="section-header-content">
+                <mat-icon class="section-icon">monitoring</mat-icon>
+                <span>Monitoring</span>
               </div>
-              <div class="state-layer"></div>
-            </a>
+              <mat-icon class="expand-icon">{{expandedSections['monitoring'] ? 'expand_less' : 'expand_more'}}</mat-icon>
+            </button>
+            
+            <div class="nav-items" [class.expanded]="expandedSections['monitoring']">
+              <a class="nav-item" 
+                 routerLink="/scraper-logs" 
+                 routerLinkActive="active">
+                <div class="nav-item-wrapper">
+                  <mat-icon class="nav-icon">history</mat-icon>
+                  <span class="nav-label">Scraper Logs</span>
+                  <div class="nav-indicator"></div>
+                </div>
+              </a>
+            </div>
           </div>
 
-          <div class="nav-section">
-            <h3 class="section-header">User Management</h3>
-            
-            <a mat-list-item 
-               class="nav-item" 
-               routerLink="/users" 
-               routerLinkActive="active-link">
-              <div class="nav-item-content">
-                <mat-icon class="nav-icon">people</mat-icon>
-                <span class="nav-label">Users</span>
+          <div class="nav-section expandable-section">
+            <button class="section-title expandable-header" 
+                    (click)="toggleSection('userManagement')"
+                    [class.expanded]="expandedSections['userManagement']">
+              <div class="section-header-content">
+                <mat-icon class="section-icon">group</mat-icon>
+                <span>User Management</span>
               </div>
-              <div class="state-layer"></div>
-            </a>
+              <mat-icon class="expand-icon">{{expandedSections['userManagement'] ? 'expand_less' : 'expand_more'}}</mat-icon>
+            </button>
+            
+            <div class="nav-items" [class.expanded]="expandedSections['userManagement']">
+              <a class="nav-item" 
+                 routerLink="/users" 
+                 routerLinkActive="active">
+                <div class="nav-item-wrapper">
+                  <mat-icon class="nav-icon">people</mat-icon>
+                  <span class="nav-label">Users</span>
+                  <div class="nav-indicator"></div>
+                </div>
+              </a>
+            </div>
           </div>
         </ng-container>
 
         <!-- User, Admin, and Moderator accessible sections -->
         <ng-container *hasAnyRole="['User', 'Admin', 'Moderator']">
-          <div class="nav-section">
-            <h3 class="section-header">Content Management</h3>
-            
-            <a mat-list-item 
-               class="nav-item" 
-               routerLink="/mappings" 
-               routerLinkActive="active-link">
-              <div class="nav-item-content">
-                <mat-icon class="nav-icon">link</mat-icon>
-                <span class="nav-label">Product Mappings</span>
+          <div class="nav-section expandable-section">
+            <button class="section-title expandable-header" 
+                    (click)="toggleSection('contentManagement')"
+                    [class.expanded]="expandedSections['contentManagement']">
+              <div class="section-header-content">
+                <mat-icon class="section-icon">link</mat-icon>
+                <span>Content Management</span>
               </div>
-              <div class="state-layer"></div>
-            </a>
+              <mat-icon class="expand-icon">{{expandedSections['contentManagement'] ? 'expand_less' : 'expand_more'}}</mat-icon>
+            </button>
+            
+            <div class="nav-items" [class.expanded]="expandedSections['contentManagement']">
+              <a class="nav-item" 
+                 routerLink="/mappings" 
+                 routerLinkActive="active">
+                <div class="nav-item-wrapper">
+                  <mat-icon class="nav-icon">alt_route</mat-icon>
+                  <span class="nav-label">Product Mappings</span>
+                  <div class="nav-indicator"></div>
+                </div>
+              </a>
+            </div>
           </div>
         </ng-container>
 
         <!-- User features - accessible to Users and Admins -->
         <ng-container *hasAnyRole="['User', 'Admin']">
-          <div class="nav-section">
-            <h3 class="section-header">Personal</h3>
+          <div class="nav-section expandable-section personal-section">
+            <button class="section-title expandable-header" 
+                    (click)="toggleSection('personal')"
+                    [class.expanded]="expandedSections['personal']">
+              <div class="section-header-content">
+                <mat-icon class="section-icon">person</mat-icon>
+                <span>Personal</span>
+              </div>
+              <mat-icon class="expand-icon">{{expandedSections['personal'] ? 'expand_less' : 'expand_more'}}</mat-icon>
+            </button>
             
-            <a mat-list-item 
-               class="nav-item" 
-               routerLink="/alerts" 
-               routerLinkActive="active-link">
-              <div class="nav-item-content">
-                <mat-icon class="nav-icon">notifications</mat-icon>
-                <span class="nav-label">Alert Rules</span>
-              </div>
-              <div class="state-layer"></div>
-            </a>
+            <div class="nav-items" [class.expanded]="expandedSections['personal']">
+              <a class="nav-item" 
+                 routerLink="/alerts" 
+                 routerLinkActive="active">
+                <div class="nav-item-wrapper">
+                  <mat-icon class="nav-icon">notifications_active</mat-icon>
+                  <span class="nav-label">Alert Rules</span>
+                  <div class="nav-indicator"></div>
+                </div>
+              </a>
 
-            <a mat-list-item 
-               class="nav-item" 
-               routerLink="/notification-settings" 
-               routerLinkActive="active-link">
-              <div class="nav-item-content">
-                <mat-icon class="nav-icon">settings_applications</mat-icon>
-                <span class="nav-label">Notification Settings</span>
-              </div>
-              <div class="state-layer"></div>
-            </a>
+              <a class="nav-item" 
+                 routerLink="/notification-settings" 
+                 routerLinkActive="active">
+                <div class="nav-item-wrapper">
+                  <mat-icon class="nav-icon">settings_applications</mat-icon>
+                  <span class="nav-label">Notification Settings</span>
+                  <div class="nav-indicator"></div>
+                </div>
+              </a>
+            </div>
           </div>
         </ng-container>
 
         <!-- Development/Testing -->
-        <div class="nav-section">
-          <h3 class="section-header">Development</h3>
+        <div class="nav-section dev-section">
+          <div class="section-divider"></div>
+          <div class="section-title dev-title">
+            <mat-icon class="section-icon">code</mat-icon>
+            <span>Development</span>
+          </div>
           
-          <a mat-list-item 
-             class="nav-item" 
-             routerLink="/rbac-demo" 
-             routerLinkActive="active-link">
-            <div class="nav-item-content">
-              <mat-icon class="nav-icon">security</mat-icon>
-              <span class="nav-label">RBAC Demo</span>
-            </div>
-            <div class="state-layer"></div>
-          </a>
+          <div class="nav-items">
+            <a class="nav-item dev-item" 
+               routerLink="/rbac-demo" 
+               routerLinkActive="active">
+              <div class="nav-item-wrapper">
+                <mat-icon class="nav-icon">security</mat-icon>
+                <span class="nav-label">RBAC Demo</span>
+                <div class="nav-indicator"></div>
+              </div>
+            </a>
+          </div>
         </div>
       </nav>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="sidenav-footer">
+      <div class="footer-info">
+        <mat-icon class="footer-icon">info_outline</mat-icon>
+        <span class="footer-text">v2.1.0</span>
+      </div>
     </div>
   </mat-sidenav>
 
