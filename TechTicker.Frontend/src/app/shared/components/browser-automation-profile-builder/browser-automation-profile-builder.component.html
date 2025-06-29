@@ -225,6 +225,87 @@
                   </button>
                 </div>
 
+                <!-- AI Generation Section -->
+                <div *ngIf="hasAiConfiguration" class="ai-generation-section-modern">
+                  <mat-card class="ai-card" appearance="outlined">
+                    <mat-card-header class="ai-card-header">
+                      <div class="ai-header-content">
+                        <mat-card-title class="mat-title-medium">
+                          <mat-icon class="ai-icon">auto_awesome</mat-icon>
+                          AI Action Generator
+                        </mat-card-title>
+                        <mat-card-subtitle class="mat-body-small">
+                          Describe what you want to do and let AI generate the automation actions
+                        </mat-card-subtitle>
+                      </div>
+                    </mat-card-header>
+                    
+                    <mat-card-content class="ai-card-content">
+                      <div class="ai-input-section">
+                        <mat-form-field appearance="outline" class="ai-instructions-field">
+                          <mat-label>Instructions for AI</mat-label>
+                          <textarea matInput 
+                                    [formControl]="aiInstructions"
+                                    rows="3"
+                                    placeholder="Example: Scroll down 3 times, then click the 'Load More' button, wait for products to load, and take a screenshot"
+                                    [disabled]="isGeneratingActions"></textarea>
+                          <mat-hint>Describe the sequence of actions you want to perform on the webpage</mat-hint>
+                        </mat-form-field>
+                      </div>
+                      
+                      <div class="ai-actions">
+                        <div class="ai-action-buttons">
+                          <button mat-raised-button 
+                                  color="primary" 
+                                  type="button"
+                                  (click)="generateActionsWithAI()"
+                                  [disabled]="isGeneratingActions || !aiInstructions.value?.trim()"
+                                  class="generate-btn">
+                            <mat-icon *ngIf="!isGeneratingActions">auto_awesome</mat-icon>
+                            <mat-spinner *ngIf="isGeneratingActions" diameter="20"></mat-spinner>
+                            {{ isGeneratingActions ? 'Generating...' : 'Generate Actions' }}
+                          </button>
+                          
+                          <button mat-button 
+                                  type="button"
+                                  (click)="clearAiInstructions()"
+                                  [disabled]="isGeneratingActions"
+                                  class="clear-btn">
+                            <mat-icon>clear</mat-icon>
+                            Clear
+                          </button>
+                        </div>
+                        
+                        <div *ngIf="aiError" class="ai-error">
+                          <mat-card class="error-card" appearance="outlined">
+                            <mat-card-content>
+                              <div class="error-content">
+                                <mat-icon class="error-icon">error</mat-icon>
+                                <p class="mat-body-small">{{ aiError }}</p>
+                              </div>
+                            </mat-card-content>
+                          </mat-card>
+                        </div>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+
+                <!-- AI Configuration Warning -->
+                <div *ngIf="!hasAiConfiguration" class="ai-config-warning">
+                  <mat-card class="warning-card" appearance="outlined">
+                    <mat-card-content>
+                      <div class="warning-content">
+                        <mat-icon class="warning-icon">info</mat-icon>
+                        <div class="warning-text">
+                          <p class="mat-body-medium"><strong>AI Action Generator Available</strong></p>
+                          <p class="mat-body-small">Configure your AI settings in the <a routerLink="/admin/ai-settings">Admin AI Settings</a> to enable automatic action generation.</p>
+                        </div>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+
                 <div *ngIf="actions.length === 0" class="empty-section-modern">
                   <div class="empty-content">
                     <div class="empty-icon">

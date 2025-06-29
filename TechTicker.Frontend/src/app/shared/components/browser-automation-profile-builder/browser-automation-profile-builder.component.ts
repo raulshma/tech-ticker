@@ -20,6 +20,9 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialogModule } from '@angular/material/dialog';
+import { TechTickerApiClient, AiConfigurationDto, BrowserActionGenerationRequestDto, BrowserActionGenerationResponseDto } from '../../api/api-client';
 
 export interface BrowserAutomationAction {
   actionType: string;
@@ -70,7 +73,9 @@ export interface BrowserAutomationProfile {
     MatDividerModule,
     MatSlideToggleModule,
     MatChipsModule,
-    MatCardModule
+    MatCardModule,
+    MatProgressSpinnerModule,
+    MatDialogModule
   ]
 })
 export class BrowserAutomationProfileBuilderComponent implements ControlValueAccessor, OnInit {
@@ -105,10 +110,16 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
   // Form fields for headers
   headersArray: FormArray;
 
+  // AI Generation properties
+  aiInstructions = new FormControl('');
+  isGeneratingActions = false;
+  hasAiConfiguration = false;
+  aiError: string | null = null;
+
   private onChange: any = () => {};
   private onTouched: any = () => {};
 
-  constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
+  constructor(private fb: FormBuilder, private snackBar: MatSnackBar, private apiClient: TechTickerApiClient) {
     this.headersArray = this.fb.array([]);
     
     this.profileForm = this.fb.group({
@@ -135,6 +146,9 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
         this.tryParseRawJson(val ?? '');
       }
     });
+    
+    // Check for AI configuration availability
+    this.checkAiConfigurationAvailability();
   }
 
   get actions(): FormArray {
@@ -523,5 +537,85 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
       horizontalPosition: 'center',
       verticalPosition: 'bottom'
     });
+  }
+
+  /**
+   * Check if AI configuration is available
+   */
+  private checkAiConfigurationAvailability(): void {
+    this.apiClient.getDefaultConfiguration().subscribe({
+      next: (response) => {
+        this.hasAiConfiguration = !!(response.success && response.data);
+      },
+      error: () => {
+        this.hasAiConfiguration = false;
+      }
+    });
+  }
+
+  /**
+   * Generate browser actions using AI
+   */
+  async generateActionsWithAI(): Promise<void> {
+    const instructions = this.aiInstructions.value?.trim();
+    if (!instructions) {
+      this.snackBar.open('Please enter instructions for the AI to generate actions', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+      return;
+    }
+
+    this.isGeneratingActions = true;
+    this.aiError = null;
+
+    try {
+      const request = new BrowserActionGenerationRequestDto({
+        instructions: instructions,
+        aiConfigurationId: undefined // Use default configuration
+      });
+
+      const response = await this.apiClient.generateBrowserActions(request).toPromise();
+      
+      if (response?.success && response.data?.actions && response.data.actions.length > 0) {
+        // Clear existing actions
+        this.actions.clear();
+        
+        // Add generated actions to the form
+        response.data.actions.forEach(action => {
+          this.actions.push(this.fb.group({
+            actionType: [action.actionType || '', Validators.required],
+            selector: [action.selector || ''],
+            repeat: [action.repeat || 1, [Validators.min(1)]],
+            delayMs: [action.delayMs || null, [Validators.min(0)]],
+            value: [action.value || '']
+          }));
+        });
+
+        // Clear the instructions
+        this.aiInstructions.setValue('');
+        
+        // Show success message
+        this.snackBar.open(`Generated ${response.data.actions.length} actions successfully!`, 'Close', {
+          duration: 4000,
+          panelClass: ['success-snackbar']
+        });
+      } else {
+        this.aiError = response?.data?.errorMessage || response?.message || 'Failed to generate actions. Please try again.';
+      }
+    } catch (error: any) {
+      console.error('AI generation error:', error);
+      this.aiError = error?.error?.message || error?.message || 'An error occurred while generating actions';
+    } finally {
+      this.isGeneratingActions = false;
+    }
+  }
+
+  /**
+   * Clear AI instructions
+   */
+  clearAiInstructions(): void {
+    this.aiInstructions.setValue('');
+    this.aiError = null;
   }
 } 
