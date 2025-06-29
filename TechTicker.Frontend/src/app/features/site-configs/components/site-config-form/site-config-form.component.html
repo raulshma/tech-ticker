@@ -227,6 +227,17 @@
                 <mat-hint>Advanced: JSON for Playwright profile (actions, proxy, user-agent, etc.)</mat-hint>
               </mat-form-field>
             </div>
+            <div class="example-section">
+              <h4>Example Browser Automation Profiles</h4>
+              <div *ngFor="let ex of browserAutomationExamples" class="example-block">
+                <div class="example-title">{{ ex.title }}</div>
+                <div class="example-desc">{{ ex.description }}</div>
+                <pre class="example-json">{{ ex.json }}</pre>
+                <button mat-stroked-button color="primary" (click)="copyExampleToClipboard(ex.json)">
+                  Copy Example
+                </button>
+              </div>
+            </div>
           </div>
         </mat-expansion-panel>
 

@@ -26,6 +26,101 @@ export class SiteConfigFormComponent implements OnInit {
   isEditMode = false;
   siteConfigId: string | null = null;
 
+  browserAutomationExamples = [
+    {
+      title: 'Scroll Down',
+      description: 'Scrolls down the page by one viewport.',
+      json: `{
+  "preferredBrowser": "chromium",
+  "timeoutSeconds": 30,
+  "actions": [
+    { "actionType": "scroll" }
+  ]
+}`
+    },
+    {
+      title: 'Click Button',
+      description: 'Clicks a button with a specific selector.',
+      json: `{
+  "actions": [
+    { "actionType": "click", "selector": ".buy-now-btn" }
+  ]
+}`
+    },
+    {
+      title: 'Wait for Selector',
+      description: 'Waits for a selector to appear before continuing.',
+      json: `{
+  "actions": [
+    { "actionType": "waitForSelector", "selector": ".price-loaded" }
+  ]
+}`
+    },
+    {
+      title: 'Type in Input',
+      description: 'Types text into an input field.',
+      json: `{
+  "actions": [
+    { "actionType": "type", "selector": "#search", "value": "laptop" }
+  ]
+}`
+    },
+    {
+      title: 'Wait (Timeout)',
+      description: 'Waits for a specified number of milliseconds.',
+      json: `{
+  "actions": [
+    { "actionType": "wait", "delayMs": 2000 }
+  ]
+}`
+    },
+    {
+      title: 'Evaluate JavaScript',
+      description: 'Runs custom JavaScript in the page context.',
+      json: `{
+  "actions": [
+    { "actionType": "evaluate", "value": "window.scrollTo(0, document.body.scrollHeight);" }
+  ]
+}`
+    },
+    {
+      title: 'Take Screenshot',
+      description: 'Takes a screenshot and saves to a file.',
+      json: `{
+  "actions": [
+    { "actionType": "screenshot", "value": "my-screenshot.png" }
+  ]
+}`
+    },
+    {
+      title: 'Hover Over Element',
+      description: 'Hovers over an element.',
+      json: `{
+  "actions": [
+    { "actionType": "hover", "selector": ".menu-item" }
+  ]
+}`
+    },
+    {
+      title: 'Select Option',
+      description: 'Selects an option in a <select> element.',
+      json: `{
+  "actions": [
+    { "actionType": "selectOption", "selector": "#country", "value": "US" }
+  ]
+}`
+    },
+    {
+      title: 'Set Value (JS)',
+      description: 'Sets the value of an input using JavaScript.',
+      json: `{
+  "actions": [
+    { "actionType": "setValue", "selector": "#coupon", "value": "DISCOUNT2025" }
+  ]
+}`
+    }
+  ];
+
   constructor(
     private formBuilder: FormBuilder,
     private siteConfigsService: SiteConfigsService,
@@ -220,5 +315,11 @@ export class SiteConfigFormComponent implements OnInit {
       return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be less than ${maxLength} characters`;
     }
     return '';
+  }
+
+  copyExampleToClipboard(text: string) {
+    if (navigator && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+    }
   }
 }

@@ -548,18 +548,75 @@ public partial class WebScrapingService
             {
                 foreach (var action in command.BrowserAutomationProfile.Actions)
                 {
-                    switch (action.ActionType.ToLower())
+                    var repeat = action.Repeat ?? 1;
+                    for (int i = 0; i < repeat; i++)
                     {
-                        case "scroll":
-                            await page.EvaluateAsync("window.scrollBy(0, window.innerHeight);");
-                            if (action.DelayMs.HasValue) await Task.Delay(action.DelayMs.Value);
-                            break;
-                        case "click":
-                            if (!string.IsNullOrEmpty(action.Selector))
-                                await page.ClickAsync(action.Selector, new() { Timeout = timeoutMs });
-                            if (action.DelayMs.HasValue) await Task.Delay(action.DelayMs.Value);
-                            break;
-                        // Add more actions as needed
+                        switch (action.ActionType.ToLower())
+                        {
+                            case "scroll":
+                                // Scroll down by one viewport
+                                await page.EvaluateAsync("window.scrollBy(0, window.innerHeight);");
+                                break;
+                            case "click":
+                                // Click an element by selector
+                                if (!string.IsNullOrEmpty(action.Selector))
+                                    await page.ClickAsync(action.Selector, new() { Timeout = timeoutMs });
+                                break;
+                            case "waitforselector":
+                                // Wait for a selector to appear
+                                if (!string.IsNullOrEmpty(action.Selector))
+                                    await page.WaitForSelectorAsync(action.Selector, new() { Timeout = timeoutMs });
+                                break;
+                            case "type":
+                                // Type text into an input (use Locator.FillAsync instead of deprecated TypeAsync)
+                                if (!string.IsNullOrEmpty(action.Selector) && action is { Value: string value })
+                                    await page.Locator(action.Selector).FillAsync(value, new() { Timeout = timeoutMs });
+                                break;
+                            case "wait":
+                            case "waitfortimeout":
+                                // Wait for a specified time (ms)
+                                if (action.DelayMs.HasValue)
+                                    await page.WaitForTimeoutAsync(action.DelayMs.Value);
+                                break;
+                            case "screenshot":
+                                // Take a screenshot (optional: path)
+                                var screenshotPath = !string.IsNullOrEmpty(action.Value) ? action.Value : $"screenshot_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}.png";
+                                await page.ScreenshotAsync(new() { Path = screenshotPath });
+                                break;
+                            case "evaluate":
+                                // Evaluate custom JS
+                                if (!string.IsNullOrEmpty(action.Value))
+                                    await page.EvaluateAsync(action.Value);
+                                break;
+                            case "hover":
+                                // Hover over an element
+                                if (!string.IsNullOrEmpty(action.Selector))
+                                    await page.HoverAsync(action.Selector, new() { Timeout = timeoutMs });
+                                break;
+                            case "selectoption":
+                                // Select an option in a <select>
+                                if (!string.IsNullOrEmpty(action.Selector) && !string.IsNullOrEmpty(action.Value))
+                                {
+                                    var optionValue = action.Value;
+                                    await page.SelectOptionAsync(action.Selector, optionValue);
+                                }
+                                break;
+                            case "setvalue":
+                                // Set value of an input (JS)
+                                if (!string.IsNullOrEmpty(action.Selector) && !string.IsNullOrEmpty(action.Value))
+                                {
+                                    var setValue = action.Value.Replace("'", "\\'");
+                                    await page.EvaluateAsync($"document.querySelector('{action.Selector}')?.value = '{setValue}'");
+                                }
+                                break;
+                            default:
+                                // Unknown action type
+                                _logger.LogWarning("[BrowserAutomation] Unknown action type: {ActionType}", action.ActionType);
+                                break;
+                        }
+                        // Delay after action if specified
+                        if (action.DelayMs.HasValue && action.ActionType.ToLower() != "wait" && action.ActionType.ToLower() != "waitfortimeout")
+                            await Task.Delay(action.DelayMs.Value);
                     }
                 }
             }

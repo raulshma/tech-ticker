@@ -45,8 +45,12 @@ public class BrowserAutomationProfile
 
 public class BrowserAutomationAction
 {
-    public string ActionType { get; set; } = null!; // e.g., "scroll", "click"
+    /// <summary>
+    /// Supported actions: scroll, click, waitForSelector, type, wait, screenshot, evaluate, hover, selectOption, setValue, waitForTimeout
+    /// </summary>
+    public string ActionType { get; set; } = null!; // e.g., "scroll", "click", "type", etc.
     public string? Selector { get; set; }
     public int? Repeat { get; set; }
     public int? DelayMs { get; set; }
+    public string? Value { get; set; } // For actions that require a value (e.g., type, evaluate, screenshot path, selectOption, setValue)
 }
