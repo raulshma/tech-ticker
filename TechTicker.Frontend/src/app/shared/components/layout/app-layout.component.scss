@@ -36,6 +36,21 @@
     height: 100%;
     overflow: auto;
   }
+  
+  // Ensure Material drawer is completely opaque on mobile
+  ::ng-deep .mat-drawer {
+    background-color: var(--mat-sys-color-surface-container-low, #f5f5f5) !important;
+    background-image: none !important;
+    opacity: 1 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    
+    // Additional fallback for complete opacity
+    &.modern-sidenav {
+      background: var(--mat-sys-color-surface-container-low, #f5f5f5) !important;
+      background-image: none !important;
+    }
+  }
 }
 
 // Modern Sidebar
@@ -778,6 +793,24 @@ mat-sidenav-content {
     position: fixed;
     height: 100vh;
     z-index: 1001;
+    
+    // Ensure completely solid background on mobile
+    background: var(--mat-sys-color-surface-container-low) !important;
+    opacity: 1 !important;
+    
+    // Remove any transparency effects and gradients
+    &::before {
+      display: none !important;
+    }
+    
+    // Override any inherited transparency
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    
+    // Ensure solid box shadow
+    box-shadow: 
+      2px 0 8px rgba(0, 0, 0, 0.15),
+      4px 0 16px rgba(0, 0, 0, 0.1) !important;
   }
   
   // Ensure content is properly positioned on mobile
@@ -842,6 +875,67 @@ mat-sidenav-content {
   // Adjust sidenav header padding on mobile
   .sidenav-header {
     padding: 16px 16px 20px;
+    // Ensure solid header background on mobile
+    background: var(--mat-sys-color-primary-container, #e3f2fd) !important;
+    background-image: none !important;
+    opacity: 1 !important;
+    
+    &::after {
+      display: none !important;
+    }
+  }
+  
+  // Fix header text visibility on mobile - completely override gradient text
+  .brand-title {
+    // Fallback colors first
+    color: #1565c0 !important;
+    -webkit-text-fill-color: #1565c0 !important;
+    
+    // CSS custom properties with fallbacks
+    color: var(--mat-sys-color-on-primary-container, #1565c0) !important;
+    -webkit-text-fill-color: var(--mat-sys-color-on-primary-container, #1565c0) !important;
+    
+    font-weight: 700 !important;
+    opacity: 1 !important;
+    background: none !important;
+    background-image: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    text-shadow: none !important;
+    
+    // Force text to be visible
+    filter: none !important;
+    mix-blend-mode: normal !important;
+  }
+  
+  .brand-subtitle {
+    // Fallback color first
+    color: #1976d2 !important;
+    
+    // CSS custom property with fallback
+    color: var(--mat-sys-color-on-primary-container, #1976d2) !important;
+    
+    opacity: 1 !important;
+    font-weight: 600 !important;
+    filter: none !important;
+    mix-blend-mode: normal !important;
+  }
+  
+  .brand-icon {
+    color: var(--mat-sys-color-primary, #1976d2) !important;
+    opacity: 1 !important;
+  }
+  
+  // Ensure brand icon wrapper is visible
+  .brand-icon-wrapper {
+    opacity: 1 !important;
+    background: rgba(var(--mat-sys-color-primary-rgb, 25, 118, 210), 0.15) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  // Ensure header container is solid
+  .brand-container {
+    opacity: 1 !important;
   }
   
   .brand-container {
@@ -850,6 +944,33 @@ mat-sidenav-content {
   
   .brand-icon-wrapper {
     padding: 6px;
+    // Ensure solid icon wrapper
+    opacity: 1 !important;
+  }
+  
+  // Ensure all navigation sections are solid
+  .nav-content {
+    background: transparent !important;
+    opacity: 1 !important;
+  }
+  
+  .nav-section {
+    opacity: 1 !important;
+  }
+  
+  .expandable-section {
+    background-color: rgba(var(--mat-sys-color-surface-variant-rgb), 0.8) !important;
+    opacity: 1 !important;
+  }
+  
+  .nav-item {
+    opacity: 1 !important;
+  }
+  
+  // Ensure sidebar footer is solid
+  .sidenav-footer {
+    background: var(--mat-sys-color-surface-container, #f0f0f0) !important;
+    opacity: 1 !important;
   }
   
   // Fix backdrop positioning
@@ -881,6 +1002,17 @@ mat-sidenav-content {
     height: 36px;
     margin-right: 8px;
   }
+  
+  // Extra emphasis on text visibility for very small screens
+  .brand-title {
+    font-size: 20px !important;
+    color: var(--mat-sys-color-on-primary-container, #0d47a1) !important;
+    -webkit-text-fill-color: var(--mat-sys-color-on-primary-container, #0d47a1) !important;
+  }
+  
+  .brand-subtitle {
+    color: var(--mat-sys-color-on-primary-container, #1565c0) !important;
+  }
 }
 
 // Dark Theme Enhancements
@@ -907,6 +1039,63 @@ mat-sidenav-content {
     box-shadow: 
       0 8px 32px rgba(0, 0, 0, 0.24),
       0 4px 16px rgba(0, 0, 0, 0.16);
+  }
+  
+  // Dark theme mobile sidebar opacity fixes
+  @media (max-width: 768px) {
+    .modern-sidenav {
+      background: var(--mat-sys-color-surface-container-low, #2d2d2d) !important;
+    }
+    
+    ::ng-deep .mat-drawer {
+      background-color: var(--mat-sys-color-surface-container-low, #2d2d2d) !important;
+      
+      &.modern-sidenav {
+        background: var(--mat-sys-color-surface-container-low, #2d2d2d) !important;
+      }
+    }
+    
+    .sidenav-header {
+      background: var(--mat-sys-color-primary-container, #3c3c3c) !important;
+    }
+    
+    .sidenav-footer {
+      background: var(--mat-sys-color-surface-container, #353535) !important;
+    }
+    
+    // Dark theme text visibility
+    .brand-title {
+      // Fallback colors first
+      color: #90caf9 !important;
+      -webkit-text-fill-color: #90caf9 !important;
+      
+      // CSS custom properties with fallbacks
+      color: var(--mat-sys-color-on-primary-container, #90caf9) !important;
+      -webkit-text-fill-color: var(--mat-sys-color-on-primary-container, #90caf9) !important;
+      
+      background: none !important;
+      background-image: none !important;
+      -webkit-background-clip: unset !important;
+      background-clip: unset !important;
+      text-shadow: none !important;
+      filter: none !important;
+      mix-blend-mode: normal !important;
+    }
+    
+    .brand-subtitle {
+      // Fallback color first
+      color: #81c784 !important;
+      
+      // CSS custom property with fallback
+      color: var(--mat-sys-color-on-primary-container, #81c784) !important;
+      
+      filter: none !important;
+      mix-blend-mode: normal !important;
+    }
+    
+    .brand-icon {
+      color: var(--mat-sys-color-primary, #90caf9) !important;
+    }
   }
 }
 
