@@ -298,7 +298,7 @@
                   class="user-menu-button"
                   [matMenuTriggerFor]="userMenu" 
                   *ngIf="currentUser"
-                  [attr.aria-label]="'User menu for ' + currentUser?.firstName">
+                  [attr.aria-label]="'User menu for ' + (currentUser.firstName || currentUser.email || 'user')">
             <mat-icon>account_circle</mat-icon>
           </button>
           <mat-menu #userMenu="matMenu" class="user-menu">
