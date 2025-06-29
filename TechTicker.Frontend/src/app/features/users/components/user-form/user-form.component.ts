@@ -8,12 +8,47 @@ import {
   UpdateUserDto 
 } from '../../../../shared/api/api-client';
 import { UsersService } from '../../services/users.service';
+import { RoleService } from '../../../../shared/services/role.service';
+import { UserPermissionsComponent } from '../user-permissions/user-permissions.component';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-user-form',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+    MatChipsModule,
+    MatSlideToggleModule,
+    MatMenuModule,
+    MatDividerModule,
+    UserPermissionsComponent
+  ],
   templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.scss'],
-  standalone: false
+  styleUrls: ['./user-form.component.scss']
 })
 export class UserFormComponent implements OnInit {
   userForm: FormGroup;
@@ -22,10 +57,12 @@ export class UserFormComponent implements OnInit {
   userId: string | null = null;
   availableRoles: string[] = [];
   hidePassword = true;
+  currentUser: UserDto | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
     private usersService: UsersService,
+    private roleService: RoleService,
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar
@@ -60,6 +97,7 @@ export class UserFormComponent implements OnInit {
     this.isLoading = true;
     this.usersService.getUser(id).subscribe({
       next: (user) => {
+        this.currentUser = user;
         this.userForm.patchValue({
           email: user.email,
           firstName: user.firstName,
@@ -147,21 +185,23 @@ export class UserFormComponent implements OnInit {
   }
 
   getFieldErrorMessage(fieldName: string): string {
-    const control = this.userForm.get(fieldName);
-    if (control?.hasError('required')) {
+    const field = this.userForm.get(fieldName);
+    if (field?.hasError('required')) {
       return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
     }
-    if (control?.hasError('email')) {
+    if (field?.hasError('email')) {
       return 'Please enter a valid email address';
     }
-    if (control?.hasError('minlength')) {
-      const minLength = control.errors?.['minlength']?.requiredLength;
-      return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be at least ${minLength} characters`;
+    if (field?.hasError('minlength')) {
+      return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be at least ${field.errors?.['minlength'].requiredLength} characters`;
     }
-    if (control?.hasError('maxlength')) {
-      const maxLength = control.errors?.['maxlength']?.requiredLength;
-      return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be less than ${maxLength} characters`;
+    if (field?.hasError('maxlength')) {
+      return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must not exceed ${field.errors?.['maxlength'].requiredLength} characters`;
     }
     return '';
+  }
+
+  hasPermission(permission: string): boolean {
+    return this.roleService.hasPermission(permission);
   }
 }

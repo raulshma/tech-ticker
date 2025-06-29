@@ -15,6 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { CategoriesRoutingModule } from './categories-routing.module';
+import { SharedModule } from '../../shared/shared.module';
 import { CategoriesListComponent } from './components/categories-list/categories-list.component';
 import { CategoryFormComponent } from './components/category-form/category-form.component';
 import { CategoryDeleteDialogComponent } from './components/category-delete-dialog/category-delete-dialog.component';
@@ -29,6 +30,7 @@ import { CategoryDeleteDialogComponent } from './components/category-delete-dial
     CommonModule,
     ReactiveFormsModule,
     CategoriesRoutingModule,
+    SharedModule,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,

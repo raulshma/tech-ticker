@@ -1,7 +1,7 @@
 <div class="categories-container">
   <div class="header-section">
     <h1>Categories</h1>
-    <button mat-raised-button color="primary" (click)="createCategory()">
+    <button mat-raised-button color="primary" (click)="createCategory()" *hasPermission="'Products.ManageCategories'">
       <mat-icon>add</mat-icon>
       Add Category
     </button>
@@ -69,13 +69,15 @@
               <button mat-icon-button 
                       color="primary" 
                       (click)="editCategory(category)"
-                      matTooltip="Edit category">
+                      matTooltip="Edit category"
+                      *hasPermission="'Products.ManageCategories'">
                 <mat-icon>edit</mat-icon>
               </button>
               <button mat-icon-button 
                       color="warn" 
                       (click)="deleteCategory(category)"
-                      matTooltip="Delete category">
+                      matTooltip="Delete category"
+                      *hasPermission="'Products.ManageCategories'">
                 <mat-icon>delete</mat-icon>
               </button>
             </td>
@@ -90,7 +92,7 @@
               <div class="no-data">
                 <mat-icon>category</mat-icon>
                 <p>No categories found</p>
-                <button mat-raised-button color="primary" (click)="createCategory()">
+                <button mat-raised-button color="primary" (click)="createCategory()" *hasPermission="'Products.ManageCategories'">
                   Create First Category
                 </button>
               </div>

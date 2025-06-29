@@ -1,7 +1,7 @@
 <div class="products-container">
   <div class="header-section">
     <h1>Products</h1>
-    <button mat-raised-button color="primary" (click)="createProduct()">
+    <button mat-raised-button color="primary" (click)="createProduct()" *hasPermission="'Products.Create'">
       <mat-icon>add</mat-icon>
       Add Product
     </button>
@@ -124,13 +124,13 @@
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let product">
               <div class="actions-group">
-                <button mat-icon-button color="accent" (click)="viewPriceHistory(product)" matTooltip="View price history">
+                <button mat-icon-button color="accent" (click)="viewPriceHistory(product)" matTooltip="View price history" *hasPermission="'PriceHistory.Read'">
                   <mat-icon>show_chart</mat-icon>
                 </button>
-                <button mat-icon-button color="primary" (click)="editProduct(product)" matTooltip="Edit product">
+                <button mat-icon-button color="primary" (click)="editProduct(product)" matTooltip="Edit product" *hasPermission="'Products.Update'">
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button color="warn" (click)="deleteProduct(product)" matTooltip="Delete product">
+                <button mat-icon-button color="warn" (click)="deleteProduct(product)" matTooltip="Delete product" *hasPermission="'Products.Delete'">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -146,7 +146,7 @@
               <div class="no-data">
                 <mat-icon>inventory</mat-icon>
                 <p>No products found</p>
-                <button mat-raised-button color="primary" (click)="createProduct()">
+                <button mat-raised-button color="primary" (click)="createProduct()" *hasPermission="'Products.Create'">
                   Create First Product
                 </button>
               </div>

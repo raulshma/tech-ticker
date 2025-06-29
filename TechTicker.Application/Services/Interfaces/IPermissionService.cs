@@ -88,4 +88,24 @@ public interface IPermissionService
     /// Bulk assigns permissions to a role by names
     /// </summary>
     Task<Result<bool>> BulkAssignPermissionsToRoleAsync(string roleName, IEnumerable<string> permissionNames);
+
+    /// <summary>
+    /// Assigns a permission directly to a user (bypassing roles)
+    /// </summary>
+    Task<Result<bool>> AssignPermissionToUserAsync(Guid userId, Guid permissionId);
+
+    /// <summary>
+    /// Removes a permission directly from a user
+    /// </summary>
+    Task<Result<bool>> RemovePermissionFromUserAsync(Guid userId, Guid permissionId);
+
+    /// <summary>
+    /// Bulk assigns permissions directly to a user
+    /// </summary>
+    Task<Result<bool>> BulkAssignPermissionsToUserAsync(Guid userId, IEnumerable<Guid> permissionIds);
+
+    /// <summary>
+    /// Gets all permissions that can be assigned to users
+    /// </summary>
+    Task<Result<IEnumerable<PermissionDto>>> GetAssignablePermissionsAsync();
 }

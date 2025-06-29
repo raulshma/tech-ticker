@@ -121,23 +121,30 @@
 
         <!-- Form Actions -->
         <div class="form-actions">
-          <button mat-button 
-                  type="button" 
-                  (click)="onCancel()"
-                  [disabled]="isLoading">
+          <button 
+            type="button" 
+            mat-button 
+            (click)="onCancel()"
+            [disabled]="isLoading">
             Cancel
           </button>
-          
-          <button mat-raised-button 
-                  color="primary" 
-                  type="submit"
-                  [disabled]="userForm.invalid || isLoading">
-            <mat-spinner *ngIf="isLoading" diameter="20" class="form-spinner"></mat-spinner>
-            <span *ngIf="!isLoading">{{ isEditMode ? 'Update User' : 'Create User' }}</span>
-            <span *ngIf="isLoading">{{ isEditMode ? 'Updating...' : 'Creating...' }}</span>
+          <button 
+            type="submit" 
+            mat-raised-button 
+            color="primary"
+            [disabled]="userForm.invalid || isLoading">
+            <mat-spinner diameter="16" *ngIf="isLoading"></mat-spinner>
+            <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+            {{ isEditMode ? 'Update User' : 'Create User' }}
           </button>
         </div>
       </form>
     </mat-card-content>
   </mat-card>
+
+  <!-- User Permissions Management (Admin Only) -->
+  <app-user-permissions 
+    *ngIf="isEditMode && currentUser && hasPermission('Users.ManageRoles')"
+    [user]="currentUser">
+  </app-user-permissions>
 </div>

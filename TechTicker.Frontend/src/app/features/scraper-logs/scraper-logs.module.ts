@@ -20,6 +20,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 
 import { ScraperLogsRoutingModule } from './scraper-logs-routing.module';
+import { SharedModule } from '../../shared/shared.module';
 import { ScraperLogsListComponent } from './components/scraper-logs-list/scraper-logs-list.component';
 import { ScraperLogDetailComponent } from './components/scraper-log-detail/scraper-log-detail.component';
 
@@ -32,6 +33,7 @@ import { ScraperLogDetailComponent } from './components/scraper-log-detail/scrap
     CommonModule,
     ReactiveFormsModule,
     ScraperLogsRoutingModule,
+    SharedModule,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,

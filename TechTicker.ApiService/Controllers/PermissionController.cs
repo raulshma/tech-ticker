@@ -208,4 +208,58 @@ public class PermissionController : BaseApiController
         var categories = Permissions.GetPermissionsByCategory();
         return HandleResult(Result<Dictionary<string, string[]>>.Success(categories));
     }
+
+    /// <summary>
+    /// Assign a permission directly to a user (bypassing roles)
+    /// </summary>
+    /// <param name="userId">User ID</param>
+    /// <param name="permissionId">Permission ID</param>
+    /// <returns>Success status</returns>
+    [HttpPost("user/{userId}/permission/{permissionId}", Name = "AssignPermissionToUser")]
+    [RequirePermission(Permissions.UsersManageRoles)]
+    public async Task<ActionResult<ApiResponse<bool>>> AssignPermissionToUser(Guid userId, Guid permissionId)
+    {
+        var result = await _permissionService.AssignPermissionToUserAsync(userId, permissionId);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Remove a permission directly from a user
+    /// </summary>
+    /// <param name="userId">User ID</param>
+    /// <param name="permissionId">Permission ID</param>
+    /// <returns>Success status</returns>
+    [HttpDelete("user/{userId}/permission/{permissionId}", Name = "RemovePermissionFromUser")]
+    [RequirePermission(Permissions.UsersManageRoles)]
+    public async Task<ActionResult<ApiResponse<bool>>> RemovePermissionFromUser(Guid userId, Guid permissionId)
+    {
+        var result = await _permissionService.RemovePermissionFromUserAsync(userId, permissionId);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Bulk assign permissions directly to a user
+    /// </summary>
+    /// <param name="userId">User ID</param>
+    /// <param name="permissionIds">List of permission IDs to assign</param>
+    /// <returns>Success status</returns>
+    [HttpPost("user/{userId}/permissions/bulk", Name = "BulkAssignPermissionsToUser")]
+    [RequirePermission(Permissions.UsersManageRoles)]
+    public async Task<ActionResult<ApiResponse<bool>>> BulkAssignPermissionsToUser(Guid userId, [FromBody] IEnumerable<Guid> permissionIds)
+    {
+        var result = await _permissionService.BulkAssignPermissionsToUserAsync(userId, permissionIds);
+        return HandleResult(result);
+    }
+
+    /// <summary>
+    /// Get all permissions that can be assigned to users
+    /// </summary>
+    /// <returns>List of assignable permissions</returns>
+    [HttpGet("assignable", Name = "GetAssignablePermissions")]
+    [RequirePermission(Permissions.UsersManageRoles)]
+    public async Task<ActionResult<ApiResponse<IEnumerable<PermissionDto>>>> GetAssignablePermissions()
+    {
+        var result = await _permissionService.GetAssignablePermissionsAsync();
+        return HandleResult(result);
+    }
 }

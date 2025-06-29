@@ -143,7 +143,8 @@
               <button mat-icon-button 
                       color="primary" 
                       (click)="viewDetail(log.runId!)"
-                      matTooltip="View Details">
+                      matTooltip="View Details"
+                      *hasPermission="'Scrapers.ViewLogs'">
                 <mat-icon>visibility</mat-icon>
               </button>
             </td>

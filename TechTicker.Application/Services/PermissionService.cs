@@ -470,23 +470,168 @@ public class PermissionService : IPermissionService
                 return Result<bool>.Failure("Role not found", "ROLE_NOT_FOUND");
             }
 
-            var permissionNamesList = permissionNames.ToList();
-            var permissions = await _context.Permissions
-                .Where(p => permissionNamesList.Contains(p.Name))
-                .ToListAsync();
-
-            if (permissions.Count != permissionNamesList.Count)
+            var permissionIds = new List<Guid>();
+            foreach (var permissionName in permissionNames)
             {
-                return Result<bool>.Failure("One or more permissions not found", "PERMISSION_NOT_FOUND");
+                var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.Name == permissionName);
+                if (permission != null)
+                {
+                    permissionIds.Add(permission.PermissionId);
+                }
             }
 
-            var permissionIds = permissions.Select(p => p.PermissionId);
             return await BulkAssignPermissionsToRoleAsync(role.Id, permissionIds);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error bulk assigning permissions to role {RoleName}", roleName);
-            return Result<bool>.Failure("Failed to bulk assign permissions to role", "BULK_PERMISSION_ASSIGNMENT_ERROR");
+            return Result<bool>.Failure("Failed to bulk assign permissions to role", "PERMISSION_ASSIGNMENT_ERROR");
+        }
+    }
+
+    public async Task<Result<bool>> AssignPermissionToUserAsync(Guid userId, Guid permissionId)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return Result<bool>.Failure("User not found", "USER_NOT_FOUND");
+            }
+
+            var permission = await _context.Permissions.FindAsync(permissionId);
+            if (permission == null)
+            {
+                return Result<bool>.Failure("Permission not found", "PERMISSION_NOT_FOUND");
+            }
+
+            // Check if permission is already assigned to user through roles
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var hasPermissionThroughRoles = await _context.RolePermissions
+                .Include(rp => rp.Role)
+                .Include(rp => rp.Permission)
+                .AnyAsync(rp => userRoles.Contains(rp.Role.Name!) && rp.Permission.PermissionId == permissionId);
+
+            if (hasPermissionThroughRoles)
+            {
+                return Result<bool>.Success(true); // Already has permission through roles
+            }
+
+            // For now, we'll assign the permission by adding the user to a special role
+            // In a more sophisticated system, you might have a UserPermissions table
+            var specialRoleName = $"UserPermission_{permission.Name}";
+            var specialRole = await _roleManager.FindByNameAsync(specialRoleName);
+            
+            if (specialRole == null)
+            {
+                specialRole = new IdentityRole<Guid>(specialRoleName);
+                var roleResult = await _roleManager.CreateAsync(specialRole);
+                if (!roleResult.Succeeded)
+                {
+                    return Result<bool>.Failure("Failed to create special role", "ROLE_CREATION_ERROR");
+                }
+
+                // Assign permission to the special role
+                await AssignPermissionToRoleAsync(specialRole.Id, permissionId);
+            }
+
+            // Add user to the special role
+            var addToRoleResult = await _userManager.AddToRoleAsync(user, specialRoleName);
+            if (!addToRoleResult.Succeeded)
+            {
+                return Result<bool>.Failure("Failed to assign permission to user", "PERMISSION_ASSIGNMENT_ERROR");
+            }
+
+            _logger.LogInformation("Permission {PermissionName} assigned to user {UserId}", permission.Name, userId);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error assigning permission {PermissionId} to user {UserId}", permissionId, userId);
+            return Result<bool>.Failure("Failed to assign permission to user", "PERMISSION_ASSIGNMENT_ERROR");
+        }
+    }
+
+    public async Task<Result<bool>> RemovePermissionFromUserAsync(Guid userId, Guid permissionId)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return Result<bool>.Failure("User not found", "USER_NOT_FOUND");
+            }
+
+            var permission = await _context.Permissions.FindAsync(permissionId);
+            if (permission == null)
+            {
+                return Result<bool>.Failure("Permission not found", "PERMISSION_NOT_FOUND");
+            }
+
+            // Remove user from special permission role
+            var specialRoleName = $"UserPermission_{permission.Name}";
+            var removeFromRoleResult = await _userManager.RemoveFromRoleAsync(user, specialRoleName);
+            
+            if (!removeFromRoleResult.Succeeded)
+            {
+                return Result<bool>.Failure("Failed to remove permission from user", "PERMISSION_REMOVAL_ERROR");
+            }
+
+            _logger.LogInformation("Permission {PermissionName} removed from user {UserId}", permission.Name, userId);
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error removing permission {PermissionId} from user {UserId}", permissionId, userId);
+            return Result<bool>.Failure("Failed to remove permission from user", "PERMISSION_REMOVAL_ERROR");
+        }
+    }
+
+    public async Task<Result<bool>> BulkAssignPermissionsToUserAsync(Guid userId, IEnumerable<Guid> permissionIds)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return Result<bool>.Failure("User not found", "USER_NOT_FOUND");
+            }
+
+            foreach (var permissionId in permissionIds)
+            {
+                var result = await AssignPermissionToUserAsync(userId, permissionId);
+                if (!result.IsSuccess)
+                {
+                    _logger.LogWarning("Failed to assign permission {PermissionId} to user {UserId}: {Error}", 
+                        permissionId, userId, result.ErrorMessage);
+                }
+            }
+
+            return Result<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error bulk assigning permissions to user {UserId}", userId);
+            return Result<bool>.Failure("Failed to bulk assign permissions to user", "PERMISSION_ASSIGNMENT_ERROR");
+        }
+    }
+
+    public async Task<Result<IEnumerable<PermissionDto>>> GetAssignablePermissionsAsync()
+    {
+        try
+        {
+            var permissions = await _context.Permissions
+                .OrderBy(p => p.Category)
+                .ThenBy(p => p.Name)
+                .ToListAsync();
+
+            var permissionDtos = permissions.Select(MapToDto);
+            return Result<IEnumerable<PermissionDto>>.Success(permissionDtos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving assignable permissions");
+            return Result<IEnumerable<PermissionDto>>.Failure("Failed to retrieve assignable permissions", "PERMISSION_RETRIEVAL_ERROR");
         }
     }
 

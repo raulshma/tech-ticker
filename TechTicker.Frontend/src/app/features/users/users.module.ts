@@ -20,20 +20,21 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 
 import { UsersRoutingModule } from './users-routing.module';
+import { SharedModule } from '../../shared/shared.module';
 import { UsersListComponent } from './components/users-list/users-list.component';
 import { UserFormComponent } from './components/user-form/user-form.component';
 import { UserDeleteDialogComponent } from './components/user-delete-dialog/user-delete-dialog.component';
+import { UserPermissionsComponent } from './components/user-permissions/user-permissions.component';
 
 @NgModule({
   declarations: [
-    UsersListComponent,
-    UserFormComponent,
     UserDeleteDialogComponent
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     UsersRoutingModule,
+    SharedModule,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
@@ -50,7 +51,10 @@ import { UserDeleteDialogComponent } from './components/user-delete-dialog/user-
     MatChipsModule,
     MatSlideToggleModule,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+    UsersListComponent,
+    UserFormComponent,
+    UserPermissionsComponent
   ]
 })
 export class UsersModule { }
