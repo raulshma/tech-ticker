@@ -40,6 +40,7 @@ public partial class WebScrapingService
     {
         var overallStopwatch = Stopwatch.StartNew();
         Guid? runId = null;
+        ProxyAwareHttpResponse? proxyResponse = null;
 
         try
         {
@@ -73,7 +74,7 @@ public partial class WebScrapingService
 
             // Load the page with timing using proxy-aware HTTP client
             var pageLoadStopwatch = Stopwatch.StartNew();
-            var proxyResponse = await _proxyHttpClient.GetAsync(
+            proxyResponse = await _proxyHttpClient.GetAsync(
                 command.ExactProductUrl,
                 command.ScrapingProfile.Headers,
                 command.ScrapingProfile.UserAgent);
@@ -91,7 +92,9 @@ public partial class WebScrapingService
                         ErrorCode = "HTTP_REQUEST_FAILED",
                         ErrorCategory = "NETWORK",
                         PageLoadTime = pageLoadStopwatch.Elapsed,
-                        DebugNotes = $"Proxy used: {proxyResponse.ProxyUsed ?? "Direct connection"}. Status: {proxyResponse.StatusCode}"
+                        DebugNotes = $"Proxy used: {proxyResponse.ProxyUsed ?? "Direct connection"}. Status: {proxyResponse.StatusCode}",
+                        ProxyUsed = proxyResponse.ProxyUsed,
+                        ProxyId = proxyResponse.ProxyId
                     });
                 }
 
@@ -116,11 +119,11 @@ public partial class WebScrapingService
                 await _scraperRunLogService.UpdateRunLogAsync(runId.Value, new UpdateScraperRunLogDto
                 {
                     PageLoadTime = pageLoadStopwatch.Elapsed,
-                    DebugNotes = $"Page loaded in {pageLoadStopwatch.ElapsedMilliseconds}ms. Status: {proxyResponse.StatusCode}. Proxy: {proxyResponse.ProxyUsed ?? "Direct connection"}"
+                    DebugNotes = $"Page loaded in {pageLoadStopwatch.ElapsedMilliseconds}ms. Status: {proxyResponse.StatusCode}. Proxy: {proxyResponse.ProxyUsed ?? "Direct connection"}",
+                    ProxyUsed = proxyResponse.ProxyUsed,
+                    ProxyId = proxyResponse.ProxyId
                 });
             }
-
-
 
             // Check if we got valid HTML content
             if (string.IsNullOrWhiteSpace(htmlContent))
@@ -133,7 +136,9 @@ public partial class WebScrapingService
                         ErrorMessage = errorMessage,
                         ErrorCode = "EMPTY_CONTENT",
                         ErrorCategory = "PARSING",
-                        DebugNotes = "HTML content was null or whitespace"
+                        DebugNotes = "HTML content was null or whitespace",
+                        ProxyUsed = proxyResponse.ProxyUsed,
+                        ProxyId = proxyResponse.ProxyId
                     });
                 }
 
@@ -199,7 +204,9 @@ public partial class WebScrapingService
                         RawHtmlSnippet = htmlSnippet,
                         DebugNotes = isMinimalHtml
                             ? $"Minimal HTML detected. Consider using browser automation for this site. Price selector: '{command.Selectors.PriceSelector}'"
-                            : $"Price selector '{command.Selectors.PriceSelector}' did not match any elements"
+                            : $"Price selector '{command.Selectors.PriceSelector}' did not match any elements",
+                        ProxyUsed = proxyResponse.ProxyUsed,
+                        ProxyId = proxyResponse.ProxyId
                     });
                 }
 
@@ -231,7 +238,9 @@ public partial class WebScrapingService
                     PageLoadTime = pageLoadStopwatch.Elapsed,
                     ParsingTime = parsingStopwatch.Elapsed,
                     RawHtmlSnippet = htmlSnippet,
-                    DebugNotes = $"Successfully extracted all data in {overallStopwatch.ElapsedMilliseconds}ms"
+                    DebugNotes = $"Successfully extracted all data in {overallStopwatch.ElapsedMilliseconds}ms",
+                    ProxyUsed = proxyResponse.ProxyUsed,
+                    ProxyId = proxyResponse.ProxyId
                 });
             }
 
@@ -267,7 +276,9 @@ public partial class WebScrapingService
                     ErrorCode = "SCRAPING_EXCEPTION",
                     ErrorCategory = DetermineErrorCategory(ex),
                     ErrorStackTrace = SanitizeString(ex.StackTrace),
-                    DebugNotes = SanitizeString($"Exception occurred after {overallStopwatch.ElapsedMilliseconds}ms: {ex.GetType().Name}")
+                    DebugNotes = SanitizeString($"Exception occurred after {overallStopwatch.ElapsedMilliseconds}ms: {ex.GetType().Name}"),
+                    ProxyUsed = proxyResponse?.ProxyUsed,
+                    ProxyId = proxyResponse?.ProxyId
                 });
             }
 

@@ -69,6 +69,10 @@
         width: 250px;
       }
 
+      .mat-column-proxyInfo {
+        width: 120px;
+      }
+
       .mat-column-actions {
         width: 80px;
         text-align: center;
@@ -124,6 +128,18 @@
 
 .no-error {
   color: rgba(0, 0, 0, 0.4);
+}
+
+.proxy-info {
+  color: #1976d2;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.direct-connection {
+  color: #4caf50;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 // Responsive design

@@ -276,6 +276,12 @@ public class ScraperRunLogService : IScraperRunLogService
             if (!string.IsNullOrEmpty(updateDto.DebugNotes))
                 runLog.DebugNotes = updateDto.DebugNotes;
 
+            if (!string.IsNullOrEmpty(updateDto.ProxyUsed))
+                runLog.ProxyUsed = updateDto.ProxyUsed;
+
+            if (updateDto.ProxyId.HasValue)
+                runLog.ProxyId = updateDto.ProxyId.Value;
+
             _unitOfWork.ScraperRunLogs.Update(runLog);
             await _unitOfWork.SaveChangesAsync();
 
@@ -331,6 +337,12 @@ public class ScraperRunLogService : IScraperRunLogService
             if (!string.IsNullOrEmpty(completeDto.DebugNotes))
                 runLog.DebugNotes = completeDto.DebugNotes;
 
+            if (!string.IsNullOrEmpty(completeDto.ProxyUsed))
+                runLog.ProxyUsed = completeDto.ProxyUsed;
+
+            if (completeDto.ProxyId.HasValue)
+                runLog.ProxyId = completeDto.ProxyId.Value;
+
             _unitOfWork.ScraperRunLogs.Update(runLog);
             await _unitOfWork.SaveChangesAsync();
 
@@ -373,6 +385,12 @@ public class ScraperRunLogService : IScraperRunLogService
 
             if (!string.IsNullOrEmpty(failDto.DebugNotes))
                 runLog.DebugNotes = failDto.DebugNotes;
+
+            if (!string.IsNullOrEmpty(failDto.ProxyUsed))
+                runLog.ProxyUsed = failDto.ProxyUsed;
+
+            if (failDto.ProxyId.HasValue)
+                runLog.ProxyId = failDto.ProxyId.Value;
 
             _unitOfWork.ScraperRunLogs.Update(runLog);
             await _unitOfWork.SaveChangesAsync();
@@ -478,6 +496,8 @@ public class ScraperRunLogService : IScraperRunLogService
             HttpStatusCode = runLog.HttpStatusCode,
             ResponseTime = runLog.ResponseTime,
             ResponseSizeBytes = runLog.ResponseSizeBytes,
+            ProxyUsed = runLog.ProxyUsed,
+            ProxyId = runLog.ProxyId,
             ExtractedProductName = runLog.ExtractedProductName,
             ExtractedPrice = runLog.ExtractedPrice,
             ExtractedStockStatus = runLog.ExtractedStockStatus,

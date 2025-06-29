@@ -16154,6 +16154,8 @@ export class ScraperRunLogDto implements IScraperRunLogDto {
     httpStatusCode?: number | undefined;
     responseTime?: string | undefined;
     responseSizeBytes?: number | undefined;
+    proxyUsed?: string | undefined;
+    proxyId?: string | undefined;
     extractedProductName?: string | undefined;
     extractedPrice?: number | undefined;
     extractedStockStatus?: string | undefined;
@@ -16211,6 +16213,8 @@ export class ScraperRunLogDto implements IScraperRunLogDto {
             this.httpStatusCode = _data["httpStatusCode"];
             this.responseTime = _data["responseTime"];
             this.responseSizeBytes = _data["responseSizeBytes"];
+            this.proxyUsed = _data["proxyUsed"];
+            this.proxyId = _data["proxyId"];
             this.extractedProductName = _data["extractedProductName"];
             this.extractedPrice = _data["extractedPrice"];
             this.extractedStockStatus = _data["extractedStockStatus"];
@@ -16280,6 +16284,8 @@ export class ScraperRunLogDto implements IScraperRunLogDto {
         data["httpStatusCode"] = this.httpStatusCode;
         data["responseTime"] = this.responseTime;
         data["responseSizeBytes"] = this.responseSizeBytes;
+        data["proxyUsed"] = this.proxyUsed;
+        data["proxyId"] = this.proxyId;
         data["extractedProductName"] = this.extractedProductName;
         data["extractedPrice"] = this.extractedPrice;
         data["extractedStockStatus"] = this.extractedStockStatus;
@@ -16336,6 +16342,8 @@ export interface IScraperRunLogDto {
     httpStatusCode?: number | undefined;
     responseTime?: string | undefined;
     responseSizeBytes?: number | undefined;
+    proxyUsed?: string | undefined;
+    proxyId?: string | undefined;
     extractedProductName?: string | undefined;
     extractedPrice?: number | undefined;
     extractedStockStatus?: string | undefined;

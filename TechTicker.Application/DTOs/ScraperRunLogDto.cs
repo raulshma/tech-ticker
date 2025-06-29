@@ -24,6 +24,10 @@ public class ScraperRunLogDto
     public TimeSpan? ResponseTime { get; set; }
     public long? ResponseSizeBytes { get; set; }
 
+    // Proxy information
+    public string? ProxyUsed { get; set; }
+    public Guid? ProxyId { get; set; }
+
     // Extraction results
     public string? ExtractedProductName { get; set; }
     public decimal? ExtractedPrice { get; set; }

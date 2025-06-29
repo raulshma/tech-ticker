@@ -50,6 +50,18 @@ public class ScraperRunLog
 
     public long? ResponseSizeBytes { get; set; }
 
+    // Proxy information
+    /// <summary>
+    /// Proxy host and port used for the request (e.g., "192.168.1.1:8080")
+    /// </summary>
+    [MaxLength(100)]
+    public string? ProxyUsed { get; set; }
+
+    /// <summary>
+    /// ID of the proxy configuration used for the request
+    /// </summary>
+    public Guid? ProxyId { get; set; }
+
     // Extraction results
     [MaxLength(500)]
     public string? ExtractedProductName { get; set; }

@@ -24,6 +24,7 @@ export class ScraperLogsListComponent implements OnInit, OnDestroy {
     'duration',
     'sellerName',
     'productName',
+    'proxyInfo',
     'errorMessage',
     'actions'
   ];

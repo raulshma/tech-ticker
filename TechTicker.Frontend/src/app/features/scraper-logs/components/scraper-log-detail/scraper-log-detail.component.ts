@@ -145,12 +145,26 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
   }
 
   hasImageData(): boolean {
-    return !!(this.scraperLog?.extractedPrimaryImageUrl ||
-             (this.scraperLog?.extractedAdditionalImageUrls && this.scraperLog.extractedAdditionalImageUrls.length > 0) ||
-             (this.scraperLog?.extractedOriginalImageUrls && this.scraperLog.extractedOriginalImageUrls.length > 0) ||
-             this.scraperLog?.imageProcessingCount !== null ||
-             this.scraperLog?.imageUploadCount !== null ||
-             this.scraperLog?.imageScrapingError);
+    return !!(this.scraperLog?.extractedPrimaryImageUrl || 
+              this.scraperLog?.extractedAdditionalImageUrls?.length || 
+              this.scraperLog?.extractedOriginalImageUrls?.length ||
+              this.scraperLog?.imageProcessingCount ||
+              this.scraperLog?.imageUploadCount ||
+              this.scraperLog?.imageScrapingError);
+  }
+
+  hasProxyData(): boolean {
+    return !!(this.scraperLog?.proxyUsed || this.scraperLog?.proxyId);
+  }
+
+  getProxyDisplayInfo(): { hasProxy: boolean; proxyInfo: string } {
+    if (this.scraperLog?.proxyUsed) {
+      return { hasProxy: true, proxyInfo: this.scraperLog.proxyUsed };
+    } else if (this.scraperLog?.proxyId) {
+      return { hasProxy: true, proxyInfo: `Proxy ID: ${this.scraperLog.proxyId}` };
+    } else {
+      return { hasProxy: false, proxyInfo: 'Direct Connection' };
+    }
   }
 
   getAdditionalHeadersJson(): string {

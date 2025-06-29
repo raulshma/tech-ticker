@@ -105,6 +105,39 @@
       </mat-card-content>
     </mat-card>
 
+    <!-- Proxy Information -->
+    <mat-card class="info-card" *ngIf="hasProxyData()">
+      <mat-card-header>
+        <mat-card-title>Proxy Information</mat-card-title>
+        <mat-card-subtitle>Proxy used for this scraping operation</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item" *ngIf="scraperLog?.proxyUsed">
+            <label>Proxy Used:</label>
+            <span class="value proxy-value">{{scraperLog.proxyUsed}}</span>
+            <button mat-icon-button (click)="copyToClipboard(scraperLog.proxyUsed!)" matTooltip="Copy Proxy">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+          </div>
+
+          <div class="info-item" *ngIf="scraperLog.proxyId">
+            <label>Proxy ID:</label>
+            <span class="value proxy-id-value">{{scraperLog.proxyId}}</span>
+            <button mat-icon-button (click)="copyToClipboard(scraperLog.proxyId!)" matTooltip="Copy Proxy ID">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+          </div>
+
+          <div class="info-item" *ngIf="!scraperLog.proxyUsed && !scraperLog.proxyId">
+            <label>Connection Type:</label>
+            <span class="value">Direct Connection</span>
+            <mat-icon class="direct-icon">wifi</mat-icon>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
     <!-- Extracted Data -->
     <mat-card class="info-card" *ngIf="scraperLog.extractedProductName || scraperLog.extractedPrice || scraperLog.extractedStockStatus || scraperLog.extractedSellerName">
       <mat-card-header>

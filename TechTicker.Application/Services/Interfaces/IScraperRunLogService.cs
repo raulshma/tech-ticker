@@ -112,6 +112,8 @@ public class UpdateScraperRunLogDto
     public TimeSpan? ParsingTime { get; set; }
     public string? RawHtmlSnippet { get; set; }
     public string? DebugNotes { get; set; }
+    public string? ProxyUsed { get; set; }
+    public Guid? ProxyId { get; set; }
 }
 
 /// <summary>
@@ -134,6 +136,8 @@ public class CompleteScraperRunDto
     public TimeSpan? ParsingTime { get; set; }
     public string? RawHtmlSnippet { get; set; }
     public string? DebugNotes { get; set; }
+    public string? ProxyUsed { get; set; }
+    public Guid? ProxyId { get; set; }
 }
 
 /// <summary>
@@ -151,4 +155,6 @@ public class FailScraperRunDto
     public TimeSpan? ParsingTime { get; set; }
     public string? RawHtmlSnippet { get; set; }
     public string? DebugNotes { get; set; }
+    public string? ProxyUsed { get; set; }
+    public Guid? ProxyId { get; set; }
 }

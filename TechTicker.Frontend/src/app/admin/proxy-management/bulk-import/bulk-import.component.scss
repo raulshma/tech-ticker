@@ -66,13 +66,8 @@
       font-weight: 500;
     }
 
-    &.active .step-label {
-      color: #1976d2;
-    }
-
-    &.completed .step-label {
-      color: #4caf50;
-    }
+    &.active .step-label { color: #1976d2; }
+    &.completed .step-label { color: #4caf50; }
   }
 
   .step-line {
@@ -82,23 +77,20 @@
     margin: 0 16px;
     transition: all 0.3s ease;
 
-    &.completed {
-      background: #4caf50;
-    }
+    &.completed { background: #4caf50; }
   }
 }
 
 .step-card {
   margin-bottom: 24px;
+  animation: slideIn 0.3s ease-in-out;
 
-  .mat-mdc-card-header {
-    .mat-mdc-card-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 1.25rem;
-      color: #333;
-    }
+  .mat-mdc-card-header .mat-mdc-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.25rem;
+    color: #333;
   }
 }
 
@@ -116,9 +108,7 @@
     }
   }
 
-  .full-width {
-    width: 100%;
-  }
+  .full-width { width: 100%; }
 
   .options-grid {
     display: grid;
@@ -132,17 +122,14 @@
     gap: 16px;
   }
 
-  // Proxy type selector styling
-  .mat-mdc-select-panel .mat-mdc-option {
-    .type-chip {
-      margin: 0;
-      font-size: 0.75rem;
-      height: 24px;
+  .mat-mdc-select-panel .mat-mdc-option .type-chip {
+    margin: 0;
+    font-size: 0.75rem;
+    height: 24px;
 
-      .mat-mdc-chip-label {
-        font-size: 0.75rem;
-        line-height: 1;
-      }
+    .mat-mdc-chip-label {
+      font-size: 0.75rem;
+      line-height: 1;
     }
   }
 }
@@ -200,9 +187,7 @@
 .progress-section {
   padding: 16px 24px 0;
 
-  .mat-mdc-progress-bar {
-    margin-bottom: 8px;
-  }
+  .mat-mdc-progress-bar { margin-bottom: 8px; }
 
   .progress-text {
     display: flex;
@@ -248,23 +233,13 @@
   border-radius: 8px;
   border: 1px solid #e0e0e0;
 
-  .filter-field {
-    flex: 1;
-    min-width: 150px;
-  }
-
-  .clear-filters-btn {
-    min-width: auto;
-    white-space: nowrap;
-  }
+  .filter-field { flex: 1; min-width: 150px; }
+  .clear-filters-btn { min-width: auto; white-space: nowrap; }
 
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: stretch;
-
-    .filter-field {
-      width: 100%;
-    }
+    .filter-field { width: 100%; }
   }
 }
 
@@ -307,11 +282,7 @@
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
-
-    .action-buttons {
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+    .action-buttons { justify-content: center; }
   }
 }
 
@@ -381,13 +352,8 @@
       border-bottom: 1px solid #f0f0f0;
       transition: background-color 0.2s ease;
 
-      &:hover {
-        background-color: #f9f9f9;
-      }
-
-      &:last-child {
-        border-bottom: none;
-      }
+      &:hover { background-color: #f9f9f9; }
+      &:last-child { border-bottom: none; }
 
       .proxy-cell {
         display: flex;
@@ -441,31 +407,7 @@
     }
   }
 
-  .test-error {
-    margin-top: 4px;
-  }
-}
-
-// Responsive adjustments for virtual scrolling table
-@media (max-width: 768px) {
-  .table-container {
-    .table-header .header-row,
-    .virtual-scroll-viewport .proxy-row {
-      padding: 0 8px;
-
-      .header-cell,
-      .proxy-cell {
-        &.select-column { flex: 0.5; min-width: 40px; }
-        &.host-column { flex: 3; min-width: 100px; }
-        &.port-column { flex: 1; min-width: 60px; }
-        &.type-column { flex: 1; min-width: 80px; }
-        &.auth-column { flex: 0.5; min-width: 40px; }
-        &.status-column { flex: 1; min-width: 80px; }
-        &.test-column { flex: 0.5; min-width: 40px; }
-        &.errors-column { flex: 2; min-width: 120px; }
-      }
-    }
-  }
+  .test-error { margin-top: 4px; }
 }
 
 .results-summary {
@@ -545,10 +487,7 @@
     border-radius: 8px;
     border-left: 4px solid #f44336;
 
-    h4 {
-      margin: 0 0 12px 0;
-      color: #d32f2f;
-    }
+    h4 { margin: 0 0 12px 0; color: #d32f2f; }
 
     .error-list {
       display: flex;
@@ -566,18 +505,12 @@
 
   @media (max-width: 768px) {
     flex-direction: column-reverse;
-
-    button {
-      width: 100%;
-    }
+    button { width: 100%; }
   }
 }
 
-// Responsive design
 @media (max-width: 768px) {
-  .bulk-import-container {
-    padding: 16px;
-  }
+  .bulk-import-container { padding: 16px; }
 
   .step-indicator {
     flex-direction: column;
@@ -590,23 +523,29 @@
     }
   }
 
-  .summary-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .results-stats {
-    grid-template-columns: 1fr;
-  }
-
+  .summary-stats { grid-template-columns: repeat(2, 1fr); }
+  .results-stats { grid-template-columns: 1fr; }
   .options-grid,
-  .defaults-grid {
-    grid-template-columns: 1fr;
-  }
-}
+  .defaults-grid { grid-template-columns: 1fr; }
 
-// Animation
-.step-card {
-  animation: slideIn 0.3s ease-in-out;
+  .table-container {
+    .table-header .header-row,
+    .virtual-scroll-viewport .proxy-row {
+      padding: 0 8px;
+
+      .header-cell,
+      .proxy-cell {
+        &.select-column { flex: 0.5; min-width: 40px; }
+        &.host-column { flex: 3; min-width: 100px; }
+        &.port-column { flex: 1; min-width: 60px; }
+        &.type-column { flex: 1; min-width: 80px; }
+        &.auth-column { flex: 0.5; min-width: 40px; }
+        &.status-column { flex: 1; min-width: 80px; }
+        &.test-column { flex: 0.5; min-width: 40px; }
+        &.errors-column { flex: 2; min-width: 120px; }
+      }
+    }
+  }
 }
 
 @keyframes slideIn {

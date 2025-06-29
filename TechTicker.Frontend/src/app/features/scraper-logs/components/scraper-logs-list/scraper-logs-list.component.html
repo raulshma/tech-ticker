@@ -110,6 +110,19 @@
             </td>
           </ng-container>
 
+          <!-- Proxy Info Column -->
+          <ng-container matColumnDef="proxyInfo">
+            <th mat-header-cell *matHeaderCellDef>Proxy</th>
+            <td mat-cell *matCellDef="let log">
+              <span *ngIf="log.proxyUsed" 
+                    [matTooltip]="log.proxyUsed" 
+                    class="proxy-info">
+                {{truncateText(log.proxyUsed, 20)}}
+              </span>
+              <span *ngIf="!log.proxyUsed" class="direct-connection">Direct</span>
+            </td>
+          </ng-container>
+
           <!-- Error Message Column -->
           <ng-container matColumnDef="errorMessage">
             <th mat-header-cell *matHeaderCellDef>Error</th>
