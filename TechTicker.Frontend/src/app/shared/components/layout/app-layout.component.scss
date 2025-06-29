@@ -100,12 +100,9 @@ mat-sidenav-content {
 // Enhanced Brand Header
 .sidenav-header {
   padding: 24px 20px;
-  background: linear-gradient(
-    135deg,
-    var(--mat-sys-color-primary-container) 0%,
-    var(--mat-sys-color-tertiary-container) 50%,
-    var(--mat-sys-color-secondary-container) 100%
-  );
+  background: var(--mat-sys-color-surface-container, #fff) !important;
+  background-image: none !important;
+  opacity: 1 !important;
   border-bottom: 1px solid var(--mat-sys-color-outline-variant);
   position: relative;
   flex-shrink: 0;
@@ -160,7 +157,7 @@ mat-sidenav-content {
   font-size: 28px;
   width: 28px;
   height: 28px;
-  color: var(--mat-sys-color-primary);
+  color: var(--mat-sys-color-primary, #6c63ff);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -176,7 +173,7 @@ mat-sidenav-content {
   font-size: 22px;
   font-weight: 700;
   line-height: 28px;
-  color: var(--mat-sys-color-on-surface);
+  color: var(--mat-sys-color-on-surface, #222);
   letter-spacing: -0.02em;
   background: linear-gradient(
     135deg,
@@ -192,7 +189,7 @@ mat-sidenav-content {
   font-size: 12px;
   font-weight: 600;
   line-height: 16px;
-  color: var(--mat-sys-color-on-surface-variant);
+  color: var(--mat-sys-color-on-surface-variant, #666);
   letter-spacing: 0.8px;
   text-transform: uppercase;
   opacity: 0.8;
@@ -495,7 +492,7 @@ mat-sidenav-content {
   font-size: 22px;
   width: 22px;
   height: 22px;
-  color: var(--mat-sys-color-on-surface-variant);
+  color: var(--mat-sys-color-on-surface-variant, #888);
   transition: all 250ms cubic-bezier(0.2, 0, 0, 1);
   flex-shrink: 0;
 }
@@ -504,7 +501,7 @@ mat-sidenav-content {
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
-  color: var(--mat-sys-color-on-surface);
+  color: var(--mat-sys-color-on-surface, #222);
   letter-spacing: 0.1px;
   transition: all 250ms cubic-bezier(0.2, 0, 0, 1);
   flex: 1;
@@ -524,11 +521,7 @@ mat-sidenav-content {
 
 // Active Link Styling
 .nav-item.active {
-  background: linear-gradient(
-    135deg,
-    var(--mat-sys-color-primary-container),
-    rgba(var(--mat-sys-color-tertiary-container-rgb), 0.8)
-  ) !important;
+  background: var(--mat-sys-color-primary-container, #ede7f6) !important;
   border: 1px solid var(--mat-sys-color-primary) !important;
   transform: translateX(6px);
   box-shadow: 
@@ -536,7 +529,7 @@ mat-sidenav-content {
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   
   .nav-icon {
-    color: var(--mat-sys-color-primary) !important;
+    color: var(--mat-sys-color-primary, #6c63ff) !important;
     transform: scale(1.15);
   }
   
@@ -584,11 +577,7 @@ mat-sidenav-content {
 .sidenav-footer {
   padding: 16px 20px;
   border-top: 1px solid var(--mat-sys-color-outline-variant);
-  background: linear-gradient(
-    180deg,
-    var(--mat-sys-color-surface-container),
-    var(--mat-sys-color-surface-container-low)
-  );
+  background: var(--mat-sys-color-surface-container, #f0f0f0) !important;
   flex-shrink: 0;
 }
 
@@ -609,13 +598,13 @@ mat-sidenav-content {
   font-size: 16px;
   width: 16px;
   height: 16px;
-  color: var(--mat-sys-color-on-surface-variant);
+  color: var(--mat-sys-color-on-surface-variant, #888);
 }
 
 .footer-text {
   font-size: 12px;
   font-weight: 500;
-  color: var(--mat-sys-color-on-surface-variant);
+  color: var(--mat-sys-color-on-surface-variant, #888);
   letter-spacing: 0.4px;
 }
 
@@ -876,7 +865,7 @@ mat-sidenav-content {
   .sidenav-header {
     padding: 16px 16px 20px;
     // Ensure solid header background on mobile
-    background: var(--mat-sys-color-primary-container, #e3f2fd) !important;
+    background: var(--mat-sys-color-surface-container, #fff) !important;
     background-image: none !important;
     opacity: 1 !important;
     
@@ -888,8 +877,8 @@ mat-sidenav-content {
   // Fix header text visibility on mobile - completely override gradient text
   .brand-title {
     // Fallback colors first
-    color: #1565c0 !important;
-    -webkit-text-fill-color: #1565c0 !important;
+    color: var(--mat-sys-color-on-surface, #222) !important;
+    -webkit-text-fill-color: var(--mat-sys-color-on-surface, #222) !important;
     
     // CSS custom properties with fallbacks
     color: var(--mat-sys-color-on-primary-container, #1565c0) !important;
@@ -910,7 +899,7 @@ mat-sidenav-content {
   
   .brand-subtitle {
     // Fallback color first
-    color: #1976d2 !important;
+    color: var(--mat-sys-color-on-surface-variant, #666) !important;
     
     // CSS custom property with fallback
     color: var(--mat-sys-color-on-primary-container, #1976d2) !important;
@@ -922,15 +911,15 @@ mat-sidenav-content {
   }
   
   .brand-icon {
-    color: var(--mat-sys-color-primary, #1976d2) !important;
+    color: var(--mat-sys-color-primary, #6c63ff) !important;
     opacity: 1 !important;
   }
   
   // Ensure brand icon wrapper is visible
   .brand-icon-wrapper {
     opacity: 1 !important;
-    background: rgba(var(--mat-sys-color-primary-rgb, 25, 118, 210), 0.15) !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    background: rgba(var(--mat-sys-color-primary-rgb, 108, 99, 255), 0.12) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
   }
   
   // Ensure header container is solid
@@ -959,7 +948,7 @@ mat-sidenav-content {
   }
   
   .expandable-section {
-    background-color: rgba(var(--mat-sys-color-surface-variant-rgb), 0.8) !important;
+    background-color: var(--mat-sys-color-surface-container, #f5f5f5) !important;
     opacity: 1 !important;
   }
   
@@ -1056,18 +1045,18 @@ mat-sidenav-content {
     }
     
     .sidenav-header {
-      background: var(--mat-sys-color-primary-container, #3c3c3c) !important;
+      background: var(--mat-sys-color-surface-container, #23232b) !important;
     }
     
     .sidenav-footer {
-      background: var(--mat-sys-color-surface-container, #353535) !important;
+      background: var(--mat-sys-color-surface-container, #23232b) !important;
     }
     
     // Dark theme text visibility
     .brand-title {
       // Fallback colors first
-      color: #90caf9 !important;
-      -webkit-text-fill-color: #90caf9 !important;
+      color: var(--mat-sys-color-on-surface, #fff) !important;
+      -webkit-text-fill-color: var(--mat-sys-color-on-surface, #fff) !important;
       
       // CSS custom properties with fallbacks
       color: var(--mat-sys-color-on-primary-container, #90caf9) !important;
@@ -1084,7 +1073,7 @@ mat-sidenav-content {
     
     .brand-subtitle {
       // Fallback color first
-      color: #81c784 !important;
+      color: var(--mat-sys-color-on-surface-variant, #bbb) !important;
       
       // CSS custom property with fallback
       color: var(--mat-sys-color-on-primary-container, #81c784) !important;
