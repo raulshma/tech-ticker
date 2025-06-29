@@ -8,15 +8,15 @@
           <p class="mat-body-large welcome-subtitle">Configure and monitor HTTP/SOCKS5 proxies for web scraping</p>
         </div>
         <div class="header-actions">
-          <button mat-raised-button color="primary" class="primary-action-btn" routerLink="/admin/proxies/add" *hasPermission="'Proxies.Create'">
+          <button matButton="filled" color="primary" routerLink="/admin/proxies/add" *hasPermission="'Proxies.Create'">
             <mat-icon>add</mat-icon>
             Add Proxy
           </button>
-          <button mat-raised-button color="accent" class="secondary-action-btn" routerLink="/admin/proxies/bulk-import" *hasPermission="'Proxies.BulkImport'">
+          <button matButton="filled" color="accent" routerLink="/admin/proxies/bulk-import" *hasPermission="'Proxies.BulkImport'">
             <mat-icon>upload</mat-icon>
             Bulk Import
           </button>
-          <button mat-outlined-button class="tertiary-action-btn" (click)="loadProxies()" *hasPermission="'Proxies.Read'">
+          <button matButton="outlined" (click)="loadProxies()" *hasPermission="'Proxies.Read'">
             <mat-icon>refresh</mat-icon>
             Refresh
           </button>
@@ -139,7 +139,7 @@
               <mat-icon matSuffix>tune</mat-icon>
             </mat-form-field>
 
-            <button mat-outlined-button class="clear-filters-btn" (click)="clearFilters()">
+            <button matButton="outlined" (click)="clearFilters()">
               <mat-icon>clear</mat-icon>
               Clear Filters
             </button>
@@ -156,27 +156,27 @@
                   <span class="mat-title-medium">{{ getSelectedCount() }} proxies selected</span>
                 </div>
                 <div class="bulk-actions-buttons">
-                  <button mat-raised-button color="primary" (click)="bulkTestProxies()"
+                  <button matButton="filled" color="primary" (click)="bulkTestProxies()"
                           [disabled]="bulkTesting || bulkUpdating"
                           *hasPermission="'Proxies.Test'">
                     <mat-spinner diameter="16" *ngIf="bulkTesting" class="btn-spinner"></mat-spinner>
                     <mat-icon *ngIf="!bulkTesting">play_arrow</mat-icon>
                     {{ bulkTesting ? 'Testing...' : 'Test Selected' }}
                   </button>
-                  <button mat-raised-button color="accent" (click)="bulkToggleStatus(true)"
+                  <button matButton="filled" color="accent" (click)="bulkToggleStatus(true)"
                           [disabled]="bulkTesting || bulkUpdating"
                           *hasPermission="'Proxies.Update'">
                     <mat-spinner diameter="16" *ngIf="bulkUpdating" class="btn-spinner"></mat-spinner>
                     <mat-icon *ngIf="!bulkUpdating">check_circle</mat-icon>
                     {{ bulkUpdating ? 'Updating...' : 'Enable Selected' }}
                   </button>
-                  <button mat-outlined-button color="warn" (click)="bulkToggleStatus(false)"
+                  <button matButton="outlined" color="warn" (click)="bulkToggleStatus(false)"
                           [disabled]="bulkTesting || bulkUpdating"
                           *hasPermission="'Proxies.Update'">
                     <mat-icon>cancel</mat-icon>
                     Disable Selected
                   </button>
-                  <button mat-outlined-button color="warn" (click)="bulkDeleteProxies()"
+                  <button matButton="outlined" color="warn" (click)="bulkDeleteProxies()"
                           [disabled]="bulkTesting || bulkUpdating"
                           *hasPermission="'Proxies.Delete'">
                     <mat-icon>delete</mat-icon>

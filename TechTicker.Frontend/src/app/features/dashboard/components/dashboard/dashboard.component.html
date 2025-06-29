@@ -14,10 +14,10 @@
         <div class="error-content">
           <mat-icon class="error-icon" aria-hidden="true">error</mat-icon>
           <p class="mat-body-medium">{{error}}</p>
-          <button mat-raised-button color="primary" (click)="loadDashboardStats()" class="retry-button">
-            <mat-icon>refresh</mat-icon>
-            Retry
-          </button>
+                <button matButton="filled" color="primary" (click)="loadDashboardStats()">
+        <mat-icon>refresh</mat-icon>
+        Retry
+      </button>
         </div>
       </mat-card-content>
     </mat-card>

@@ -8,7 +8,7 @@
           <p class="mat-body-large welcome-subtitle">Configure CSS selectors and settings for different e-commerce sites</p>
         </div>
         <div class="header-actions">
-          <button mat-raised-button color="primary" class="primary-action-btn" (click)="createSiteConfig()">
+          <button matButton="filled" color="primary" (click)="createSiteConfig()">
             <mat-icon>add</mat-icon>
             Add Site Config
           </button>
@@ -24,7 +24,7 @@
         <div class="error-content">
           <mat-icon class="error-icon" aria-hidden="true">error</mat-icon>
           <p class="mat-body-medium">Failed to load site configurations. Please try again.</p>
-          <button mat-raised-button color="primary" (click)="loadSiteConfigs()" class="retry-button">
+          <button matButton="filled" color="primary" (click)="loadSiteConfigs()">
             <mat-icon>refresh</mat-icon>
             Retry
           </button>
@@ -186,14 +186,12 @@
                 <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
                 <td mat-cell *matCellDef="let config" class="actions-cell">
                   <div class="actions-group">
-                    <button mat-icon-button 
-                            class="action-btn edit-btn" 
+                    <button matIconButton 
                             (click)="editSiteConfig(config)"
                             matTooltip="Edit configuration">
                       <mat-icon>edit</mat-icon>
                     </button>
-                    <button mat-icon-button 
-                            class="action-btn delete-btn" 
+                    <button matIconButton 
                             (click)="deleteSiteConfig(config)"
                             matTooltip="Delete configuration">
                       <mat-icon>delete</mat-icon>
@@ -214,7 +212,7 @@
                     </div>
                     <h3 class="mat-headline-small">No site configurations found</h3>
                     <p class="mat-body-medium">Site configurations define how to scrape product information from different e-commerce websites.</p>
-                    <button mat-raised-button color="primary" (click)="createSiteConfig()">
+                    <button matButton="filled" color="primary" (click)="createSiteConfig()">
                       <mat-icon>add</mat-icon>
                       Create First Configuration
                     </button>

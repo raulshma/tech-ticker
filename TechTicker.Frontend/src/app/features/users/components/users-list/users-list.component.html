@@ -8,11 +8,11 @@
           <p class="mat-body-large welcome-subtitle">Manage system users, roles, and permissions with comprehensive access control</p>
         </div>
         <div class="header-actions">
-          <button mat-raised-button color="primary" class="primary-action-btn" (click)="createUser()" *hasPermission="'Users.Create'">
+          <button matButton="filled" color="primary" (click)="createUser()" *hasPermission="'Users.Create'">
             <mat-icon>person_add</mat-icon>
             Add User
           </button>
-          <button mat-outlined-button class="tertiary-action-btn" (click)="loadUsers()" *hasPermission="'Users.Read'">
+          <button matButton="outlined" (click)="loadUsers()" *hasPermission="'Users.Read'">
             <mat-icon>refresh</mat-icon>
             Refresh
           </button>
@@ -132,7 +132,7 @@
               <mat-icon matSuffix>category</mat-icon>
             </mat-form-field>
 
-            <button mat-outlined-button class="clear-filters-btn" (click)="clearFilters()">
+            <button matButton="outlined" (click)="clearFilters()">
               <mat-icon>clear_all</mat-icon>
               Clear Filters
             </button>
@@ -212,25 +212,22 @@
                 <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
                 <td mat-cell *matCellDef="let user" class="actions-cell">
                   <div class="actions-group-modern">
-                    <button mat-icon-button
-                            class="action-btn edit-btn"
+                    <button matIconButton
                             (click)="editUser(user)"
                             matTooltip="Edit User"
                             *hasPermission="'Users.Update'">
                       <mat-icon>edit</mat-icon>
                     </button>
 
-                    <button mat-icon-button
-                            [class]="user.isActive ? 'action-btn disable-btn' : 'action-btn enable-btn'"
+                    <button matIconButton
                             (click)="toggleUserStatus(user)"
                             [matTooltip]="user.isActive ? 'Deactivate User' : 'Activate User'"
                             *hasPermission="'Users.Update'">
                       <mat-icon>{{ user.isActive ? 'person_off' : 'person' }}</mat-icon>
                     </button>
 
-                    <button mat-icon-button
+                    <button matIconButton
                             [matMenuTriggerFor]="userActionsMenu"
-                            class="action-btn more-btn"
                             matTooltip="More Actions">
                       <mat-icon>more_vert</mat-icon>
                     </button>
@@ -248,7 +245,7 @@
                       
                       <mat-divider></mat-divider>
                       
-                      <button mat-menu-item (click)="deleteUser(user)" class="delete-action" *hasPermission="'Users.Delete'">
+                      <button mat-menu-item (click)="deleteUser(user)" *hasPermission="'Users.Delete'">
                         <mat-icon>delete</mat-icon>
                         <span>Delete User</span>
                       </button>
@@ -274,7 +271,7 @@
                          'Get started by creating your first user account' }}
                     </p>
                     <ng-container *ngIf="!searchControl.value && !statusFilter && !roleFilter">
-                      <button mat-raised-button color="primary" (click)="createUser()" *hasPermission="'Users.Create'">
+                      <button matButton="filled" color="primary" (click)="createUser()" *hasPermission="'Users.Create'">
                         <mat-icon>person_add</mat-icon>
                         Create First User
                       </button>

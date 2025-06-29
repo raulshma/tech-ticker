@@ -8,7 +8,7 @@
           <p class="mat-body-large welcome-subtitle">Monitor and analyze scraper execution history and performance</p>
         </div>
         <div class="header-actions">
-          <button mat-outlined-button class="refresh-action-btn" (click)="loadScraperLogs()">
+          <button matButton="outlined" (click)="loadScraperLogs()">
             <mat-icon>refresh</mat-icon>
             Refresh
           </button>
@@ -138,7 +138,7 @@
               <mat-datepicker #dateToPicker></mat-datepicker>
             </mat-form-field>
 
-            <button mat-outlined-button type="button" class="clear-filters-btn" (click)="clearFilters()">
+            <button matButton="outlined" type="button" (click)="clearFilters()">
               <mat-icon>clear</mat-icon>
               Clear Filters
             </button>
