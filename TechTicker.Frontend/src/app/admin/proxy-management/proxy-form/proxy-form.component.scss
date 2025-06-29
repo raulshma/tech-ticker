@@ -11,12 +11,12 @@
     margin: 0 0 8px 0;
     font-size: 2rem;
     font-weight: 500;
-    color: #1976d2;
+    color: var(--mat-sys-color-primary);
   }
 
   .subtitle {
     margin: 0;
-    color: #666;
+    color: var(--mat-sys-color-on-surface);
     font-size: 1rem;
   }
 }
@@ -30,7 +30,7 @@
   gap: 16px;
 
   p {
-    color: #666;
+    color: var(--mat-sys-color-on-surface);
     margin: 0;
   }
 }
@@ -44,7 +44,7 @@
       align-items: center;
       gap: 8px;
       font-size: 1.25rem;
-      color: #333;
+      color: var(--mat-sys-color-on-surface);
     }
   }
 }
@@ -57,8 +57,8 @@
       margin: 0 0 16px 0;
       font-size: 1.1rem;
       font-weight: 500;
-      color: #1976d2;
-      border-bottom: 1px solid #e0e0e0;
+      color: var(--mat-sys-color-primary);
+      border-bottom: 1px solid var(--mat-sys-color-outline);
       padding-bottom: 8px;
     }
   }
@@ -88,7 +88,7 @@
 
   .mat-mdc-form-field {
     .mat-mdc-form-field-icon-suffix {
-      color: #666;
+      color: var(--mat-sys-color-on-surface);
     }
   }
 
@@ -102,8 +102,8 @@
 
 .form-actions {
   padding: 16px 24px;
-  background-color: #f5f5f5;
-  border-top: 1px solid #e0e0e0;
+  background-color: var(--mat-sys-color-surface-variant, var(--mat-sys-color-surface));
+  border-top: 1px solid var(--mat-sys-color-outline);
   
   .action-buttons {
     display: flex;
@@ -127,7 +127,7 @@
       align-items: center;
       gap: 8px;
       font-size: 1.1rem;
-      color: #333;
+      color: var(--mat-sys-color-on-surface);
     }
   }
 
@@ -142,7 +142,7 @@
       margin: 0 0 8px 0;
       font-size: 1rem;
       font-weight: 500;
-      color: #1976d2;
+      color: var(--mat-sys-color-primary);
     }
     
     ul {
@@ -154,31 +154,10 @@
         line-height: 1.4;
         
         strong {
-          color: #333;
+          color: var(--mat-sys-color-on-surface);
         }
       }
     }
-  }
-}
-
-// Form validation styles
-.mat-mdc-form-field {
-  &.ng-invalid.ng-touched {
-    .mat-mdc-text-field-wrapper {
-      .mat-mdc-form-field-outline {
-        .mat-mdc-form-field-outline-thick {
-          color: #f44336;
-        }
-      }
-    }
-  }
-}
-
-// Button styles
-.mat-mdc-button,
-.mat-mdc-raised-button {
-  .mat-icon {
-    margin-right: 8px;
   }
 }
 

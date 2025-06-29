@@ -14,7 +14,7 @@
     margin: 0;
     font-size: 2rem;
     font-weight: 400;
-    color: #333;
+    color: var(--mat-sys-color-on-surface);
   }
 }
 
@@ -35,22 +35,11 @@
   gap: 12px;
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--mat-sys-color-outline);
 }
 
 .form-spinner {
   margin-right: 8px;
-}
-
-// Form field customizations
-::ng-deep .mat-form-field-appearance-outline {
-  .mat-form-field-outline {
-    border-radius: 8px;
-  }
-  
-  .mat-form-field-outline-thick {
-    border-width: 2px;
-  }
 }
 
 // Responsive design

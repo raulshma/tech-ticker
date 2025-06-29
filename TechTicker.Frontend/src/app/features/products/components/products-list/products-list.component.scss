@@ -2,7 +2,7 @@
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  background-color: #fafafa;
+  background-color: var(--mat-sys-color-surface);
   min-height: 100vh;
 }
 
@@ -16,7 +16,7 @@
     margin: 0;
     font-size: 2rem;
     font-weight: 400;
-    color: #333;
+    color: var(--mat-sys-color-on-surface);
   }
 }
 
@@ -49,7 +49,7 @@
 
   p {
     margin-top: 16px;
-    color: #666;
+    color: var(--mat-sys-color-on-surface);
   }
 }
 
@@ -111,9 +111,9 @@
   align-items: center;
   width: 80px;
   height: 80px;
-  background-color: #f5f5f5;
+  background-color: var(--mat-sys-color-surface-variant, var(--mat-sys-color-surface));
   border-radius: 4px;
-  color: #ccc;
+  color: var(--mat-sys-color-outline);
 
   mat-icon {
     font-size: 24px;
@@ -125,7 +125,7 @@
 .product-name {
   .product-description {
     display: block;
-    color: #666;
+    color: var(--mat-sys-color-on-surface);
     font-size: 0.75rem;
     margin-top: 2px;
     max-width: 200px;
@@ -136,26 +136,26 @@
 }
 
 .status-active {
-  background-color: #e8f5e8 !important;
-  color: #2e7d32 !important;
+  background: var(--mat-sys-color-success-container, var(--mat-sys-color-surface)) !important;
+  color: var(--mat-sys-color-success, var(--mat-sys-color-primary)) !important;
 }
 
 .status-inactive {
-  background-color: #ffebee !important;
-  color: #c62828 !important;
+  background: var(--mat-sys-color-error-container, var(--mat-sys-color-surface)) !important;
+  color: var(--mat-sys-color-error) !important;
 }
 
 .no-data {
   text-align: center;
   padding: 40px;
-  color: #666;
+  color: var(--mat-sys-color-on-surface);
 
   mat-icon {
     font-size: 48px;
     width: 48px;
     height: 48px;
     margin-bottom: 16px;
-    color: #ccc;
+    color: var(--mat-sys-color-outline);
   }
 
   p {
@@ -221,7 +221,7 @@
 }
 
 .product-description {
-  color: #888;
+  color: var(--mat-sys-color-on-surface);
   font-size: 0.85em;
 }
 
@@ -230,27 +230,17 @@
   gap: 8px;
 }
 
-.status-active {
-  background: #e6f4ea !important;
-  color: #388e3c !important;
-}
-
-.status-inactive {
-  background: #fbe9e7 !important;
-  color: #d84315 !important;
-}
-
 .sticky-header {
   position: sticky;
   top: 0;
-  background: #fff;
+  background: var(--mat-sys-color-surface);
   z-index: 2;
 }
 
 .no-data {
   text-align: center;
   padding: 32px 0;
-  color: #888;
+  color: var(--mat-sys-color-on-surface);
 }
 
 // Responsive improvements
@@ -289,8 +279,8 @@
   }
 }
 .product-description.compact {
+  color: var(--mat-sys-color-on-surface);
   font-size: 0.7em;
-  color: #888;
   margin-top: 0;
   max-width: 120px;
   white-space: nowrap;

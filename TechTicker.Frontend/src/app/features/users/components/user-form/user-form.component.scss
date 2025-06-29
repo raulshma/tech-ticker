@@ -14,7 +14,7 @@
     margin: 0;
     font-size: 2rem;
     font-weight: 400;
-    color: #333;
+    color: var(--mat-sys-color-on-surface);
   }
 }
 
@@ -30,8 +30,8 @@
     margin: 0 0 20px 0;
     font-size: 1.25rem;
     font-weight: 500;
-    color: #333;
-    border-bottom: 2px solid #e0e0e0;
+    color: var(--mat-sys-color-on-surface);
+    border-bottom: 2px solid var(--mat-sys-color-outline);
     padding-bottom: 8px;
   }
 }
@@ -61,14 +61,14 @@
   flex-direction: column;
   gap: 8px;
   padding: 16px;
-  background-color: #f8f9fa;
+  background-color: var(--mat-sys-color-surface-variant, var(--mat-sys-color-surface));
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--mat-sys-color-outline);
   
   .status-label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--mat-sys-color-on-surface, rgba(0, 0, 0, 0.6));
   }
   
   .status-toggle {
@@ -77,7 +77,7 @@
   
   .status-hint {
     font-size: 0.75rem;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--mat-sys-color-on-surface, rgba(0, 0, 0, 0.6));
     margin-top: 4px;
   }
 }
@@ -88,43 +88,11 @@
   gap: 12px;
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--mat-sys-color-outline);
 }
 
 .form-spinner {
   margin-right: 8px;
-}
-
-// Form field customizations
-::ng-deep .mat-form-field-appearance-outline {
-  .mat-form-field-outline {
-    border-radius: 8px;
-  }
-  
-  .mat-form-field-outline-thick {
-    border-width: 2px;
-  }
-}
-
-// Multi-select customizations
-::ng-deep .mat-select-panel {
-  .mat-option {
-    &.mat-selected {
-      background-color: rgba(25, 118, 210, 0.12);
-      
-      &:not(.mat-option-disabled) {
-        color: #1976d2;
-      }
-    }
-  }
-}
-
-// Password field customizations
-::ng-deep .mat-form-field-suffix {
-  .mat-icon-button {
-    width: 40px;
-    height: 40px;
-  }
 }
 
 // Responsive design

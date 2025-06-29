@@ -14,7 +14,7 @@
     margin: 0;
     font-size: 2rem;
     font-weight: 400;
-    color: #333;
+    color: var(--mat-sys-color-on-surface);
   }
 }
 
@@ -42,7 +42,7 @@
 
   p {
     margin-top: 16px;
-    color: #666;
+    color: var(--mat-sys-color-on-surface);
   }
 }
 
@@ -86,7 +86,7 @@
 .product-info {
   .product-details {
     display: block;
-    color: #666;
+    color: var(--mat-sys-color-on-surface);
     font-size: 0.75rem;
     margin-top: 2px;
   }
@@ -96,7 +96,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #1976d2;
+  color: var(--mat-sys-color-primary);
   text-decoration: none;
   font-size: 0.875rem;
 
@@ -111,52 +111,42 @@
   }
 }
 
-.status-active {
-  background-color: #e8f5e8 !important;
-  color: #2e7d32 !important;
+.status-active, .status-success {
+  background-color: var(--mat-sys-color-success-container, var(--mat-sys-color-surface)) !important;
+  color: var(--mat-sys-color-success, var(--mat-sys-color-primary)) !important;
 }
 
-.status-inactive {
-  background-color: #ffebee !important;
-  color: #c62828 !important;
-}
-
-.status-success {
-  background-color: #e8f5e8 !important;
-  color: #2e7d32 !important;
-}
-
-.status-error {
-  background-color: #ffebee !important;
-  color: #c62828 !important;
+.status-inactive, .status-error {
+  background-color: var(--mat-sys-color-error-container, var(--mat-sys-color-surface)) !important;
+  color: var(--mat-sys-color-error) !important;
 }
 
 .status-pending {
-  background-color: #fff3e0 !important;
-  color: #f57c00 !important;
+  background-color: var(--mat-sys-color-warn-container, var(--mat-sys-color-surface)) !important;
+  color: var(--mat-sys-color-warn, var(--mat-sys-color-secondary)) !important;
 }
 
 .status-unknown {
-  background-color: #f5f5f5 !important;
-  color: #666 !important;
+  background-color: var(--mat-sys-color-surface-variant, var(--mat-sys-color-surface)) !important;
+  color: var(--mat-sys-color-on-surface) !important;
 }
 
 .never-scraped {
-  color: #999;
+  color: var(--mat-sys-color-on-surface);
   font-style: italic;
 }
 
 .no-data {
   text-align: center;
   padding: 40px;
-  color: #666;
+  color: var(--mat-sys-color-on-surface);
 
   mat-icon {
     font-size: 48px;
     width: 48px;
     height: 48px;
     margin-bottom: 16px;
-    color: #ccc;
+    color: var(--mat-sys-color-outline);
   }
 
   p {

@@ -26,12 +26,12 @@
           margin: 4px 0;
           font-size: 1.5rem;
           font-weight: 400;
-          color: #666;
+          color: var(--mat-sys-color-on-surface);
         }
 
         .product-details {
           margin: 4px 0 0 0;
-          color: #888;
+          color: var(--mat-sys-color-on-surface);
           font-size: 0.9rem;
         }
       }
@@ -81,7 +81,7 @@
     gap: 16px;
 
     p {
-      color: #666;
+      color: var(--mat-sys-color-on-surface);
       margin: 0;
     }
   }
@@ -101,7 +101,7 @@
       align-items: center;
       justify-content: center;
       padding: 40px;
-      color: #666;
+      color: var(--mat-sys-color-on-surface);
       gap: 16px;
 
       mat-icon {
@@ -124,29 +124,7 @@
 
     .price-cell {
       font-weight: 500;
-      color: #2e7d32;
-    }
-
-    mat-chip {
-      &.status-in-stock {
-        background-color: #e8f5e8;
-        color: #2e7d32;
-      }
-
-      &.status-out-of-stock {
-        background-color: #ffebee;
-        color: #c62828;
-      }
-
-      &.status-limited-stock {
-        background-color: #fff3e0;
-        color: #ef6c00;
-      }
-
-      &.status-unknown {
-        background-color: #f5f5f5;
-        color: #666;
-      }
+      color: var(--mat-sys-color-success, var(--mat-sys-color-primary));
     }
   }
 }
@@ -205,20 +183,20 @@
   .price-history-container {
     .header .title-section {
       h2 {
-        color: #ccc;
+        color: var(--mat-sys-color-on-surface);
       }
 
       .product-details {
-        color: #aaa;
+        color: var(--mat-sys-color-on-surface);
       }
     }
 
     .loading-container p {
-      color: #ccc;
+      color: var(--mat-sys-color-on-surface);
     }
 
     .no-data {
-      color: #ccc;
+      color: var(--mat-sys-color-on-surface);
 
       mat-icon {
         opacity: 0.3;
@@ -227,14 +205,7 @@
 
     .price-history-table {
       .price-cell {
-        color: #4caf50;
-      }
-
-      mat-chip {
-        &.status-unknown {
-          background-color: #424242;
-          color: #ccc;
-        }
+        color: var(--mat-sys-color-success, var(--mat-sys-color-primary));
       }
     }
   }

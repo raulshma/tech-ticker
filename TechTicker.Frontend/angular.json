@@ -34,7 +34,7 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"],
+            "styles": ["src/styles.scss", "src/themes/_theme-colors.scss"],
             "scripts": []
           },
           "configurations": {
@@ -92,7 +92,7 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"],
+            "styles": ["src/styles.scss", "src/themes/_theme-colors.scss"],
             "scripts": [],
             "karmaConfig": "karma.conf.js"
           }

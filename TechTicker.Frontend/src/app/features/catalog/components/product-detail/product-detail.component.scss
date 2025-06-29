@@ -13,7 +13,7 @@
   gap: 16px;
 
   p {
-    color: #666;
+    color: var(--mat-sys-color-on-surface);
     margin: 0;
   }
 }
@@ -32,15 +32,15 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #666;
+    color: var(--mat-sys-color-on-surface);
     font-size: 0.9rem;
 
     .breadcrumb-item {
-      color: #666;
+      color: var(--mat-sys-color-on-surface);
     }
 
     .breadcrumb-current {
-      color: #333;
+      color: var(--mat-sys-color-on-surface);
       font-weight: 500;
     }
 
@@ -64,7 +64,7 @@
       height: 400px;
       object-fit: cover;
       border-radius: 12px;
-      background: #f5f5f5;
+      background: var(--mat-sys-color-surface-variant, var(--mat-sys-color-surface));
     }
   }
 
@@ -79,7 +79,7 @@
         font-size: 2rem;
         font-weight: 500;
         line-height: 1.2;
-        color: #333;
+        color: var(--mat-sys-color-on-surface);
       }
 
       .product-meta {
@@ -88,13 +88,13 @@
         gap: 16px;
 
         .category-chip {
-          background: #e3f2fd;
-          color: #1976d2;
+          background: var(--mat-sys-color-primary-container, var(--mat-sys-color-surface));
+          color: var(--mat-sys-color-primary);
         }
 
         .product-sku {
           font-size: 0.9rem;
-          color: #666;
+          color: var(--mat-sys-color-on-surface);
         }
       }
     }
@@ -104,13 +104,13 @@
         margin: 0;
         font-size: 1rem;
         line-height: 1.6;
-        color: #666;
+        color: var(--mat-sys-color-on-surface);
       }
     }
 
     .pricing-summary {
       padding: 24px;
-      background: #f9f9f9;
+      background: var(--mat-sys-color-surface-variant, var(--mat-sys-color-surface));
       border-radius: 12px;
 
       .price-info {
@@ -121,14 +121,14 @@
 
           .price-label {
             font-size: 1rem;
-            color: #666;
+            color: var(--mat-sys-color-on-surface);
             margin-right: 12px;
           }
 
           .price-value {
             font-size: 2rem;
             font-weight: 600;
-            color: #2e7d32;
+            color: var(--mat-sys-color-success, var(--mat-sys-color-primary));
           }
         }
 
@@ -137,14 +137,14 @@
 
           .range-label {
             font-size: 0.9rem;
-            color: #666;
+            color: var(--mat-sys-color-on-surface);
             margin-right: 12px;
           }
 
           .range-value {
             font-size: 1.1rem;
             font-weight: 500;
-            color: #333;
+            color: var(--mat-sys-color-on-surface);
           }
         }
 
@@ -153,9 +153,9 @@
           align-items: center;
           gap: 8px;
           padding: 8px 12px;
-          background: #e8f5e8;
+          background: var(--mat-sys-color-success-container, var(--mat-sys-color-surface));
           border-radius: 6px;
-          color: #2e7d32;
+          color: var(--mat-sys-color-success, var(--mat-sys-color-primary));
 
           .savings-icon {
             font-size: 20px;
@@ -175,7 +175,7 @@
           display: flex;
           align-items: center;
           gap: 8px;
-          color: #666;
+          color: var(--mat-sys-color-on-surface);
 
           mat-icon {
             font-size: 20px;
@@ -212,7 +212,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 20px;
-      border: 1px solid #e0e0e0;
+      border: 1px solid var(--mat-sys-color-outline);
       border-radius: 8px;
       transition: all 0.2s ease;
 
@@ -221,8 +221,8 @@
       }
 
       &.best-price {
-        border-color: #2e7d32;
-        background: #f1f8e9;
+        border-color: var(--mat-sys-color-success, var(--mat-sys-color-primary));
+        background: var(--mat-sys-color-success-container, var(--mat-sys-color-surface));
         position: relative;
 
         &::before {
@@ -230,8 +230,8 @@
           position: absolute;
           top: -8px;
           left: 16px;
-          background: #2e7d32;
-          color: white;
+          background: var(--mat-sys-color-success, var(--mat-sys-color-primary));
+          color: var(--mat-sys-color-on-primary);
           padding: 4px 8px;
           border-radius: 4px;
           font-size: 0.75rem;
@@ -249,7 +249,7 @@
           .seller-name {
             font-size: 1.1rem;
             font-weight: 500;
-            color: #333;
+            color: var(--mat-sys-color-on-surface);
           }
 
           .stock-status {
@@ -264,16 +264,16 @@
               height: 16px;
             }
 
-            &.success { color: #2e7d32; }
-            &.warn { color: #d32f2f; }
-            &.accent { color: #f57c00; }
-            &.primary { color: #1976d2; }
+            &.success { color: var(--mat-sys-color-success, var(--mat-sys-color-primary)); }
+            &.warn { color: var(--mat-sys-color-error); }
+            &.accent { color: var(--mat-sys-color-warn, var(--mat-sys-color-secondary)); }
+            &.primary { color: var(--mat-sys-color-primary); }
           }
         }
 
         .last-updated {
           font-size: 0.875rem;
-          color: #666;
+          color: var(--mat-sys-color-on-surface);
         }
       }
 
@@ -285,7 +285,7 @@
         .price {
           font-size: 1.5rem;
           font-weight: 600;
-          color: #2e7d32;
+          color: var(--mat-sys-color-success, var(--mat-sys-color-primary));
         }
 
         button {
@@ -310,18 +310,18 @@
     font-size: 64px;
     width: 64px;
     height: 64px;
-    color: #ccc;
+    color: var(--mat-sys-color-outline);
     margin-bottom: 16px;
   }
 
   h3, h4 {
     margin: 0 0 8px 0;
-    color: #666;
+    color: var(--mat-sys-color-on-surface);
   }
 
   p {
     margin: 0;
-    color: #999;
+    color: var(--mat-sys-color-on-surface);
     max-width: 400px;
   }
 }
@@ -331,7 +331,7 @@
     margin: 0 0 24px 0;
     font-size: 1.5rem;
     font-weight: 500;
-    color: #333;
+    color: var(--mat-sys-color-on-surface);
   }
 
   .loading-history {
@@ -339,13 +339,13 @@
     align-items: center;
     gap: 16px;
     padding: 32px 0;
-    color: #666;
+    color: var(--mat-sys-color-on-surface);
   }
 
   .price-history-content {
     .history-info {
       margin: 0 0 24px 0;
-      color: #666;
+      color: var(--mat-sys-color-on-surface);
       font-size: 0.9rem;
     }
 
@@ -354,9 +354,9 @@
       width: 100%;
       margin-top: 16px;
       padding: 16px;
-      background: #fff;
+      background: var(--mat-sys-color-surface);
       border-radius: 8px;
-      border: 1px solid #e0e0e0;
+      border: 1px solid var(--mat-sys-color-outline);
     }
   }
 }
@@ -366,7 +366,7 @@
     margin: 0 0 24px 0;
     font-size: 1.5rem;
     font-weight: 500;
-    color: #333;
+    color: var(--mat-sys-color-on-surface);
   }
 
   .specs-grid {
@@ -378,16 +378,16 @@
       display: flex;
       justify-content: space-between;
       padding: 12px 16px;
-      background: #f9f9f9;
+      background: var(--mat-sys-color-surface-variant, var(--mat-sys-color-surface));
       border-radius: 6px;
 
       .spec-label {
         font-weight: 500;
-        color: #333;
+        color: var(--mat-sys-color-on-surface);
       }
 
       .spec-value {
-        color: #666;
+        color: var(--mat-sys-color-on-surface);
         text-align: right;
       }
     }

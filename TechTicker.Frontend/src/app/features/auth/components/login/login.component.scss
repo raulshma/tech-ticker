@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--mat-sys-color-primary) 0%, var(--mat-sys-color-secondary, var(--mat-sys-color-primary)) 100%);
   padding: 20px;
 }
 
@@ -26,7 +26,7 @@
   gap: 8px;
   font-size: 24px;
   font-weight: 600;
-  color: #333;
+  color: var(--mat-sys-color-on-surface);
   margin-bottom: 8px;
 }
 
@@ -34,11 +34,11 @@
   font-size: 28px;
   width: 28px;
   height: 28px;
-  color: #667eea;
+  color: var(--mat-sys-color-primary);
 }
 
 mat-card-subtitle {
-  color: #666;
+  color: var(--mat-sys-color-on-surface);
   margin-bottom: 20px;
 }
 
@@ -71,32 +71,32 @@ mat-card-subtitle {
 .login-footer {
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--mat-sys-color-outline);
 }
 
 .demo-credentials {
   text-align: center;
-  color: #666;
-  background: #f5f5f5;
+  color: var(--mat-sys-color-on-surface);
+  background: var(--mat-sys-color-surface-variant, var(--mat-sys-color-surface));
   padding: 12px;
   border-radius: 6px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid var(--mat-sys-color-primary);
 }
 
 .demo-credentials strong {
-  color: #333;
+  color: var(--mat-sys-color-on-surface);
 }
 
 // Material form field customizations
-::ng-deep .mat-form-field-appearance-outline {
-  .mat-form-field-outline {
-    border-radius: 8px;
-  }
-  
-  .mat-form-field-outline-thick {
-    border-width: 2px;
-  }
-}
+// ::ng-deep .mat-form-field-appearance-outline {
+//   .mat-form-field-outline {
+//     border-radius: 8px;
+//   }
+//   
+//   .mat-form-field-outline-thick {
+//     border-width: 2px;
+//   }
+// }
 
 // Responsive design
 @media (max-width: 480px) {
