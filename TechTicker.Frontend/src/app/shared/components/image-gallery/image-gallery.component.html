@@ -18,14 +18,14 @@
 
       <!-- Navigation arrows for multiple images -->
       <div *ngIf="allImageUrls.length > 1" class="image-navigation">
-        <button mat-icon-button
+        <button matIconButton
                 class="nav-button nav-previous"
                 (click)="previousImage($event)"
                 matTooltip="Previous image">
           <mat-icon>chevron_left</mat-icon>
         </button>
 
-        <button mat-icon-button
+        <button matIconButton
                 class="nav-button nav-next"
                 (click)="nextImage($event)"
                 matTooltip="Next image">

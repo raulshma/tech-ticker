@@ -151,21 +151,19 @@
         <!-- Action Buttons -->
         <div class="action-section">
           <div class="action-buttons">
-            <button mat-raised-button 
+            <button matButton="filled" 
                     color="primary" 
                     type="submit"
-                    [disabled]="assistantForm.invalid || isLoading"
-                    class="primary-action-btn">
+                    [disabled]="assistantForm.invalid || isLoading">
               <mat-spinner diameter="20" *ngIf="isLoading" class="btn-spinner"></mat-spinner>
               <mat-icon *ngIf="!isLoading">send</mat-icon>
               {{ isLoading ? 'Processing...' : 'Generate Response' }}
             </button>
             
-            <button mat-outlined-button 
+            <button matButton="outlined" 
                     type="button"
                     (click)="clearForm()"
-                    [disabled]="isLoading"
-                    class="secondary-action-btn">
+                    [disabled]="isLoading">
               <mat-icon>clear</mat-icon>
               Clear
             </button>
@@ -210,7 +208,7 @@
                   </mat-chip>
                 </div>
                 <div class="response-actions">
-                  <button mat-icon-button 
+                  <button matIconButton 
                           (click)="copyResponse()"
                           matTooltip="Copy response">
                     <mat-icon>content_copy</mat-icon>

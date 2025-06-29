@@ -112,7 +112,7 @@
           <mat-icon>cancel</mat-icon>
           Cancel
         </button>
-        <button mat-raised-button color="primary" (click)="parseProxies()" [disabled]="parsing || importForm.invalid">
+        <button matButton="filled" color="primary" (click)="parseProxies()" [disabled]="parsing || importForm.invalid">
           <mat-spinner diameter="20" *ngIf="parsing"></mat-spinner>
           <mat-icon *ngIf="!parsing">preview</mat-icon>
           {{ parsing ? parseProgressMessage || 'Parsing...' : 'Parse & Preview' }}
@@ -182,7 +182,7 @@
           </mat-select>
         </mat-form-field>
 
-        <button mat-button (click)="clearFilters()" class="clear-filters-btn">
+        <button matButton (click)="clearFilters()">
           <mat-icon>clear</mat-icon>
           Clear Filters
         </button>
@@ -284,7 +284,7 @@
             </div>
 
             <div class="proxy-cell test-column">
-              <button mat-icon-button
+              <button matIconButton
                       (click)="testProxy(proxy)"
                       [disabled]="isProxyTesting(proxy) || !proxy.isValid"
                       matTooltip="Test proxy connection">
@@ -328,7 +328,7 @@
           <mat-icon *ngIf="!validating">check_circle</mat-icon>
           {{ validating ? 'Validating...' : 'Validate' }}
         </button>
-        <button mat-raised-button color="primary" (click)="performImport()"
+        <button matButton="filled" color="primary" (click)="performImport()"
                 [disabled]="importing || getValidProxiesCount() === 0">
           <mat-spinner diameter="20" *ngIf="importing"></mat-spinner>
           <mat-icon *ngIf="!importing">upload</mat-icon>
@@ -387,7 +387,7 @@
           <mat-icon>refresh</mat-icon>
           Import More
         </button>
-        <button mat-raised-button color="primary" (click)="onCancel()">
+        <button matButton="filled" color="primary" (click)="onCancel()">
           <mat-icon>list</mat-icon>
           View Proxy List
         </button>

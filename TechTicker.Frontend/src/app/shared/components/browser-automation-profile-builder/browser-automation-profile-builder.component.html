@@ -8,7 +8,7 @@
           <p class="mat-body-large welcome-subtitle">Configure browser automation settings for web scraping</p>
         </div>
         <div class="header-actions">
-          <button mat-stroked-button 
+          <button matButton="outlined" 
                   color="primary" 
                   type="button" 
                   (click)="toggleRawJson()" 
@@ -144,7 +144,7 @@
                     <h4 class="mat-title-medium">HTTP Headers</h4>
                     <p class="mat-body-small">Add custom headers that will be sent with all requests</p>
                   </div>
-                  <button mat-raised-button 
+                  <button matButton="filled" 
                           color="primary" 
                           type="button" 
                           (click)="addHeader()" 
@@ -184,7 +184,7 @@
                       </mat-error>
                     </mat-form-field>
                     
-                    <button mat-icon-button 
+                    <button matIconButton 
                             color="warn" 
                             type="button" 
                             (click)="removeHeader(i)" 
@@ -255,7 +255,7 @@
                       
                       <div class="ai-actions">
                         <div class="ai-action-buttons">
-                          <button mat-raised-button 
+                          <button matButton="filled" 
                                   color="primary" 
                                   type="button"
                                   (click)="generateActionsWithAI()"
@@ -340,11 +340,10 @@
                         </mat-form-field>
                       </div>
                       <div class="action-controls">
-                        <button mat-icon-button 
+                        <button matIconButton 
                                 color="warn" 
                                 type="button" 
                                 (click)="removeAction(i)" 
-                                class="delete-action-btn"
                                 matTooltip="Remove action">
                           <mat-icon>delete</mat-icon>
                         </button>
@@ -437,7 +436,7 @@
               <div class="json-preview-modern">
                 <div class="preview-header">
                   <h4 class="mat-title-medium">Generated Configuration</h4>
-                  <button mat-icon-button 
+                  <button matIconButton 
                           color="primary" 
                           (click)="copyToClipboard()" 
                           matTooltip="Copy JSON to clipboard">

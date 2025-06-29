@@ -42,7 +42,7 @@
           <div class="error-text">
             <h3 class="mat-headline-small">Configuration Error</h3>
             <p class="mat-body-medium">{{ errorMessage }}</p>
-            <button mat-raised-button color="primary" (click)="retryLastOperation()">
+            <button matButton="filled" color="primary" (click)="retryLastOperation()">
               <mat-icon>refresh</mat-icon>
               Retry
             </button>
@@ -155,7 +155,7 @@
                          formControlName="password" 
                          placeholder="Enter password"
                          autocomplete="new-password">
-                  <button mat-icon-button matSuffix 
+                  <button matIconButton matSuffix 
                           type="button"
                           (click)="hidePassword = !hidePassword"
                           [attr.aria-label]="'Hide password'"
@@ -251,33 +251,30 @@
       <mat-card-actions class="form-actions">
         <div class="actions-container">
           <div class="secondary-actions">
-            <button mat-outlined-button 
+            <button matButton="outlined" 
                     type="button" 
                     (click)="onCancel()"
-                    [disabled]="loading"
-                    class="cancel-btn">
+                    [disabled]="loading">
               <mat-icon>arrow_back</mat-icon>
               Back to List
             </button>
 
-            <button mat-outlined-button 
+            <button matButton="outlined" 
                     type="button" 
                     color="accent"
                     (click)="testConnection()"
-                    [disabled]="loading || !canTestConnection()"
-                    class="test-btn">
+                    [disabled]="loading || !canTestConnection()">
               <mat-icon>network_check</mat-icon>
               Test Connection
             </button>
           </div>
 
           <div class="primary-actions">
-            <button mat-raised-button 
+            <button matButton="filled" 
                     type="submit"
                     color="primary"
                     (click)="onSubmit()"
-                    [disabled]="loading || proxyForm.invalid"
-                    class="save-btn">
+                    [disabled]="loading || proxyForm.invalid">
               <mat-icon>{{ isEditMode ? 'save' : 'add_circle' }}</mat-icon>
               {{ isEditMode ? 'Update Proxy' : 'Create Proxy' }}
             </button>

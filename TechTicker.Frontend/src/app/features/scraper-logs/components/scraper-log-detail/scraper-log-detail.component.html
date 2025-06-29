@@ -82,8 +82,8 @@
               <label class="info-label">Mapping ID</label>
               <div class="info-value-container">
                 <span class="info-value">{{ scraperLog.mappingId }}</span>
-                <button mat-icon-button (click)="copyToClipboard(scraperLog.mappingId!)" 
-                        matTooltip="Copy Mapping ID" class="copy-small-btn">
+                <button matIconButton (click)="copyToClipboard(scraperLog.mappingId!)" 
+                        matTooltip="Copy Mapping ID">
                   <mat-icon>content_copy</mat-icon>
                 </button>
               </div>
@@ -126,12 +126,12 @@
               <div class="url-display">
                 <span class="url-text">{{ scraperLog.targetUrl }}</span>
                 <div class="url-actions">
-                  <button mat-icon-button (click)="copyToClipboard(scraperLog.targetUrl!)" 
-                          matTooltip="Copy URL" class="copy-small-btn">
+                  <button matIconButton (click)="copyToClipboard(scraperLog.targetUrl!)" 
+                          matTooltip="Copy URL">
                     <mat-icon>content_copy</mat-icon>
                   </button>
-                  <button mat-icon-button (click)="openUrl(scraperLog.targetUrl!)" 
-                          matTooltip="Open URL" class="open-url-btn">
+                  <button matIconButton (click)="openUrl(scraperLog.targetUrl!)" 
+                          matTooltip="Open URL">
                     <mat-icon>open_in_new</mat-icon>
                   </button>
                 </div>
@@ -142,8 +142,8 @@
               <label class="info-label">User Agent</label>
               <div class="user-agent-display">
                 <span class="user-agent-text">{{ scraperLog.userAgent }}</span>
-                <button mat-icon-button (click)="copyToClipboard(scraperLog.userAgent!)" 
-                        matTooltip="Copy User Agent" class="copy-small-btn">
+                <button matIconButton (click)="copyToClipboard(scraperLog.userAgent!)" 
+                        matTooltip="Copy User Agent">
                   <mat-icon>content_copy</mat-icon>
                 </button>
               </div>
@@ -170,8 +170,8 @@
                   <mat-icon matChipAvatar>security</mat-icon>
                   {{ scraperLog.proxyUsed }}
                 </mat-chip>
-                <button mat-icon-button (click)="copyToClipboard(scraperLog.proxyUsed!)" 
-                        matTooltip="Copy Proxy" class="copy-small-btn">
+                <button matIconButton (click)="copyToClipboard(scraperLog.proxyUsed!)" 
+                        matTooltip="Copy Proxy">
                   <mat-icon>content_copy</mat-icon>
                 </button>
               </div>
@@ -181,8 +181,8 @@
               <label class="info-label">Proxy ID</label>
               <div class="info-value-container">
                 <code class="proxy-id">{{ scraperLog.proxyId }}</code>
-                <button mat-icon-button (click)="copyToClipboard(scraperLog.proxyId!)" 
-                        matTooltip="Copy Proxy ID" class="copy-small-btn">
+                <button matIconButton (click)="copyToClipboard(scraperLog.proxyId!)" 
+                        matTooltip="Copy Proxy ID">
                   <mat-icon>content_copy</mat-icon>
                 </button>
               </div>
@@ -294,12 +294,12 @@
               <div class="image-url-item">
                 <span class="url-display">{{ scraperLog.extractedPrimaryImageUrl }}</span>
                 <div class="image-actions">
-                  <button mat-icon-button (click)="copyToClipboard(scraperLog.extractedPrimaryImageUrl!)" 
-                          matTooltip="Copy URL" class="copy-small-btn">
+                  <button matIconButton (click)="copyToClipboard(scraperLog.extractedPrimaryImageUrl!)" 
+                          matTooltip="Copy URL">
                     <mat-icon>content_copy</mat-icon>
                   </button>
-                  <button mat-icon-button (click)="openUrl(scraperLog.extractedPrimaryImageUrl!)" 
-                          matTooltip="View Image" class="view-image-btn">
+                  <button matIconButton (click)="openUrl(scraperLog.extractedPrimaryImageUrl!)" 
+                          matTooltip="View Image">
                     <mat-icon>visibility</mat-icon>
                   </button>
                 </div>
@@ -314,12 +314,12 @@
                   <span class="image-index">{{ i + 1 }}.</span>
                   <span class="url-display">{{ imageUrl }}</span>
                   <div class="image-actions">
-                    <button mat-icon-button (click)="copyToClipboard(imageUrl)" 
-                            matTooltip="Copy URL" class="copy-small-btn">
+                    <button matIconButton (click)="copyToClipboard(imageUrl)" 
+                            matTooltip="Copy URL">
                       <mat-icon>content_copy</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="openUrl(imageUrl)" 
-                            matTooltip="View Image" class="view-image-btn">
+                    <button matIconButton (click)="openUrl(imageUrl)" 
+                            matTooltip="View Image">
                       <mat-icon>visibility</mat-icon>
                     </button>
                   </div>
@@ -343,8 +343,8 @@
           <div class="error-display">
             <div class="error-content">
               <pre class="error-message">{{ scraperLog.errorMessage }}</pre>
-              <button mat-icon-button (click)="copyToClipboard(scraperLog.errorMessage!)" 
-                      matTooltip="Copy Error Message" class="copy-error-btn">
+              <button matIconButton (click)="copyToClipboard(scraperLog.errorMessage!)" 
+                      matTooltip="Copy Error Message">
                 <mat-icon>content_copy</mat-icon>
               </button>
             </div>

@@ -341,37 +341,33 @@
                   <mat-header-cell *matHeaderCellDef class="actions-header">Actions</mat-header-cell>
                   <mat-cell *matCellDef="let proxy" class="actions-cell">
                     <div class="actions-group">
-                      <button mat-icon-button
-                              [class]="proxy.isActive ? 'action-btn disable-btn' : 'action-btn enable-btn'"
-                              (click)="toggleProxyStatus(proxy)"
-                              [matTooltip]="proxy.isActive ? 'Disable' : 'Enable'"
-                              *hasPermission="'Proxies.Update'">
-                        <mat-icon>{{ proxy.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
-                      </button>
+                                        <button matIconButton
+                          (click)="toggleProxyStatus(proxy)"
+                          [matTooltip]="proxy.isActive ? 'Disable' : 'Enable'"
+                          *hasPermission="'Proxies.Update'">
+                    <mat-icon>{{ proxy.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
+                  </button>
 
-                      <button mat-icon-button
-                              class="action-btn test-btn"
-                              (click)="testProxy(proxy)"
-                              matTooltip="Test Proxy"
-                              *hasPermission="'Proxies.Test'">
-                        <mat-icon>network_check</mat-icon>
-                      </button>
+                  <button matIconButton
+                          (click)="testProxy(proxy)"
+                          matTooltip="Test Proxy"
+                          *hasPermission="'Proxies.Test'">
+                    <mat-icon>network_check</mat-icon>
+                  </button>
 
-                      <button mat-icon-button
-                              class="action-btn edit-btn"
-                              [routerLink]="['/admin/proxies/edit', proxy.proxyConfigurationId]"
-                              matTooltip="Edit"
-                              *hasPermission="'Proxies.Update'">
-                        <mat-icon>edit</mat-icon>
-                      </button>
+                  <button matIconButton
+                          [routerLink]="['/admin/proxies/edit', proxy.proxyConfigurationId]"
+                          matTooltip="Edit"
+                          *hasPermission="'Proxies.Update'">
+                    <mat-icon>edit</mat-icon>
+                  </button>
 
-                      <button mat-icon-button
-                              class="action-btn delete-btn"
-                              (click)="deleteProxy(proxy)"
-                              matTooltip="Delete"
-                              *hasPermission="'Proxies.Delete'">
-                        <mat-icon>delete</mat-icon>
-                      </button>
+                  <button matIconButton
+                          (click)="deleteProxy(proxy)"
+                          matTooltip="Delete"
+                          *hasPermission="'Proxies.Delete'">
+                    <mat-icon>delete</mat-icon>
+                  </button>
                     </div>
                   </mat-cell>
                 </ng-container>
@@ -487,32 +483,28 @@
                 <!-- Actions -->
                 <div class="proxy-cell actions-column">
                   <div class="actions-group">
-                    <button mat-icon-button
-                            [class]="proxy.isActive ? 'action-btn disable-btn' : 'action-btn enable-btn'"
+                    <button matIconButton
                             (click)="toggleProxyStatus(proxy)"
                             [matTooltip]="proxy.isActive ? 'Disable' : 'Enable'"
                             *hasPermission="'Proxies.Update'">
                       <mat-icon>{{ proxy.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
                     </button>
 
-                    <button mat-icon-button
-                            class="action-btn test-btn"
+                    <button matIconButton
                             (click)="testProxy(proxy)"
                             matTooltip="Test Proxy"
                             *hasPermission="'Proxies.Test'">
                       <mat-icon>network_check</mat-icon>
                     </button>
 
-                    <button mat-icon-button
-                            class="action-btn edit-btn"
+                    <button matIconButton
                             [routerLink]="['/admin/proxies/edit', proxy.proxyConfigurationId]"
                             matTooltip="Edit"
                             *hasPermission="'Proxies.Update'">
                       <mat-icon>edit</mat-icon>
                     </button>
 
-                    <button mat-icon-button
-                            class="action-btn delete-btn"
+                    <button matIconButton
                             (click)="deleteProxy(proxy)"
                             matTooltip="Delete"
                             *hasPermission="'Proxies.Delete'">
@@ -534,11 +526,11 @@
               <h3 class="mat-headline-small">No Proxies Configured</h3>
               <p class="mat-body-medium">Get started by adding your first proxy configuration for web scraping.</p>
               <div class="empty-actions">
-                <button mat-raised-button color="primary" routerLink="/admin/proxies/add" *hasPermission="'Proxies.Create'">
+                <button matButton="filled" color="primary" routerLink="/admin/proxies/add" *hasPermission="'Proxies.Create'">
                   <mat-icon>add</mat-icon>
                   Add First Proxy
                 </button>
-                <button mat-outlined-button routerLink="/admin/proxies/bulk-import" *hasPermission="'Proxies.BulkImport'">
+                <button matButton="outlined" routerLink="/admin/proxies/bulk-import" *hasPermission="'Proxies.BulkImport'">
                   <mat-icon>upload</mat-icon>
                   Bulk Import
                 </button>

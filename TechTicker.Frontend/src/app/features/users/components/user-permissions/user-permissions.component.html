@@ -41,7 +41,7 @@
         </div>
         <h3 class="mat-headline-small error-title">Failed to Load Permissions</h3>
         <p class="mat-body-medium error-message">{{ error }}</p>
-        <button mat-raised-button color="primary" (click)="loadPermissions()" class="retry-btn">
+        <button matButton="filled" color="primary" (click)="loadPermissions()">
           <mat-icon>refresh</mat-icon>
           Try Again
         </button>
@@ -85,7 +85,7 @@
                   <mat-icon class="permission-icon">security</mat-icon>
                   <span class="permission-name">{{ permission.name }}</span>
                   <button 
-                    mat-icon-button 
+                    matIconButton 
                     class="remove-permission-btn"
                     (click)="removePermission(permission)"
                     [disabled]="isUpdating"
@@ -194,7 +194,7 @@
           
           <div class="actions-buttons">
             <button 
-              mat-outlined-button 
+              matButton="outlined" 
               class="reset-btn"
               (click)="resetChanges()"
               [disabled]="isUpdating">
@@ -203,7 +203,7 @@
             </button>
             
             <button 
-              mat-raised-button 
+              matButton="filled" 
               color="primary"
               class="save-btn"
               (click)="saveChanges()"

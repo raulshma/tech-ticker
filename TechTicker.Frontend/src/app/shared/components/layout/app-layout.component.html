@@ -303,7 +303,7 @@
     <mat-toolbar color="primary" class="main-toolbar">
       <div class="toolbar-content">
         <div class="toolbar-start">
-          <button mat-icon-button 
+          <button matIconButton 
                   class="menu-button"
                   (click)="toggleSidenav()"
                   *ngIf="isMobile"
@@ -315,7 +315,7 @@
 
         <div class="toolbar-end">
           <!-- User menu -->
-          <button mat-icon-button 
+          <button matIconButton 
                   class="user-menu-button"
                   [matMenuTriggerFor]="userMenu" 
                   *ngIf="currentUser"
@@ -339,7 +339,7 @@
             </button>
           </mat-menu>
 
-          <button mat-icon-button
+          <button matIconButton
                   class="theme-toggle-button"
                   (click)="toggleTheme()" 
                   [attr.aria-label]="themeTooltip"

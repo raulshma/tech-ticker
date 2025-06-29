@@ -254,8 +254,7 @@
                 <mat-header-cell *matHeaderCellDef class="actions-header">Actions</mat-header-cell>
                 <mat-cell *matCellDef="let log" class="actions-cell">
                   <div class="actions-group">
-                    <button mat-icon-button 
-                            class="action-btn view-btn"
+                    <button matIconButton 
                             (click)="viewDetail(log.runId!)"
                             matTooltip="View Details"
                             *hasPermission="'Scrapers.ViewLogs'">
@@ -276,7 +275,7 @@
               <mat-icon class="no-data-icon">search_off</mat-icon>
               <h3 class="mat-headline-medium no-data-title">No scraper logs found</h3>
               <p class="mat-body-large no-data-subtitle">Try adjusting your filters or check back later</p>
-              <button mat-raised-button color="primary" (click)="clearFilters()" class="clear-filters-action">
+              <button matButton="filled" color="primary" (click)="clearFilters()">
                 <mat-icon>clear</mat-icon>
                 Clear All Filters
               </button>

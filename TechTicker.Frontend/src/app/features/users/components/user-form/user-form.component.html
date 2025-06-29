@@ -10,10 +10,10 @@
           </p>
         </div>
         <div class="header-actions">
-          <button mat-outlined-button class="back-action-btn" (click)="onCancel()">
-            <mat-icon>arrow_back</mat-icon>
-            Back to Users
-          </button>
+                  <button matButton="outlined" (click)="onCancel()">
+          <mat-icon>arrow_back</mat-icon>
+          Back to Users
+        </button>
         </div>
       </div>
     </div>
@@ -80,7 +80,7 @@
                          formControlName="password" 
                          [type]="hidePassword ? 'password' : 'text'"
                          placeholder="Enter a secure password">
-                  <button mat-icon-button 
+                  <button matIconButton 
                           matSuffix 
                           type="button"
                           (click)="togglePasswordVisibility()" 
@@ -194,7 +194,7 @@
             <div class="actions-container">
               <button 
                 type="button" 
-                mat-outlined-button 
+                matButton="outlined" 
                 class="cancel-btn"
                 (click)="onCancel()"
                 [disabled]="isLoading">
@@ -204,7 +204,7 @@
               
               <button 
                 type="submit" 
-                mat-raised-button 
+                matButton="filled" 
                 color="primary"
                 class="submit-btn"
                 [disabled]="userForm.invalid || isLoading">
