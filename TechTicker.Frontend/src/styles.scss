@@ -1,0 +1,90 @@
+@use "@angular/material" as mat;
+@use "./themes/_theme-colors.scss" as theme-colors;
+
+/* Global styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  @include mat.theme(
+    (
+      color: (
+        primary: theme-colors.$primary-palette,
+        secondary: theme-colors.$secondary-palette,
+        tertiary: theme-colors.$accent-palette,
+        background: theme-colors.$background-palette,
+      ),
+      typography: (
+        plain-family: Poppins,
+        brand-family: Montserrat,
+      ),
+      density: -3,
+    )
+  );
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--mat-sys-color-background, #fafafa);
+}
+
+.dark-theme {
+  @include mat.theme(
+    (
+      color: (
+        primary: theme-colors.$primary-palette-dark,
+        secondary: theme-colors.$secondary-palette-dark,
+        tertiary: theme-colors.$accent-palette-dark,
+        background: theme-colors.$background-palette-dark,
+      ),
+      typography: (
+        plain-family: Poppins,
+        brand-family: Montserrat,
+      ),
+      density: -3,
+    )
+  );
+  color-scheme: dark;
+}
+
+// /* Fix for Material Design components */
+// .mat-mdc-card {
+//   box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+// }
+
+// .mat-mdc-table {
+//   background: white;
+// }
+
+// /* Ensure proper spacing and layout */
+// .mat-mdc-form-field {
+//   width: 100%;
+// }
+
+// /* Fix button styling */
+// .mat-mdc-raised-button {
+//   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+// }
+
+// /* Improve table styling */
+// .mat-mdc-table .mat-mdc-header-cell {
+//   font-weight: 600;
+//   color: #333;
+// }
+
+// .mat-mdc-table .mat-mdc-cell {
+//   border-bottom: 1px solid #e0e0e0;
+// }
+
+// /* Fix chip styling */
+// .mat-mdc-chip-set {
+//   margin: 0;
+// }
+
+// .mat-mdc-chip {
+//   font-size: 0.75rem;
+// }

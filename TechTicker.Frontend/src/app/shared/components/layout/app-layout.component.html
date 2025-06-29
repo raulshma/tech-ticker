@@ -130,6 +130,10 @@
           <span>Logout</span>
         </button>
       </mat-menu>
+
+      <button mat-icon-button (click)="toggleTheme()" [attr.aria-label]="isDarkTheme ? 'Switch to light mode' : 'Switch to dark mode'">
+        <mat-icon>{{ isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
+      </button>
     </mat-toolbar>
 
     <!-- Page content -->
