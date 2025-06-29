@@ -1,330 +1,370 @@
 <div class="scraper-log-detail-container">
-  <!-- Header -->
-  <div class="header-section">
-    <button mat-icon-button (click)="goBack()" class="back-button">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1>Scraper Run Log Details</h1>
-  </div>
+  <!-- Modern Header Section -->
+  <header class="detail-header-section">
+    <div class="header-content">
+      <div class="header-main">
+        <div class="back-navigation">
+          <button mat-icon-button (click)="goBack()" class="back-button" matTooltip="Back to Logs">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+        </div>
+        <div class="title-section">
+          <h1 class="mat-display-small">Scraper Log Details</h1>
+          <p class="mat-body-large header-subtitle" *ngIf="scraperLog">
+            Run ID: <code>{{ scraperLog.runId }}</code>
+          </p>
+        </div>
+        <div class="header-actions" *ngIf="scraperLog">
+          <button mat-icon-button (click)="copyToClipboard(scraperLog.runId!)" matTooltip="Copy Run ID" class="copy-btn">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
 
   <!-- Loading Spinner -->
-  <div *ngIf="isLoading" class="loading-container">
-    <mat-spinner diameter="50"></mat-spinner>
-    <p>Loading scraper log details...</p>
+  <div *ngIf="isLoading" class="loading-container" role="status" aria-live="polite">
+    <mat-spinner diameter="48" strokeWidth="4"></mat-spinner>
+    <p class="mat-body-large loading-text">Loading scraper log details...</p>
   </div>
 
   <!-- Main Content -->
   <div *ngIf="!isLoading && scraperLog" class="content-section">
+    <div class="content-grid">
 
-    <!-- Basic Information -->
-    <mat-card class="info-card">
-      <mat-card-header>
-        <mat-card-title>Basic Information</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>Run ID:</label>
-            <span class="value">{{scraperLog.runId}}</span>
-            <button mat-icon-button (click)="copyToClipboard(scraperLog.runId!)" matTooltip="Copy Run ID">
-              <mat-icon>content_copy</mat-icon>
-            </button>
+      <!-- Status Overview Card -->
+      <mat-card class="status-overview-card" appearance="outlined">
+        <mat-card-header>
+          <div class="status-header-content">
+            <div class="status-icon-container" [class]="'status-' + getStatusColor(scraperLog.status)">
+              <mat-icon>{{ getStatusIcon(scraperLog.status) }}</mat-icon>
+            </div>
+            <div class="status-text">
+              <mat-card-title class="mat-headline-medium">{{ scraperLog.statusDisplayName || scraperLog.status }}</mat-card-title>
+              <mat-card-subtitle class="mat-body-medium">Execution Status</mat-card-subtitle>
+            </div>
           </div>
-
-          <div class="info-item">
-            <label>Mapping ID:</label>
-            <span class="value">{{scraperLog.mappingId}}</span>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="status-metrics">
+            <div class="metric-item">
+              <span class="metric-label">Started</span>
+              <span class="metric-value">{{ formatDate(scraperLog.startedAt) }}</span>
+            </div>
+            <div class="metric-item" *ngIf="scraperLog.completedAt">
+              <span class="metric-label">Completed</span>
+              <span class="metric-value">{{ formatDate(scraperLog.completedAt) }}</span>
+            </div>
+            <div class="metric-item" *ngIf="scraperLog.duration">
+              <span class="metric-label">Duration</span>
+              <span class="metric-value">{{ formatDuration(scraperLog.duration) }}</span>
+            </div>
+            <div class="metric-item" *ngIf="scraperLog.attemptNumber">
+              <span class="metric-label">Attempt</span>
+              <span class="metric-value">#{{ scraperLog.attemptNumber }}</span>
+            </div>
           </div>
+        </mat-card-content>
+      </mat-card>
 
-          <div class="info-item">
-            <label>Status:</label>
-            <mat-chip [color]="getStatusColor(scraperLog.status)" selected>
-              <mat-icon matChipAvatar>{{getStatusIcon(scraperLog.status)}}</mat-icon>
-              {{scraperLog.statusDisplayName || scraperLog.status}}
-            </mat-chip>
+      <!-- Basic Information -->
+      <mat-card class="info-card basic-info" appearance="outlined">
+        <mat-card-header>
+          <mat-card-title class="mat-headline-small">
+            <mat-icon>info</mat-icon>
+            Basic Information
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-grid">
+            <div class="info-item">
+              <label class="info-label">Mapping ID</label>
+              <div class="info-value-container">
+                <span class="info-value">{{ scraperLog.mappingId }}</span>
+                <button mat-icon-button (click)="copyToClipboard(scraperLog.mappingId!)" 
+                        matTooltip="Copy Mapping ID" class="copy-small-btn">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="info-item" *ngIf="scraperLog.httpStatusCode">
+              <label class="info-label">HTTP Status</label>
+              <div class="info-value-container">
+                <mat-chip [class]="getHttpStatusClass(scraperLog.httpStatusCode)">
+                  {{ scraperLog.httpStatusCode }}
+                </mat-chip>
+              </div>
+            </div>
+
+            <div class="info-item" *ngIf="scraperLog.responseTime">
+              <label class="info-label">Response Time</label>
+              <span class="info-value">{{ formatDuration(scraperLog.responseTime) }}</span>
+            </div>
+
+            <div class="info-item" *ngIf="scraperLog.responseSizeBytes">
+              <label class="info-label">Response Size</label>
+              <span class="info-value">{{ formatBytes(scraperLog.responseSizeBytes) }}</span>
+            </div>
           </div>
+        </mat-card-content>
+      </mat-card>
 
-          <div class="info-item">
-            <label>Started At:</label>
-            <span class="value">{{formatDate(scraperLog.startedAt)}}</span>
-          </div>
+      <!-- Target Information -->
+      <mat-card class="info-card target-info" appearance="outlined">
+        <mat-card-header>
+          <mat-card-title class="mat-headline-small">
+            <mat-icon>language</mat-icon>
+            Target Information
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-grid">
+            <div class="info-item full-width">
+              <label class="info-label">Target URL</label>
+              <div class="url-display">
+                <span class="url-text">{{ scraperLog.targetUrl }}</span>
+                <div class="url-actions">
+                  <button mat-icon-button (click)="copyToClipboard(scraperLog.targetUrl!)" 
+                          matTooltip="Copy URL" class="copy-small-btn">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="openUrl(scraperLog.targetUrl!)" 
+                          matTooltip="Open URL" class="open-url-btn">
+                    <mat-icon>open_in_new</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
 
-          <div class="info-item" *ngIf="scraperLog.completedAt">
-            <label>Completed At:</label>
-            <span class="value">{{formatDate(scraperLog.completedAt)}}</span>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.duration">
-            <label>Duration:</label>
-            <span class="value">{{formatDuration(scraperLog.duration)}}</span>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.attemptNumber">
-            <label>Attempt Number:</label>
-            <span class="value">{{scraperLog.attemptNumber}}</span>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Target Information -->
-    <mat-card class="info-card">
-      <mat-card-header>
-        <mat-card-title>Target Information</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item full-width">
-            <label>Target URL:</label>
-            <span class="value url-value">{{scraperLog.targetUrl}}</span>
-            <button mat-icon-button (click)="copyToClipboard(scraperLog.targetUrl!)" matTooltip="Copy URL">
-              <mat-icon>content_copy</mat-icon>
-            </button>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.userAgent">
-            <label>User Agent:</label>
-            <span class="value">{{scraperLog.userAgent}}</span>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.httpStatusCode">
-            <label>HTTP Status:</label>
-            <span class="value">{{scraperLog.httpStatusCode}}</span>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.responseTime">
-            <label>Response Time:</label>
-            <span class="value">{{formatDuration(scraperLog.responseTime)}}</span>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.responseSizeBytes">
-            <label>Response Size:</label>
-            <span class="value">{{formatBytes(scraperLog.responseSizeBytes)}}</span>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Proxy Information -->
-    <mat-card class="info-card" *ngIf="hasProxyData()">
-      <mat-card-header>
-        <mat-card-title>Proxy Information</mat-card-title>
-        <mat-card-subtitle>Proxy used for this scraping operation</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item" *ngIf="scraperLog?.proxyUsed">
-            <label>Proxy Used:</label>
-            <span class="value proxy-value">{{scraperLog.proxyUsed}}</span>
-            <button mat-icon-button (click)="copyToClipboard(scraperLog.proxyUsed!)" matTooltip="Copy Proxy">
-              <mat-icon>content_copy</mat-icon>
-            </button>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.proxyId">
-            <label>Proxy ID:</label>
-            <span class="value proxy-id-value">{{scraperLog.proxyId}}</span>
-            <button mat-icon-button (click)="copyToClipboard(scraperLog.proxyId!)" matTooltip="Copy Proxy ID">
-              <mat-icon>content_copy</mat-icon>
-            </button>
-          </div>
-
-          <div class="info-item" *ngIf="!scraperLog.proxyUsed && !scraperLog.proxyId">
-            <label>Connection Type:</label>
-            <span class="value">Direct Connection</span>
-            <mat-icon class="direct-icon">wifi</mat-icon>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Extracted Data -->
-    <mat-card class="info-card" *ngIf="scraperLog.extractedProductName || scraperLog.extractedPrice || scraperLog.extractedStockStatus || scraperLog.extractedSellerName">
-      <mat-card-header>
-        <mat-card-title>Extracted Data</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item" *ngIf="scraperLog.extractedProductName">
-            <label>Product Name:</label>
-            <span class="value">{{scraperLog.extractedProductName}}</span>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.extractedPrice">
-            <label>Price:</label>
-            <span class="value">${{scraperLog.extractedPrice}}</span>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.extractedStockStatus">
-            <label>Stock Status:</label>
-            <span class="value">{{scraperLog.extractedStockStatus}}</span>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.extractedSellerName">
-            <label>Seller Name:</label>
-            <span class="value">{{scraperLog.extractedSellerName}}</span>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Image Extraction Results -->
-    <mat-card class="info-card" *ngIf="hasImageData()">
-      <mat-card-header>
-        <mat-card-title>Image Extraction Results</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item" *ngIf="scraperLog.extractedPrimaryImageUrl">
-            <label>Primary Image:</label>
-            <span class="value url-value">{{scraperLog.extractedPrimaryImageUrl}}</span>
-            <button mat-icon-button (click)="copyToClipboard(scraperLog.extractedPrimaryImageUrl!)" matTooltip="Copy URL">
-              <mat-icon>content_copy</mat-icon>
-            </button>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.imageProcessingCount !== null && scraperLog.imageProcessingCount !== undefined">
-            <label>Images Processed:</label>
-            <span class="value">{{scraperLog.imageProcessingCount}}</span>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.imageUploadCount !== null && scraperLog.imageUploadCount !== undefined">
-            <label>Images Uploaded:</label>
-            <span class="value">{{scraperLog.imageUploadCount}}</span>
-          </div>
-
-          <div class="info-item full-width" *ngIf="scraperLog.extractedAdditionalImageUrls && scraperLog.extractedAdditionalImageUrls.length > 0">
-            <label>Additional Images:</label>
-            <div class="value">
-              <div *ngFor="let imageUrl of scraperLog.extractedAdditionalImageUrls; let i = index" class="image-url-item">
-                <span class="url-value">{{imageUrl}}</span>
-                <button mat-icon-button (click)="copyToClipboard(imageUrl)" matTooltip="Copy URL">
+            <div class="info-item full-width" *ngIf="scraperLog.userAgent">
+              <label class="info-label">User Agent</label>
+              <div class="user-agent-display">
+                <span class="user-agent-text">{{ scraperLog.userAgent }}</span>
+                <button mat-icon-button (click)="copyToClipboard(scraperLog.userAgent!)" 
+                        matTooltip="Copy User Agent" class="copy-small-btn">
                   <mat-icon>content_copy</mat-icon>
                 </button>
               </div>
             </div>
           </div>
+        </mat-card-content>
+      </mat-card>
 
-          <div class="info-item full-width" *ngIf="scraperLog.extractedOriginalImageUrls && scraperLog.extractedOriginalImageUrls.length > 0">
-            <label>Original Image URLs:</label>
-            <div class="value">
-              <div *ngFor="let imageUrl of scraperLog.extractedOriginalImageUrls; let i = index" class="image-url-item">
-                <span class="url-value">{{imageUrl}}</span>
-                <button mat-icon-button (click)="copyToClipboard(imageUrl)" matTooltip="Copy URL">
+      <!-- Proxy Information -->
+      <mat-card class="info-card proxy-info" appearance="outlined" *ngIf="hasProxyData()">
+        <mat-card-header>
+          <mat-card-title class="mat-headline-small">
+            <mat-icon>security</mat-icon>
+            Proxy Information
+          </mat-card-title>
+          <mat-card-subtitle>Network proxy configuration used</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="scraperLog?.proxyUsed">
+              <label class="info-label">Proxy Server</label>
+              <div class="proxy-display">
+                <mat-chip class="proxy-chip">
+                  <mat-icon matChipAvatar>security</mat-icon>
+                  {{ scraperLog.proxyUsed }}
+                </mat-chip>
+                <button mat-icon-button (click)="copyToClipboard(scraperLog.proxyUsed!)" 
+                        matTooltip="Copy Proxy" class="copy-small-btn">
                   <mat-icon>content_copy</mat-icon>
                 </button>
               </div>
             </div>
-          </div>
 
-          <div class="info-item full-width" *ngIf="scraperLog.imageScrapingError">
-            <label>Image Scraping Error:</label>
-            <span class="value error-value">{{scraperLog.imageScrapingError}}</span>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Performance Metrics -->
-    <mat-card class="info-card" *ngIf="scraperLog.pageLoadTime || scraperLog.parsingTime">
-      <mat-card-header>
-        <mat-card-title>Performance Metrics</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item" *ngIf="scraperLog.pageLoadTime">
-            <label>Page Load Time:</label>
-            <span class="value">{{formatDuration(scraperLog.pageLoadTime)}}</span>
-          </div>
-
-          <div class="info-item" *ngIf="scraperLog.parsingTime">
-            <label>Parsing Time:</label>
-            <span class="value">{{formatDuration(scraperLog.parsingTime)}}</span>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Error Information -->
-    <mat-card class="info-card error-card" *ngIf="scraperLog.errorMessage || scraperLog.errorCode">
-      <mat-card-header>
-        <mat-card-title>Error Information</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="info-grid">
-          <div class="info-item" *ngIf="scraperLog.errorCode">
-            <label>Error Code:</label>
-            <span class="value error-text">{{scraperLog.errorCode}}</span>
-          </div>
-
-          <div class="info-item full-width" *ngIf="scraperLog.errorMessage">
-            <label>Error Message:</label>
-            <span class="value error-text">{{scraperLog.errorMessage}}</span>
-          </div>
-
-          <div class="info-item full-width" *ngIf="scraperLog.errorStackTrace">
-            <label>Stack Trace:</label>
-            <pre class="stack-trace">{{scraperLog.errorStackTrace}}</pre>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Technical Details -->
-    <mat-expansion-panel class="technical-panel">
-      <mat-expansion-panel-header>
-        <mat-panel-title>Technical Details</mat-panel-title>
-        <mat-panel-description>Additional headers, selectors, and debug information</mat-panel-description>
-      </mat-expansion-panel-header>
-
-      <div class="technical-content">
-        <div *ngIf="hasAdditionalHeaders()" class="technical-section">
-          <h4>Additional Headers</h4>
-          <pre class="json-content">{{getAdditionalHeadersJson()}}</pre>
-        </div>
-
-        <div *ngIf="hasSelectors()" class="technical-section">
-          <h4>Selectors</h4>
-          <pre class="json-content">{{getSelectorsJson()}}</pre>
-        </div>
-
-        <div *ngIf="scraperLog.rawHtmlSnippet" class="technical-section">
-          <h4>Raw HTML Snippet</h4>
-          <pre class="html-content">{{scraperLog.rawHtmlSnippet}}</pre>
-        </div>
-
-        <div *ngIf="scraperLog.debugNotes" class="technical-section">
-          <h4>Debug Notes</h4>
-          <p class="debug-notes">{{scraperLog.debugNotes}}</p>
-        </div>
-      </div>
-    </mat-expansion-panel>
-
-    <!-- Retry Chain -->
-    <mat-card class="info-card" *ngIf="retryChain.length > 0">
-      <mat-card-header>
-        <mat-card-title>Retry Chain</mat-card-title>
-        <mat-card-subtitle>{{retryChain.length}} retry attempt(s)</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div *ngIf="isLoadingRetryChain" class="loading-container">
-          <mat-spinner diameter="30"></mat-spinner>
-        </div>
-
-        <div *ngIf="!isLoadingRetryChain" class="retry-list">
-          <div *ngFor="let retry of retryChain" class="retry-item" (click)="viewRetryDetail(retry.runId!)">
-            <div class="retry-info">
-              <mat-chip [color]="getStatusColor(retry.status)" selected>
-                <mat-icon matChipAvatar>{{getStatusIcon(retry.status)}}</mat-icon>
-                {{retry.statusDisplayName || retry.status}}
-              </mat-chip>
-              <span class="retry-date">{{formatDate(retry.startedAt)}}</span>
-              <span class="retry-duration">{{formatDuration(retry.duration)}}</span>
+            <div class="info-item" *ngIf="scraperLog.proxyId">
+              <label class="info-label">Proxy ID</label>
+              <div class="info-value-container">
+                <code class="proxy-id">{{ scraperLog.proxyId }}</code>
+                <button mat-icon-button (click)="copyToClipboard(scraperLog.proxyId!)" 
+                        matTooltip="Copy Proxy ID" class="copy-small-btn">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
             </div>
-            <mat-icon class="retry-arrow">chevron_right</mat-icon>
+
+            <div class="info-item direct-connection" *ngIf="!scraperLog.proxyUsed && !scraperLog.proxyId">
+              <label class="info-label">Connection Type</label>
+              <div class="direct-connection-display">
+                <mat-chip class="direct-chip">
+                  <mat-icon matChipAvatar>wifi</mat-icon>
+                  Direct Connection
+                </mat-chip>
+              </div>
+            </div>
           </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Extracted Data -->
+      <mat-card class="info-card extracted-data" appearance="outlined" 
+                *ngIf="scraperLog.extractedProductName || scraperLog.extractedPrice || scraperLog.extractedStockStatus || scraperLog.extractedSellerName">
+        <mat-card-header>
+          <mat-card-title class="mat-headline-small">
+            <mat-icon>data_object</mat-icon>
+            Extracted Data
+          </mat-card-title>
+          <mat-card-subtitle>Successfully scraped information</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="extracted-data-grid">
+            <div class="data-item" *ngIf="scraperLog.extractedProductName">
+              <div class="data-icon">
+                <mat-icon>shopping_bag</mat-icon>
+              </div>
+              <div class="data-content">
+                <label class="data-label">Product Name</label>
+                <span class="data-value">{{ scraperLog.extractedProductName }}</span>
+              </div>
+            </div>
+
+            <div class="data-item" *ngIf="scraperLog.extractedPrice">
+              <div class="data-icon">
+                <mat-icon>attach_money</mat-icon>
+              </div>
+              <div class="data-content">
+                <label class="data-label">Price</label>
+                <span class="data-value price-value">${{ scraperLog.extractedPrice }}</span>
+              </div>
+            </div>
+
+            <div class="data-item" *ngIf="scraperLog.extractedStockStatus">
+              <div class="data-icon">
+                <mat-icon>inventory</mat-icon>
+              </div>
+              <div class="data-content">
+                <label class="data-label">Stock Status</label>
+                <mat-chip class="stock-chip">{{ scraperLog.extractedStockStatus }}</mat-chip>
+              </div>
+            </div>
+
+            <div class="data-item" *ngIf="scraperLog.extractedSellerName">
+              <div class="data-icon">
+                <mat-icon>store</mat-icon>
+              </div>
+              <div class="data-content">
+                <label class="data-label">Seller</label>
+                <span class="data-value">{{ scraperLog.extractedSellerName }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Image Extraction Results -->
+      <mat-card class="info-card image-results" appearance="outlined" *ngIf="hasImageData()">
+        <mat-card-header>
+          <mat-card-title class="mat-headline-small">
+            <mat-icon>image</mat-icon>
+            Image Extraction
+          </mat-card-title>
+          <mat-card-subtitle>Image processing and upload results</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="image-stats">
+            <div class="image-stat" *ngIf="scraperLog.imageProcessingCount !== null && scraperLog.imageProcessingCount !== undefined">
+              <div class="stat-icon processed">
+                <mat-icon>image_search</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ scraperLog.imageProcessingCount }}</span>
+                <span class="stat-label">Processed</span>
+              </div>
+            </div>
+
+            <div class="image-stat" *ngIf="scraperLog.imageUploadCount !== null && scraperLog.imageUploadCount !== undefined">
+              <div class="stat-icon uploaded">
+                <mat-icon>cloud_upload</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ scraperLog.imageUploadCount }}</span>
+                <span class="stat-label">Uploaded</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="image-urls" *ngIf="scraperLog.extractedPrimaryImageUrl || (scraperLog.extractedAdditionalImageUrls && scraperLog.extractedAdditionalImageUrls.length > 0)">
+            <div class="primary-image" *ngIf="scraperLog.extractedPrimaryImageUrl">
+              <label class="image-label">Primary Image</label>
+              <div class="image-url-item">
+                <span class="url-display">{{ scraperLog.extractedPrimaryImageUrl }}</span>
+                <div class="image-actions">
+                  <button mat-icon-button (click)="copyToClipboard(scraperLog.extractedPrimaryImageUrl!)" 
+                          matTooltip="Copy URL" class="copy-small-btn">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="openUrl(scraperLog.extractedPrimaryImageUrl!)" 
+                          matTooltip="View Image" class="view-image-btn">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="additional-images" *ngIf="scraperLog.extractedAdditionalImageUrls && scraperLog.extractedAdditionalImageUrls.length > 0">
+              <label class="image-label">Additional Images ({{ scraperLog.extractedAdditionalImageUrls.length }})</label>
+              <div class="additional-images-list">
+                <div *ngFor="let imageUrl of scraperLog.extractedAdditionalImageUrls; let i = index" 
+                     class="image-url-item">
+                  <span class="image-index">{{ i + 1 }}.</span>
+                  <span class="url-display">{{ imageUrl }}</span>
+                  <div class="image-actions">
+                    <button mat-icon-button (click)="copyToClipboard(imageUrl)" 
+                            matTooltip="Copy URL" class="copy-small-btn">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="openUrl(imageUrl)" 
+                            matTooltip="View Image" class="view-image-btn">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Error Information -->
+      <mat-card class="info-card error-info" appearance="outlined" *ngIf="scraperLog.errorMessage">
+        <mat-card-header>
+          <mat-card-title class="mat-headline-small error-title">
+            <mat-icon>error</mat-icon>
+            Error Details
+          </mat-card-title>
+          <mat-card-subtitle>Error information and diagnostic details</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="error-display">
+            <div class="error-content">
+              <pre class="error-message">{{ scraperLog.errorMessage }}</pre>
+              <button mat-icon-button (click)="copyToClipboard(scraperLog.errorMessage!)" 
+                      matTooltip="Copy Error Message" class="copy-error-btn">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && !scraperLog" class="error-state-container">
+    <div class="error-state-content">
+      <mat-icon class="error-state-icon">error_outline</mat-icon>
+      <h2 class="mat-headline-medium">Log Not Found</h2>
+      <p class="mat-body-large">The requested scraper log could not be found or may have been deleted.</p>
+      <button mat-raised-button color="primary" (click)="goBack()" class="back-to-list-btn">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Logs
+      </button>
+    </div>
   </div>
 </div>

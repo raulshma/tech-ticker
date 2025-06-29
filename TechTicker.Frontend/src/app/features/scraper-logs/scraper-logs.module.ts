@@ -18,6 +18,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { ScraperLogsRoutingModule } from './scraper-logs-routing.module';
 import { SharedModule } from '../../shared/shared.module';
@@ -50,7 +51,8 @@ import { ScraperLogDetailComponent } from './components/scraper-log-detail/scrap
     MatNativeDateModule,
     MatChipsModule,
     MatExpansionModule,
-    MatTabsModule
+    MatTabsModule,
+    MatProgressBarModule
   ]
 })
 export class ScraperLogsModule { }

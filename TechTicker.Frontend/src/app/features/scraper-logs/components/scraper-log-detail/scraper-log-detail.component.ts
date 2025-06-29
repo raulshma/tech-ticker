@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subject, takeUntil } from 'rxjs';
 import { ScraperLogsService } from '../../services/scraper-logs.service';
 import { ScraperRunLogDto } from '../../../../shared/api/api-client';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-scraper-log-detail',
@@ -24,7 +25,8 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private scraperLogsService: ScraperLogsService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private location: Location
   ) { }
 
   ngOnInit(): void {
@@ -87,7 +89,7 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/scraper-logs']);
+    this.location.back();
   }
 
   getStatusColor(status?: string): string {
@@ -190,5 +192,22 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
 
   viewRetryDetail(retryRunId: string): void {
     this.router.navigate(['/scraper-logs', retryRunId]);
+  }
+
+  getHttpStatusClass(statusCode: number): string {
+    if (statusCode >= 200 && statusCode < 300) {
+      return 'success-chip';
+    } else if (statusCode >= 400 && statusCode < 500) {
+      return 'warning-chip';
+    } else if (statusCode >= 500) {
+      return 'error-chip';
+    }
+    return 'info-chip';
+  }
+
+  openUrl(url: string): void {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   }
 }

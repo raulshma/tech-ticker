@@ -1,182 +1,302 @@
 <div class="scraper-logs-container">
-  <mat-card class="filter-card">
-    <mat-card-header>
-      <mat-card-title>Scraper Run Logs</mat-card-title>
-      <mat-card-subtitle>Monitor and analyze scraper execution history</mat-card-subtitle>
-    </mat-card-header>
-    
-    <mat-card-content>
-      <form [formGroup]="filterForm" class="filter-form">
-        <div class="filter-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Mapping ID</mat-label>
-            <input matInput formControlName="mappingId" placeholder="Enter mapping ID">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Status</mat-label>
-            <mat-select formControlName="status">
-              <mat-option *ngFor="let option of statusOptions" [value]="option.value">
-                {{option.label}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Error Category</mat-label>
-            <mat-select formControlName="errorCategory">
-              <mat-option *ngFor="let option of errorCategoryOptions" [value]="option.value">
-                {{option.label}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+  <!-- Modern Welcome Header Section -->
+  <header class="welcome-section">
+    <div class="welcome-content">
+      <div class="header-main">
+        <div class="title-section">
+          <h1 class="mat-display-medium">Scraper Logs</h1>
+          <p class="mat-body-large welcome-subtitle">Monitor and analyze scraper execution history and performance</p>
         </div>
-
-        <div class="filter-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Date From</mat-label>
-            <input matInput [matDatepicker]="dateFromPicker" formControlName="dateFrom">
-            <mat-datepicker-toggle matSuffix [for]="dateFromPicker"></mat-datepicker-toggle>
-            <mat-datepicker #dateFromPicker></mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Date To</mat-label>
-            <input matInput [matDatepicker]="dateToPicker" formControlName="dateTo">
-            <mat-datepicker-toggle matSuffix [for]="dateToPicker"></mat-datepicker-toggle>
-            <mat-datepicker #dateToPicker></mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Seller Name</mat-label>
-            <input matInput formControlName="sellerName" placeholder="Enter seller name">
-          </mat-form-field>
-
-          <button mat-raised-button color="accent" type="button" (click)="clearFilters()">
-            <mat-icon>clear</mat-icon>
-            Clear Filters
+        <div class="header-actions">
+          <button mat-outlined-button class="refresh-action-btn" (click)="loadScraperLogs()">
+            <mat-icon>refresh</mat-icon>
+            Refresh
           </button>
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card class="table-card">
-    <mat-card-content>
-      <div class="table-container">
-        <table mat-table [dataSource]="dataSource" matSort class="scraper-logs-table">
-          <!-- Started At Column -->
-          <ng-container matColumnDef="startedAt">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Started At</th>
-            <td mat-cell *matCellDef="let log">
-              {{formatDate(log.startedAt)}}
-            </td>
-          </ng-container>
-
-          <!-- Status Column -->
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
-            <td mat-cell *matCellDef="let log">
-              <mat-chip [color]="getStatusColor(log.status)" selected>
-                <mat-icon matChipAvatar>{{getStatusIcon(log.status)}}</mat-icon>
-                {{log.statusDisplayName || log.status}}
-              </mat-chip>
-            </td>
-          </ng-container>
-
-          <!-- Duration Column -->
-          <ng-container matColumnDef="duration">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Duration</th>
-            <td mat-cell *matCellDef="let log">
-              {{formatDuration(log.duration)}}
-            </td>
-          </ng-container>
-
-          <!-- Seller Name Column -->
-          <ng-container matColumnDef="sellerName">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Seller</th>
-            <td mat-cell *matCellDef="let log">
-              {{log.sellerName || 'N/A'}}
-            </td>
-          </ng-container>
-
-          <!-- Product Name Column -->
-          <ng-container matColumnDef="productName">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Product</th>
-            <td mat-cell *matCellDef="let log">
-              <span [matTooltip]="log.productName || 'N/A'">
-                {{truncateText(log.productName, 30)}}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Proxy Info Column -->
-          <ng-container matColumnDef="proxyInfo">
-            <th mat-header-cell *matHeaderCellDef>Proxy</th>
-            <td mat-cell *matCellDef="let log">
-              <span *ngIf="log.proxyUsed" 
-                    [matTooltip]="log.proxyUsed" 
-                    class="proxy-info">
-                {{truncateText(log.proxyUsed, 20)}}
-              </span>
-              <span *ngIf="!log.proxyUsed" class="direct-connection">Direct</span>
-            </td>
-          </ng-container>
-
-          <!-- Error Message Column -->
-          <ng-container matColumnDef="errorMessage">
-            <th mat-header-cell *matHeaderCellDef>Error</th>
-            <td mat-cell *matCellDef="let log">
-              <span *ngIf="log.errorMessage" 
-                    [matTooltip]="log.errorMessage" 
-                    class="error-message">
-                {{truncateText(log.errorMessage, 40)}}
-              </span>
-              <span *ngIf="!log.errorMessage" class="no-error">-</span>
-            </td>
-          </ng-container>
-
-          <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let log">
-              <button mat-icon-button 
-                      color="primary" 
-                      (click)="viewDetail(log.runId!)"
-                      matTooltip="View Details"
-                      *hasPermission="'Scrapers.ViewLogs'">
-                <mat-icon>visibility</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-
-        <!-- Loading Spinner -->
-        <div *ngIf="isLoading" class="loading-container">
-          <mat-spinner diameter="50"></mat-spinner>
-          <p>Loading scraper logs...</p>
-        </div>
-
-        <!-- No Data Message -->
-        <div *ngIf="!isLoading && dataSource.length === 0" class="no-data-container">
-          <mat-icon class="no-data-icon">search_off</mat-icon>
-          <p>No scraper logs found</p>
-          <p class="no-data-subtitle">Try adjusting your filters or check back later</p>
-        </div>
       </div>
+    </div>
+  </header>
 
-      <!-- Paginator -->
-      <mat-paginator 
-        [length]="totalCount"
-        [pageSize]="pageSize"
-        [pageIndex]="pageIndex"
-        [pageSizeOptions]="[5, 10, 25, 50, 100]"
-        (page)="onPageChange($event)"
-        showFirstLastButtons>
-      </mat-paginator>
-    </mat-card-content>
-  </mat-card>
+  <!-- Enhanced Statistics Overview -->
+  <section class="stats-section" *ngIf="!isLoading && totalCount > 0" aria-label="Scraper Logs Statistics">
+    <div class="stats-grid">
+      <mat-card class="stat-card total-logs" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon primary-surface">
+              <mat-icon aria-hidden="true">list_alt</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ totalCount }}</h3>
+              <p class="mat-body-medium stat-label">Total Logs</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card success-logs" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon success-surface">
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ getSuccessCount() }}</h3>
+              <p class="mat-body-medium stat-label">Successful</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card failed-logs" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon error-surface">
+              <mat-icon aria-hidden="true">error</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ getFailedCount() }}</h3>
+              <p class="mat-body-medium stat-label">Failed</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card filtered-results" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon info-surface">
+              <mat-icon aria-hidden="true">filter_list</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ dataSource.length }}</h3>
+              <p class="mat-body-medium stat-label">Filtered</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+
+  <!-- Modern Management Section -->
+  <section class="management-section" aria-label="Scraper Logs Management">
+    <mat-card class="management-card" appearance="outlined">
+      <mat-card-header class="management-header">
+        <mat-card-title class="mat-headline-large">Scraper Execution History</mat-card-title>
+        <mat-card-subtitle class="mat-body-large">Search, filter, and analyze scraper run logs</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="management-content">
+        <!-- Enhanced Filter Controls -->
+        <form [formGroup]="filterForm" class="filters-section" *ngIf="!isLoading">
+          <div class="filter-controls">
+            <mat-form-field appearance="outline" class="search-field">
+              <mat-label>Search logs</mat-label>
+              <input matInput formControlName="sellerName" placeholder="Search by seller name or product">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status">
+                <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>tune</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Error Category</mat-label>
+              <mat-select formControlName="errorCategory">
+                <mat-option *ngFor="let option of errorCategoryOptions" [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Mapping ID</mat-label>
+              <input matInput formControlName="mappingId" placeholder="Enter mapping ID">
+              <mat-icon matSuffix>fingerprint</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="date-filter-controls">
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>Date From</mat-label>
+              <input matInput [matDatepicker]="dateFromPicker" formControlName="dateFrom">
+              <mat-datepicker-toggle matSuffix [for]="dateFromPicker"></mat-datepicker-toggle>
+              <mat-datepicker #dateFromPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>Date To</mat-label>
+              <input matInput [matDatepicker]="dateToPicker" formControlName="dateTo">
+              <mat-datepicker-toggle matSuffix [for]="dateToPicker"></mat-datepicker-toggle>
+              <mat-datepicker #dateToPicker></mat-datepicker>
+            </mat-form-field>
+
+            <button mat-outlined-button type="button" class="clear-filters-btn" (click)="clearFilters()">
+              <mat-icon>clear</mat-icon>
+              Clear Filters
+            </button>
+          </div>
+        </form>
+
+        <!-- Loading spinner with improved styling -->
+        <div *ngIf="isLoading" class="loading-container" role="status" aria-live="polite">
+          <mat-spinner diameter="48" strokeWidth="4"></mat-spinner>
+          <p class="mat-body-large loading-text">Loading scraper logs...</p>
+        </div>
+
+        <!-- Enhanced Scraper Logs Table -->
+        <div *ngIf="!isLoading" class="table-container">
+          <div class="table-wrapper">
+            <mat-table [dataSource]="dataSource" matSort class="scraper-logs-table modern-table">
+
+              <!-- Started At Column -->
+              <ng-container matColumnDef="startedAt">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="time-header">Started At</mat-header-cell>
+                <mat-cell *matCellDef="let log" class="time-cell">
+                  <div class="time-info-modern">
+                    <span class="mat-body-medium time-value">{{ formatDate(log.startedAt) }}</span>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <!-- Status Column -->
+              <ng-container matColumnDef="status">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="status-header">Status</mat-header-cell>
+                <mat-cell *matCellDef="let log" class="status-cell">
+                  <div class="status-container-modern">
+                    <mat-chip [class]="'status-chip-' + getStatusColor(log.status)" selected>
+                      <mat-icon matChipAvatar>{{ getStatusIcon(log.status) }}</mat-icon>
+                      {{ log.statusDisplayName || log.status }}
+                    </mat-chip>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <!-- Duration Column -->
+              <ng-container matColumnDef="duration">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="duration-header">Duration</mat-header-cell>
+                <mat-cell *matCellDef="let log" class="duration-cell">
+                  <div class="duration-info-modern">
+                    <span class="mat-body-medium duration-value">{{ formatDuration(log.duration) }}</span>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <!-- Seller Name Column -->
+              <ng-container matColumnDef="sellerName">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="seller-header">Seller</mat-header-cell>
+                <mat-cell *matCellDef="let log" class="seller-cell">
+                  <div class="seller-info-modern">
+                    <span class="mat-body-medium seller-name" [matTooltip]="log.sellerName || 'N/A'">
+                      {{ truncateText(log.sellerName, 20) }}
+                    </span>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <!-- Product Name Column -->
+              <ng-container matColumnDef="productName">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="product-header">Product</mat-header-cell>
+                <mat-cell *matCellDef="let log" class="product-cell">
+                  <div class="product-info-modern">
+                    <span class="mat-body-medium product-name" [matTooltip]="log.productName || 'N/A'">
+                      {{ truncateText(log.productName, 30) }}
+                    </span>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <!-- Proxy Info Column -->
+              <ng-container matColumnDef="proxyInfo">
+                <mat-header-cell *matHeaderCellDef class="proxy-header">Proxy</mat-header-cell>
+                <mat-cell *matCellDef="let log" class="proxy-cell">
+                  <div class="proxy-info-modern">
+                    <mat-chip *ngIf="log.proxyUsed" class="proxy-chip" [matTooltip]="log.proxyUsed">
+                      <mat-icon matChipAvatar>security</mat-icon>
+                      {{ truncateText(log.proxyUsed, 15) }}
+                    </mat-chip>
+                    <mat-chip *ngIf="!log.proxyUsed" class="direct-chip">
+                      <mat-icon matChipAvatar>wifi</mat-icon>
+                      Direct
+                    </mat-chip>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <!-- Error Message Column -->
+              <ng-container matColumnDef="errorMessage">
+                <mat-header-cell *matHeaderCellDef class="error-header">Error</mat-header-cell>
+                <mat-cell *matCellDef="let log" class="error-cell">
+                  <div class="error-info-modern">
+                    <span *ngIf="log.errorMessage" 
+                          class="mat-body-small error-message" 
+                          [matTooltip]="log.errorMessage">
+                      <mat-icon class="error-icon">error_outline</mat-icon>
+                      {{ truncateText(log.errorMessage, 25) }}
+                    </span>
+                    <span *ngIf="!log.errorMessage" class="no-error">
+                      <mat-icon class="success-icon">check_circle</mat-icon>
+                      No Error
+                    </span>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef class="actions-header">Actions</mat-header-cell>
+                <mat-cell *matCellDef="let log" class="actions-cell">
+                  <div class="actions-group">
+                    <button mat-icon-button 
+                            class="action-btn view-btn"
+                            (click)="viewDetail(log.runId!)"
+                            matTooltip="View Details"
+                            *hasPermission="'Scrapers.ViewLogs'">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <mat-header-row *matHeaderRowDef="displayedColumns" class="table-header"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></mat-row>
+            </mat-table>
+          </div>
+
+          <!-- No Data Message -->
+          <div *ngIf="!isLoading && dataSource.length === 0" class="no-data-container">
+            <div class="no-data-content">
+              <mat-icon class="no-data-icon">search_off</mat-icon>
+              <h3 class="mat-headline-medium no-data-title">No scraper logs found</h3>
+              <p class="mat-body-large no-data-subtitle">Try adjusting your filters or check back later</p>
+              <button mat-raised-button color="primary" (click)="clearFilters()" class="clear-filters-action">
+                <mat-icon>clear</mat-icon>
+                Clear All Filters
+              </button>
+            </div>
+          </div>
+
+          <!-- Enhanced Paginator -->
+          <div class="paginator-container" *ngIf="dataSource.length > 0">
+            <mat-paginator 
+              [length]="totalCount"
+              [pageSize]="pageSize"
+              [pageIndex]="pageIndex"
+              [pageSizeOptions]="[5, 10, 25, 50, 100]"
+              (page)="onPageChange($event)"
+              showFirstLastButtons
+              class="modern-paginator">
+            </mat-paginator>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
 </div>

@@ -150,6 +150,19 @@ export class ScraperLogsListComponent implements OnInit, OnDestroy {
     this.router.navigate(['/scraper-logs', runId]);
   }
 
+  // Statistics methods for the new template
+  getSuccessCount(): number {
+    return this.dataSource.filter(log => 
+      log.status === 'SUCCESS' || log.status === 'Completed'
+    ).length;
+  }
+
+  getFailedCount(): number {
+    return this.dataSource.filter(log => 
+      log.status === 'FAILED' || log.status === 'Error'
+    ).length;
+  }
+
   getStatusColor(status?: string): string {
     return this.scraperLogsService.getStatusColor(status);
   }
