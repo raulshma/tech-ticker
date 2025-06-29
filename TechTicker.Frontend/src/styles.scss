@@ -1,51 +1,121 @@
 @use "@angular/material" as mat;
 @use "./themes/_theme-colors.scss" as theme-colors;
 
+@include mat.core();
+
 /* Global styles */
-html,
-body {
+html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: 'Roboto', sans-serif;
 }
 
+// Default light theme
 :root {
+  color-scheme: light;
   @include mat.theme(
     (
       color: (
         primary: theme-colors.$primary-palette,
         secondary: theme-colors.$secondary-palette,
-        tertiary: theme-colors.$accent-palette,
+        tertiary: theme-colors.$tertiary-palette,
         background: theme-colors.$background-palette,
       ),
       typography: (
-        plain-family: Roboto,
-        brand-family: Montserrat,
+        plain-family: 'Roboto',
+        brand-family: 'Montserrat',
       ),
       density: -2,
     )
   );
 }
 
-body {
-  margin: 0;
-}
-
+// Dark theme - applied when .dark-theme class is present
 .dark-theme {
+  color-scheme: dark;
   @include mat.theme(
     (
       color: (
         primary: theme-colors.$primary-palette-dark,
         secondary: theme-colors.$secondary-palette-dark,
-        tertiary: theme-colors.$accent-palette-dark,
+        tertiary: theme-colors.$tertiary-palette-dark,
         background: theme-colors.$background-palette-dark,
       ),
       typography: (
-        plain-family: Poppins,
-        brand-family: Montserrat,
+        plain-family: 'Roboto',
+        brand-family: 'Montserrat',
       ),
       density: -2,
     )
   );
-  color-scheme: dark;
+}
+
+// Enhanced theme transition for smooth switching
+.theme-transition {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Apply smooth transitions to body and all elements for theme switching
+body {
+  @extend .theme-transition;
+  
+  // Apply transitions to all child elements for smooth theme switching
+  * {
+    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+// Enhanced theme support for Material components
+.mat-mdc-card, 
+.mat-mdc-button, 
+.mat-toolbar,
+.mat-mdc-form-field,
+.mat-mdc-list-item,
+.mat-mdc-menu-panel,
+.mat-mdc-dialog-container,
+.mat-mdc-tab-group,
+.mat-mdc-snack-bar-container {
+  @extend .theme-transition;
+}
+
+// Improved focus indicators for accessibility
+button:focus,
+.mat-mdc-button:focus,
+.mat-mdc-icon-button:focus {
+  outline: 2px solid var(--mdc-theme-primary, #1976d2);
+  outline-offset: 2px;
+}
+
+// Dark theme specific improvements
+.dark-theme {
+  // Better contrast for form controls
+  .mat-mdc-form-field {
+    --mdc-outlined-text-field-label-text-color: rgba(255, 255, 255, 0.7);
+    --mdc-outlined-text-field-input-text-color: rgba(255, 255, 255, 0.87);
+  }
+  
+  // Enhanced scrollbar styling for dark mode
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
 }

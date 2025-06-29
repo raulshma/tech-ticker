@@ -5,6 +5,7 @@ import {
   AuthService,
   CurrentUser,
 } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-layout',
@@ -15,9 +16,12 @@ import {
 export class AppLayoutComponent implements OnInit, OnDestroy {
   currentUser: CurrentUser | null = null;
   private destroy$ = new Subject<void>();
-  isDarkTheme = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    public themeService: ThemeService
+  ) {}
 
   ngOnInit(): void {
     this.authService.currentUser$
@@ -25,7 +29,6 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       .subscribe((user) => {
         this.currentUser = user;
       });
-    this.applyTheme();
   }
 
   ngOnDestroy(): void {
@@ -43,15 +46,36 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   }
 
   toggleTheme(): void {
-    this.isDarkTheme = !this.isDarkTheme;
-    this.applyTheme();
+    this.themeService.toggleTheme();
   }
 
-  private applyTheme(): void {
-    if (this.isDarkTheme) {
-      document.body.classList.add('dark-theme');
-    } else {
-      document.body.classList.remove('dark-theme');
+  get isDarkTheme(): boolean {
+    return this.themeService.isDarkTheme();
+  }
+
+  get themeIcon(): string {
+    switch (this.themeService.themeMode()) {
+      case 'dark':
+        return 'dark_mode';
+      case 'light':
+        return 'light_mode';
+      case 'auto':
+        return this.themeService.isDarkTheme() ? 'brightness_auto' : 'brightness_auto';
+      default:
+        return 'light_mode';
+    }
+  }
+
+  get themeTooltip(): string {
+    switch (this.themeService.themeMode()) {
+      case 'dark':
+        return 'Switch to light mode';
+      case 'light':
+        return 'Switch to dark mode';
+      case 'auto':
+        return `Auto mode (currently ${this.themeService.isDarkTheme() ? 'dark' : 'light'})`;
+      default:
+        return 'Toggle theme';
     }
   }
 }

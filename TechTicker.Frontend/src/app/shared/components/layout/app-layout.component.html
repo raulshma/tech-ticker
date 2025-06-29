@@ -131,8 +131,13 @@
         </button>
       </mat-menu>
 
-      <button mat-icon-button (click)="toggleTheme()" [attr.aria-label]="isDarkTheme ? 'Switch to light mode' : 'Switch to dark mode'">
-        <mat-icon>{{ isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
+      <button 
+        mat-icon-button 
+        (click)="toggleTheme()" 
+        [attr.aria-label]="themeTooltip"
+        [matTooltip]="themeTooltip"
+        matTooltipPosition="below">
+        <mat-icon>{{ themeIcon }}</mat-icon>
       </button>
     </mat-toolbar>
 

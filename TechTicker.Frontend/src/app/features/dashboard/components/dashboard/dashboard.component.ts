@@ -80,4 +80,15 @@ export class DashboardComponent implements OnInit {
       }
     });
   }
+
+  onCardKeydown(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (!target) return;
+    if (event.code === 'Enter' || event.key === 'Enter') {
+      target.click();
+    } else if (event.code === 'Space' || event.key === ' ' || event.key === 'Spacebar') {
+      target.click();
+      event.preventDefault();
+    }
+  }
 }
