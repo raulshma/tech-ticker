@@ -1,0 +1,225 @@
+<div class="permissions-management-container">
+  <!-- Modern Welcome Header Section -->
+  <header class="welcome-section">
+    <div class="welcome-content">
+      <div class="header-main">
+        <div class="title-section">
+          <h1 class="mat-display-medium">User Permissions</h1>
+          <p class="mat-body-large welcome-subtitle">
+            Manage permissions for {{ user?.firstName }} {{ user?.lastName || user?.email }}
+          </p>
+        </div>
+        <div class="header-actions">
+          <button mat-outlined-button class="refresh-action-btn" (click)="loadPermissions()" [disabled]="isLoading">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <section *ngIf="isLoading" class="loading-section" aria-label="Loading Permissions">
+    <mat-card class="loading-card" appearance="outlined">
+      <mat-card-content class="loading-content">
+        <div class="loading-spinner-wrapper">
+          <mat-spinner diameter="56" strokeWidth="4"></mat-spinner>
+        </div>
+        <h3 class="mat-headline-small loading-title">Loading Permissions</h3>
+        <p class="mat-body-medium loading-message">Please wait while we fetch the permission data...</p>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <!-- Error State -->
+  <section *ngIf="error && !isLoading" class="error-section" aria-label="Error Loading Permissions">
+    <mat-card class="error-card" appearance="outlined">
+      <mat-card-content class="error-content">
+        <div class="error-icon-wrapper">
+          <mat-icon class="error-icon">error_outline</mat-icon>
+        </div>
+        <h3 class="mat-headline-small error-title">Failed to Load Permissions</h3>
+        <p class="mat-body-medium error-message">{{ error }}</p>
+        <button mat-raised-button color="primary" (click)="loadPermissions()" class="retry-btn">
+          <mat-icon>refresh</mat-icon>
+          Try Again
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <!-- Permissions Content -->
+  <div *ngIf="!isLoading && !error" class="permissions-content">
+    
+    <!-- Current User Permissions Section -->
+    <section class="current-permissions-section" aria-label="Current User Permissions">
+      <mat-card class="permissions-card" appearance="outlined">
+        <mat-card-header class="permissions-header">
+          <div class="header-icon-wrapper">
+            <mat-icon class="header-icon">verified_user</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title class="mat-headline-large">Current Permissions</mat-card-title>
+            <mat-card-subtitle class="mat-body-large">Permissions directly assigned to this user</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content class="permissions-content-body">
+          <div *ngIf="userPermissions.length === 0" class="no-permissions-modern">
+            <div class="no-permissions-icon-wrapper">
+              <mat-icon class="no-permissions-icon">info_outline</mat-icon>
+            </div>
+            <h4 class="mat-title-medium no-permissions-title">No Direct Permissions</h4>
+            <p class="mat-body-medium no-permissions-message">
+              This user has no direct permissions assigned. Permissions are inherited from their assigned roles.
+            </p>
+          </div>
+
+          <div *ngIf="userPermissions.length > 0" class="permissions-list-modern">
+            <div class="permissions-grid">
+              <div 
+                *ngFor="let permission of userPermissions" 
+                class="permission-chip-modern">
+                <div class="permission-chip-content">
+                  <mat-icon class="permission-icon">security</mat-icon>
+                  <span class="permission-name">{{ permission.name }}</span>
+                  <button 
+                    mat-icon-button 
+                    class="remove-permission-btn"
+                    (click)="removePermission(permission)"
+                    [disabled]="isUpdating"
+                    matTooltip="Remove permission">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+                <p class="permission-description" *ngIf="permission.description">
+                  {{ permission.description }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <!-- Assign New Permissions Section -->
+    <section class="assign-permissions-section" aria-label="Assign New Permissions">
+      <mat-card class="permissions-card" appearance="outlined">
+        <mat-card-header class="permissions-header">
+          <div class="header-icon-wrapper">
+            <mat-icon class="header-icon">admin_panel_settings</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title class="mat-headline-large">Assign Permissions</mat-card-title>
+            <mat-card-subtitle class="mat-body-large">Select permissions to assign directly to this user</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content class="permissions-content-body">
+          <div class="permissions-categories">
+            <mat-accordion class="permissions-accordion">
+              <mat-expansion-panel 
+                *ngFor="let category of permissionCategories" 
+                class="category-panel"
+                [expanded]="true">
+                <mat-expansion-panel-header class="category-header">
+                  <mat-panel-title class="category-title">
+                    <mat-icon class="category-icon">{{ getCategoryIcon(category.name) }}</mat-icon>
+                    <span>{{ category.name }}</span>
+                  </mat-panel-title>
+                  <mat-panel-description class="category-description">
+                    {{ category.permissions.length }} permission{{ category.permissions.length !== 1 ? 's' : '' }} available
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <div class="category-permissions-modern">
+                  <div class="permissions-grid-modern">
+                    <div 
+                      *ngFor="let permission of category.permissions" 
+                      class="permission-item-modern"
+                      [class.assigned]="isPermissionAssigned(permission)"
+                      [class.pending]="pendingChanges.has(permission.name!)">
+                      
+                      <div class="permission-checkbox-wrapper">
+                        <mat-checkbox
+                          [checked]="isPermissionAssigned(permission)"
+                          (change)="togglePermission(permission, $event.checked)"
+                          [disabled]="isUpdating"
+                          class="permission-checkbox">
+                        </mat-checkbox>
+                      </div>
+                      
+                      <div class="permission-details">
+                        <div class="permission-header">
+                          <span class="permission-name-modern">{{ permission.name }}</span>
+                          <mat-icon 
+                            *ngIf="pendingChanges.has(permission.name!)" 
+                            class="pending-icon"
+                            matTooltip="Pending change">
+                            schedule
+                          </mat-icon>
+                        </div>
+                        <p 
+                          class="permission-description-modern" 
+                          *ngIf="permission.description">
+                          {{ permission.description }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <!-- Actions Section -->
+    <section class="actions-section" *ngIf="hasChanges()" aria-label="Permission Actions">
+      <mat-card class="actions-card" appearance="outlined">
+        <mat-card-content class="actions-content">
+          <div class="actions-header">
+            <div class="changes-info">
+              <mat-icon class="changes-icon">pending_actions</mat-icon>
+              <div class="changes-text">
+                <h4 class="mat-title-medium changes-title">Pending Changes</h4>
+                <p class="mat-body-medium changes-description">
+                  {{ pendingChanges.size }} permission{{ pendingChanges.size !== 1 ? 's' : '' }} will be modified
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="actions-buttons">
+            <button 
+              mat-outlined-button 
+              class="reset-btn"
+              (click)="resetChanges()"
+              [disabled]="isUpdating">
+              <mat-icon>undo</mat-icon>
+              Reset Changes
+            </button>
+            
+            <button 
+              mat-raised-button 
+              color="primary"
+              class="save-btn"
+              (click)="saveChanges()"
+              [disabled]="isUpdating">
+              <div class="save-content" *ngIf="!isUpdating">
+                <mat-icon>save</mat-icon>
+                <span>Save Changes</span>
+              </div>
+              <div class="save-loading" *ngIf="isUpdating">
+                <mat-spinner diameter="20" strokeWidth="3"></mat-spinner>
+                <span>Saving...</span>
+              </div>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </section>
+  </div>
+</div> 

@@ -31,235 +31,8 @@ import { UsersService, PermissionCategory } from '../../services/users.service';
     MatSnackBarModule,
     MatTooltipModule
   ],
-  template: `
-    <mat-card class="permissions-card">
-      <mat-card-header>
-        <mat-card-title>User Permissions</mat-card-title>
-        <mat-card-subtitle>Manage permissions for {{ user?.firstName }} {{ user?.lastName }}</mat-card-subtitle>
-      </mat-card-header>
-
-      <mat-card-content>
-        <!-- Loading State -->
-        <div *ngIf="isLoading" class="loading-container">
-          <mat-spinner diameter="40"></mat-spinner>
-          <p>Loading permissions...</p>
-        </div>
-
-        <!-- Error State -->
-        <div *ngIf="error" class="error-container">
-          <mat-icon color="warn">error</mat-icon>
-          <p>{{ error }}</p>
-          <button mat-button color="primary" (click)="loadPermissions()">
-            <mat-icon>refresh</mat-icon>
-            Retry
-          </button>
-        </div>
-
-        <!-- Permissions Content -->
-        <div *ngIf="!isLoading && !error" class="permissions-content">
-          <!-- Current User Permissions -->
-          <div class="current-permissions">
-            <h3>Current Permissions</h3>
-            <div *ngIf="userPermissions.length === 0" class="no-permissions">
-              <mat-icon>info</mat-icon>
-              <p>No direct permissions assigned. Permissions are inherited from roles.</p>
-            </div>
-            <div *ngIf="userPermissions.length > 0" class="permissions-list">
-              <mat-chip-set>
-                <mat-chip 
-                  *ngFor="let permission of userPermissions" 
-                  [removable]="true"
-                  (removed)="removePermission(permission)"
-                  color="primary">
-                  {{ permission.name }}
-                  <mat-icon matChipRemove>cancel</mat-icon>
-                </mat-chip>
-              </mat-chip-set>
-            </div>
-          </div>
-
-          <!-- Assign New Permissions -->
-          <div class="assign-permissions">
-            <h3>Assign Permissions</h3>
-            <p class="description">Select permissions to assign directly to this user:</p>
-
-            <mat-accordion>
-              <mat-expansion-panel 
-                *ngFor="let category of permissionCategories" 
-                [expanded]="true">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    {{ category.name }}
-                  </mat-panel-title>
-                  <mat-panel-description>
-                    {{ category.permissions.length }} permissions
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
-
-                <div class="category-permissions">
-                  <div 
-                    *ngFor="let permission of category.permissions" 
-                    class="permission-item"
-                    [class.assigned]="isPermissionAssigned(permission)">
-                    <mat-checkbox
-                      [checked]="isPermissionAssigned(permission)"
-                      (change)="togglePermission(permission, $event.checked)"
-                      [disabled]="isUpdating"
-                      matTooltip="{{ permission.description || permission.name }}">
-                      {{ permission.name }}
-                    </mat-checkbox>
-                    <span class="permission-description" *ngIf="permission.description">
-                      {{ permission.description }}
-                    </span>
-                  </div>
-                </div>
-              </mat-expansion-panel>
-            </mat-accordion>
-          </div>
-
-          <!-- Actions -->
-          <div class="actions" *ngIf="hasChanges()">
-            <button 
-              mat-raised-button 
-              color="primary" 
-              (click)="saveChanges()"
-              [disabled]="isUpdating">
-              <mat-spinner diameter="16" *ngIf="isUpdating"></mat-spinner>
-              <mat-icon *ngIf="!isUpdating">save</mat-icon>
-              {{ isUpdating ? 'Saving...' : 'Save Changes' }}
-            </button>
-            <button 
-              mat-button 
-              (click)="resetChanges()"
-              [disabled]="isUpdating">
-              <mat-icon>undo</mat-icon>
-              Reset
-            </button>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  `,
-  styles: [`
-    .permissions-card {
-      margin: 16px 0;
-    }
-
-    .loading-container,
-    .error-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 32px;
-      text-align: center;
-    }
-
-    .error-container {
-      color: #d32f2f;
-    }
-
-    .error-container mat-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
-      margin-bottom: 16px;
-    }
-
-    .permissions-content {
-      padding: 16px 0;
-    }
-
-    .current-permissions {
-      margin-bottom: 32px;
-    }
-
-    .current-permissions h3 {
-      margin-bottom: 16px;
-      color: #1976d2;
-    }
-
-    .no-permissions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 16px;
-      background: #f5f5f5;
-      border-radius: 8px;
-      color: #666;
-    }
-
-    .permissions-list {
-      margin-top: 16px;
-    }
-
-    .assign-permissions h3 {
-      margin-bottom: 8px;
-      color: #1976d2;
-    }
-
-    .description {
-      color: #666;
-      margin-bottom: 16px;
-    }
-
-    .category-permissions {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 16px;
-      padding: 16px 0;
-    }
-
-    .permission-item {
-      display: flex;
-      flex-direction: column;
-      padding: 12px;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      background: #fafafa;
-      transition: all 0.2s ease;
-    }
-
-    .permission-item:hover {
-      background: #f0f0f0;
-      border-color: #1976d2;
-    }
-
-    .permission-item.assigned {
-      background: #e3f2fd;
-      border-color: #1976d2;
-    }
-
-    .permission-description {
-      font-size: 12px;
-      color: #666;
-      margin-top: 4px;
-      margin-left: 24px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 16px;
-      margin-top: 24px;
-      padding-top: 16px;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    mat-expansion-panel {
-      margin-bottom: 8px;
-    }
-
-    mat-expansion-panel-header {
-      background: #f5f5f5;
-    }
-
-    mat-panel-title {
-      font-weight: 500;
-    }
-
-    mat-panel-description {
-      color: #666;
-    }
-  `]
+  templateUrl: './user-permissions.component.html',
+  styleUrls: ['./user-permissions.component.scss']
 })
 export class UserPermissionsComponent implements OnInit, OnDestroy {
   @Input() user: UserDto | null = null;
@@ -386,5 +159,21 @@ export class UserPermissionsComponent implements OnInit, OnDestroy {
 
   resetChanges(): void {
     this.pendingChanges.clear();
+  }
+
+  getCategoryIcon(categoryName: string): string {
+    const iconMap: { [key: string]: string } = {
+      'Users': 'people',
+      'Products': 'inventory',
+      'Categories': 'category',
+      'Alerts': 'notifications',
+      'System': 'settings',
+      'Reports': 'assessment',
+      'Admin': 'admin_panel_settings',
+      'Permissions': 'security',
+      'Default': 'folder'
+    };
+    
+    return iconMap[categoryName] || iconMap['Default'];
   }
 } 
