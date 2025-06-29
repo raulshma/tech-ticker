@@ -259,6 +259,14 @@ mat-sidenav-content {
       height: 16px;
     }
   }
+  
+  // Override nav-items default hiding behavior for quick access
+  .nav-items {
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    padding-bottom: 8px;
+  }
 }
 
 // Expandable Sections
