@@ -66,27 +66,8 @@
   }
 }
 
-// ===== BACK ACTION BUTTON =====
-.back-action-btn {
-  height: 48px;
-  border-radius: 16px;
-  font-weight: 500;
-  box-shadow: var(--mat-sys-elevation-level1);
-  transition: all 0.2s ease-in-out;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--mat-sys-elevation-level2);
-  }
-
-  mat-icon {
-    margin-right: 8px;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-}
+// ===== REMOVED UNUSED BUTTON STYLES =====
+// back-action-btn styles removed - using Angular Material's built-in button styling
 
 // ===== LOADING SECTION =====
 .loading-section {

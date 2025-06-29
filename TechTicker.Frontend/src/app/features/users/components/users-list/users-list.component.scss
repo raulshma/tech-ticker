@@ -66,25 +66,8 @@
   }
 }
 
-// ===== ACTION BUTTONS =====
-.primary-action-btn,
-.secondary-action-btn,
-.tertiary-action-btn {
-  height: 48px;
-  border-radius: 16px;
-  font-weight: 500;
-  box-shadow: var(--mat-sys-elevation-level1);
-  transition: all 0.2s ease-in-out;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--mat-sys-elevation-level2);
-  }
-
-  mat-icon {
-    margin-right: 8px;
-  }
-}
+// ===== REMOVED UNUSED BUTTON STYLES =====
+// Button styles removed as they are now handled by Angular Material's built-in styling
 
 // ===== STATISTICS SECTION =====
 .stats-section {
@@ -294,21 +277,7 @@
     }
   }
   
-  .clear-filters-btn {
-    height: 56px;
-    border-radius: 12px !important;
-    border: 1px solid var(--mat-sys-color-outline-variant) !important;
-    color: var(--mat-sys-color-on-surface-variant) !important;
-    
-    &:hover {
-      background: var(--mat-sys-color-surface-variant) !important;
-      border-color: var(--mat-sys-color-outline) !important;
-    }
-    
-    mat-icon {
-      margin-right: 8px;
-    }
-  }
+  // clear-filters-btn styles removed - using Angular Material's built-in button styling
 }
 
 // ===== TABLE CONTAINER =====
@@ -516,54 +485,7 @@
   justify-content: center;
   align-items: center;
   
-  .action-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    transition: all 200ms;
-    
-    mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-    }
-    
-    &.edit-btn {
-      color: var(--mat-sys-color-primary);
-      
-      &:hover {
-        background: var(--mat-sys-color-primary-container);
-        color: var(--mat-sys-color-on-primary-container);
-      }
-    }
-    
-    &.enable-btn {
-      color: var(--mat-sys-color-tertiary);
-      
-      &:hover {
-        background: var(--mat-sys-color-tertiary-container);
-        color: var(--mat-sys-color-on-tertiary-container);
-      }
-    }
-    
-    &.disable-btn {
-      color: var(--mat-sys-color-error);
-      
-      &:hover {
-        background: var(--mat-sys-color-error-container);
-        color: var(--mat-sys-color-on-error-container);
-      }
-    }
-    
-    &.more-btn {
-      color: var(--mat-sys-color-on-surface-variant);
-      
-      &:hover {
-        background: var(--mat-sys-color-surface-variant);
-        color: var(--mat-sys-color-on-surface);
-      }
-    }
-  }
+  // action-btn styles removed - using Angular Material's built-in matIconButton styling
 }
 
 // ===== USER ACTIONS MENU =====

@@ -70,19 +70,7 @@
   }
 
   .header-actions {
-    .copy-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--mat-sys-on-primary-container);
-      transition: all 0.2s ease;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-1px);
-      }
-    }
+    // copy-btn styles removed - using Angular Material's built-in button styling
   }
 }
 
@@ -340,23 +328,7 @@
     display: flex;
     gap: 4px;
 
-    .copy-small-btn,
-    .open-url-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      color: var(--mat-sys-primary);
-
-      &:hover {
-        background: var(--mat-sys-primary-container);
-      }
-
-      mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-      }
-    }
+    // copy-small-btn, open-url-btn styles removed - using Angular Material's built-in button styling
   }
 }
 
@@ -592,23 +564,7 @@
       display: flex;
       gap: 4px;
 
-      .copy-small-btn,
-      .view-image-btn {
-        width: 28px;
-        height: 28px;
-        border-radius: 6px;
-        color: var(--mat-sys-primary);
-
-        &:hover {
-          background: var(--mat-sys-primary-container);
-        }
-
-        mat-icon {
-          font-size: 14px;
-          width: 14px;
-          height: 14px;
-        }
-      }
+      // copy-small-btn, view-image-btn styles removed - using Angular Material's built-in button styling
     }
   }
 
@@ -661,23 +617,7 @@
         word-break: break-word;
       }
 
-      .copy-error-btn {
-        align-self: flex-start;
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        color: var(--mat-sys-on-error-container);
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.1);
-        }
-
-        mat-icon {
-          font-size: 16px;
-          width: 16px;
-          height: 16px;
-        }
-      }
+      // copy-error-btn styles removed - using Angular Material's built-in button styling
     }
   }
 }
@@ -733,14 +673,7 @@
       margin: 0 0 24px 0;
     }
 
-    .back-to-list-btn {
-      border-radius: 12px;
-      height: 48px;
-
-      mat-icon {
-        margin-right: 8px;
-      }
-    }
+    // back-to-list-btn styles removed - using Angular Material's built-in button styling
   }
 }
 

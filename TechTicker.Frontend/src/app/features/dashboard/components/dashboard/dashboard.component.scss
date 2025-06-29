@@ -407,18 +407,7 @@
       min-width: 200px;
     }
 
-    .retry-button {
-      border-radius: 20px;
-      font-weight: 500;
-      text-transform: none;
-      
-      mat-icon {
-        margin-right: 8px;
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-      }
-    }
+    // retry-button styles removed - using Angular Material's built-in button styling
   }
 }
 
@@ -478,9 +467,7 @@
     text-align: center;
     gap: 12px;
     
-    .retry-button {
-      align-self: center;
-    }
+    // retry-button styles removed - using Angular Material's built-in button styling
   }
 }
 

@@ -64,22 +64,7 @@
       }
     }
 
-    .refresh-action-btn {
-      height: 48px;
-      border-radius: 16px;
-      font-weight: 500;
-      box-shadow: var(--mat-sys-elevation-level1);
-      transition: all 0.2s ease-in-out;
-
-      &:hover {
-        transform: translateY(-1px);
-        box-shadow: var(--mat-sys-elevation-level2);
-      }
-
-      mat-icon {
-        margin-right: 8px;
-      }
-    }
+    // refresh-action-btn styles removed - using Angular Material's built-in button styling
   }
 }
 
@@ -293,16 +278,7 @@
       }
     }
 
-    .clear-filters-btn {
-      height: 48px;
-      border-radius: 12px;
-      font-weight: 500;
-      white-space: nowrap;
-
-      mat-icon {
-        margin-right: 8px;
-      }
-    }
+    // clear-filters-btn styles removed - using Angular Material's built-in button styling
   }
 }
 
@@ -452,20 +428,7 @@
         display: flex;
         gap: 4px;
 
-        .action-btn {
-          width: 40px;
-          height: 40px;
-          border-radius: 8px;
-          transition: all 0.2s ease;
-
-          &.view-btn {
-            color: var(--mat-sys-primary);
-
-            &:hover {
-              background: var(--mat-sys-primary-container);
-            }
-          }
-        }
+        // action-btn styles removed - using Angular Material's built-in matIconButton styling
       }
     }
   }
