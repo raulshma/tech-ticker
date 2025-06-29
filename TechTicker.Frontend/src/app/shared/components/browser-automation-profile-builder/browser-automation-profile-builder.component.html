@@ -1,96 +1,96 @@
 <div class="browser-automation-profile-builder">
   <div class="builder-header">
-    <h3>Browser Automation Profile Builder</h3>
-    <button mat-stroked-button color="primary" type="button" (click)="toggleRawJson()">
-      {{ showRawJson ? 'Switch to Form View' : 'Switch to Raw JSON' }}
+    <h3>Automation Profile</h3>
+    <button mat-stroked-button color="primary" type="button" (click)="toggleRawJson()" matTooltip="Switch between form and JSON view">
+      <mat-icon>{{ showRawJson ? 'view_list' : 'code' }}</mat-icon>
     </button>
   </div>
 
+  <mat-divider></mat-divider>
+
   <form *ngIf="!showRawJson" [formGroup]="profileForm" class="profile-form">
     <div class="form-row">
-      <mat-form-field appearance="outline">
-        <mat-label>Preferred Browser</mat-label>
+      <mat-form-field appearance="fill" class="dense">
+        <mat-label>Browser</mat-label>
         <mat-select formControlName="preferredBrowser">
           <mat-option *ngFor="let browser of browsers" [value]="browser.value">{{ browser.label }}</mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Timeout (seconds)</mat-label>
+      <mat-form-field appearance="fill" class="dense">
+        <mat-label>Timeout (s)</mat-label>
         <input matInput type="number" formControlName="timeoutSeconds" min="1">
         <mat-error *ngIf="profileForm.get('timeoutSeconds')?.invalid && profileForm.get('timeoutSeconds')?.touched">
           Timeout must be at least 1 second.
         </mat-error>
       </mat-form-field>
-    </div>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>User Agent (optional)</mat-label>
-        <input matInput formControlName="userAgent" placeholder="Custom user agent string">
+      <mat-form-field appearance="fill" class="dense full-width">
+        <mat-label>User Agent</mat-label>
+        <input matInput formControlName="userAgent" placeholder="Custom user agent">
       </mat-form-field>
     </div>
 
-    <div class="form-row">
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>Proxy Settings (optional)</mat-panel-title>
-        </mat-expansion-panel-header>
-        <div [formGroup]="proxyGroup">
-          <mat-form-field appearance="outline">
-            <mat-label>Host</mat-label>
-            <input matInput formControlName="host" placeholder="proxy.example.com">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Port</mat-label>
-            <input matInput type="number" formControlName="port" min="1">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Username</mat-label>
-            <input matInput formControlName="username" placeholder="proxy user">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password" placeholder="proxy password">
-          </mat-form-field>
-        </div>
-      </mat-expansion-panel>
-    </div>
+    <mat-expansion-panel class="dense" hideToggle>
+      <mat-expansion-panel-header>
+        <mat-panel-title>Proxy Settings</mat-panel-title>
+      </mat-expansion-panel-header>
+      <div [formGroup]="proxyGroup">
+        <mat-form-field appearance="fill" class="dense">
+          <mat-label>Host</mat-label>
+          <input matInput formControlName="host" placeholder="proxy.example.com">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="dense">
+          <mat-label>Port</mat-label>
+          <input matInput type="number" formControlName="port" min="1">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="dense">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" placeholder="proxy user">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="dense">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" placeholder="proxy password">
+        </mat-form-field>
+      </div>
+    </mat-expansion-panel>
+
+    <mat-divider></mat-divider>
 
     <div class="form-row">
-      <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel class="dense" [expanded]="true">
         <mat-expansion-panel-header>
           <mat-panel-title>Actions</mat-panel-title>
         </mat-expansion-panel-header>
         <div formArrayName="actions">
+          <div *ngIf="actions.length === 0" class="empty-actions">No actions defined.</div>
           <div *ngFor="let action of actions.controls; let i = index" [formGroupName]="i" class="action-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Action Type</mat-label>
-              <mat-select formControlName="actionType">
+            <mat-form-field appearance="fill" class="dense">
+              <mat-label>Type</mat-label>
+              <mat-select formControlName="actionType" matTooltip="Action type">
                 <mat-option *ngFor="let type of actionTypes" [value]="type.value">{{ type.label }}</mat-option>
               </mat-select>
             </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Selector (optional)</mat-label>
-              <input matInput formControlName="selector" placeholder=".product-title">
+            <mat-form-field appearance="fill" class="dense">
+              <mat-label>Selector</mat-label>
+              <input matInput formControlName="selector" placeholder=".product-title" matTooltip="CSS selector (optional)">
             </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Value (optional)</mat-label>
-              <input matInput formControlName="value" placeholder="Text, JS code, filename, etc.">
+            <mat-form-field appearance="fill" class="dense">
+              <mat-label>Value</mat-label>
+              <input matInput formControlName="value" placeholder="Text, JS, filename" matTooltip="Value (optional)">
             </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Timeout (ms, optional)</mat-label>
-              <input matInput type="number" formControlName="timeoutMs" min="0">
+            <mat-form-field appearance="fill" class="dense">
+              <mat-label>Timeout (ms)</mat-label>
+              <input matInput type="number" formControlName="timeoutMs" min="0" matTooltip="Timeout in ms (optional)">
             </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Delay (ms, optional)</mat-label>
-              <input matInput type="number" formControlName="delayMs" min="0">
+            <mat-form-field appearance="fill" class="dense">
+              <mat-label>Delay (ms)</mat-label>
+              <input matInput type="number" formControlName="delayMs" min="0" matTooltip="Delay in ms (optional)">
             </mat-form-field>
             <button mat-icon-button color="warn" type="button" (click)="removeAction(i)" matTooltip="Remove action">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
-          <button mat-raised-button color="primary" type="button" (click)="addAction()">
-            <mat-icon>add</mat-icon> Add Action
+          <button mat-fab color="primary" type="button" (click)="addAction()" class="add-action-fab" matTooltip="Add Action">
+            <mat-icon>add</mat-icon>
           </button>
         </div>
       </mat-expansion-panel>
@@ -100,6 +100,8 @@
       <mat-icon color="warn">error</mat-icon> {{ validationError }}
     </div>
 
+    <mat-divider></mat-divider>
+
     <div class="json-preview">
       <h4>Live JSON Preview</h4>
       <pre>{{ profileForm.value | json }}</pre>
@@ -107,7 +109,7 @@
   </form>
 
   <div *ngIf="showRawJson" class="raw-json-section">
-    <mat-form-field appearance="outline" class="full-width">
+    <mat-form-field appearance="fill" class="full-width">
       <mat-label>Browser Automation Profile (JSON)</mat-label>
       <textarea matInput [formControl]="rawJsonControl" rows="12"></textarea>
     </mat-form-field>

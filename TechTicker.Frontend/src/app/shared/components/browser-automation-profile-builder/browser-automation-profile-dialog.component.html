@@ -1,0 +1,18 @@
+<h2 mat-dialog-title class="dialog-title">Edit Browser Automation Profile</h2>
+<div mat-dialog-content class="compact-content">
+  <div class="action-summary" *ngIf="data.profile?.actions?.length">
+    <mat-chip-set>
+      <mat-chip *ngFor="let action of data.profile.actions">
+        {{ action.actionType }}
+      </mat-chip>
+    </mat-chip-set>
+  </div>
+  <app-browser-automation-profile-builder
+    #profileBuilder
+    class="compact-builder"
+  ></app-browser-automation-profile-builder>
+</div>
+<div mat-dialog-actions align="end" class="compact-actions">
+  <button mat-stroked-button (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()">Save</button>
+</div> 

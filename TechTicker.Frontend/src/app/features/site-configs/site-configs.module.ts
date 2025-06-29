@@ -16,18 +16,23 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+import { LayoutModule } from '@angular/cdk/layout';
 
 import { SiteConfigsRoutingModule } from './site-configs-routing.module';
 import { SiteConfigsListComponent } from './components/site-configs-list/site-configs-list.component';
 import { SiteConfigFormComponent } from './components/site-config-form/site-config-form.component';
 import { SiteConfigDeleteDialogComponent } from './components/site-config-delete-dialog/site-config-delete-dialog.component';
 import { BrowserAutomationProfileBuilderComponent } from '../../shared/components/browser-automation-profile-builder/browser-automation-profile-builder.component';
+import { BrowserAutomationProfileDialogComponent } from '../../shared/components/browser-automation-profile-builder/browser-automation-profile-dialog.component';
 
 @NgModule({
   declarations: [
     SiteConfigsListComponent,
     SiteConfigFormComponent,
-    SiteConfigDeleteDialogComponent
+    SiteConfigDeleteDialogComponent,
+    BrowserAutomationProfileDialogComponent
   ],
   imports: [
     CommonModule,
@@ -48,6 +53,9 @@ import { BrowserAutomationProfileBuilderComponent } from '../../shared/component
     MatSlideToggleModule,
     MatExpansionModule,
     MatChipsModule,
+    MatSelectModule,
+    MatDividerModule,
+    LayoutModule,
     BrowserAutomationProfileBuilderComponent
   ]
 })

@@ -64,11 +64,6 @@ export interface BrowserAutomationProfile {
     MatExpansionModule,
     MatTooltipModule,
     MatDividerModule,
-    MatMenuModule,
-    MatToolbarModule,
-    MatSidenavModule,
-    MatListModule,
-    MatError,
   ]
 })
 export class BrowserAutomationProfileBuilderComponent implements ControlValueAccessor, OnInit {

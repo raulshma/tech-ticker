@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import {
   ScraperSiteConfigurationDto,
   CreateScraperSiteConfigurationDto,
   UpdateScraperSiteConfigurationDto
 } from '../../../../shared/api/api-client';
 import { SiteConfigsService } from '../../services/site-configs.service';
+import { BrowserAutomationProfileDialogComponent } from '../../../../shared/components/browser-automation-profile-builder/browser-automation-profile-dialog.component';
 
 interface HeaderEntry {
   key: string;
@@ -127,7 +129,8 @@ export class SiteConfigFormComponent implements OnInit {
     private siteConfigsService: SiteConfigsService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {
     this.siteConfigForm = this.formBuilder.group({
       siteDomain: ['', [Validators.required, Validators.maxLength(200)]],
@@ -335,5 +338,41 @@ export class SiteConfigFormComponent implements OnInit {
 
   get browserAutomationProfileControl() {
     return this.siteConfigForm.get('browserAutomationProfile') as import('@angular/forms').FormControl;
+  }
+
+  openAutomationProfileDialog() {
+    const currentProfile = this.siteConfigForm.get('browserAutomationProfile')?.value;
+    let profileObj: any;
+    try {
+      profileObj = typeof currentProfile === 'string' ? JSON.parse(currentProfile) : (currentProfile || {});
+    } catch {
+      profileObj = {};
+    }
+    const dialogRef = this.dialog.open(BrowserAutomationProfileDialogComponent, {
+      data: { profile: { ...profileObj } },
+      maxWidth: '98vw',
+      width: '680px',
+      panelClass: 'automation-profile-dialog',
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.siteConfigForm.get('browserAutomationProfile')?.setValue(result);
+      }
+    });
+  }
+
+  browserAutomationProfileSummary(): string {
+    const val = this.siteConfigForm.get('browserAutomationProfile')?.value;
+    let profile: any;
+    try {
+      profile = typeof val === 'string' ? JSON.parse(val) : val;
+    } catch {
+      return '';
+    }
+    if (profile && Array.isArray(profile.actions) && profile.actions.length > 0) {
+      return profile.actions.map((a: any) => a.actionType).join(', ');
+    }
+    return 'No actions defined';
   }
 }

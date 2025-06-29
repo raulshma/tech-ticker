@@ -1,0 +1,53 @@
+.dialog-title {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.compact-content {
+  padding: 0 8px 8px 8px;
+  max-width: 680px;
+  min-width: 320px;
+}
+
+.compact-builder {
+  margin-top: 0.5rem;
+}
+
+.action-summary {
+  margin-bottom: 0.5rem;
+  mat-chip-set {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  mat-chip {
+    font-size: 0.85em;
+    margin: 2px;
+    height: 24px;
+    line-height: 24px;
+  }
+}
+
+.compact-actions {
+  padding: 8px 8px 8px 0;
+  button {
+    min-width: 80px;
+    margin-left: 8px;
+  }
+}
+
+.full-screen-dialog .mat-dialog-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.full-screen-dialog .compact-content {
+  max-width: 100vw;
+  min-width: 0;
+  padding: 0 8px;
+} 

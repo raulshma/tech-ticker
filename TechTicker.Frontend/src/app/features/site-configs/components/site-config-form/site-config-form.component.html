@@ -218,10 +218,13 @@
               </mat-hint>
             </div>
             <div class="form-row">
-              <app-browser-automation-profile-builder
-                [formControl]="browserAutomationProfileControl"
-                [parentForm]="siteConfigForm">
-              </app-browser-automation-profile-builder>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Browser Automation Profile</mat-label>
+                <input matInput [value]="browserAutomationProfileSummary()" readonly>
+                <button mat-icon-button matSuffix type="button" (click)="openAutomationProfileDialog()" matTooltip="Edit Automation Profile">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </mat-form-field>
             </div>
           </div>
         </mat-expansion-panel>
