@@ -47,6 +47,13 @@ public class ScraperSiteConfiguration
     [Required]
     public DateTimeOffset UpdatedAt { get; set; }
 
+    public bool RequiresBrowserAutomation { get; set; } = false;
+
+    /// <summary>
+    /// Browser automation profile as JSON (serialized BrowserAutomationProfile)
+    /// </summary>
+    public string? BrowserAutomationProfile { get; set; }
+
     // Navigation properties
     public ICollection<ProductSellerMapping> ProductSellerMappings { get; set; } = new List<ProductSellerMapping>();
 

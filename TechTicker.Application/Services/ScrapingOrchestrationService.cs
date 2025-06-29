@@ -4,6 +4,7 @@ using TechTicker.Application.Configuration;
 using TechTicker.Application.Messages;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
+using System.Text.Json;
 
 namespace TechTicker.Application.Services;
 
@@ -56,7 +57,11 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
                         UserAgent = mapping.SiteConfiguration?.DefaultUserAgent ?? 
                                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
                         Headers = mapping.SiteConfiguration?.AdditionalHeadersDict
-                    }
+                    },
+                    RequiresBrowserAutomation = mapping.SiteConfiguration?.RequiresBrowserAutomation ?? false,
+                    BrowserAutomationProfile = string.IsNullOrEmpty(mapping.SiteConfiguration?.BrowserAutomationProfile)
+                        ? null
+                        : JsonSerializer.Deserialize<BrowserAutomationProfile>(mapping.SiteConfiguration.BrowserAutomationProfile!)
                 };
 
                 await _messagePublisher.PublishAsync(
@@ -174,7 +179,11 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
                     UserAgent = mapping.SiteConfiguration?.DefaultUserAgent ??
                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
                     Headers = mapping.SiteConfiguration?.AdditionalHeadersDict
-                }
+                },
+                RequiresBrowserAutomation = mapping.SiteConfiguration?.RequiresBrowserAutomation ?? false,
+                BrowserAutomationProfile = string.IsNullOrEmpty(mapping.SiteConfiguration?.BrowserAutomationProfile)
+                    ? null
+                    : JsonSerializer.Deserialize<BrowserAutomationProfile>(mapping.SiteConfiguration.BrowserAutomationProfile!)
             };
 
             await _messagePublisher.PublishAsync(

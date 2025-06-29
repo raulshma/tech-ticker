@@ -31,6 +31,9 @@ namespace TechTicker.Shared.Models
         [Required]
         public DateTimeOffset UpdatedAt { get; set; }
 
+        public bool RequiresBrowserAutomation { get; set; }
+        public string? BrowserAutomationProfile { get; set; }
+
         // Navigation property for mappings using this configuration
         public ICollection<ProductSellerMapping> ProductSellerMappings { get; set; } = new List<ProductSellerMapping>();
     }

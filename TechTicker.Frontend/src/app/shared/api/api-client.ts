@@ -12058,6 +12058,8 @@ export class CreateScraperSiteConfigurationDto implements ICreateScraperSiteConf
     defaultUserAgent?: string | undefined;
     additionalHeaders?: { [key: string]: string; } | undefined;
     isEnabled?: boolean;
+    requiresBrowserAutomation?: boolean;
+    browserAutomationProfile?: string | undefined;
 
     constructor(data?: ICreateScraperSiteConfigurationDto) {
         if (data) {
@@ -12085,6 +12087,8 @@ export class CreateScraperSiteConfigurationDto implements ICreateScraperSiteConf
                 }
             }
             this.isEnabled = _data["isEnabled"];
+            this.requiresBrowserAutomation = _data["requiresBrowserAutomation"];
+            this.browserAutomationProfile = _data["browserAutomationProfile"];
         }
     }
 
@@ -12112,6 +12116,8 @@ export class CreateScraperSiteConfigurationDto implements ICreateScraperSiteConf
             }
         }
         data["isEnabled"] = this.isEnabled;
+        data["requiresBrowserAutomation"] = this.requiresBrowserAutomation;
+        data["browserAutomationProfile"] = this.browserAutomationProfile;
         return data;
     }
 }
@@ -12126,6 +12132,8 @@ export interface ICreateScraperSiteConfigurationDto {
     defaultUserAgent?: string | undefined;
     additionalHeaders?: { [key: string]: string; } | undefined;
     isEnabled?: boolean;
+    requiresBrowserAutomation?: boolean;
+    browserAutomationProfile?: string | undefined;
 }
 
 export class CreateUserDto implements ICreateUserDto {
@@ -17317,6 +17325,8 @@ export class ScraperSiteConfigurationDto implements IScraperSiteConfigurationDto
     isEnabled?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    requiresBrowserAutomation?: boolean;
+    browserAutomationProfile?: string | undefined;
 
     constructor(data?: IScraperSiteConfigurationDto) {
         if (data) {
@@ -17347,6 +17357,8 @@ export class ScraperSiteConfigurationDto implements IScraperSiteConfigurationDto
             this.isEnabled = _data["isEnabled"];
             this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
             this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.requiresBrowserAutomation = _data["requiresBrowserAutomation"];
+            this.browserAutomationProfile = _data["browserAutomationProfile"];
         }
     }
 
@@ -17377,6 +17389,8 @@ export class ScraperSiteConfigurationDto implements IScraperSiteConfigurationDto
         data["isEnabled"] = this.isEnabled;
         data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
         data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["requiresBrowserAutomation"] = this.requiresBrowserAutomation;
+        data["browserAutomationProfile"] = this.browserAutomationProfile;
         return data;
     }
 }
@@ -17394,6 +17408,8 @@ export interface IScraperSiteConfigurationDto {
     isEnabled?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    requiresBrowserAutomation?: boolean;
+    browserAutomationProfile?: string | undefined;
 }
 
 export class ScraperSiteConfigurationDtoApiResponse implements IScraperSiteConfigurationDtoApiResponse {
@@ -18630,6 +18646,8 @@ export class UpdateScraperSiteConfigurationDto implements IUpdateScraperSiteConf
     defaultUserAgent?: string | undefined;
     additionalHeaders?: { [key: string]: string; } | undefined;
     isEnabled?: boolean | undefined;
+    requiresBrowserAutomation?: boolean | undefined;
+    browserAutomationProfile?: string | undefined;
 
     constructor(data?: IUpdateScraperSiteConfigurationDto) {
         if (data) {
@@ -18657,6 +18675,8 @@ export class UpdateScraperSiteConfigurationDto implements IUpdateScraperSiteConf
                 }
             }
             this.isEnabled = _data["isEnabled"];
+            this.requiresBrowserAutomation = _data["requiresBrowserAutomation"];
+            this.browserAutomationProfile = _data["browserAutomationProfile"];
         }
     }
 
@@ -18684,6 +18704,8 @@ export class UpdateScraperSiteConfigurationDto implements IUpdateScraperSiteConf
             }
         }
         data["isEnabled"] = this.isEnabled;
+        data["requiresBrowserAutomation"] = this.requiresBrowserAutomation;
+        data["browserAutomationProfile"] = this.browserAutomationProfile;
         return data;
     }
 }
@@ -18698,6 +18720,8 @@ export interface IUpdateScraperSiteConfigurationDto {
     defaultUserAgent?: string | undefined;
     additionalHeaders?: { [key: string]: string; } | undefined;
     isEnabled?: boolean | undefined;
+    requiresBrowserAutomation?: boolean | undefined;
+    browserAutomationProfile?: string | undefined;
 }
 
 export class UpdateUserDto implements IUpdateUserDto {

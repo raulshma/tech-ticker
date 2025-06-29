@@ -41,5 +41,8 @@ namespace TechTicker.Shared.Models
 
         // Navigation property for site configuration
         public ScraperSiteConfiguration? SiteConfiguration { get; set; }
+
+        public bool RequiresBrowserAutomation => SiteConfiguration?.RequiresBrowserAutomation ?? false;
+        public string? BrowserAutomationProfile => SiteConfiguration?.BrowserAutomationProfile;
     }
 }

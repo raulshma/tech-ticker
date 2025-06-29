@@ -8,6 +8,7 @@ using TechTicker.Application.DTOs;
 using TechTicker.Application.Messages;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.ScrapingWorker.Services;
+using Microsoft.Playwright;
 
 namespace TechTicker.ScrapingWorker.Services;
 
@@ -38,6 +39,11 @@ public partial class WebScrapingService
 
     public async Task<ScrapingResult> ScrapeProductPageAsync(ScrapeProductPageCommand command)
     {
+        if (command.RequiresBrowserAutomation)
+        {
+            return await ScrapeWithBrowserAutomationAsync(command);
+        }
+
         var overallStopwatch = Stopwatch.StartNew();
         Guid? runId = null;
         ProxyAwareHttpResponse? proxyResponse = null;
@@ -489,6 +495,140 @@ public partial class WebScrapingService
         {
             _logger.LogWarning(ex, "Failed to extract seller name using selector {Selector}", selector);
             return null;
+        }
+    }
+
+    private async Task<ScrapingResult> ScrapeWithBrowserAutomationAsync(ScrapeProductPageCommand command)
+    {
+        // Log start
+        _logger.LogInformation("[BrowserAutomation] Starting Playwright scraping for mapping {MappingId} at URL {Url}",
+            command.MappingId, command.ExactProductUrl);
+
+        // Set up Playwright
+        try
+        {
+            using var playwright = await Microsoft.Playwright.Playwright.CreateAsync();
+            var browserType = (command.BrowserAutomationProfile?.PreferredBrowser ?? "chromium").ToLower();
+            IBrowser browser = browserType switch
+            {
+                "firefox" => await playwright.Firefox.LaunchAsync(new() { Headless = true }),
+                "webkit" => await playwright.Webkit.LaunchAsync(new() { Headless = true }),
+                _ => await playwright.Chromium.LaunchAsync(new() { Headless = true })
+            };
+
+            // Proxy support
+            var contextOptions = new Microsoft.Playwright.BrowserNewContextOptions();
+            if (!string.IsNullOrEmpty(command.BrowserAutomationProfile?.ProxyServer))
+            {
+                contextOptions.Proxy = new Microsoft.Playwright.Proxy
+                {
+                    Server = command.BrowserAutomationProfile.ProxyServer,
+                    Username = command.BrowserAutomationProfile.ProxyUsername,
+                    Password = command.BrowserAutomationProfile.ProxyPassword
+                };
+            }
+
+            // User-Agent and headers
+            if (!string.IsNullOrEmpty(command.BrowserAutomationProfile?.UserAgent))
+                contextOptions.UserAgent = command.BrowserAutomationProfile.UserAgent;
+            if (command.BrowserAutomationProfile?.Headers != null)
+                contextOptions.ExtraHTTPHeaders = command.BrowserAutomationProfile.Headers;
+
+            // Timeout
+            int timeoutMs = (command.BrowserAutomationProfile?.TimeoutSeconds ?? 30) * 1000;
+
+            var context = await browser.NewContextAsync(contextOptions);
+            var page = await context.NewPageAsync();
+
+            // Go to page
+            await page.GotoAsync(command.ExactProductUrl, new() { Timeout = timeoutMs, WaitUntil = Microsoft.Playwright.WaitUntilState.NetworkIdle });
+
+            // Perform actions (scroll, click, etc.)
+            if (command.BrowserAutomationProfile?.Actions != null)
+            {
+                foreach (var action in command.BrowserAutomationProfile.Actions)
+                {
+                    switch (action.ActionType.ToLower())
+                    {
+                        case "scroll":
+                            await page.EvaluateAsync("window.scrollBy(0, window.innerHeight);");
+                            if (action.DelayMs.HasValue) await Task.Delay(action.DelayMs.Value);
+                            break;
+                        case "click":
+                            if (!string.IsNullOrEmpty(action.Selector))
+                                await page.ClickAsync(action.Selector, new() { Timeout = timeoutMs });
+                            if (action.DelayMs.HasValue) await Task.Delay(action.DelayMs.Value);
+                            break;
+                        // Add more actions as needed
+                    }
+                }
+            }
+
+            // Wait for selectors if specified
+            if (!string.IsNullOrEmpty(command.Selectors.PriceSelector))
+                await page.WaitForSelectorAsync(command.Selectors.PriceSelector, new() { Timeout = timeoutMs });
+
+            // Extract data
+            var productName = !string.IsNullOrEmpty(command.Selectors.ProductNameSelector)
+                ? await page.TextContentAsync(command.Selectors.ProductNameSelector)
+                : null;
+            var priceText = !string.IsNullOrEmpty(command.Selectors.PriceSelector)
+                ? await page.TextContentAsync(command.Selectors.PriceSelector)
+                : null;
+            var stockStatus = !string.IsNullOrEmpty(command.Selectors.StockSelector)
+                ? await page.TextContentAsync(command.Selectors.StockSelector)
+                : null;
+            var sellerNameOnPage = !string.IsNullOrEmpty(command.Selectors.SellerNameOnPageSelector)
+                ? await page.TextContentAsync(command.Selectors.SellerNameOnPageSelector)
+                : null;
+
+            // Parse price
+            decimal? price = null;
+            if (!string.IsNullOrEmpty(priceText))
+            {
+                var cleaned = new string(priceText.Where(c => char.IsDigit(c) || c == '.' || c == ',').ToArray());
+                if (decimal.TryParse(cleaned, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
+                    price = parsed;
+            }
+
+            // Scrape images if selector is provided
+            List<string> imageUrls = new();
+            if (!string.IsNullOrEmpty(command.Selectors.ImageSelector))
+            {
+                var imageElements = await page.QuerySelectorAllAsync(command.Selectors.ImageSelector);
+                foreach (var img in imageElements)
+                {
+                    var src = await img.GetAttributeAsync("src");
+                    if (!string.IsNullOrEmpty(src)) imageUrls.Add(src);
+                }
+            }
+
+            await browser.CloseAsync();
+
+            return new ScrapingResult
+            {
+                IsSuccess = price.HasValue,
+                ProductName = productName,
+                Price = price ?? 0,
+                StockStatus = stockStatus,
+                SellerNameOnPage = sellerNameOnPage,
+                ScrapedAt = DateTimeOffset.UtcNow,
+                ErrorMessage = price.HasValue ? null : "Could not extract price from the page (browser automation)",
+                ErrorCode = price.HasValue ? null : "BROWSER_AUTOMATION_EXTRACTION_FAILED",
+                PrimaryImageUrl = imageUrls.FirstOrDefault(),
+                AdditionalImageUrls = imageUrls.Skip(1).ToList(),
+                OriginalImageUrls = imageUrls
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[BrowserAutomation] Playwright scraping failed for mapping {MappingId}", command.MappingId);
+            return new ScrapingResult
+            {
+                IsSuccess = false,
+                ErrorMessage = $"Browser automation failed: {ex.Message}",
+                ErrorCode = "BROWSER_AUTOMATION_ERROR"
+            };
         }
     }
 }

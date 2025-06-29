@@ -56,7 +56,9 @@ public class ScrapingOrchestrationServiceTests
                     SiteDomain = "amazon.com",
                     ProductNameSelector = "#productTitle",
                     PriceSelector = ".a-price-whole",
-                    StockSelector = "#availability span"
+                    StockSelector = "#availability span",
+                    RequiresBrowserAutomation = false,
+                    BrowserAutomationProfile = null
                 }
             },
             new ProductSellerMapping
@@ -73,7 +75,9 @@ public class ScrapingOrchestrationServiceTests
                     SiteDomain = "bestbuy.com",
                     ProductNameSelector = "h1.sr-only",
                     PriceSelector = ".sr-only",
-                    StockSelector = ".fulfillment-add-to-cart-button"
+                    StockSelector = ".fulfillment-add-to-cart-button",
+                    RequiresBrowserAutomation = false,
+                    BrowserAutomationProfile = null
                 }
             }
         };
@@ -262,7 +266,9 @@ public class ScrapingOrchestrationServiceTests
                 SiteDomain = "amazon.com",
                 ProductNameSelector = "#productTitle",
                 PriceSelector = ".a-price-whole",
-                StockSelector = "#availability span"
+                StockSelector = "#availability span",
+                RequiresBrowserAutomation = false,
+                BrowserAutomationProfile = null
             }
         };
 

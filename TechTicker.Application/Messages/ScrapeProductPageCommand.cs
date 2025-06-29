@@ -11,6 +11,8 @@ public class ScrapeProductPageCommand
     public string ExactProductUrl { get; set; } = null!;
     public ScrapingSelectors Selectors { get; set; } = null!;
     public ScrapingProfile ScrapingProfile { get; set; } = null!;
+    public bool RequiresBrowserAutomation { get; set; } = false;
+    public BrowserAutomationProfile? BrowserAutomationProfile { get; set; }
 }
 
 public class ScrapingSelectors
@@ -26,4 +28,25 @@ public class ScrapingProfile
 {
     public string UserAgent { get; set; } = null!;
     public Dictionary<string, string>? Headers { get; set; }
+}
+
+public class BrowserAutomationProfile
+{
+    public string? PreferredBrowser { get; set; } // e.g., "chromium", "firefox", "webkit"
+    public int? WaitTimeMs { get; set; }
+    public List<BrowserAutomationAction>? Actions { get; set; } // e.g., scroll, click, etc.
+    public int? TimeoutSeconds { get; set; }
+    public string? UserAgent { get; set; }
+    public Dictionary<string, string>? Headers { get; set; }
+    public string? ProxyServer { get; set; }
+    public string? ProxyUsername { get; set; }
+    public string? ProxyPassword { get; set; }
+}
+
+public class BrowserAutomationAction
+{
+    public string ActionType { get; set; } = null!; // e.g., "scroll", "click"
+    public string? Selector { get; set; }
+    public int? Repeat { get; set; }
+    public int? DelayMs { get; set; }
 }

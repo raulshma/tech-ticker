@@ -191,10 +191,12 @@ public class MappingService : IMappingService
             SellerNameOnPageSelector = config.SellerNameOnPageSelector,
             ImageSelector = config.ImageSelector,
             DefaultUserAgent = config.DefaultUserAgent,
-            AdditionalHeaders = config.AdditionalHeadersDict,
+            AdditionalHeaders = string.IsNullOrEmpty(config.AdditionalHeaders) ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(config.AdditionalHeaders),
             IsEnabled = config.IsEnabled,
             CreatedAt = config.CreatedAt,
-            UpdatedAt = config.UpdatedAt
+            UpdatedAt = config.UpdatedAt,
+            RequiresBrowserAutomation = config.RequiresBrowserAutomation,
+            BrowserAutomationProfile = config.BrowserAutomationProfile
         };
     }
 
@@ -210,8 +212,12 @@ public class MappingService : IMappingService
             SellerNameOnPageSelector = createDto.SellerNameOnPageSelector,
             ImageSelector = createDto.ImageSelector,
             DefaultUserAgent = createDto.DefaultUserAgent,
-            AdditionalHeadersDict = createDto.AdditionalHeaders,
-            IsEnabled = createDto.IsEnabled
+            AdditionalHeaders = createDto.AdditionalHeaders == null ? null : JsonSerializer.Serialize(createDto.AdditionalHeaders),
+            IsEnabled = createDto.IsEnabled,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow,
+            RequiresBrowserAutomation = createDto.RequiresBrowserAutomation,
+            BrowserAutomationProfile = createDto.BrowserAutomationProfile
         };
     }
 
@@ -239,10 +245,16 @@ public class MappingService : IMappingService
             config.DefaultUserAgent = updateDto.DefaultUserAgent;
 
         if (updateDto.AdditionalHeaders != null)
-            config.AdditionalHeadersDict = updateDto.AdditionalHeaders;
+            config.AdditionalHeaders = JsonSerializer.Serialize(updateDto.AdditionalHeaders);
 
         if (updateDto.IsEnabled.HasValue)
             config.IsEnabled = updateDto.IsEnabled.Value;
+
+        config.UpdatedAt = DateTimeOffset.UtcNow;
+        if (updateDto.RequiresBrowserAutomation.HasValue)
+            config.RequiresBrowserAutomation = updateDto.RequiresBrowserAutomation.Value;
+        if (updateDto.BrowserAutomationProfile != null)
+            config.BrowserAutomationProfile = updateDto.BrowserAutomationProfile;
     }
 
     public PriceHistoryDto MapToDto(PriceHistory priceHistory)

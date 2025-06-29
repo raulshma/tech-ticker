@@ -82,7 +82,9 @@ public class WebScrapingServiceTests : IDisposable
                 {
                     ["Accept"] = "text/html"
                 }
-            }
+            },
+            RequiresBrowserAutomation = false,
+            BrowserAutomationProfile = null
         };
 
         // Act
@@ -121,7 +123,9 @@ public class WebScrapingServiceTests : IDisposable
             ScrapingProfile = new ScrapingProfile
             {
                 UserAgent = "Test Bot"
-            }
+            },
+            RequiresBrowserAutomation = false,
+            BrowserAutomationProfile = null
         };
 
         // Act
@@ -154,7 +158,9 @@ public class WebScrapingServiceTests : IDisposable
             ScrapingProfile = new ScrapingProfile
             {
                 UserAgent = "Test Bot"
-            }
+            },
+            RequiresBrowserAutomation = false,
+            BrowserAutomationProfile = null
         };
 
         // Act
@@ -185,7 +191,9 @@ public class WebScrapingServiceTests : IDisposable
             ScrapingProfile = new ScrapingProfile
             {
                 UserAgent = "Test Bot"
-            }
+            },
+            RequiresBrowserAutomation = false,
+            BrowserAutomationProfile = null
         };
 
         // Act
@@ -216,7 +224,9 @@ public class WebScrapingServiceTests : IDisposable
             ScrapingProfile = new ScrapingProfile
             {
                 UserAgent = customUserAgent
-            }
+            },
+            RequiresBrowserAutomation = false,
+            BrowserAutomationProfile = null
         };
 
         // Act
@@ -253,7 +263,9 @@ public class WebScrapingServiceTests : IDisposable
             {
                 UserAgent = "Test Bot",
                 Headers = headers
-            }
+            },
+            RequiresBrowserAutomation = false,
+            BrowserAutomationProfile = null
         };
 
         // Act
@@ -320,7 +332,9 @@ public class WebScrapingServiceTests : IDisposable
             ScrapingProfile = new ScrapingProfile
             {
                 UserAgent = "Test Bot"
-            }
+            },
+            RequiresBrowserAutomation = false,
+            BrowserAutomationProfile = null
         };
 
         // Act
@@ -351,7 +365,9 @@ public class WebScrapingServiceTests : IDisposable
             {
                 UserAgent = "Test Bot",
                 Headers = null
-            }
+            },
+            RequiresBrowserAutomation = false,
+            BrowserAutomationProfile = null
         };
 
         // Act

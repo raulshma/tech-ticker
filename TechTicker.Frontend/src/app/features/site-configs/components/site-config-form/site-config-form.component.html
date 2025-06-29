@@ -201,6 +201,35 @@
           </div>
         </mat-expansion-panel>
 
+        <!-- Browser Automation -->
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Browser Automation</mat-panel-title>
+            <mat-panel-description>Enable Playwright for JavaScript-heavy sites</mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="form-section">
+            <div class="form-row">
+              <mat-slide-toggle formControlName="requiresBrowserAutomation">
+                Requires Browser Automation (Playwright)
+              </mat-slide-toggle>
+              <mat-hint>
+                Enable this for sites that require JavaScript rendering (e.g., dynamic prices, stock status)
+              </mat-hint>
+            </div>
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Browser Automation Profile (JSON)</mat-label>
+                <textarea matInput
+                          formControlName="browserAutomationProfile"
+                          placeholder='{"preferredBrowser":"chromium","timeoutSeconds":30,"actions":[{"actionType":"scroll"}]}'
+                          rows="5"></textarea>
+                <mat-hint>Advanced: JSON for Playwright profile (actions, proxy, user-agent, etc.)</mat-hint>
+              </mat-form-field>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
         <!-- Form Actions -->
         <div class="form-actions">
           <button mat-button

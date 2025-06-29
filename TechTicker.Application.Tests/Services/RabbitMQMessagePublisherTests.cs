@@ -183,7 +183,9 @@ public class RabbitMQPublisherTests
                     ["Accept"] = "text/html",
                     ["Accept-Language"] = "en-US"
                 }
-            }
+            },
+            RequiresBrowserAutomation = false,
+            BrowserAutomationProfile = null
         };
 
         var exchange = "scraping";

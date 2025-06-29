@@ -42,7 +42,9 @@ export class SiteConfigFormComponent implements OnInit {
       imageSelector: ['', [Validators.maxLength(500)]],
       defaultUserAgent: ['', [Validators.maxLength(1000)]],
       additionalHeaders: this.formBuilder.array([]),
-      isEnabled: [true]
+      isEnabled: [true],
+      requiresBrowserAutomation: [false],
+      browserAutomationProfile: [''],
     });
   }
 
@@ -77,7 +79,9 @@ export class SiteConfigFormComponent implements OnInit {
           sellerNameOnPageSelector: config.sellerNameOnPageSelector,
           imageSelector: configAny.imageSelector,
           defaultUserAgent: config.defaultUserAgent,
-          isEnabled: config.isEnabled
+          isEnabled: config.isEnabled,
+          requiresBrowserAutomation: configAny.requiresBrowserAutomation ?? false,
+          browserAutomationProfile: configAny.browserAutomationProfile ?? ''
         });
 
         // Load additional headers
@@ -132,7 +136,9 @@ export class SiteConfigFormComponent implements OnInit {
           sellerNameOnPageSelector: formValue.sellerNameOnPageSelector || undefined,
           defaultUserAgent: formValue.defaultUserAgent || undefined,
           additionalHeaders: Object.keys(headersObject).length > 0 ? headersObject : undefined,
-          isEnabled: formValue.isEnabled
+          isEnabled: formValue.isEnabled,
+          requiresBrowserAutomation: formValue.requiresBrowserAutomation,
+          browserAutomationProfile: formValue.browserAutomationProfile || undefined
         });
 
         // Add image selector using type assertion until API client is regenerated
@@ -158,7 +164,9 @@ export class SiteConfigFormComponent implements OnInit {
           sellerNameOnPageSelector: formValue.sellerNameOnPageSelector || undefined,
           defaultUserAgent: formValue.defaultUserAgent || undefined,
           additionalHeaders: Object.keys(headersObject).length > 0 ? headersObject : undefined,
-          isEnabled: formValue.isEnabled
+          isEnabled: formValue.isEnabled,
+          requiresBrowserAutomation: formValue.requiresBrowserAutomation,
+          browserAutomationProfile: formValue.browserAutomationProfile || undefined
         });
 
         // Add image selector using type assertion until API client is regenerated

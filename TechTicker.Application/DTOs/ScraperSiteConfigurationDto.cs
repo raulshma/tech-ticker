@@ -19,6 +19,8 @@ public class ScraperSiteConfigurationDto
     public bool IsEnabled { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+    public bool RequiresBrowserAutomation { get; set; }
+    public string? BrowserAutomationProfile { get; set; }
 }
 
 /// <summary>
@@ -48,6 +50,9 @@ public class CreateScraperSiteConfigurationDto
     public Dictionary<string, string>? AdditionalHeaders { get; set; }
 
     public bool IsEnabled { get; set; } = true;
+
+    public bool RequiresBrowserAutomation { get; set; } = false;
+    public string? BrowserAutomationProfile { get; set; }
 }
 
 /// <summary>
@@ -73,4 +78,7 @@ public class UpdateScraperSiteConfigurationDto
     public Dictionary<string, string>? AdditionalHeaders { get; set; }
 
     public bool? IsEnabled { get; set; }
+
+    public bool? RequiresBrowserAutomation { get; set; }
+    public string? BrowserAutomationProfile { get; set; }
 }
