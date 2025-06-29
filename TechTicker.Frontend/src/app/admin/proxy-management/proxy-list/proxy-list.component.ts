@@ -4,8 +4,10 @@ import { RouterModule } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -35,8 +37,10 @@ import {
     MatTableModule,
     MatButtonModule,
     MatIconModule,
+    MatCardModule,
     MatChipsModule,
     MatProgressSpinnerModule,
+    MatProgressBarModule,
     MatSnackBarModule,
     MatDialogModule,
     MatCheckboxModule,
@@ -114,6 +118,7 @@ export class ProxyListComponent implements OnInit {
 
   async loadProxies(): Promise<void> {
     this.loading = true;
+    this.hasError = false;
     try {
       const response = await firstValueFrom(this.apiClient.getAllProxies());
       if (response?.success && response.data) {
@@ -122,11 +127,12 @@ export class ProxyListComponent implements OnInit {
       } else {
         this.proxies = [];
         this.filteredProxies = [];
-        this.snackBar.open('No proxies found', 'Close', { duration: 3000 });
+        if (!response?.success) {
+          throw new Error(response?.message || 'Failed to load proxies');
+        }
       }
     } catch (error) {
-      console.error('Failed to load proxies:', error);
-      this.snackBar.open('Failed to load proxies', 'Close', { duration: 3000 });
+      this.handleError(error, 'Load proxies');
       this.proxies = [];
       this.filteredProxies = [];
     } finally {
@@ -141,6 +147,9 @@ export class ProxyListComponent implements OnInit {
         this.stats = response.data;
       } else {
         this.stats = null;
+        if (!response?.success) {
+          console.warn('Failed to load proxy stats:', response?.message);
+        }
       }
     } catch (error) {
       console.error('Failed to load proxy stats:', error);
@@ -239,9 +248,15 @@ export class ProxyListComponent implements OnInit {
     return 'warn';
   }
 
-  formatLastTested(dateString: string | null): string {
-    if (!dateString) return 'Never';
-    const date = new Date(dateString);
+  formatLastTested(dateInput: string | Date | null | undefined): string {
+    if (!dateInput) return 'Never';
+    
+    // Handle both Date objects and date strings
+    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) return 'Invalid date';
+    
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
@@ -285,6 +300,62 @@ export class ProxyListComponent implements OnInit {
       default:
         return 'basic';
     }
+  }
+
+  // Get icon for proxy type
+  getProxyTypeIcon(proxyType: string | undefined): string {
+    switch (proxyType?.toUpperCase()) {
+      case 'HTTP':
+      case 'HTTPS':
+        return 'language';
+      case 'SOCKS4':
+        return 'hub';
+      case 'SOCKS5':
+        return 'security';
+      default:
+        return 'cloud';
+    }
+  }
+
+  // Get icon for proxy status
+  getStatusIcon(proxy: ProxyConfigurationDto): string {
+    if (!proxy.isActive) return 'pause_circle';
+    if (!proxy.isHealthy) return 'error';
+    const successRate = proxy.successRate ?? 0;
+    if (successRate >= 90) return 'check_circle';
+    if (successRate >= 70) return 'warning';
+    return 'error';
+  }
+
+  // Get success rate class for progress bar styling
+  getSuccessRateClass(successRate: number): string {
+    if (successRate >= 90) return 'excellent';
+    if (successRate >= 70) return 'good';
+    if (successRate >= 50) return 'fair';
+    return 'poor';
+  }
+
+  // Enhanced error handling with retry
+  hasError = false;
+  errorMessage = '';
+
+  private handleError(error: any, operation: string): void {
+    console.error(`${operation} failed:`, error);
+    this.hasError = true;
+    this.errorMessage = `Failed to ${operation.toLowerCase()}. Please try again.`;
+    this.snackBar.open(this.errorMessage, 'Retry', { 
+      duration: 5000 
+    }).onAction().subscribe(() => {
+      this.retryLastOperation();
+    });
+  }
+
+  private retryLastOperation(): void {
+    this.hasError = false;
+    this.errorMessage = '';
+    // Retry loading data
+    this.loadProxies();
+    this.loadStats();
   }
 
   // Filtering methods

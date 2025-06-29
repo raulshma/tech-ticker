@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -9,8 +9,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { firstValueFrom } from 'rxjs';
 import {
   ProxyConfigurationDto,
@@ -25,6 +29,7 @@ import {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -32,8 +37,12 @@ import {
     MatButtonModule,
     MatIconModule,
     MatCheckboxModule,
+    MatSlideToggleModule,
+    MatExpansionModule,
+    MatChipsModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule
   ],
   templateUrl: './proxy-form.component.html',
   styleUrls: ['./proxy-form.component.scss']
@@ -43,6 +52,11 @@ export class ProxyFormComponent implements OnInit {
   loading = false;
   isEditMode = false;
   proxyId: string | null = null;
+
+  // UI state
+  hidePassword = true;
+  hasError = false;
+  errorMessage = '';
 
   proxyTypes = [
     { value: 'HTTP', label: 'HTTP' },
@@ -84,8 +98,52 @@ export class ProxyFormComponent implements OnInit {
     });
   }
 
+  // Helper method to get proxy type icon
+  getProxyTypeIcon(proxyType: string | undefined): string {
+    switch (proxyType?.toUpperCase()) {
+      case 'HTTP':
+      case 'HTTPS':
+        return 'language';
+      case 'SOCKS4':
+        return 'hub';
+      case 'SOCKS5':
+        return 'security';
+      default:
+        return 'cloud';
+    }
+  }
+
+  // Check if connection test is available
+  canTestConnection(): boolean {
+    return !!(this.proxyForm.get('host')?.valid && 
+           this.proxyForm.get('port')?.valid && 
+           this.proxyForm.get('proxyType')?.valid);
+  }
+
+  // Enhanced error handling
+  private handleError(error: any, operation: string): void {
+    console.error(`${operation} failed:`, error);
+    this.hasError = true;
+    this.errorMessage = `Failed to ${operation.toLowerCase()}. Please check your configuration and try again.`;
+    this.snackBar.open(this.errorMessage, 'Retry', { 
+      duration: 5000 
+    }).onAction().subscribe(() => {
+      this.retryLastOperation();
+    });
+  }
+
+  retryLastOperation(): void {
+    this.hasError = false;
+    this.errorMessage = '';
+    
+    if (this.isEditMode && this.proxyId) {
+      this.loadProxy(this.proxyId);
+    }
+  }
+
   async loadProxy(id: string): Promise<void> {
     this.loading = true;
+    this.hasError = false;
     try {
       const response = await firstValueFrom(this.apiClient.getProxyById(id));
       if (response?.success && response.data) {
@@ -102,12 +160,11 @@ export class ProxyFormComponent implements OnInit {
           isActive: proxy.isActive
         });
       } else {
-        this.snackBar.open('Proxy not found', 'Close', { duration: 3000 });
+        this.handleError(new Error('Proxy not found'), 'Load proxy');
         this.router.navigate(['/admin/proxies']);
       }
     } catch (error) {
-      console.error('Error loading proxy:', error);
-      this.snackBar.open('Failed to load proxy', 'Close', { duration: 3000 });
+      this.handleError(error, 'Load proxy');
       this.router.navigate(['/admin/proxies']);
     } finally {
       this.loading = false;
@@ -117,6 +174,7 @@ export class ProxyFormComponent implements OnInit {
   async onSubmit(): Promise<void> {
     if (this.proxyForm.valid) {
       this.loading = true;
+      this.hasError = false;
       try {
         const formValue = this.proxyForm.value;
 
@@ -141,7 +199,7 @@ export class ProxyFormComponent implements OnInit {
             this.snackBar.open('Proxy updated successfully', 'Close', { duration: 3000 });
             this.router.navigate(['/admin/proxies']);
           } else {
-            this.snackBar.open('Failed to update proxy', 'Close', { duration: 3000 });
+            this.handleError(new Error(response?.message || 'Update failed'), 'Update proxy');
           }
         } else {
           // Create new proxy
@@ -164,17 +222,17 @@ export class ProxyFormComponent implements OnInit {
             this.snackBar.open('Proxy created successfully', 'Close', { duration: 3000 });
             this.router.navigate(['/admin/proxies']);
           } else {
-            this.snackBar.open('Failed to create proxy', 'Close', { duration: 3000 });
+            this.handleError(new Error(response?.message || 'Create failed'), 'Create proxy');
           }
         }
       } catch (error) {
-        console.error('Error saving proxy:', error);
-        this.snackBar.open('Failed to save proxy', 'Close', { duration: 3000 });
+        this.handleError(error, this.isEditMode ? 'Update proxy' : 'Create proxy');
       } finally {
         this.loading = false;
       }
     } else {
       this.markFormGroupTouched();
+      this.snackBar.open('Please correct the form errors before submitting', 'Close', { duration: 3000 });
     }
   }
 
@@ -183,45 +241,47 @@ export class ProxyFormComponent implements OnInit {
   }
 
   async testConnection(): Promise<void> {
-    if (this.proxyForm.get('host')?.valid && this.proxyForm.get('port')?.valid) {
-      this.loading = true;
-      try {
-        // For testing, we'll create a temporary proxy if in create mode
-        if (!this.isEditMode) {
-          this.snackBar.open('Save the proxy first to test the connection', 'Close', { duration: 3000 });
-          return;
-        }
+    if (!this.canTestConnection()) {
+      this.snackBar.open('Please fill in host, port, and proxy type before testing', 'Close', { duration: 3000 });
+      return;
+    }
 
-        if (this.proxyId) {
-          const response = await firstValueFrom(
-            this.apiClient.testProxy(this.proxyId, undefined, 30)
-          );
+    if (!this.isEditMode) {
+      this.snackBar.open('Please save the proxy first to test the connection', 'Close', { duration: 3000 });
+      return;
+    }
 
-          if (response?.success && response.data) {
-            const result = response.data;
-            if (result.isHealthy) {
-              this.snackBar.open(
-                `Connection test successful (${result.responseTimeMs}ms)`,
-                'Close',
-                { duration: 3000 }
-              );
-            } else {
-              this.snackBar.open(
-                `Connection test failed: ${result.errorMessage}`,
-                'Close',
-                { duration: 5000 }
-              );
-            }
+    this.loading = true;
+    try {
+      if (this.proxyId) {
+        const response = await firstValueFrom(
+          this.apiClient.testProxy(this.proxyId, undefined, 30)
+        );
+
+        if (response?.success && response.data) {
+          const result = response.data;
+          if (result.isHealthy) {
+            this.snackBar.open(
+              `Connection test successful! Response time: ${result.responseTimeMs}ms`,
+              'Close',
+              { duration: 5000 }
+            );
+          } else {
+            this.snackBar.open(
+              `Connection test failed: ${result.errorMessage}`,
+              'Close',
+              { duration: 5000 }
+            );
           }
+        } else {
+          this.snackBar.open('Connection test completed with unknown result', 'Close', { duration: 3000 });
         }
-      } catch (error) {
-        console.error('Error testing connection:', error);
-        this.snackBar.open('Failed to test connection', 'Close', { duration: 3000 });
-      } finally {
-        this.loading = false;
       }
-    } else {
-      this.snackBar.open('Please enter valid host and port', 'Close', { duration: 3000 });
+    } catch (error) {
+      console.error('Error testing connection:', error);
+      this.snackBar.open('Failed to test connection', 'Close', { duration: 3000 });
+    } finally {
+      this.loading = false;
     }
   }
 
@@ -234,11 +294,16 @@ export class ProxyFormComponent implements OnInit {
 
   getFieldError(fieldName: string): string {
     const control = this.proxyForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) return `${fieldName} is required`;
-      if (control.errors['maxlength']) return `${fieldName} is too long`;
-      if (control.errors['min']) return `${fieldName} must be greater than ${control.errors['min'].min}`;
-      if (control.errors['max']) return `${fieldName} must be less than ${control.errors['max'].max}`;
+    if (control && control.errors && control.touched) {
+      const errors = control.errors;
+      
+      if (errors['required']) return `${fieldName} is required`;
+      if (errors['maxlength']) return `${fieldName} is too long (max ${errors['maxlength'].requiredLength} characters)`;
+      if (errors['min']) return `${fieldName} must be at least ${errors['min'].min}`;
+      if (errors['max']) return `${fieldName} must be at most ${errors['max'].max}`;
+      if (errors['email']) return `${fieldName} must be a valid email`;
+      
+      return `${fieldName} is invalid`;
     }
     return '';
   }

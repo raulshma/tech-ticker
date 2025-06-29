@@ -1,442 +1,567 @@
 <div class="proxy-management-container">
-  <!-- Header Section -->
-  <div class="header-section">
-    <div class="title-section">
-      <h1>Proxy Management</h1>
-      <p class="subtitle">Configure and monitor HTTP/SOCKS5 proxies for web scraping</p>
+  <!-- Modern Welcome Header Section -->
+  <header class="welcome-section">
+    <div class="welcome-content">
+      <div class="header-main">
+        <div class="title-section">
+          <h1 class="mat-display-medium">Proxy Management</h1>
+          <p class="mat-body-large welcome-subtitle">Configure and monitor HTTP/SOCKS5 proxies for web scraping</p>
+        </div>
+        <div class="header-actions">
+          <button mat-raised-button color="primary" class="primary-action-btn" routerLink="/admin/proxies/add" *hasPermission="'Proxies.Create'">
+            <mat-icon>add</mat-icon>
+            Add Proxy
+          </button>
+          <button mat-raised-button color="accent" class="secondary-action-btn" routerLink="/admin/proxies/bulk-import" *hasPermission="'Proxies.BulkImport'">
+            <mat-icon>upload</mat-icon>
+            Bulk Import
+          </button>
+          <button mat-outlined-button class="tertiary-action-btn" (click)="loadProxies()" *hasPermission="'Proxies.Read'">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+          </button>
+        </div>
+      </div>
     </div>
+  </header>
 
-    <div class="action-buttons">
-      <button mat-raised-button color="primary" routerLink="/admin/proxies/add" *hasPermission="'Proxies.Create'">
-        <mat-icon>add</mat-icon>
-        Add Proxy
-      </button>
-      <button mat-raised-button color="accent" routerLink="/admin/proxies/bulk-import" *hasPermission="'Proxies.BulkImport'">
-        <mat-icon>upload</mat-icon>
-        Bulk Import
-      </button>
-      <button mat-button (click)="loadProxies()" *hasPermission="'Proxies.Read'">
-        <mat-icon>refresh</mat-icon>
-        Refresh
-      </button>
-    </div>
-  </div>
-
-  <!-- Stats Cards -->
-  <div class="stats-section" *ngIf="stats">
+  <!-- Enhanced Statistics Overview -->
+  <section class="stats-section" *ngIf="stats && !loading" aria-label="Proxy Statistics">
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.totalProxies }}</div>
-        <div class="stat-label">Total Proxies</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.activeProxies }}</div>
-        <div class="stat-label">Active</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.healthyProxies }}</div>
-        <div class="stat-label">Healthy</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.averageSuccessRate | number:'1.1-1' }}%</div>
-        <div class="stat-label">Avg Success Rate</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">{{ filteredProxies.length }}</div>
-        <div class="stat-label">Filtered</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filter Controls -->
-  <div class="filter-controls" *ngIf="!loading">
-    <mat-form-field appearance="outline" class="filter-field">
-      <mat-label>Search</mat-label>
-      <input matInput [(ngModel)]="filterText" (input)="onFilterChange()"
-             placeholder="Search by name, host, or port">
-      <mat-icon matSuffix>search</mat-icon>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="filter-field">
-      <mat-label>Type</mat-label>
-      <mat-select [(value)]="filterType" (selectionChange)="onFilterChange()">
-        <mat-option *ngFor="let type of typeOptions" [value]="type.value">
-          {{ type.label }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="filter-field">
-      <mat-label>Status</mat-label>
-      <mat-select [(value)]="filterStatus" (selectionChange)="onFilterChange()">
-        <mat-option *ngFor="let status of statusOptions" [value]="status.value">
-          {{ status.label }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <button mat-button (click)="clearFilters()" class="clear-filters-btn">
-      <mat-icon>clear</mat-icon>
-      Clear Filters
-    </button>
-  </div>
-
-  <!-- Bulk Actions -->
-  <div class="bulk-actions" *ngIf="getSelectedCount() > 0">
-    <div class="selection-info">
-      <span>{{ getSelectedCount() }} proxies selected</span>
-    </div>
-    <div class="action-buttons">
-      <button mat-button color="primary" (click)="bulkTestProxies()"
-              [disabled]="bulkTesting || bulkUpdating"
-              *hasPermission="'Proxies.Test'">
-        <mat-spinner diameter="16" *ngIf="bulkTesting"></mat-spinner>
-        <mat-icon *ngIf="!bulkTesting">play_arrow</mat-icon>
-        {{ bulkTesting ? 'Testing...' : 'Test Selected' }}
-      </button>
-      <button mat-button color="accent" (click)="bulkToggleStatus(true)"
-              [disabled]="bulkTesting || bulkUpdating"
-              *hasPermission="'Proxies.Update'">
-        <mat-spinner diameter="16" *ngIf="bulkUpdating"></mat-spinner>
-        <mat-icon *ngIf="!bulkUpdating">check_circle</mat-icon>
-        {{ bulkUpdating ? 'Updating...' : 'Enable Selected' }}
-      </button>
-      <button mat-button color="warn" (click)="bulkToggleStatus(false)"
-              [disabled]="bulkTesting || bulkUpdating"
-              *hasPermission="'Proxies.Update'">
-        <mat-icon>cancel</mat-icon>
-        Disable Selected
-      </button>
-      <button mat-button color="warn" (click)="bulkDeleteProxies()"
-              [disabled]="bulkTesting || bulkUpdating"
-              *hasPermission="'Proxies.Delete'">
-        <mat-icon>delete</mat-icon>
-        Delete Selected
-      </button>
-      <button mat-button (click)="clearSelection()">
-        <mat-icon>clear</mat-icon>
-        Clear Selection
-      </button>
-    </div>
-  </div>
-
-  <!-- Loading Spinner -->
-  <div class="loading-container" *ngIf="loading">
-    <mat-spinner></mat-spinner>
-    <p>Loading proxies...</p>
-  </div>
-
-  <!-- Performance Info for Large Datasets -->
-  <div class="performance-info" *ngIf="shouldUseVirtualScrolling() && !loading">
-    <mat-icon>info</mat-icon>
-    <span>Large dataset detected ({{ proxies.length }} proxies). Using virtual scrolling for optimal performance.</span>
-  </div>
-
-  <!-- Proxy Table -->
-  <div class="table-container" *ngIf="!loading">
-
-    <!-- Regular Table for Small Datasets -->
-    <div *ngIf="!shouldUseVirtualScrolling()" class="regular-table">
-      <mat-table [dataSource]="filteredProxies" class="proxy-table">
-
-        <!-- Selection Column -->
-        <ng-container matColumnDef="select">
-          <mat-header-cell *matHeaderCellDef>
-            <mat-checkbox
-              [checked]="selectAll"
-              [indeterminate]="getSelectedCount() > 0 && !selectAll"
-              (change)="toggleSelectAll()"
-              matTooltip="Select all">
-            </mat-checkbox>
-          </mat-header-cell>
-          <mat-cell *matCellDef="let proxy">
-            <mat-checkbox
-              [checked]="isProxySelected(proxy)"
-              (change)="toggleProxySelection(proxy)">
-            </mat-checkbox>
-          </mat-cell>
-        </ng-container>
-
-        <!-- Display Name Column -->
-        <ng-container matColumnDef="displayName">
-          <mat-header-cell *matHeaderCellDef>Proxy</mat-header-cell>
-          <mat-cell *matCellDef="let proxy">
-            <div class="proxy-info">
-              <div class="proxy-name">{{ proxy.displayName }}</div>
-              <div class="proxy-description" *ngIf="proxy.description">{{ proxy.description }}</div>
+      <mat-card class="stat-card total-proxies" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon primary-surface">
+              <mat-icon aria-hidden="true">cloud</mat-icon>
             </div>
-          </mat-cell>
-        </ng-container>
-
-        <!-- Type Column -->
-        <ng-container matColumnDef="proxyType">
-          <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
-          <mat-cell *matCellDef="let proxy">
-            <mat-chip [color]="getProxyTypeColor(proxy.proxyType)" selected>
-              {{ proxy.proxyType }}
-            </mat-chip>
-          </mat-cell>
-        </ng-container>
-
-        <!-- Status Column -->
-        <ng-container matColumnDef="status">
-          <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
-          <mat-cell *matCellDef="let proxy">
-            <div class="status-container">
-              <mat-chip [color]="getStatusColor(proxy)" selected>
-                {{ proxy.statusDescription }}
-              </mat-chip>
-              <div class="status-indicators">
-                <mat-icon *ngIf="!proxy.isActive" class="status-icon inactive" title="Inactive">power_off</mat-icon>
-                <mat-icon *ngIf="proxy.isActive && !proxy.isHealthy" class="status-icon unhealthy" title="Unhealthy">warning</mat-icon>
-                <mat-icon *ngIf="proxy.requiresAuthentication" class="status-icon auth" title="Requires Authentication">lock</mat-icon>
-              </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ stats.totalProxies }}</h3>
+              <p class="mat-body-medium stat-label">Total Proxies</p>
             </div>
-          </mat-cell>
-        </ng-container>
-
-        <!-- Success Rate Column -->
-        <ng-container matColumnDef="successRate">
-          <mat-header-cell *matHeaderCellDef>Success Rate</mat-header-cell>
-          <mat-cell *matCellDef="let proxy">
-            <div class="success-rate">
-              <div class="rate-value">{{ proxy.successRate | number:'1.1-1' }}%</div>
-              <div class="rate-details">{{ proxy.successfulRequests }}/{{ proxy.totalRequests }}</div>
-            </div>
-          </mat-cell>
-        </ng-container>
-
-        <!-- Total Requests Column -->
-        <ng-container matColumnDef="totalRequests">
-          <mat-header-cell *matHeaderCellDef>Requests</mat-header-cell>
-          <mat-cell *matCellDef="let proxy">
-            <div class="request-stats">
-              <div class="total">{{ proxy.totalRequests }}</div>
-              <div class="failures" *ngIf="proxy.consecutiveFailures > 0">
-                {{ proxy.consecutiveFailures }} consecutive failures
-              </div>
-            </div>
-          </mat-cell>
-        </ng-container>
-
-        <!-- Last Tested Column -->
-        <ng-container matColumnDef="lastTested">
-          <mat-header-cell *matHeaderCellDef>Last Tested</mat-header-cell>
-          <mat-cell *matCellDef="let proxy">
-            <div class="last-tested">
-              {{ formatLastTested(proxy.lastTestedAt) }}
-              <div class="error-info" *ngIf="proxy.lastErrorMessage">
-                <mat-icon class="error-icon">error_outline</mat-icon>
-                {{ proxy.lastErrorMessage }}
-              </div>
-            </div>
-          </mat-cell>
-        </ng-container>
-
-        <!-- Actions Column -->
-        <ng-container matColumnDef="actions">
-          <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
-          <mat-cell *matCellDef="let proxy">
-            <div class="action-buttons">
-              <button mat-icon-button
-                      [color]="proxy.isActive ? 'warn' : 'primary'"
-                      (click)="toggleProxyStatus(proxy)"
-                      [title]="proxy.isActive ? 'Disable' : 'Enable'"
-                      *hasPermission="'Proxies.Update'">
-                <mat-icon>{{ proxy.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
-              </button>
-
-              <button mat-icon-button
-                      color="accent"
-                      (click)="testProxy(proxy)"
-                      title="Test Proxy"
-                      *hasPermission="'Proxies.Test'">
-                <mat-icon>network_check</mat-icon>
-              </button>
-
-              <button mat-icon-button
-                      [routerLink]="['/admin/proxies/edit', proxy.proxyConfigurationId]"
-                      title="Edit"
-                      *hasPermission="'Proxies.Update'">
-                <mat-icon>edit</mat-icon>
-              </button>
-
-              <button mat-icon-button
-                      color="warn"
-                      (click)="deleteProxy(proxy)"
-                      title="Delete"
-                      *hasPermission="'Proxies.Delete'">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </mat-cell>
-        </ng-container>
-
-        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-      </mat-table>
-    </div>
-
-    <!-- Virtual Scrolling Table for Large Datasets -->
-    <div *ngIf="shouldUseVirtualScrolling()" class="virtual-table">
-      <!-- Table Header -->
-      <div class="virtual-table-header">
-        <div class="header-row">
-          <div class="header-cell select-column">
-            <mat-checkbox
-              [checked]="selectAll"
-              [indeterminate]="getSelectedCount() > 0 && !selectAll"
-              (change)="toggleSelectAll()"
-              matTooltip="Select all">
-            </mat-checkbox>
           </div>
-          <div class="header-cell proxy-column">Proxy</div>
-          <div class="header-cell type-column">Type</div>
-          <div class="header-cell status-column">Status</div>
-          <div class="header-cell rate-column">Success Rate</div>
-          <div class="header-cell requests-column">Requests</div>
-          <div class="header-cell tested-column">Last Tested</div>
-          <div class="header-cell actions-column">Actions</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card active-proxies" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon success-surface">
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ stats.activeProxies }}</h3>
+              <p class="mat-body-medium stat-label">Active</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card healthy-proxies" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon secondary-surface">
+              <mat-icon aria-hidden="true">health_and_safety</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ stats.healthyProxies }}</h3>
+              <p class="mat-body-medium stat-label">Healthy</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card success-rate" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon warning-surface">
+              <mat-icon aria-hidden="true">trending_up</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ stats.averageSuccessRate | number:'1.1-1' }}%</h3>
+              <p class="mat-body-medium stat-label">Avg Success Rate</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card filtered-results" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon info-surface">
+              <mat-icon aria-hidden="true">filter_list</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ filteredProxies.length }}</h3>
+              <p class="mat-body-medium stat-label">Filtered</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+
+  <!-- Modern Management Section -->
+  <section class="management-section" aria-label="Proxy Management">
+    <mat-card class="management-card" appearance="outlined">
+      <mat-card-header class="management-header">
+        <mat-card-title class="mat-headline-large">Proxy Configuration</mat-card-title>
+        <mat-card-subtitle class="mat-body-large">Search, filter, and manage your proxy configurations</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="management-content">
+        <!-- Enhanced Filter Controls -->
+        <div class="filters-section" *ngIf="!loading">
+          <div class="filter-controls">
+            <mat-form-field appearance="outline" class="search-field">
+              <mat-label>Search proxies</mat-label>
+              <input matInput [(ngModel)]="filterText" (input)="onFilterChange()"
+                     placeholder="Search by name, host, or port">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Type</mat-label>
+              <mat-select [(value)]="filterType" (selectionChange)="onFilterChange()">
+                <mat-option *ngFor="let type of typeOptions" [value]="type.value">
+                  {{ type.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Status</mat-label>
+              <mat-select [(value)]="filterStatus" (selectionChange)="onFilterChange()">
+                <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+                  {{ status.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>tune</mat-icon>
+            </mat-form-field>
+
+            <button mat-outlined-button class="clear-filters-btn" (click)="clearFilters()">
+              <mat-icon>clear</mat-icon>
+              Clear Filters
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Virtual Scroll Viewport -->
-      <cdk-virtual-scroll-viewport
-        [itemSize]="itemSize"
-        [minBufferPx]="minBufferPx"
-        [maxBufferPx]="maxBufferPx"
-        class="virtual-scroll-viewport"
-        [style.height.px]="getVirtualScrollHeight()">
-
-        <div *cdkVirtualFor="let proxy of filteredProxies; trackBy: trackByProxyId"
-             class="proxy-row">
-
-          <!-- Selection -->
-          <div class="proxy-cell select-column">
-            <mat-checkbox
-              [checked]="isProxySelected(proxy)"
-              (change)="toggleProxySelection(proxy)">
-            </mat-checkbox>
-          </div>
-
-          <!-- Proxy Info -->
-          <div class="proxy-cell proxy-column">
-            <div class="proxy-info">
-              <div class="proxy-name">{{ proxy.displayName }}</div>
-              <div class="proxy-description" *ngIf="proxy.description">{{ proxy.description }}</div>
-            </div>
-          </div>
-
-          <!-- Type -->
-          <div class="proxy-cell type-column">
-            <mat-chip [color]="getProxyTypeColor(proxy.proxyType)" selected>
-              {{ proxy.proxyType }}
-            </mat-chip>
-          </div>
-
-          <!-- Status -->
-          <div class="proxy-cell status-column">
-            <div class="status-container">
-              <mat-chip [color]="getStatusColor(proxy)" selected>
-                {{ proxy.statusDescription }}
-              </mat-chip>
-              <div class="status-indicators">
-                <mat-icon *ngIf="!proxy.isActive" class="status-icon inactive" title="Inactive">power_off</mat-icon>
-                <mat-icon *ngIf="proxy.isActive && !proxy.isHealthy" class="status-icon unhealthy" title="Unhealthy">warning</mat-icon>
-                <mat-icon *ngIf="proxy.requiresAuthentication" class="status-icon auth" title="Requires Authentication">lock</mat-icon>
+        <!-- Enhanced Bulk Actions -->
+        <div class="bulk-actions-modern" *ngIf="getSelectedCount() > 0">
+          <mat-card class="bulk-card" appearance="outlined">
+            <mat-card-content>
+              <div class="bulk-content">
+                <div class="selection-info">
+                  <mat-icon class="selection-icon">check_circle</mat-icon>
+                  <span class="mat-title-medium">{{ getSelectedCount() }} proxies selected</span>
+                </div>
+                <div class="bulk-actions-buttons">
+                  <button mat-raised-button color="primary" (click)="bulkTestProxies()"
+                          [disabled]="bulkTesting || bulkUpdating"
+                          *hasPermission="'Proxies.Test'">
+                    <mat-spinner diameter="16" *ngIf="bulkTesting" class="btn-spinner"></mat-spinner>
+                    <mat-icon *ngIf="!bulkTesting">play_arrow</mat-icon>
+                    {{ bulkTesting ? 'Testing...' : 'Test Selected' }}
+                  </button>
+                  <button mat-raised-button color="accent" (click)="bulkToggleStatus(true)"
+                          [disabled]="bulkTesting || bulkUpdating"
+                          *hasPermission="'Proxies.Update'">
+                    <mat-spinner diameter="16" *ngIf="bulkUpdating" class="btn-spinner"></mat-spinner>
+                    <mat-icon *ngIf="!bulkUpdating">check_circle</mat-icon>
+                    {{ bulkUpdating ? 'Updating...' : 'Enable Selected' }}
+                  </button>
+                  <button mat-outlined-button color="warn" (click)="bulkToggleStatus(false)"
+                          [disabled]="bulkTesting || bulkUpdating"
+                          *hasPermission="'Proxies.Update'">
+                    <mat-icon>cancel</mat-icon>
+                    Disable Selected
+                  </button>
+                  <button mat-outlined-button color="warn" (click)="bulkDeleteProxies()"
+                          [disabled]="bulkTesting || bulkUpdating"
+                          *hasPermission="'Proxies.Delete'">
+                    <mat-icon>delete</mat-icon>
+                    Delete Selected
+                  </button>
+                  <button mat-text-button (click)="clearSelection()">
+                    <mat-icon>clear</mat-icon>
+                    Clear Selection
+                  </button>
+                </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Success Rate -->
-          <div class="proxy-cell rate-column">
-            <div class="success-rate">
-              <div class="rate-value">{{ proxy.successRate | number:'1.1-1' }}%</div>
-              <div class="rate-details">{{ proxy.successfulRequests }}/{{ proxy.totalRequests }}</div>
-            </div>
-          </div>
-
-          <!-- Requests -->
-          <div class="proxy-cell requests-column">
-            <div class="request-stats">
-              <div class="total">{{ proxy.totalRequests }}</div>
-              <div class="failures" *ngIf="proxy.consecutiveFailures && proxy.consecutiveFailures > 0">
-                {{ proxy.consecutiveFailures }} consecutive failures
-              </div>
-            </div>
-          </div>
-
-          <!-- Last Tested -->
-          <div class="proxy-cell tested-column">
-            <div class="last-tested">
-              {{ formatLastTested(proxy.lastTestedAt?.toISOString() || null) }}
-              <div class="error-info" *ngIf="proxy.lastErrorMessage">
-                <mat-icon class="error-icon">error_outline</mat-icon>
-                {{ proxy.lastErrorMessage }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="proxy-cell actions-column">
-            <div class="action-buttons">
-              <button mat-icon-button
-                      [color]="proxy.isActive ? 'warn' : 'primary'"
-                      (click)="toggleProxyStatus(proxy)"
-                      [title]="proxy.isActive ? 'Disable' : 'Enable'"
-                      *hasPermission="'Proxies.Update'">
-                <mat-icon>{{ proxy.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
-              </button>
-
-              <button mat-icon-button
-                      color="accent"
-                      (click)="testProxy(proxy)"
-                      title="Test Proxy"
-                      *hasPermission="'Proxies.Test'">
-                <mat-icon>network_check</mat-icon>
-              </button>
-
-              <button mat-icon-button
-                      [routerLink]="['/admin/proxies/edit', proxy.proxyConfigurationId]"
-                      title="Edit"
-                      *hasPermission="'Proxies.Update'">
-                <mat-icon>edit</mat-icon>
-              </button>
-
-              <button mat-icon-button
-                      color="warn"
-                      (click)="deleteProxy(proxy)"
-                      title="Delete"
-                      *hasPermission="'Proxies.Delete'">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </div>
-
+            </mat-card-content>
+          </mat-card>
         </div>
-      </cdk-virtual-scroll-viewport>
-    </div>
 
-    <!-- Empty State -->
-    <div class="empty-state" *ngIf="proxies.length === 0 && !loading">
-      <mat-icon class="empty-icon">cloud_off</mat-icon>
-      <h3>No Proxies Configured</h3>
-      <p>Get started by adding your first proxy configuration.</p>
-      <button mat-raised-button color="primary" routerLink="/admin/proxies/add" *hasPermission="'Proxies.Create'">
-        <mat-icon>add</mat-icon>
-        Add First Proxy
-      </button>
-    </div>
+        <!-- Loading spinner with improved styling -->
+        <div *ngIf="loading" class="loading-container" role="status" aria-live="polite">
+          <mat-spinner diameter="48" strokeWidth="4"></mat-spinner>
+          <p class="mat-body-large loading-text">Loading proxies...</p>
+        </div>
 
-    <!-- No Results State -->
-    <div class="empty-state" *ngIf="proxies.length > 0 && filteredProxies.length === 0 && !loading">
-      <mat-icon class="empty-icon">search_off</mat-icon>
-      <h3>No Proxies Match Your Filters</h3>
-      <p>Try adjusting your search criteria or clearing the filters.</p>
-      <button mat-button (click)="clearFilters()">
-        <mat-icon>clear</mat-icon>
-        Clear Filters
-      </button>
-    </div>
-  </div>
+        <!-- Performance Info for Large Datasets -->
+        <div class="performance-info-modern" *ngIf="shouldUseVirtualScrolling() && !loading">
+          <mat-card class="info-card" appearance="outlined">
+            <mat-card-content>
+              <div class="info-content">
+                <mat-icon class="info-icon">info</mat-icon>
+                <div class="info-text">
+                  <h4 class="mat-title-medium">Large Dataset Detected</h4>
+                  <p class="mat-body-small">{{ proxies.length }} proxies found. Using virtual scrolling for optimal performance.</p>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Enhanced Proxy Table -->
+        <div *ngIf="!loading" class="table-container">
+          <!-- Regular Table for Small Datasets -->
+          <div *ngIf="!shouldUseVirtualScrolling()" class="regular-table">
+            <div class="table-wrapper">
+              <mat-table [dataSource]="filteredProxies" class="proxy-table modern-table">
+
+                <!-- Selection Column -->
+                <ng-container matColumnDef="select">
+                  <mat-header-cell *matHeaderCellDef class="select-header">
+                    <mat-checkbox
+                      [checked]="selectAll"
+                      [indeterminate]="getSelectedCount() > 0 && !selectAll"
+                      (change)="toggleSelectAll()"
+                      matTooltip="Select all">
+                    </mat-checkbox>
+                  </mat-header-cell>
+                  <mat-cell *matCellDef="let proxy" class="select-cell">
+                    <mat-checkbox
+                      [checked]="isProxySelected(proxy)"
+                      (change)="toggleProxySelection(proxy)">
+                    </mat-checkbox>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Display Name Column -->
+                <ng-container matColumnDef="displayName">
+                  <mat-header-cell *matHeaderCellDef class="proxy-header">Proxy</mat-header-cell>
+                  <mat-cell *matCellDef="let proxy" class="proxy-cell">
+                    <div class="proxy-info-modern">
+                      <h4 class="mat-title-medium proxy-name" matTooltip="{{ proxy.displayName }}">
+                        {{ proxy.displayName }}
+                      </h4>
+                      <p *ngIf="proxy.description" 
+                         class="mat-body-small proxy-description" 
+                         matTooltip="{{ proxy.description }}">
+                        {{ proxy.description }}
+                      </p>
+                      <div class="proxy-details">
+                        <span class="mat-body-small proxy-host">{{ proxy.host }}:{{ proxy.port }}</span>
+                      </div>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Type Column -->
+                <ng-container matColumnDef="proxyType">
+                  <mat-header-cell *matHeaderCellDef class="type-header">Type</mat-header-cell>
+                  <mat-cell *matCellDef="let proxy" class="type-cell">
+                    <mat-chip [class]="'type-chip-' + getProxyTypeColor(proxy.proxyType)">
+                      <mat-icon>{{ getProxyTypeIcon(proxy.proxyType) }}</mat-icon>
+                      {{ proxy.proxyType }}
+                    </mat-chip>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <mat-header-cell *matHeaderCellDef class="status-header">Status</mat-header-cell>
+                  <mat-cell *matCellDef="let proxy" class="status-cell">
+                    <div class="status-container-modern">
+                      <mat-chip [class]="'status-chip-' + getStatusColor(proxy)">
+                        <mat-icon>{{ getStatusIcon(proxy) }}</mat-icon>
+                        {{ proxy.statusDescription }}
+                      </mat-chip>
+                      <div class="status-indicators-modern">
+                        <mat-icon *ngIf="!proxy.isActive" class="indicator-icon inactive" 
+                                  matTooltip="Inactive">power_off</mat-icon>
+                        <mat-icon *ngIf="proxy.isActive && !proxy.isHealthy" class="indicator-icon unhealthy" 
+                                  matTooltip="Unhealthy">warning</mat-icon>
+                        <mat-icon *ngIf="proxy.requiresAuthentication" class="indicator-icon auth" 
+                                  matTooltip="Requires Authentication">lock</mat-icon>
+                      </div>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Success Rate Column -->
+                <ng-container matColumnDef="successRate">
+                  <mat-header-cell *matHeaderCellDef class="rate-header">Success Rate</mat-header-cell>
+                  <mat-cell *matCellDef="let proxy" class="rate-cell">
+                    <div class="success-rate-modern">
+                      <div class="rate-value mat-title-medium">
+                        {{ proxy.successRate !== null ? (proxy.successRate | number:'1.1-1') + '%' : 'N/A' }}
+                      </div>
+                      <div class="rate-progress" *ngIf="proxy.successRate !== null && proxy.successRate !== undefined">
+                        <mat-progress-bar 
+                          mode="determinate" 
+                          [value]="proxy.successRate!"
+                          [class]="'progress-' + getSuccessRateClass(proxy.successRate!)">
+                        </mat-progress-bar>
+                      </div>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Total Requests Column -->
+                <ng-container matColumnDef="totalRequests">
+                  <mat-header-cell *matHeaderCellDef class="requests-header">Requests</mat-header-cell>
+                  <mat-cell *matCellDef="let proxy" class="requests-cell">
+                    <div class="requests-info">
+                      <span class="mat-body-medium requests-count">{{ proxy.totalRequests || 0 }}</span>
+                      <span class="mat-body-small requests-label">total</span>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Last Tested Column -->
+                <ng-container matColumnDef="lastTested">
+                  <mat-header-cell *matHeaderCellDef class="tested-header">Last Tested</mat-header-cell>
+                  <mat-cell *matCellDef="let proxy" class="tested-cell">
+                    <div class="last-tested-modern">
+                      <span class="mat-body-small tested-time">{{ formatLastTested(proxy.lastTestedAt) }}</span>
+                      <div class="error-info-modern" *ngIf="proxy.lastErrorMessage">
+                        <mat-icon class="error-icon">error_outline</mat-icon>
+                        <span class="mat-body-small error-message" matTooltip="{{ proxy.lastErrorMessage }}">
+                          {{ proxy.lastErrorMessage | slice:0:50 }}{{ proxy.lastErrorMessage?.length > 50 ? '...' : '' }}
+                        </span>
+                      </div>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <mat-header-cell *matHeaderCellDef class="actions-header">Actions</mat-header-cell>
+                  <mat-cell *matCellDef="let proxy" class="actions-cell">
+                    <div class="actions-group">
+                      <button mat-icon-button
+                              [class]="proxy.isActive ? 'action-btn disable-btn' : 'action-btn enable-btn'"
+                              (click)="toggleProxyStatus(proxy)"
+                              [matTooltip]="proxy.isActive ? 'Disable' : 'Enable'"
+                              *hasPermission="'Proxies.Update'">
+                        <mat-icon>{{ proxy.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
+                      </button>
+
+                      <button mat-icon-button
+                              class="action-btn test-btn"
+                              (click)="testProxy(proxy)"
+                              matTooltip="Test Proxy"
+                              *hasPermission="'Proxies.Test'">
+                        <mat-icon>network_check</mat-icon>
+                      </button>
+
+                      <button mat-icon-button
+                              class="action-btn edit-btn"
+                              [routerLink]="['/admin/proxies/edit', proxy.proxyConfigurationId]"
+                              matTooltip="Edit"
+                              *hasPermission="'Proxies.Update'">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+
+                      <button mat-icon-button
+                              class="action-btn delete-btn"
+                              (click)="deleteProxy(proxy)"
+                              matTooltip="Delete"
+                              *hasPermission="'Proxies.Delete'">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns" class="table-header"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></mat-row>
+              </mat-table>
+            </div>
+          </div>
+
+          <!-- Virtual Scrolling Table for Large Datasets -->
+          <div *ngIf="shouldUseVirtualScrolling()" class="virtual-table-modern">
+            <!-- Table Header -->
+            <div class="virtual-table-header-modern">
+              <div class="header-row-modern">
+                <div class="header-cell select-column">
+                  <mat-checkbox
+                    [checked]="selectAll"
+                    [indeterminate]="getSelectedCount() > 0 && !selectAll"
+                    (change)="toggleSelectAll()"
+                    matTooltip="Select all">
+                  </mat-checkbox>
+                </div>
+                <div class="header-cell proxy-column">Proxy</div>
+                <div class="header-cell type-column">Type</div>
+                <div class="header-cell status-column">Status</div>
+                <div class="header-cell rate-column">Success Rate</div>
+                <div class="header-cell requests-column">Requests</div>
+                <div class="header-cell tested-column">Last Tested</div>
+                <div class="header-cell actions-column">Actions</div>
+              </div>
+            </div>
+
+            <!-- Virtual Scroll Viewport -->
+            <cdk-virtual-scroll-viewport
+              [itemSize]="itemSize"
+              [minBufferPx]="minBufferPx"
+              [maxBufferPx]="maxBufferPx"
+              class="virtual-scroll-viewport-modern"
+              [style.height.px]="getVirtualScrollHeight()">
+
+              <div *cdkVirtualFor="let proxy of filteredProxies; trackBy: trackByProxyId"
+                   class="proxy-row-modern">
+
+                <!-- Selection -->
+                <div class="proxy-cell select-column">
+                  <mat-checkbox
+                    [checked]="isProxySelected(proxy)"
+                    (change)="toggleProxySelection(proxy)">
+                  </mat-checkbox>
+                </div>
+
+                <!-- Proxy Info -->
+                <div class="proxy-cell proxy-column">
+                  <div class="proxy-info-modern">
+                    <h4 class="mat-title-medium proxy-name">{{ proxy.displayName }}</h4>
+                    <p *ngIf="proxy.description" class="mat-body-small proxy-description">{{ proxy.description }}</p>
+                    <span class="mat-body-small proxy-host">{{ proxy.host }}:{{ proxy.port }}</span>
+                  </div>
+                </div>
+
+                <!-- Type -->
+                <div class="proxy-cell type-column">
+                  <mat-chip [class]="'type-chip-' + getProxyTypeColor(proxy.proxyType)">
+                    <mat-icon>{{ getProxyTypeIcon(proxy.proxyType) }}</mat-icon>
+                    {{ proxy.proxyType }}
+                  </mat-chip>
+                </div>
+
+                <!-- Status -->
+                <div class="proxy-cell status-column">
+                  <div class="status-container-modern">
+                    <mat-chip [class]="'status-chip-' + getStatusColor(proxy)">
+                      <mat-icon>{{ getStatusIcon(proxy) }}</mat-icon>
+                      {{ proxy.statusDescription }}
+                    </mat-chip>
+                    <div class="status-indicators-modern">
+                      <mat-icon *ngIf="!proxy.isActive" class="indicator-icon inactive">power_off</mat-icon>
+                      <mat-icon *ngIf="proxy.isActive && !proxy.isHealthy" class="indicator-icon unhealthy">warning</mat-icon>
+                      <mat-icon *ngIf="proxy.requiresAuthentication" class="indicator-icon auth">lock</mat-icon>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Success Rate -->
+                <div class="proxy-cell rate-column">
+                  <div class="success-rate-modern">
+                    <span class="mat-body-medium">
+                      {{ proxy.successRate !== null ? (proxy.successRate | number:'1.1-1') + '%' : 'N/A' }}
+                    </span>
+                    <mat-progress-bar 
+                      *ngIf="proxy.successRate !== null && proxy.successRate !== undefined"
+                      mode="determinate" 
+                      [value]="proxy.successRate!"
+                      [class]="'progress-' + getSuccessRateClass(proxy.successRate!)">
+                    </mat-progress-bar>
+                  </div>
+                </div>
+
+                <!-- Requests -->
+                <div class="proxy-cell requests-column">
+                  <span class="mat-body-medium">{{ proxy.totalRequests || 0 }}</span>
+                </div>
+
+                <!-- Last Tested -->
+                <div class="proxy-cell tested-column">
+                  <div class="last-tested-modern">
+                    <span class="mat-body-small">{{ formatLastTested(proxy.lastTestedAt) }}</span>
+                    <mat-icon *ngIf="proxy.lastErrorMessage" class="error-icon">error_outline</mat-icon>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="proxy-cell actions-column">
+                  <div class="actions-group">
+                    <button mat-icon-button
+                            [class]="proxy.isActive ? 'action-btn disable-btn' : 'action-btn enable-btn'"
+                            (click)="toggleProxyStatus(proxy)"
+                            [matTooltip]="proxy.isActive ? 'Disable' : 'Enable'"
+                            *hasPermission="'Proxies.Update'">
+                      <mat-icon>{{ proxy.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
+                    </button>
+
+                    <button mat-icon-button
+                            class="action-btn test-btn"
+                            (click)="testProxy(proxy)"
+                            matTooltip="Test Proxy"
+                            *hasPermission="'Proxies.Test'">
+                      <mat-icon>network_check</mat-icon>
+                    </button>
+
+                    <button mat-icon-button
+                            class="action-btn edit-btn"
+                            [routerLink]="['/admin/proxies/edit', proxy.proxyConfigurationId]"
+                            matTooltip="Edit"
+                            *hasPermission="'Proxies.Update'">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+
+                    <button mat-icon-button
+                            class="action-btn delete-btn"
+                            (click)="deleteProxy(proxy)"
+                            matTooltip="Delete"
+                            *hasPermission="'Proxies.Delete'">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </cdk-virtual-scroll-viewport>
+          </div>
+
+          <!-- Enhanced Empty State -->
+          <div class="empty-state-modern" *ngIf="proxies.length === 0 && !loading">
+            <div class="empty-content">
+              <div class="empty-icon">
+                <mat-icon>cloud_off</mat-icon>
+              </div>
+              <h3 class="mat-headline-small">No Proxies Configured</h3>
+              <p class="mat-body-medium">Get started by adding your first proxy configuration for web scraping.</p>
+              <div class="empty-actions">
+                <button mat-raised-button color="primary" routerLink="/admin/proxies/add" *hasPermission="'Proxies.Create'">
+                  <mat-icon>add</mat-icon>
+                  Add First Proxy
+                </button>
+                <button mat-outlined-button routerLink="/admin/proxies/bulk-import" *hasPermission="'Proxies.BulkImport'">
+                  <mat-icon>upload</mat-icon>
+                  Bulk Import
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Enhanced No Results State -->
+          <div class="no-results-state-modern" *ngIf="proxies.length > 0 && filteredProxies.length === 0 && !loading">
+            <div class="no-results-content">
+              <div class="no-results-icon">
+                <mat-icon>search_off</mat-icon>
+              </div>
+              <h3 class="mat-headline-small">No results found</h3>
+              <p class="mat-body-medium">Try adjusting your search criteria or filters to find what you're looking for.</p>
+              <button mat-text-button color="primary" (click)="clearFilters()">
+                <mat-icon>clear</mat-icon>
+                Clear all filters
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
 </div>

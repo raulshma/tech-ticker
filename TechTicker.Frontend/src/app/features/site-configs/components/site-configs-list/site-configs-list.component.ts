@@ -19,6 +19,7 @@ export class SiteConfigsListComponent implements OnInit {
   displayedColumns: string[] = ['siteDomain', 'selectors', 'isEnabled', 'createdAt', 'actions'];
   dataSource = new MatTableDataSource<ScraperSiteConfigurationDto>();
   isLoading = false;
+  error: string | null = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -41,13 +42,16 @@ export class SiteConfigsListComponent implements OnInit {
 
   loadSiteConfigs(): void {
     this.isLoading = true;
+    this.error = null;
     this.siteConfigsService.getSiteConfigs().subscribe({
       next: (configs) => {
         this.dataSource.data = configs;
         this.isLoading = false;
+        this.error = null;
       },
       error: (error) => {
         console.error('Error loading site configurations:', error);
+        this.error = 'Failed to load site configurations. Please try again.';
         this.snackBar.open('Failed to load site configurations', 'Close', { duration: 5000 });
         this.isLoading = false;
       }
@@ -114,5 +118,17 @@ export class SiteConfigsListComponent implements OnInit {
     if ((config as any).imageSelector) selectors.push('Image');
 
     return selectors.length > 0 ? selectors.join(', ') : 'None configured';
+  }
+
+  getEnabledConfigsCount(): number {
+    return this.dataSource.data.filter(config => config.isEnabled).length;
+  }
+
+  getDisabledConfigsCount(): number {
+    return this.dataSource.data.filter(config => !config.isEnabled).length;
+  }
+
+  getBrowserAutomationCount(): number {
+    return this.dataSource.data.filter(config => (config as any).requiresBrowserAutomation).length;
   }
 }

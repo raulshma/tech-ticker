@@ -28,6 +28,7 @@ export class SiteConfigFormComponent implements OnInit {
   isEditMode = false;
   siteConfigId: string | null = null;
   showExamples = false;
+  error: string | null = null;
 
   browserAutomationExamples = [
     {
@@ -169,6 +170,7 @@ export class SiteConfigFormComponent implements OnInit {
 
   loadSiteConfig(id: string): void {
     this.isLoading = true;
+    this.error = null;
     this.siteConfigsService.getSiteConfig(id).subscribe({
       next: (config) => {
         const configAny = config as any;
@@ -193,11 +195,13 @@ export class SiteConfigFormComponent implements OnInit {
         }
 
         this.isLoading = false;
+        this.error = null;
       },
       error: (error) => {
         console.error('Error loading site configuration:', error);
+        this.error = 'Failed to load site configuration. Please try again.';
         this.snackBar.open('Failed to load site configuration', 'Close', { duration: 5000 });
-        this.router.navigate(['/site-configs']);
+        this.isLoading = false;
       }
     });
   }
@@ -295,6 +299,14 @@ export class SiteConfigFormComponent implements OnInit {
 
   onCancel(): void {
     this.router.navigate(['/site-configs']);
+  }
+
+  onRetry(): void {
+    if (this.isEditMode && this.siteConfigId) {
+      this.loadSiteConfig(this.siteConfigId);
+    } else {
+      this.error = null;
+    }
   }
 
   private markFormGroupTouched(): void {

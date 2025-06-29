@@ -1,129 +1,239 @@
 <div class="site-configs-container">
-  <div class="header-section">
-    <h1>Site Configurations</h1>
-    <button mat-raised-button color="primary" (click)="createSiteConfig()">
-      <mat-icon>add</mat-icon>
-      Add Site Config
-    </button>
+  <!-- Modern Welcome Header Section -->
+  <header class="welcome-section">
+    <div class="welcome-content">
+      <div class="header-main">
+        <div class="title-section">
+          <h1 class="mat-display-medium">Site Configurations</h1>
+          <p class="mat-body-large welcome-subtitle">Configure CSS selectors and settings for different e-commerce sites</p>
+        </div>
+        <div class="header-actions">
+          <button mat-raised-button color="primary" class="primary-action-btn" (click)="createSiteConfig()">
+            <mat-icon>add</mat-icon>
+            Add Site Config
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Error message with Material Design 3 styling -->
+  <div *ngIf="error" class="error-message" role="alert">
+    <mat-card class="error-card" appearance="outlined">
+      <mat-card-content>
+        <div class="error-content">
+          <mat-icon class="error-icon" aria-hidden="true">error</mat-icon>
+          <p class="mat-body-medium">Failed to load site configurations. Please try again.</p>
+          <button mat-raised-button color="primary" (click)="loadSiteConfigs()" class="retry-button">
+            <mat-icon>refresh</mat-icon>
+            Retry
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </div>
 
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Manage Scraper Site Configurations</mat-card-title>
-      <mat-card-subtitle>Configure CSS selectors and settings for different e-commerce sites</mat-card-subtitle>
-    </mat-card-header>
+  <!-- Enhanced Statistics Overview -->
+  <section class="stats-section" *ngIf="!isLoading && !error" aria-label="Site Configuration Statistics">
+    <div class="stats-grid">
+      <mat-card class="stat-card" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon primary-surface">
+              <mat-icon aria-hidden="true">settings</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{dataSource.data.length}}</h3>
+              <p class="mat-body-medium stat-label">Total Configurations</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
 
-    <mat-card-content>
-      <!-- Search filter -->
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-label>Search configurations</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Search by domain">
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
+      <mat-card class="stat-card" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon success-surface">
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{getEnabledConfigsCount()}}</h3>
+              <p class="mat-body-medium stat-label">Enabled Configs</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
 
-      <!-- Loading spinner -->
-      <div *ngIf="isLoading" class="loading-container">
-        <mat-spinner diameter="50"></mat-spinner>
-        <p>Loading site configurations...</p>
-      </div>
+      <mat-card class="stat-card" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon warning-surface">
+              <mat-icon aria-hidden="true">pause_circle</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{getDisabledConfigsCount()}}</h3>
+              <p class="mat-body-medium stat-label">Disabled Configs</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
 
-      <!-- Site configs table -->
-      <div *ngIf="!isLoading" class="table-container">
-        <table mat-table [dataSource]="dataSource" matSort class="site-configs-table">
-          <!-- Site Domain Column -->
-          <ng-container matColumnDef="siteDomain">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Site Domain</th>
-            <td mat-cell *matCellDef="let config">
-              <div class="domain-info">
-                <strong>{{config.siteDomain || 'Not specified'}}</strong>
-                <small *ngIf="config.defaultUserAgent" class="user-agent">
-                  User Agent: {{config.defaultUserAgent.substring(0, 50)}}{{config.defaultUserAgent.length > 50 ? '...' : ''}}
-                </small>
-              </div>
-            </td>
-          </ng-container>
+      <mat-card class="stat-card" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon secondary-surface">
+              <mat-icon aria-hidden="true">integration_instructions</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{getBrowserAutomationCount()}}</h3>
+              <p class="mat-body-medium stat-label">Browser Automation</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
 
-          <!-- Selectors Column -->
-          <ng-container matColumnDef="selectors">
-            <th mat-header-cell *matHeaderCellDef>CSS Selectors</th>
-            <td mat-cell *matCellDef="let config">
-              <div class="selectors-info">
-                <mat-chip-set>
-                  <mat-chip class="selector-count">
-                    {{getSelectorsCount(config)}} configured
-                  </mat-chip>
-                </mat-chip-set>
-                <small class="selectors-list">
-                  {{getSelectorsText(config)}}
-                </small>
-              </div>
-            </td>
-          </ng-container>
+  <!-- Modern Management Section -->
+  <section class="management-section" *ngIf="!error" aria-label="Site Configuration Management">
+    <mat-card class="management-card" appearance="outlined">
+      <mat-card-header class="management-header">
+        <mat-card-title class="mat-headline-large">Configuration Management</mat-card-title>
+        <mat-card-subtitle class="mat-body-large">Search and manage your scraper configurations</mat-card-subtitle>
+      </mat-card-header>
 
-          <!-- Enabled Status Column -->
-          <ng-container matColumnDef="isEnabled">
-            <th mat-header-cell *matHeaderCellDef>Status</th>
-            <td mat-cell *matCellDef="let config">
-              <mat-chip-set>
-                <mat-chip [class]="config.isEnabled ? 'status-enabled' : 'status-disabled'">
-                  {{config.isEnabled ? 'Enabled' : 'Disabled'}}
-                </mat-chip>
-              </mat-chip-set>
-            </td>
-          </ng-container>
+      <mat-card-content class="management-content">
+        <!-- Enhanced Filters Section -->
+        <div class="filters-section">
+          <div class="filter-controls">
+            <mat-form-field appearance="outline" class="search-field">
+              <mat-label>Search configurations</mat-label>
+              <input matInput (keyup)="applyFilter($event)" placeholder="Search by domain">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
 
-          <!-- Created At Column -->
-          <ng-container matColumnDef="createdAt">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Created</th>
-            <td mat-cell *matCellDef="let config">
-              {{config.createdAt | date:'short'}}
-            </td>
-          </ng-container>
+        <!-- Loading spinner with improved styling -->
+        <div *ngIf="isLoading" class="loading-container" role="status" aria-live="polite">
+          <mat-spinner diameter="48" strokeWidth="4"></mat-spinner>
+          <p class="mat-body-large loading-text">Loading site configurations...</p>
+        </div>
 
-          <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let config">
-              <button mat-icon-button 
-                      color="primary" 
-                      (click)="editSiteConfig(config)"
-                      matTooltip="Edit configuration">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button 
-                      color="warn" 
-                      (click)="deleteSiteConfig(config)"
-                      matTooltip="Delete configuration">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </td>
-          </ng-container>
+        <!-- Enhanced Site Configs Table -->
+        <div *ngIf="!isLoading" class="table-container">
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="dataSource" matSort class="site-configs-table modern-table">
+              <!-- Site Domain Column -->
+              <ng-container matColumnDef="siteDomain">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="domain-header">Site Domain</th>
+                <td mat-cell *matCellDef="let config" class="domain-cell">
+                  <div class="domain-info">
+                    <h4 class="mat-title-medium domain-name" matTooltip="{{config.siteDomain}}">
+                      {{config.siteDomain || 'Not specified'}}
+                    </h4>
+                    <p *ngIf="config.defaultUserAgent" 
+                       class="mat-body-small user-agent" 
+                       matTooltip="{{config.defaultUserAgent}}">
+                      {{config.defaultUserAgent.substring(0, 60)}}{{config.defaultUserAgent.length > 60 ? '...' : ''}}
+                    </p>
+                  </div>
+                </td>
+              </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              <!-- Selectors Column -->
+              <ng-container matColumnDef="selectors">
+                <th mat-header-cell *matHeaderCellDef class="selectors-header">CSS Selectors</th>
+                <td mat-cell *matCellDef="let config" class="selectors-cell">
+                  <div class="selectors-info">
+                    <mat-chip-set>
+                      <mat-chip class="selector-count-chip">
+                        <mat-icon>code</mat-icon>
+                        {{getSelectorsCount(config)}} configured
+                      </mat-chip>
+                    </mat-chip-set>
+                    <p class="mat-body-small selectors-list" matTooltip="{{getSelectorsText(config)}}">
+                      {{getSelectorsText(config)}}
+                    </p>
+                  </div>
+                </td>
+              </ng-container>
 
-          <!-- No data row -->
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
-              <div class="no-data">
-                <mat-icon>settings</mat-icon>
-                <p>No site configurations found</p>
-                <p class="no-data-description">
-                  Site configurations define how to scrape product information from different e-commerce websites.
-                </p>
-                <button mat-raised-button color="primary" (click)="createSiteConfig()">
-                  Create First Configuration
-                </button>
-              </div>
-            </td>
-          </tr>
-        </table>
+              <!-- Status Column -->
+              <ng-container matColumnDef="isEnabled">
+                <th mat-header-cell *matHeaderCellDef class="status-header">Status</th>
+                <td mat-cell *matCellDef="let config" class="status-cell">
+                  <mat-chip-set>
+                    <mat-chip [class]="config.isEnabled ? 'status-enabled' : 'status-disabled'">
+                      <mat-icon *ngIf="config.isEnabled">check_circle</mat-icon>
+                      <mat-icon *ngIf="!config.isEnabled">pause_circle</mat-icon>
+                      {{config.isEnabled ? 'Enabled' : 'Disabled'}}
+                    </mat-chip>
+                  </mat-chip-set>
+                </td>
+              </ng-container>
 
-        <mat-paginator [pageSizeOptions]="[5, 10, 20]" 
-                       showFirstLastButtons 
-                       aria-label="Select page of site configurations">
-        </mat-paginator>
-      </div>
-    </mat-card-content>
-  </mat-card>
+              <!-- Created At Column -->
+              <ng-container matColumnDef="createdAt">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="created-header">Created</th>
+                <td mat-cell *matCellDef="let config" class="created-cell">
+                  <span class="mat-body-small">{{config.createdAt | date:'M/d/yy, h:mm a'}}</span>
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+                <td mat-cell *matCellDef="let config" class="actions-cell">
+                  <div class="actions-group">
+                    <button mat-icon-button 
+                            class="action-btn edit-btn" 
+                            (click)="editSiteConfig(config)"
+                            matTooltip="Edit configuration">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button 
+                            class="action-btn delete-btn" 
+                            (click)="deleteSiteConfig(config)"
+                            matTooltip="Delete configuration">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-header"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+
+              <!-- Enhanced No Data State -->
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell no-data-cell" [attr.colspan]="displayedColumns.length">
+                  <div class="no-data-content">
+                    <div class="no-data-icon">
+                      <mat-icon>settings</mat-icon>
+                    </div>
+                    <h3 class="mat-headline-small">No site configurations found</h3>
+                    <p class="mat-body-medium">Site configurations define how to scrape product information from different e-commerce websites.</p>
+                    <button mat-raised-button color="primary" (click)="createSiteConfig()">
+                      <mat-icon>add</mat-icon>
+                      Create First Configuration
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Enhanced Pagination -->
+          <div class="pagination-section">
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" 
+                           showFirstLastButtons 
+                           class="modern-paginator"
+                           aria-label="Select page of site configurations">
+            </mat-paginator>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
 </div>

@@ -24,6 +24,7 @@ export class ProductsListComponent implements OnInit {
   displayedColumns: string[] = ['image', 'name', 'category', 'manufacturer', 'modelNumber', 'isActive', 'createdAt', 'actions'];
   dataSource = new MatTableDataSource<ProductDto>();
   isLoading = false;
+  error: string | null = null;
 
   // Pagination
   totalCount = 0;
@@ -86,6 +87,7 @@ export class ProductsListComponent implements OnInit {
 
   loadProducts(): void {
     this.isLoading = true;
+    this.error = null;
 
     const filter: ProductsFilter = {
       search: this.searchControl.value || undefined,
@@ -99,9 +101,11 @@ export class ProductsListComponent implements OnInit {
         this.dataSource.data = result.items;
         this.totalCount = result.totalCount;
         this.isLoading = false;
+        this.error = null;
       },
       error: (error) => {
         console.error('Error loading products:', error);
+        this.error = 'Failed to load products. Please try again.';
         this.snackBar.open('Failed to load products', 'Close', { duration: 5000 });
         this.isLoading = false;
       }
@@ -164,5 +168,13 @@ export class ProductsListComponent implements OnInit {
     if (!imageUrl) return '';
     if (imageUrl.startsWith('http')) return imageUrl;
     return `${environment.apiUrl}/${imageUrl}`;
+  }
+
+  getActiveProductsCount(): number {
+    return this.dataSource.data.filter(product => product.isActive).length;
+  }
+
+  getInactiveProductsCount(): number {
+    return this.dataSource.data.filter(product => !product.isActive).length;
   }
 }
