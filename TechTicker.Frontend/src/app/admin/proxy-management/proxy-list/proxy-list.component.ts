@@ -16,7 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { firstValueFrom } from 'rxjs';
-import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { RbacModule } from '../../../shared/modules/rbac.module';
 import {
   ProxyConfigurationDto,
   ProxyStatsDto,
@@ -45,7 +45,7 @@ import {
     MatInputModule,
     MatSelectModule,
     ScrollingModule,
-    HasPermissionDirective
+    RbacModule
   ],
   templateUrl: './proxy-list.component.html',
   styleUrls: ['./proxy-list.component.scss']

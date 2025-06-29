@@ -21,7 +21,7 @@ import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { UserDto, UpdateUserDto } from '../../../../shared/api/api-client';
 import { UsersService } from '../../services/users.service';
 import { UserDeleteDialogComponent } from '../user-delete-dialog/user-delete-dialog.component';
-import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
+import { RbacModule } from '../../../../shared/modules/rbac.module';
 
 @Component({
   selector: 'app-users-list',
@@ -46,7 +46,7 @@ import { HasPermissionDirective } from '../../../../shared/directives/has-permis
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatDividerModule,
-    HasPermissionDirective
+    RbacModule
   ]
 })
 export class UsersListComponent implements OnInit, OnDestroy {

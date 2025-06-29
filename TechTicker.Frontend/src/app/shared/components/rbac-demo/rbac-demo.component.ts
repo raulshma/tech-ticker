@@ -7,10 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Observable } from 'rxjs';
 import { AuthService, CurrentUser } from '../../services/auth.service';
 import { RoleService, RoleDefinition } from '../../services/role.service';
-import { HasRoleDirective } from '../../directives/has-role.directive';
-import { HasAnyRoleDirective } from '../../directives/has-any-role.directive';
-import { HasAllRolesDirective } from '../../directives/has-all-roles.directive';
-import { HasPermissionDirective } from '../../directives/has-permission.directive';
+import { RbacModule } from '../../modules/rbac.module';
 
 @Component({
   selector: 'app-rbac-demo',
@@ -21,10 +18,7 @@ import { HasPermissionDirective } from '../../directives/has-permission.directiv
     MatButtonModule,
     MatChipsModule,
     MatIconModule,
-    HasRoleDirective,
-    HasAnyRoleDirective,
-    HasAllRolesDirective,
-    HasPermissionDirective
+    RbacModule
   ],
   template: `
     <div class="rbac-demo-container">

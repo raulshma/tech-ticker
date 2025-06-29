@@ -1,144 +1,248 @@
 <mat-sidenav-container class="sidenav-container">
   <!-- Sidebar -->
   <mat-sidenav #drawer class="sidenav" fixedInViewport="true" mode="side" opened="true">
-    <mat-toolbar class="sidenav-header">
-      <span>TechTicker</span>
-    </mat-toolbar>
+    <!-- Brand Header -->
+    <div class="sidenav-header">
+      <div class="brand-container">
+        <mat-icon class="brand-icon">trending_up</mat-icon>
+        <div class="brand-text">
+          <span class="brand-title">TechTicker</span>
+          <span class="brand-subtitle">Price Tracker</span>
+        </div>
+      </div>
+    </div>
 
-    <mat-nav-list>
-      <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
-        <mat-icon matListItemIcon>dashboard</mat-icon>
-        <span matListItemTitle>Dashboard</span>
-      </a>
+    <!-- Navigation Content -->
+    <div class="nav-content">
+      <nav class="primary-nav">
+        <!-- Main Navigation -->
+        <div class="nav-section">
+          <a mat-list-item 
+             class="nav-item" 
+             routerLink="/dashboard" 
+             routerLinkActive="active-link" 
+             [routerLinkActiveOptions]="{exact: true}">
+            <div class="nav-item-content">
+              <mat-icon class="nav-icon">dashboard</mat-icon>
+              <span class="nav-label">Dashboard</span>
+            </div>
+            <div class="state-layer"></div>
+          </a>
 
-      <a mat-list-item routerLink="/catalog" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>storefront</mat-icon>
-        <span matListItemTitle>Product Catalog</span>
-      </a>
+          <a mat-list-item 
+             class="nav-item" 
+             routerLink="/catalog" 
+             routerLinkActive="active-link">
+            <div class="nav-item-content">
+              <mat-icon class="nav-icon">storefront</mat-icon>
+              <span class="nav-label">Product Catalog</span>
+            </div>
+            <div class="state-layer"></div>
+          </a>
+        </div>
 
-      <mat-divider></mat-divider>
+        <!-- Admin and Moderator sections -->
+        <ng-container *hasAnyRole="['Admin', 'Moderator']">
+          <div class="nav-section">
+            <h3 class="section-header">Product Management</h3>
+            
+            <a mat-list-item 
+               class="nav-item" 
+               routerLink="/categories" 
+               routerLinkActive="active-link">
+              <div class="nav-item-content">
+                <mat-icon class="nav-icon">category</mat-icon>
+                <span class="nav-label">Categories</span>
+              </div>
+              <div class="state-layer"></div>
+            </a>
 
-      <!-- Admin and Moderator sections -->
-      <ng-container *hasAnyRole="['Admin', 'Moderator']">
-        <h3 matSubheader>Product Management</h3>
+            <a mat-list-item 
+               class="nav-item" 
+               routerLink="/products" 
+               routerLinkActive="active-link">
+              <div class="nav-item-content">
+                <mat-icon class="nav-icon">inventory</mat-icon>
+                <span class="nav-label">Products</span>
+              </div>
+              <div class="state-layer"></div>
+            </a>
+          </div>
+        </ng-container>
 
-        <a mat-list-item routerLink="/categories" routerLinkActive="active-link">
-          <mat-icon matListItemIcon>category</mat-icon>
-          <span matListItemTitle>Categories</span>
-        </a>
+        <!-- Admin-only sections -->
+        <ng-container *hasRole="'Admin'">
+          <div class="nav-section">
+            <a mat-list-item 
+               class="nav-item" 
+               routerLink="/site-configs" 
+               routerLinkActive="active-link">
+              <div class="nav-item-content">
+                <mat-icon class="nav-icon">settings</mat-icon>
+                <span class="nav-label">Site Configurations</span>
+              </div>
+              <div class="state-layer"></div>
+            </a>
+          </div>
 
-        <a mat-list-item routerLink="/products" routerLinkActive="active-link">
-          <mat-icon matListItemIcon>inventory</mat-icon>
-          <span matListItemTitle>Products</span>
-        </a>
-      </ng-container>
+          <div class="nav-section">
+            <h3 class="section-header">Infrastructure</h3>
+            
+            <a mat-list-item 
+               class="nav-item" 
+               routerLink="/admin/proxies" 
+               routerLinkActive="active-link" 
+               *hasPermission="'Proxies.Read'">
+              <div class="nav-item-content">
+                <mat-icon class="nav-icon">vpn_lock</mat-icon>
+                <span class="nav-label">Proxy Management</span>
+              </div>
+              <div class="state-layer"></div>
+            </a>
+          </div>
 
-      <!-- Admin-only sections -->
-      <ng-container *hasRole="'Admin'">
-        <a mat-list-item routerLink="/site-configs" routerLinkActive="active-link">
-          <mat-icon matListItemIcon>settings</mat-icon>
-          <span matListItemTitle>Site Configurations</span>
-        </a>
+          <div class="nav-section">
+            <h3 class="section-header">Monitoring</h3>
+            
+            <a mat-list-item 
+               class="nav-item" 
+               routerLink="/scraper-logs" 
+               routerLinkActive="active-link">
+              <div class="nav-item-content">
+                <mat-icon class="nav-icon">history</mat-icon>
+                <span class="nav-label">Scraper Logs</span>
+              </div>
+              <div class="state-layer"></div>
+            </a>
+          </div>
 
-        <mat-divider></mat-divider>
+          <div class="nav-section">
+            <h3 class="section-header">User Management</h3>
+            
+            <a mat-list-item 
+               class="nav-item" 
+               routerLink="/users" 
+               routerLinkActive="active-link">
+              <div class="nav-item-content">
+                <mat-icon class="nav-icon">people</mat-icon>
+                <span class="nav-label">Users</span>
+              </div>
+              <div class="state-layer"></div>
+            </a>
+          </div>
+        </ng-container>
 
-        <h3 matSubheader>Infrastructure</h3>
+        <!-- User, Admin, and Moderator accessible sections -->
+        <ng-container *hasAnyRole="['User', 'Admin', 'Moderator']">
+          <div class="nav-section">
+            <h3 class="section-header">Content Management</h3>
+            
+            <a mat-list-item 
+               class="nav-item" 
+               routerLink="/mappings" 
+               routerLinkActive="active-link">
+              <div class="nav-item-content">
+                <mat-icon class="nav-icon">link</mat-icon>
+                <span class="nav-label">Product Mappings</span>
+              </div>
+              <div class="state-layer"></div>
+            </a>
+          </div>
+        </ng-container>
 
-        <a mat-list-item routerLink="/admin/proxies" routerLinkActive="active-link" *hasPermission="'Proxies.Read'">
-          <mat-icon matListItemIcon>vpn_lock</mat-icon>
-          <span matListItemTitle>Proxy Management</span>
-        </a>
+        <!-- User features - accessible to Users and Admins -->
+        <ng-container *hasAnyRole="['User', 'Admin']">
+          <div class="nav-section">
+            <h3 class="section-header">Personal</h3>
+            
+            <a mat-list-item 
+               class="nav-item" 
+               routerLink="/alerts" 
+               routerLinkActive="active-link">
+              <div class="nav-item-content">
+                <mat-icon class="nav-icon">notifications</mat-icon>
+                <span class="nav-label">Alert Rules</span>
+              </div>
+              <div class="state-layer"></div>
+            </a>
 
-        <mat-divider></mat-divider>
+            <a mat-list-item 
+               class="nav-item" 
+               routerLink="/notification-settings" 
+               routerLinkActive="active-link">
+              <div class="nav-item-content">
+                <mat-icon class="nav-icon">settings_applications</mat-icon>
+                <span class="nav-label">Notification Settings</span>
+              </div>
+              <div class="state-layer"></div>
+            </a>
+          </div>
+        </ng-container>
 
-        <h3 matSubheader>Monitoring</h3>
-
-        <a mat-list-item routerLink="/scraper-logs" routerLinkActive="active-link">
-          <mat-icon matListItemIcon>history</mat-icon>
-          <span matListItemTitle>Scraper Logs</span>
-        </a>
-
-        <mat-divider></mat-divider>
-
-        <h3 matSubheader>User Management</h3>
-
-        <a mat-list-item routerLink="/users" routerLinkActive="active-link">
-          <mat-icon matListItemIcon>people</mat-icon>
-          <span matListItemTitle>Users</span>
-        </a>
-      </ng-container>
-
-      <!-- User, Admin, and Moderator accessible sections -->
-      <ng-container *hasAnyRole="['User', 'Admin', 'Moderator']">
-        <h3 matSubheader>Content Management</h3>
-
-        <a mat-list-item routerLink="/mappings" routerLinkActive="active-link">
-          <mat-icon matListItemIcon>link</mat-icon>
-          <span matListItemTitle>Product Mappings</span>
-        </a>
-      </ng-container>
-
-      <mat-divider></mat-divider>
-
-      <!-- User features - accessible to Users and Admins -->
-      <ng-container *hasAnyRole="['User', 'Admin']">
-        <h3 matSubheader>Personal</h3>
-
-        <a mat-list-item routerLink="/alerts" routerLinkActive="active-link">
-          <mat-icon matListItemIcon>notifications</mat-icon>
-          <span matListItemTitle>Alert Rules</span>
-        </a>
-
-        <a mat-list-item routerLink="/notification-settings" routerLinkActive="active-link">
-          <mat-icon matListItemIcon>settings_applications</mat-icon>
-          <span matListItemTitle>Notification Settings</span>
-        </a>
-      </ng-container>
-
-      <mat-divider></mat-divider>
-
-      <!-- Development/Testing -->
-      <h3 matSubheader>Development</h3>
-
-      <a mat-list-item routerLink="/rbac-demo" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>security</mat-icon>
-        <span matListItemTitle>RBAC Demo</span>
-      </a>
-    </mat-nav-list>
+        <!-- Development/Testing -->
+        <div class="nav-section">
+          <h3 class="section-header">Development</h3>
+          
+          <a mat-list-item 
+             class="nav-item" 
+             routerLink="/rbac-demo" 
+             routerLinkActive="active-link">
+            <div class="nav-item-content">
+              <mat-icon class="nav-icon">security</mat-icon>
+              <span class="nav-label">RBAC Demo</span>
+            </div>
+            <div class="state-layer"></div>
+          </a>
+        </div>
+      </nav>
+    </div>
   </mat-sidenav>
 
   <!-- Main content -->
-  <mat-sidenav-content>
+  <mat-sidenav-content style="margin-left: 1px;">
     <!-- Top toolbar -->
     <mat-toolbar color="primary" class="main-toolbar">
-      <span>TechTicker</span>
-
-      <span class="spacer"></span>
-
-      <!-- User menu -->
-      <button mat-icon-button [matMenuTriggerFor]="userMenu" *ngIf="currentUser">
-        <mat-icon>account_circle</mat-icon>
-      </button>
-      <mat-menu #userMenu="matMenu">
-        <div class="user-info">
-          <p><strong>{{currentUser?.firstName}} {{currentUser?.lastName}}</strong></p>
-          <p class="user-email">{{currentUser?.email}}</p>
+      <div class="toolbar-content">
+        <div class="toolbar-start">
+          <span class="toolbar-title">TechTicker</span>
         </div>
-        <mat-divider></mat-divider>
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          <span>Logout</span>
-        </button>
-      </mat-menu>
 
-      <button 
-        mat-icon-button 
-        (click)="toggleTheme()" 
-        [attr.aria-label]="themeTooltip"
-        [matTooltip]="themeTooltip"
-        matTooltipPosition="below">
-        <mat-icon>{{ themeIcon }}</mat-icon>
-      </button>
+        <div class="toolbar-end">
+          <!-- User menu -->
+          <button mat-icon-button 
+                  class="user-menu-button"
+                  [matMenuTriggerFor]="userMenu" 
+                  *ngIf="currentUser"
+                  [attr.aria-label]="'User menu for ' + currentUser?.firstName">
+            <mat-icon>account_circle</mat-icon>
+          </button>
+          <mat-menu #userMenu="matMenu" class="user-menu">
+            <div class="user-info">
+              <div class="user-avatar">
+                <mat-icon>account_circle</mat-icon>
+              </div>
+              <div class="user-details">
+                <p class="user-name">{{currentUser?.firstName}} {{currentUser?.lastName}}</p>
+                <p class="user-email">{{currentUser?.email}}</p>
+              </div>
+            </div>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="logout()" class="logout-item">
+              <mat-icon>logout</mat-icon>
+              <span>Logout</span>
+            </button>
+          </mat-menu>
+
+          <button mat-icon-button
+                  class="theme-toggle-button"
+                  (click)="toggleTheme()" 
+                  [attr.aria-label]="themeTooltip"
+                  [matTooltip]="themeTooltip"
+                  matTooltipPosition="below">
+            <mat-icon>{{ themeIcon }}</mat-icon>
+          </button>
+        </div>
+      </div>
     </mat-toolbar>
 
     <!-- Page content -->

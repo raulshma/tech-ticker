@@ -4,19 +4,19 @@
 .dashboard-container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: clamp(16px, 4vw, 32px);
+  padding: 16px;
   background: var(--mat-sys-surface);
   min-height: 100vh;
 }
 
 // Welcome Section
 .welcome-section {
-  margin-bottom: clamp(32px, 6vw, 48px);
+  margin-bottom: 24px;
   
   .welcome-content {
-    padding: clamp(16px, 4vw, 24px);
+    padding: 20px;
     background: var(--mat-sys-surface-container-low);
-    border-radius: 28px;
+    border-radius: 16px;
     border: 1px solid var(--mat-sys-outline-variant);
   }
 
@@ -37,17 +37,17 @@
 
 // Statistics Section
 .stats-section {
-  margin-bottom: clamp(40px, 6vw, 56px);
+  margin-bottom: 32px;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: clamp(16px, 3vw, 24px);
+  gap: 16px;
   
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 12px;
   }
 }
 
@@ -72,13 +72,13 @@
   }
 
   mat-card-content {
-    padding: clamp(16px, 4vw, 24px) !important;
+    padding: 16px !important;
   }
 
   .stat-content {
     display: flex;
     align-items: center;
-    gap: clamp(16px, 3vw, 20px);
+    gap: 16px;
   }
 
   .stat-icon {
@@ -176,10 +176,10 @@
 
 // Quick Actions Section
 .quick-actions-section {
-  margin-bottom: clamp(40px, 6vw, 56px);
+  margin-bottom: 32px;
 
   .section-title {
-    margin: 0 0 clamp(20px, 4vw, 32px) 0;
+    margin: 0 0 20px 0;
     color: var(--mat-sys-on-surface);
     font-weight: 400;
   }
@@ -188,7 +188,7 @@
 .actions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: clamp(16px, 3vw, 20px);
+  gap: 16px;
   
   @media (max-width: 768px) {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
