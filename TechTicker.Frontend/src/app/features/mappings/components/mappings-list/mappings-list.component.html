@@ -26,7 +26,7 @@
           </mat-select>
         </mat-form-field>
 
-        <mat-checkbox [(ngModel)]="showAllMappings" (change)="loadMappings()">
+        <mat-checkbox [formControl]="showAllMappingsControl">
           Show all mappings (including inactive)
         </mat-checkbox>
 

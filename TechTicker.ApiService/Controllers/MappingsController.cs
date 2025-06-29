@@ -54,9 +54,23 @@ public class MappingsController : BaseApiController
             return HandleResult(result);
         }
 
-        // If no product ID specified, return all active mappings
-        var activeResult = await _mappingService.GetActiveMappingsAsync();
-        return HandleResult(activeResult);
+        // If no product ID specified
+        if (isActiveForScraping.HasValue)
+        {
+            // Return all mappings filtered by isActiveForScraping
+            var allMappingsResult = await _mappingService.GetAllMappingsAsync();
+            if (!allMappingsResult.IsSuccess)
+                return HandleResult(allMappingsResult);
+            var filtered = (allMappingsResult.Data ?? Enumerable.Empty<ProductSellerMappingDto>())
+                .Where(m => m.IsActiveForScraping == isActiveForScraping.Value);
+            return HandleResult(Result<IEnumerable<ProductSellerMappingDto>>.Success(filtered));
+        }
+        else
+        {
+            // Return all mappings (active and inactive)
+            var allMappingsResult = await _mappingService.GetAllMappingsAsync();
+            return HandleResult(allMappingsResult);
+        }
     }
 
     /// <summary>

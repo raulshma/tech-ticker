@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
@@ -18,6 +19,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { MappingsRoutingModule } from './mappings-routing.module';
 import { MappingsListComponent } from './components/mappings-list/mappings-list.component';
@@ -33,6 +35,7 @@ import { MappingDeleteDialogComponent } from './components/mapping-delete-dialog
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MappingsRoutingModule,
     MatTableModule,
     MatPaginatorModule,
@@ -50,7 +53,8 @@ import { MappingDeleteDialogComponent } from './components/mapping-delete-dialog
     MatChipsModule,
     MatSlideToggleModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatCheckboxModule
   ]
 })
 export class MappingsModule { }

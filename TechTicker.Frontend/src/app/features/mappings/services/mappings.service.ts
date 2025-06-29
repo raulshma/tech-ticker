@@ -11,7 +11,6 @@ import {
   ScraperSiteConfigurationDto,
   ApiResponse
 } from '../../../shared/api/api-client';
-import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

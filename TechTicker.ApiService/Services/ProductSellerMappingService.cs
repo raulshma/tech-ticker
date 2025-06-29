@@ -169,4 +169,19 @@ public class ProductSellerMappingService : IProductSellerMappingService
             return Result.Failure("An error occurred while deleting the mapping.", "INTERNAL_ERROR");
         }
     }
+
+    public async Task<Result<IEnumerable<ProductSellerMappingDto>>> GetAllMappingsAsync()
+    {
+        try
+        {
+            var mappings = await _unitOfWork.ProductSellerMappings.GetAllAsync();
+            var mappingDtos = mappings.Select(_mappingService.MapToDto);
+            return Result<IEnumerable<ProductSellerMappingDto>>.Success(mappingDtos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving all mappings");
+            return Result<IEnumerable<ProductSellerMappingDto>>.Failure("An error occurred while retrieving all mappings.", "INTERNAL_ERROR");
+        }
+    }
 }
