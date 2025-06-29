@@ -16,25 +16,27 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatError } from '@angular/material/form-field';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatChipsModule } from '@angular/material/chips';
 
 export interface BrowserAutomationAction {
   actionType: string;
   selector?: string;
-  timeoutMs?: number;
-  [key: string]: any;
+  repeat?: number;
+  delayMs?: number;
+  value?: string;
 }
 
 export interface BrowserAutomationProfile {
-  preferredBrowser: 'chromium' | 'firefox' | 'webkit';
-  timeoutSeconds: number;
+  preferredBrowser?: string; // "chromium", "firefox", "webkit"
+  waitTimeMs?: number;
+  actions?: BrowserAutomationAction[];
+  timeoutSeconds?: number;
   userAgent?: string;
-  proxy?: {
-    host: string;
-    port: number;
-    username?: string;
-    password?: string;
-  };
-  actions: BrowserAutomationAction[];
+  headers?: { [key: string]: string };
+  proxyServer?: string; // Full proxy URL like "http://proxy.example.com:8080"
+  proxyUsername?: string;
+  proxyPassword?: string;
 }
 
 @Component({
@@ -64,6 +66,8 @@ export interface BrowserAutomationProfile {
     MatExpansionModule,
     MatTooltipModule,
     MatDividerModule,
+    MatSlideToggleModule,
+    MatChipsModule
   ]
 })
 export class BrowserAutomationProfileBuilderComponent implements ControlValueAccessor, OnInit {
@@ -71,40 +75,48 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
 
   profileForm: FormGroup;
   browsers = [
-    { value: 'chromium', label: 'Chromium' },
+    { value: 'chromium', label: 'Chromium (Default)' },
     { value: 'firefox', label: 'Firefox' },
-    { value: 'webkit', label: 'Webkit' }
+    { value: 'webkit', label: 'WebKit (Safari)' }
   ];
+  
+  // Updated action types to match backend implementation
   actionTypes = [
-    { value: 'scroll', label: 'Scroll' },
-    { value: 'click', label: 'Click' },
-    { value: 'wait', label: 'Wait' },
-    { value: 'waitForSelector', label: 'Wait for Selector' },
-    { value: 'type', label: 'Type Text' },
-    { value: 'evaluate', label: 'Evaluate JavaScript' },
-    { value: 'screenshot', label: 'Screenshot' },
-    { value: 'hover', label: 'Hover' },
-    { value: 'selectOption', label: 'Select Option' },
-    { value: 'setValue', label: 'Set Value (JS)' }
+    { value: 'scroll', label: 'Scroll Down', description: 'Scroll down by one viewport' },
+    { value: 'click', label: 'Click Element', description: 'Click on an element by CSS selector' },
+    { value: 'waitForSelector', label: 'Wait for Selector', description: 'Wait for an element to appear' },
+    { value: 'type', label: 'Type Text', description: 'Type text into an input field' },
+    { value: 'wait', label: 'Wait (Timeout)', description: 'Wait for a specified time' },
+    { value: 'waitForTimeout', label: 'Wait for Timeout', description: 'Wait for a specified time (alternative)' },
+    { value: 'screenshot', label: 'Take Screenshot', description: 'Capture a screenshot of the page' },
+    { value: 'evaluate', label: 'Execute JavaScript', description: 'Run custom JavaScript code' },
+    { value: 'hover', label: 'Hover Element', description: 'Hover over an element' },
+    { value: 'selectOption', label: 'Select Option', description: 'Select an option from a dropdown' },
+    { value: 'setValue', label: 'Set Value (JS)', description: 'Set input value using JavaScript' }
   ];
+  
   validationError: string | null = null;
   showRawJson = false;
   rawJsonControl = new FormControl('');
+
+  // Form fields for headers
+  headersArray: FormArray;
 
   private onChange: any = () => {};
   private onTouched: any = () => {};
 
   constructor(private fb: FormBuilder) {
+    this.headersArray = this.fb.array([]);
+    
     this.profileForm = this.fb.group({
-      preferredBrowser: ['chromium', Validators.required],
-      timeoutSeconds: [30, [Validators.required, Validators.min(1)]],
+      preferredBrowser: ['chromium'],
+      timeoutSeconds: [30, [Validators.min(1)]],
+      waitTimeMs: [null, [Validators.min(0)]],
       userAgent: [''],
-      proxy: this.fb.group({
-        host: [''],
-        port: [null],
-        username: [''],
-        password: ['']
-      }),
+      proxyServer: [''],
+      proxyUsername: [''],
+      proxyPassword: [''],
+      headers: this.headersArray,
       actions: this.fb.array([])
     });
   }
@@ -126,17 +138,17 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
     return this.profileForm.get('actions') as FormArray;
   }
 
-  get proxyGroup(): FormGroup {
-    return this.profileForm.get('proxy') as FormGroup;
+  get headers(): FormArray {
+    return this.profileForm.get('headers') as FormArray;
   }
 
   addAction() {
     this.actions.push(this.fb.group({
       actionType: ['', Validators.required],
       selector: [''],
-      timeoutMs: [null],
-      value: [''],
-      delayMs: [null]
+      repeat: [1, [Validators.min(1)]],
+      delayMs: [null, [Validators.min(0)]],
+      value: ['']
     }));
   }
 
@@ -144,25 +156,61 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
     this.actions.removeAt(index);
   }
 
+  addHeader() {
+    this.headers.push(this.fb.group({
+      key: ['', Validators.required],
+      value: ['', Validators.required]
+    }));
+  }
+
+  removeHeader(index: number) {
+    this.headers.removeAt(index);
+  }
+
   writeValue(obj: any): void {
     if (obj) {
       try {
-        this.profileForm.patchValue(obj, { emitEvent: false });
+        // Clear existing form arrays
         this.actions.clear();
+        this.headers.clear();
+        
+        // Set basic form values
+        this.profileForm.patchValue({
+          preferredBrowser: obj.preferredBrowser || 'chromium',
+          timeoutSeconds: obj.timeoutSeconds || 30,
+          waitTimeMs: obj.waitTimeMs || null,
+          userAgent: obj.userAgent || '',
+          proxyServer: obj.proxyServer || '',
+          proxyUsername: obj.proxyUsername || '',
+          proxyPassword: obj.proxyPassword || ''
+        }, { emitEvent: false });
+        
+        // Populate actions
         if (Array.isArray(obj.actions)) {
-          obj.actions.forEach((a: any) => {
+          obj.actions.forEach((action: any) => {
             this.actions.push(this.fb.group({
-              actionType: [a.actionType, Validators.required],
-              selector: [a.selector || ''],
-              timeoutMs: [a.timeoutMs || null],
-              value: [a.value || ''],
-              delayMs: [a.delayMs || null]
+              actionType: [action.actionType || '', Validators.required],
+              selector: [action.selector || ''],
+              repeat: [action.repeat || 1, [Validators.min(1)]],
+              delayMs: [action.delayMs || null, [Validators.min(0)]],
+              value: [action.value || '']
             }));
           });
         }
+        
+        // Populate headers
+        if (obj.headers && typeof obj.headers === 'object') {
+          Object.entries(obj.headers).forEach(([key, value]) => {
+            this.headers.push(this.fb.group({
+              key: [key, Validators.required],
+              value: [value, Validators.required]
+            }));
+          });
+        }
+        
         this.rawJsonControl.setValue(JSON.stringify(obj, null, 2), { emitEvent: false });
-      } catch {
-        // ignore
+      } catch (error) {
+        console.error('Error parsing browser automation profile:', error);
       }
     }
   }
@@ -186,33 +234,108 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
   }
 
   propagateChange() {
-    const value = this.profileForm.value;
+    const formValue = this.profileForm.value;
+    
+    // Transform form data to match backend structure
+    const profile: BrowserAutomationProfile = {
+      preferredBrowser: formValue.preferredBrowser || undefined,
+      timeoutSeconds: formValue.timeoutSeconds || undefined,
+      waitTimeMs: formValue.waitTimeMs || undefined,
+      userAgent: formValue.userAgent || undefined,
+      proxyServer: formValue.proxyServer || undefined,
+      proxyUsername: formValue.proxyUsername || undefined,
+      proxyPassword: formValue.proxyPassword || undefined
+    };
+    
+    // Transform headers array to dictionary
+    if (formValue.headers && Array.isArray(formValue.headers)) {
+      const headersDict: { [key: string]: string } = {};
+      formValue.headers.forEach((header: any) => {
+        if (header.key && header.value) {
+          headersDict[header.key] = header.value;
+        }
+      });
+      if (Object.keys(headersDict).length > 0) {
+        profile.headers = headersDict;
+      }
+    }
+    
+    // Transform actions array
+    if (formValue.actions && Array.isArray(formValue.actions)) {
+      profile.actions = formValue.actions.map((action: any) => ({
+        actionType: action.actionType,
+        selector: action.selector || undefined,
+        repeat: action.repeat || undefined,
+        delayMs: action.delayMs || undefined,
+        value: action.value || undefined
+      })).filter((action: any) => action.actionType); // Only include actions with actionType
+    }
+    
+    // Remove undefined values to clean up the JSON
+    const cleanProfile = this.removeUndefinedValues(profile);
     
     // Always propagate the current value to prevent form resets
-    this.onChange(value);
-    this.rawJsonControl.setValue(JSON.stringify(value, null, 2), { emitEvent: false });
+    this.onChange(cleanProfile);
+    this.rawJsonControl.setValue(JSON.stringify(cleanProfile, null, 2), { emitEvent: false });
     
     // Update validation error display
     if (this.profileForm.valid) {
       this.validationError = null;
     } else {
-      // Only show validation error if user has interacted with invalid fields
       const hasInvalidTouchedFields = this.hasInvalidTouchedFields();
       this.validationError = hasInvalidTouchedFields ? 'Please fix validation errors in the form.' : null;
     }
   }
 
+  private removeUndefinedValues(obj: any): any {
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.removeUndefinedValues(item));
+    } else if (obj !== null && typeof obj === 'object') {
+      const cleaned: any = {};
+      for (const [key, value] of Object.entries(obj)) {
+        if (value !== undefined && value !== null && value !== '') {
+          cleaned[key] = this.removeUndefinedValues(value);
+        }
+      }
+      return Object.keys(cleaned).length > 0 ? cleaned : undefined;
+    }
+    return obj;
+  }
+
   private hasInvalidTouchedFields(): boolean {
-    if (this.profileForm.get('timeoutSeconds')?.invalid && this.profileForm.get('timeoutSeconds')?.touched) {
-      return true;
+    // Check basic form fields
+    const basicFields = ['timeoutSeconds', 'waitTimeMs'];
+    for (const field of basicFields) {
+      const control = this.profileForm.get(field);
+      if (control?.invalid && control?.touched) {
+        return true;
+      }
     }
     
-    // Check if any action has invalid required fields that have been touched
+    // Check actions array
     const actionsArray = this.actions;
     for (let i = 0; i < actionsArray.length; i++) {
       const actionGroup = actionsArray.at(i);
       const actionTypeControl = actionGroup?.get('actionType');
-      if (actionTypeControl?.invalid && actionTypeControl?.touched) {
+      const repeatControl = actionGroup?.get('repeat');
+      const delayMsControl = actionGroup?.get('delayMs');
+      
+      if ((actionTypeControl?.invalid && actionTypeControl?.touched) ||
+          (repeatControl?.invalid && repeatControl?.touched) ||
+          (delayMsControl?.invalid && delayMsControl?.touched)) {
+        return true;
+      }
+    }
+    
+    // Check headers array
+    const headersArray = this.headers;
+    for (let i = 0; i < headersArray.length; i++) {
+      const headerGroup = headersArray.at(i);
+      const keyControl = headerGroup?.get('key');
+      const valueControl = headerGroup?.get('value');
+      
+      if ((keyControl?.invalid && keyControl?.touched) ||
+          (valueControl?.invalid && valueControl?.touched)) {
         return true;
       }
     }
@@ -223,10 +346,55 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
   toggleRawJson() {
     this.showRawJson = !this.showRawJson;
     if (this.showRawJson) {
-      this.rawJsonControl.setValue(JSON.stringify(this.profileForm.value, null, 2), { emitEvent: false });
+      const currentValue = this.profileForm.value;
+      const transformedValue = this.transformFormToProfile(currentValue);
+      this.rawJsonControl.setValue(JSON.stringify(transformedValue, null, 2), { emitEvent: false });
     } else {
       this.tryParseRawJson(this.rawJsonControl.value ?? '');
     }
+  }
+
+  private transformFormToProfile(formValue: any): BrowserAutomationProfile {
+    const profile: BrowserAutomationProfile = {};
+    
+    if (formValue.preferredBrowser) profile.preferredBrowser = formValue.preferredBrowser;
+    if (formValue.timeoutSeconds) profile.timeoutSeconds = formValue.timeoutSeconds;
+    if (formValue.waitTimeMs) profile.waitTimeMs = formValue.waitTimeMs;
+    if (formValue.userAgent) profile.userAgent = formValue.userAgent;
+    if (formValue.proxyServer) profile.proxyServer = formValue.proxyServer;
+    if (formValue.proxyUsername) profile.proxyUsername = formValue.proxyUsername;
+    if (formValue.proxyPassword) profile.proxyPassword = formValue.proxyPassword;
+    
+    // Transform headers
+    if (formValue.headers && Array.isArray(formValue.headers)) {
+      const headersDict: { [key: string]: string } = {};
+      formValue.headers.forEach((header: any) => {
+        if (header.key && header.value) {
+          headersDict[header.key] = header.value;
+        }
+      });
+      if (Object.keys(headersDict).length > 0) {
+        profile.headers = headersDict;
+      }
+    }
+    
+    // Transform actions
+    if (formValue.actions && Array.isArray(formValue.actions)) {
+      profile.actions = formValue.actions
+        .filter((action: any) => action.actionType)
+        .map((action: any) => {
+          const transformedAction: BrowserAutomationAction = {
+            actionType: action.actionType
+          };
+          if (action.selector) transformedAction.selector = action.selector;
+          if (action.repeat && action.repeat !== 1) transformedAction.repeat = action.repeat;
+          if (action.delayMs) transformedAction.delayMs = action.delayMs;
+          if (action.value) transformedAction.value = action.value;
+          return transformedAction;
+        });
+    }
+    
+    return profile;
   }
 
   tryParseRawJson(val: string) {
@@ -236,12 +404,44 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
       this.validationError = null;
       this.onChange(parsed);
     } catch {
-      this.validationError = 'Invalid JSON.';
+      this.validationError = 'Invalid JSON format.';
       this.onChange(null);
     }
   }
 
+  getActionTypeInfo(actionType: string): { label: string; description: string } {
+    const actionInfo = this.actionTypes.find(a => a.value === actionType);
+    return {
+      label: actionInfo?.label || actionType,
+      description: actionInfo?.description || ''
+    };
+  }
+
   getActionLabel(type: string): string {
     return this.actionTypes.find(a => a.value === type)?.label || type;
+  }
+
+  // Helper method to determine if action needs specific fields
+  actionNeedsSelector(actionType: string): boolean {
+    return ['click', 'waitForSelector', 'type', 'hover', 'selectOption', 'setValue'].includes(actionType);
+  }
+
+  actionNeedsValue(actionType: string): boolean {
+    return ['type', 'evaluate', 'screenshot', 'selectOption', 'setValue'].includes(actionType);
+  }
+
+  actionNeedsDelay(actionType: string): boolean {
+    return ['wait', 'waitForTimeout'].includes(actionType);
+  }
+
+  getValuePlaceholder(actionType: string): string {
+    switch (actionType) {
+      case 'type': return 'Text to type';
+      case 'evaluate': return 'JavaScript code';
+      case 'screenshot': return 'File path (optional)';
+      case 'selectOption': return 'Option value';
+      case 'setValue': return 'Value to set';
+      default: return 'Value';
+    }
   }
 } 

@@ -1,6 +1,6 @@
 <div class="browser-automation-profile-builder">
   <div class="builder-header">
-    <h3>Automation Profile</h3>
+    <h3>Browser Automation Profile</h3>
     <button mat-stroked-button color="primary" type="button" (click)="toggleRawJson()" matTooltip="Switch between form and JSON view">
       <mat-icon>{{ showRawJson ? 'view_list' : 'code' }}</mat-icon>
     </button>
@@ -9,92 +9,202 @@
   <mat-divider></mat-divider>
 
   <form *ngIf="!showRawJson" [formGroup]="profileForm" class="profile-form">
-    <div class="form-row">
-      <mat-form-field appearance="fill" class="dense">
-        <mat-label>Browser</mat-label>
-        <mat-select formControlName="preferredBrowser">
-          <mat-option *ngFor="let browser of browsers" [value]="browser.value">{{ browser.label }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="fill" class="dense">
-        <mat-label>Timeout (s)</mat-label>
-        <input matInput type="number" formControlName="timeoutSeconds" min="1">
-        <mat-error *ngIf="profileForm.get('timeoutSeconds')?.invalid && profileForm.get('timeoutSeconds')?.touched">
-          Timeout must be at least 1 second.
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field appearance="fill" class="dense full-width">
-        <mat-label>User Agent</mat-label>
-        <input matInput formControlName="userAgent" placeholder="Custom user agent">
-      </mat-form-field>
-    </div>
-
-    <mat-expansion-panel class="dense" hideToggle>
+    <!-- Basic Configuration -->
+    <mat-expansion-panel class="dense" [expanded]="true">
       <mat-expansion-panel-header>
-        <mat-panel-title>Proxy Settings</mat-panel-title>
+        <mat-panel-title>Basic Configuration</mat-panel-title>
+        <mat-panel-description>Browser, timeouts, and user agent</mat-panel-description>
       </mat-expansion-panel-header>
-      <div [formGroup]="proxyGroup">
+      
+      <div class="form-row">
         <mat-form-field appearance="fill" class="dense">
-          <mat-label>Host</mat-label>
-          <input matInput formControlName="host" placeholder="proxy.example.com">
+          <mat-label>Browser Engine</mat-label>
+          <mat-select formControlName="preferredBrowser">
+            <mat-option *ngFor="let browser of browsers" [value]="browser.value">{{ browser.label }}</mat-option>
+          </mat-select>
+          <mat-hint>Choose the browser engine for automation</mat-hint>
         </mat-form-field>
+        
         <mat-form-field appearance="fill" class="dense">
-          <mat-label>Port</mat-label>
-          <input matInput type="number" formControlName="port" min="1">
+          <mat-label>Page Timeout (seconds)</mat-label>
+          <input matInput type="number" formControlName="timeoutSeconds" min="1" max="300">
+          <mat-error *ngIf="profileForm.get('timeoutSeconds')?.invalid && profileForm.get('timeoutSeconds')?.touched">
+            Timeout must be between 1 and 300 seconds.
+          </mat-error>
+          <mat-hint>Maximum time to wait for page operations</mat-hint>
         </mat-form-field>
+        
         <mat-form-field appearance="fill" class="dense">
-          <mat-label>Username</mat-label>
-          <input matInput formControlName="username" placeholder="proxy user">
+          <mat-label>Initial Wait Time (ms)</mat-label>
+          <input matInput type="number" formControlName="waitTimeMs" min="0" max="30000" placeholder="Optional">
+          <mat-error *ngIf="profileForm.get('waitTimeMs')?.invalid && profileForm.get('waitTimeMs')?.touched">
+            Wait time must be between 0 and 30000 milliseconds.
+          </mat-error>
+          <mat-hint>Wait time after page load before actions</mat-hint>
         </mat-form-field>
-        <mat-form-field appearance="fill" class="dense">
-          <mat-label>Password</mat-label>
-          <input matInput type="password" formControlName="password" placeholder="proxy password">
+      </div>
+      
+      <div class="form-row">
+        <mat-form-field appearance="fill" class="dense full-width">
+          <mat-label>User Agent</mat-label>
+          <input matInput formControlName="userAgent" placeholder="Leave empty for default browser user agent">
+          <mat-hint>Custom user agent string (optional)</mat-hint>
         </mat-form-field>
       </div>
     </mat-expansion-panel>
 
-    <mat-divider></mat-divider>
+    <!-- Proxy Settings -->
+    <mat-expansion-panel class="dense">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Proxy Configuration</mat-panel-title>
+        <mat-panel-description>Proxy server settings for network requests</mat-panel-description>
+      </mat-expansion-panel-header>
+      
+      <div class="form-row">
+        <mat-form-field appearance="fill" class="dense full-width">
+          <mat-label>Proxy Server</mat-label>
+          <input matInput formControlName="proxyServer" placeholder="http://proxy.example.com:8080">
+          <mat-hint>Full proxy URL including protocol and port</mat-hint>
+        </mat-form-field>
+      </div>
+      
+      <div class="form-row">
+        <mat-form-field appearance="fill" class="dense">
+          <mat-label>Proxy Username</mat-label>
+          <input matInput formControlName="proxyUsername" placeholder="Optional">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="dense">
+          <mat-label>Proxy Password</mat-label>
+          <input matInput type="password" formControlName="proxyPassword" placeholder="Optional">
+        </mat-form-field>
+      </div>
+    </mat-expansion-panel>
 
-    <div class="form-row">
-      <mat-expansion-panel class="dense" [expanded]="true">
-        <mat-expansion-panel-header>
-          <mat-panel-title>Actions</mat-panel-title>
-        </mat-expansion-panel-header>
-        <div formArrayName="actions">
-          <div *ngIf="actions.length === 0" class="empty-actions">No actions defined.</div>
-          <div *ngFor="let action of actions.controls; let i = index" [formGroupName]="i" class="action-row">
-            <mat-form-field appearance="fill" class="dense">
-              <mat-label>Type</mat-label>
-              <mat-select formControlName="actionType" matTooltip="Action type">
-                <mat-option *ngFor="let type of actionTypes" [value]="type.value">{{ type.label }}</mat-option>
+    <!-- HTTP Headers -->
+    <mat-expansion-panel class="dense">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Custom Headers</mat-panel-title>
+        <mat-panel-description>Additional HTTP headers to send with requests</mat-panel-description>
+      </mat-expansion-panel-header>
+      
+      <div formArrayName="headers">
+        <div *ngIf="headers.length === 0" class="empty-section">
+          <p class="empty-text">No custom headers defined.</p>
+        </div>
+        
+        <div *ngFor="let header of headers.controls; let i = index" [formGroupName]="i" class="header-row">
+          <mat-form-field appearance="fill" class="dense">
+            <mat-label>Header Name</mat-label>
+            <input matInput formControlName="key" placeholder="X-Custom-Header">
+            <mat-error *ngIf="header.get('key')?.invalid && header.get('key')?.touched">
+              Header name is required.
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill" class="dense flex-grow">
+            <mat-label>Header Value</mat-label>
+            <input matInput formControlName="value" placeholder="header-value">
+            <mat-error *ngIf="header.get('value')?.invalid && header.get('value')?.touched">
+              Header value is required.
+            </mat-error>
+          </mat-form-field>
+          <button mat-icon-button color="warn" type="button" (click)="removeHeader(i)" matTooltip="Remove header">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+        
+        <button mat-stroked-button type="button" (click)="addHeader()" class="add-button">
+          <mat-icon>add</mat-icon> Add Header
+        </button>
+      </div>
+    </mat-expansion-panel>
+
+    <!-- Browser Actions -->
+    <mat-expansion-panel class="dense" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Browser Actions</mat-panel-title>
+        <mat-panel-description>Automated actions to perform on the page</mat-panel-description>
+      </mat-expansion-panel-header>
+      
+      <div formArrayName="actions">
+        <div *ngIf="actions.length === 0" class="empty-section">
+          <p class="empty-text">No actions defined. Add actions to interact with the page.</p>
+        </div>
+        
+        <div *ngFor="let action of actions.controls; let i = index" [formGroupName]="i" class="action-card">
+          <div class="action-header">
+            <span class="action-number">{{ i + 1 }}</span>
+            <mat-form-field appearance="fill" class="dense action-type-field">
+              <mat-label>Action Type</mat-label>
+              <mat-select formControlName="actionType">
+                <mat-option *ngFor="let type of actionTypes" [value]="type.value" [matTooltip]="type.description">
+                  {{ type.label }}
+                </mat-option>
               </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="fill" class="dense">
-              <mat-label>Selector</mat-label>
-              <input matInput formControlName="selector" placeholder=".product-title" matTooltip="CSS selector (optional)">
-            </mat-form-field>
-            <mat-form-field appearance="fill" class="dense">
-              <mat-label>Value</mat-label>
-              <input matInput formControlName="value" placeholder="Text, JS, filename" matTooltip="Value (optional)">
-            </mat-form-field>
-            <mat-form-field appearance="fill" class="dense">
-              <mat-label>Timeout (ms)</mat-label>
-              <input matInput type="number" formControlName="timeoutMs" min="0" matTooltip="Timeout in ms (optional)">
-            </mat-form-field>
-            <mat-form-field appearance="fill" class="dense">
-              <mat-label>Delay (ms)</mat-label>
-              <input matInput type="number" formControlName="delayMs" min="0" matTooltip="Delay in ms (optional)">
+              <mat-error *ngIf="action.get('actionType')?.invalid && action.get('actionType')?.touched">
+                Action type is required.
+              </mat-error>
             </mat-form-field>
             <button mat-icon-button color="warn" type="button" (click)="removeAction(i)" matTooltip="Remove action">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
-          <button mat-fab color="primary" type="button" (click)="addAction()" class="add-action-fab" matTooltip="Add Action">
-            <mat-icon>add</mat-icon>
-          </button>
+          
+          <div class="action-details" *ngIf="action.get('actionType')?.value">
+            <div class="action-description">
+              <mat-icon class="info-icon">info</mat-icon>
+              <span>{{ getActionTypeInfo(action.get('actionType')?.value).description }}</span>
+            </div>
+            
+            <div class="action-fields">
+              <!-- Selector field (for actions that need it) -->
+              <mat-form-field 
+                *ngIf="actionNeedsSelector(action.get('actionType')?.value)" 
+                appearance="fill" 
+                class="dense">
+                <mat-label>CSS Selector</mat-label>
+                <input matInput formControlName="selector" placeholder=".price, #product-name, button.load-more">
+                <mat-hint>CSS selector to target the element</mat-hint>
+              </mat-form-field>
+              
+              <!-- Value field (for actions that need it) -->
+              <mat-form-field 
+                *ngIf="actionNeedsValue(action.get('actionType')?.value)" 
+                appearance="fill" 
+                class="dense">
+                <mat-label>Value</mat-label>
+                <input matInput formControlName="value" [placeholder]="getValuePlaceholder(action.get('actionType')?.value)">
+                <mat-hint>{{ getValuePlaceholder(action.get('actionType')?.value) }}</mat-hint>
+              </mat-form-field>
+              
+              <!-- Repeat field -->
+              <mat-form-field appearance="fill" class="dense repeat-field">
+                <mat-label>Repeat</mat-label>
+                <input matInput type="number" formControlName="repeat" min="1" max="50">
+                <mat-error *ngIf="action.get('repeat')?.invalid && action.get('repeat')?.touched">
+                  Repeat count must be between 1 and 50.
+                </mat-error>
+                <mat-hint>How many times to repeat this action</mat-hint>
+              </mat-form-field>
+              
+              <!-- Delay field -->
+              <mat-form-field appearance="fill" class="dense delay-field">
+                <mat-label>Delay (ms)</mat-label>
+                <input matInput type="number" formControlName="delayMs" min="0" max="60000" placeholder="0">
+                <mat-error *ngIf="action.get('delayMs')?.invalid && action.get('delayMs')?.touched">
+                  Delay must be between 0 and 60000 milliseconds.
+                </mat-error>
+                <mat-hint *ngIf="!actionNeedsDelay(action.get('actionType')?.value)">Delay after this action</mat-hint>
+                <mat-hint *ngIf="actionNeedsDelay(action.get('actionType')?.value)">Wait duration for this action</mat-hint>
+              </mat-form-field>
+            </div>
+          </div>
         </div>
-      </mat-expansion-panel>
-    </div>
+        
+        <button mat-fab color="primary" type="button" (click)="addAction()" class="add-action-fab" matTooltip="Add Action">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+    </mat-expansion-panel>
 
     <div *ngIf="validationError" class="validation-error">
       <mat-icon color="warn">error</mat-icon> {{ validationError }}
@@ -102,16 +212,25 @@
 
     <mat-divider></mat-divider>
 
-    <div class="json-preview">
-      <h4>Live JSON Preview</h4>
-      <pre>{{ profileForm.value | json }}</pre>
-    </div>
+    <!-- JSON Preview -->
+    <mat-expansion-panel class="dense">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Live JSON Preview</mat-panel-title>
+        <mat-panel-description>Real-time preview of the generated configuration</mat-panel-description>
+      </mat-expansion-panel-header>
+      
+      <div class="json-preview">
+        <pre>{{ profileForm.valid ? (profileForm.value | json) : 'Form contains validation errors' }}</pre>
+      </div>
+    </mat-expansion-panel>
   </form>
 
+  <!-- Raw JSON Editor -->
   <div *ngIf="showRawJson" class="raw-json-section">
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Browser Automation Profile (JSON)</mat-label>
-      <textarea matInput [formControl]="rawJsonControl" rows="12"></textarea>
+      <textarea matInput [formControl]="rawJsonControl" rows="20" placeholder="Enter JSON configuration directly..."></textarea>
+      <mat-hint>Edit the JSON configuration directly. Switch back to form view to validate.</mat-hint>
     </mat-form-field>
     <div *ngIf="validationError" class="validation-error">
       <mat-icon color="warn">error</mat-icon> {{ validationError }}
