@@ -512,7 +512,7 @@ mat-sidenav-content {
   font-size: 22px;
   width: 22px;
   height: 22px;
-  color: var(--mat-sys-color-on-surface-variant, #888);
+  color: var(--mat-sys-tertiary);
   transition: all 250ms cubic-bezier(0.2, 0, 0, 1);
   flex-shrink: 0;
 }
@@ -521,7 +521,7 @@ mat-sidenav-content {
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
-  color: var(--mat-sys-color-on-surface, #222);
+  color: var(--mat-sys-tertiary);
   letter-spacing: 0.1px;
   transition: all 250ms cubic-bezier(0.2, 0, 0, 1);
   flex: 1;
@@ -1048,6 +1048,53 @@ mat-sidenav-content {
     box-shadow: 
       0 8px 32px rgba(0, 0, 0, 0.24),
       0 4px 16px rgba(0, 0, 0, 0.16);
+  }
+  
+  // Enhanced navigation item visibility in dark mode
+  .nav-item {
+    &:not(.active) {
+      .nav-icon {
+        color: var(--mat-sys-color-on-surface-variant);
+        opacity: 0.9;
+      }
+      
+      .nav-label {
+        color: var(--mat-sys-tertiary);
+        opacity: 0.9;
+      }
+      
+      &:hover {
+        .nav-icon {
+          opacity: 1;
+          color: var(--mat-sys-color-on-secondary-container);
+        }
+        
+        .nav-label {
+          opacity: 1;
+          color: var(--mat-sys-color-on-secondary-container);
+        }
+      }
+    }
+  }
+  
+  // Section headers visibility
+  .section-title {
+    color: var(--mat-sys-color-on-surface);
+    opacity: 0.9;
+    
+    .section-icon {
+      color: var(--mat-sys-color-on-surface-variant);
+      opacity: 0.8;
+    }
+  }
+  
+  // Brand text visibility
+  .brand-title {
+    color: var(--mat-sys-color-on-surface);
+  }
+  
+  .brand-subtitle {
+    color: var(--mat-sys-color-on-surface-variant);
   }
   
   // Dark theme mobile-specific styling
