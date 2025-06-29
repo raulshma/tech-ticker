@@ -25,6 +25,7 @@ export class SiteConfigFormComponent implements OnInit {
   isLoading = false;
   isEditMode = false;
   siteConfigId: string | null = null;
+  showExamples = false;
 
   browserAutomationExamples = [
     {
@@ -321,5 +322,9 @@ export class SiteConfigFormComponent implements OnInit {
     if (navigator && navigator.clipboard) {
       navigator.clipboard.writeText(text);
     }
+  }
+
+  toggleExamples() {
+    this.showExamples = !this.showExamples;
   }
 }
