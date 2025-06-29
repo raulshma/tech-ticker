@@ -1,30 +1,25 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { 
-  UserDto, 
-  CreateUserDto, 
-  UpdateUserDto 
-} from '../../../../shared/api/api-client';
-import { UsersService } from '../../services/users.service';
-import { RoleService } from '../../../../shared/services/role.service';
-import { UserPermissionsComponent } from '../user-permissions/user-permissions.component';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { Subject, takeUntil } from 'rxjs';
+import { UserDto, CreateUserDto, UpdateUserDto } from '../../../../shared/api/api-client';
+import { UsersService } from '../../services/users.service';
+import { UserPermissionsComponent } from '../user-permissions/user-permissions.component';
+import { RbacModule } from '../../../../shared/modules/rbac.module';
 
 @Component({
   selector: 'app-user-form',
@@ -45,52 +40,70 @@ import { MatDividerModule } from '@angular/material/divider';
     MatSlideToggleModule,
     MatMenuModule,
     MatDividerModule,
-    UserPermissionsComponent
+    UserPermissionsComponent,
+    RbacModule
   ],
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.scss']
 })
 export class UserFormComponent implements OnInit {
   userForm: FormGroup;
-  isLoading = false;
   isEditMode = false;
-  userId: string | null = null;
-  availableRoles: string[] = [];
-  hidePassword = true;
+  isLoading = false;
   currentUser: UserDto | null = null;
+  hidePassword = true;
+  availableRoles: string[] = [];
+
+  private destroy$ = new Subject<void>();
+  private userId: string | null = null;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private usersService: UsersService,
-    private roleService: RoleService,
+    private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
+    private usersService: UsersService,
     private snackBar: MatSnackBar
   ) {
-    this.userForm = this.formBuilder.group({
+    this.userForm = this.createForm();
+  }
+
+  ngOnInit(): void {
+    this.loadAvailableRoles();
+    this.checkRouteParams();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private createForm(): FormGroup {
+    return this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      firstName: ['', [Validators.maxLength(100)]],
-      lastName: ['', [Validators.maxLength(100)]],
+      firstName: [''],
+      lastName: [''],
       roles: [[]],
       isActive: [true]
     });
   }
 
-  ngOnInit(): void {
+  private checkRouteParams(): void {
     this.userId = this.route.snapshot.paramMap.get('id');
     this.isEditMode = !!this.userId;
-    this.availableRoles = this.usersService.getAvailableRoles();
 
-    if (this.isEditMode) {
-      // Remove password requirement for edit mode
+    if (this.isEditMode && this.userId) {
+      this.loadUser(this.userId);
+      // Remove password validation for edit mode
       this.userForm.get('password')?.clearValidators();
       this.userForm.get('password')?.updateValueAndValidity();
-      
-      if (this.userId) {
-        this.loadUser(this.userId);
-      }
     }
+  }
+
+  private loadAvailableRoles(): void {
+    // Get available roles from the users service
+    const roleDisplayNames = this.usersService.getRoleDisplayNames();
+    this.availableRoles = Object.keys(roleDisplayNames);
   }
 
   loadUser(id: string): void {
@@ -116,92 +129,115 @@ export class UserFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.userForm.valid && !this.isLoading) {
+    if (this.userForm.valid) {
       this.isLoading = true;
 
-      const formValue = this.userForm.value;
-      
-      if (this.isEditMode && this.userId) {
-        const updateDto = new UpdateUserDto({
-          email: formValue.email,
-          firstName: formValue.firstName || undefined,
-          lastName: formValue.lastName || undefined,
-          roles: formValue.roles && formValue.roles.length > 0 ? formValue.roles : undefined,
-          isActive: formValue.isActive
-        });
-
-        this.usersService.updateUser(this.userId, updateDto).subscribe({
-          next: () => {
-            this.snackBar.open('User updated successfully', 'Close', { duration: 3000 });
-            this.router.navigate(['/users']);
-          },
-          error: (error) => {
-            console.error('Error updating user:', error);
-            this.snackBar.open('Failed to update user', 'Close', { duration: 5000 });
-            this.isLoading = false;
-          }
-        });
+      if (this.isEditMode) {
+        this.updateUser();
       } else {
-        const createDto = new CreateUserDto({
-          email: formValue.email,
-          password: formValue.password,
-          firstName: formValue.firstName || undefined,
-          lastName: formValue.lastName || undefined,
-          roles: formValue.roles && formValue.roles.length > 0 ? formValue.roles : undefined
-        });
-
-        this.usersService.createUser(createDto).subscribe({
-          next: () => {
-            this.snackBar.open('User created successfully', 'Close', { duration: 3000 });
-            this.router.navigate(['/users']);
-          },
-          error: (error) => {
-            console.error('Error creating user:', error);
-            this.snackBar.open('Failed to create user', 'Close', { duration: 5000 });
-            this.isLoading = false;
-          }
-        });
+        this.createUser();
       }
-    } else {
-      this.markFormGroupTouched();
     }
   }
 
-  onCancel(): void {
-    this.router.navigate(['/users']);
+  private createUser(): void {
+    const formValue = this.userForm.value;
+    const createUserDto = new CreateUserDto({
+      email: formValue.email,
+      password: formValue.password,
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      roles: formValue.roles
+    });
+
+    this.usersService.createUser(createUserDto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.snackBar.open('User created successfully', 'Close', { duration: 3000 });
+          this.router.navigate(['/users']);
+        },
+        error: (error) => {
+          console.error('Error creating user:', error);
+          this.snackBar.open('Failed to create user', 'Close', { duration: 5000 });
+          this.isLoading = false;
+        }
+      });
+  }
+
+  private updateUser(): void {
+    if (!this.userId) return;
+
+    const formValue = this.userForm.value;
+    const updateUserDto = new UpdateUserDto({
+      email: formValue.email,
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      roles: formValue.roles,
+      isActive: formValue.isActive
+    });
+
+    this.usersService.updateUser(this.userId, updateUserDto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.snackBar.open('User updated successfully', 'Close', { duration: 3000 });
+          this.router.navigate(['/users']);
+        },
+        error: (error) => {
+          console.error('Error updating user:', error);
+          this.snackBar.open('Failed to update user', 'Close', { duration: 5000 });
+          this.isLoading = false;
+        }
+      });
   }
 
   togglePasswordVisibility(): void {
     this.hidePassword = !this.hidePassword;
   }
 
-  private markFormGroupTouched(): void {
-    Object.keys(this.userForm.controls).forEach(key => {
-      const control = this.userForm.get(key);
-      if (control) {
-        control.markAsTouched();
-      }
-    });
+  onCancel(): void {
+    this.router.navigate(['/users']);
   }
 
   getFieldErrorMessage(fieldName: string): string {
     const field = this.userForm.get(fieldName);
     if (field?.hasError('required')) {
-      return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
+      return `${this.getFieldLabel(fieldName)} is required`;
     }
     if (field?.hasError('email')) {
       return 'Please enter a valid email address';
     }
     if (field?.hasError('minlength')) {
-      return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be at least ${field.errors?.['minlength'].requiredLength} characters`;
-    }
-    if (field?.hasError('maxlength')) {
-      return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must not exceed ${field.errors?.['maxlength'].requiredLength} characters`;
+      const minLength = field.errors?.['minlength']?.requiredLength;
+      return `${this.getFieldLabel(fieldName)} must be at least ${minLength} characters long`;
     }
     return '';
   }
 
+  private getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      email: 'Email',
+      password: 'Password',
+      firstName: 'First Name',
+      lastName: 'Last Name'
+    };
+    return labels[fieldName] || fieldName;
+  }
+
+  getRoleIcon(role: string): string {
+    const iconMap: { [key: string]: string } = {
+      'Admin': 'admin_panel_settings',
+      'Manager': 'supervisor_account',
+      'User': 'person',
+      'Moderator': 'shield'
+    };
+    return iconMap[role] || 'person';
+  }
+
   hasPermission(permission: string): boolean {
-    return this.roleService.hasPermission(permission);
+    // This would typically check the current user's permissions
+    // For now, return true as a placeholder
+    return true;
   }
 }

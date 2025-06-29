@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
@@ -40,6 +41,7 @@ import { RbacModule } from '../../../../shared/modules/rbac.module';
     MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatMenuModule,
     MatDialogModule,
     MatSnackBarModule,
@@ -53,7 +55,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  displayedColumns: string[] = ['email', 'name', 'roles', 'status', 'createdAt', 'actions'];
+  displayedColumns: string[] = ['user', 'roles', 'status', 'lastActivity', 'actions'];
   dataSource = new MatTableDataSource<UserDto>([]);
   users: UserDto[] = [];
   isLoading = false;
@@ -61,6 +63,11 @@ export class UsersListComponent implements OnInit, OnDestroy {
   totalItems = 0;
   currentPage = 1;
   pageSize = 10;
+
+  // Enhanced filtering
+  statusFilter = '';
+  roleFilter = '';
+  availableRoles: string[] = [];
 
   private destroy$ = new Subject<void>();
 
@@ -73,6 +80,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadUsers();
+    this.loadAvailableRoles();
     this.setupSearch();
   }
 
@@ -86,7 +94,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  setupSearch(): void {
+  private setupSearch(): void {
     this.searchControl.valueChanges
       .pipe(
         takeUntil(this.destroy$),
@@ -110,6 +118,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
         this.users = result.items;
         this.totalItems = result.totalCount;
         this.dataSource.data = this.users;
+        this.applyFilter();
         this.isLoading = false;
       },
       error: (error) => {
@@ -120,68 +129,139 @@ export class UsersListComponent implements OnInit, OnDestroy {
     });
   }
 
-  applyFilter(): void {
-    const filterValue = this.searchControl.value?.toLowerCase() || '';
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  private loadAvailableRoles(): void {
+    // Extract available roles from users service
+    const roleDisplayNames = this.usersService.getRoleDisplayNames();
+    this.availableRoles = Object.keys(roleDisplayNames);
+  }
 
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+  private applyFilter(): void {
+    const searchValue = this.searchControl.value?.toLowerCase() || '';
+    
+    this.dataSource.filter = JSON.stringify({
+      search: searchValue,
+      status: this.statusFilter,
+      role: this.roleFilter
+    });
+
+    this.dataSource.filterPredicate = (user: UserDto, filter: string): boolean => {
+      const filterObject = JSON.parse(filter);
+      const searchMatch = !filterObject.search || 
+        (user.email?.toLowerCase().includes(filterObject.search) || false) ||
+        (user.firstName?.toLowerCase().includes(filterObject.search) || false) ||
+        (user.lastName?.toLowerCase().includes(filterObject.search) || false) ||
+        (user.roles?.some(role => role.toLowerCase().includes(filterObject.search)) || false);
+
+      const statusMatch = !filterObject.status || 
+        (filterObject.status === 'active' && user.isActive === true) ||
+        (filterObject.status === 'inactive' && user.isActive === false);
+
+      const roleMatch = !filterObject.role || 
+        (user.roles?.includes(filterObject.role) || false);
+
+      return searchMatch && statusMatch && roleMatch;
+    };
+  }
+
+  onFilterChange(): void {
+    this.applyFilter();
   }
 
   clearFilters(): void {
     this.searchControl.setValue('');
+    this.statusFilter = '';
+    this.roleFilter = '';
     this.applyFilter();
   }
 
   createUser(): void {
-    this.router.navigate(['/users/create']);
+    this.router.navigate(['/users/new']);
   }
 
   editUser(user: UserDto): void {
     this.router.navigate(['/users/edit', user.userId]);
   }
 
+  managePermissions(user: UserDto): void {
+    this.router.navigate(['/users/edit', user.userId], { fragment: 'permissions' });
+  }
+
   toggleUserStatus(user: UserDto): void {
-    const updateDto = new UpdateUserDto({
-      isActive: !user.isActive
+    const newStatus = !user.isActive;
+    const updateData = new UpdateUserDto({
+      isActive: newStatus
     });
 
-    this.usersService.updateUser(user.userId!, updateDto).subscribe({
-      next: () => {
-        user.isActive = !user.isActive;
-        this.snackBar.open(`User ${user.isActive ? 'activated' : 'deactivated'} successfully`, 'Close', { duration: 3000 });
-      },
-      error: (error) => {
-        console.error('Error updating user status:', error);
-        this.snackBar.open('Failed to update user status', 'Close', { duration: 5000 });
-      }
-    });
+    this.usersService.updateUser(user.userId!, updateData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          user.isActive = newStatus;
+          this.snackBar.open(
+            `User ${newStatus ? 'activated' : 'deactivated'} successfully`,
+            'Close',
+            { duration: 3000 }
+          );
+        },
+        error: (error) => {
+          console.error('Error updating user status:', error);
+          this.snackBar.open('Failed to update user status', 'Close', { duration: 5000 });
+        }
+      });
   }
 
   deleteUser(user: UserDto): void {
     const dialogRef = this.dialog.open(UserDeleteDialogComponent, {
-      width: '500px',
-      data: user
+      data: { user },
+      width: '400px'
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.usersService.deleteUser(user.userId!).subscribe({
-          next: () => {
-            this.users = this.users.filter(u => u.userId !== user.userId);
-            this.dataSource.data = this.users;
-            this.snackBar.open('User deleted successfully', 'Close', { duration: 3000 });
-          },
-          error: (error) => {
-            console.error('Error deleting user:', error);
-            this.snackBar.open('Failed to delete user', 'Close', { duration: 5000 });
-          }
-        });
+        this.performUserDeletion(user);
       }
     });
   }
 
+  private performUserDeletion(user: UserDto): void {
+    this.usersService.deleteUser(user.userId!)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.users = this.users.filter(u => u.userId !== user.userId);
+          this.dataSource.data = this.users;
+          this.totalItems--;
+          this.snackBar.open('User deleted successfully', 'Close', { duration: 3000 });
+        },
+        error: (error) => {
+          console.error('Error deleting user:', error);
+          this.snackBar.open('Failed to delete user', 'Close', { duration: 5000 });
+        }
+      });
+  }
+
+  // Statistics methods
+  getActiveUsersCount(): number {
+    return this.users.filter(user => user.isActive).length;
+  }
+
+  getAdminUsersCount(): number {
+    return this.users.filter(user => 
+      user.roles?.some(role => role.toLowerCase().includes('admin'))
+    ).length;
+  }
+
+  getRecentSignupsCount(): number {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    return this.users.filter(user => {
+      const createdDate = new Date(user.createdAt!);
+      return createdDate >= thirtyDaysAgo;
+    }).length;
+  }
+
+  // Display helper methods
   getUserDisplayName(user: UserDto): string {
     if (user.firstName && user.lastName) {
       return `${user.firstName} ${user.lastName}`;
@@ -190,21 +270,28 @@ export class UsersListComponent implements OnInit, OnDestroy {
     } else if (user.lastName) {
       return user.lastName;
     } else {
-      return 'No name provided';
+      return 'Unnamed User';
     }
   }
 
   getRoleColor(role: string): string {
-    switch (role.toLowerCase()) {
-      case 'admin':
-        return 'warn';
-      case 'moderator':
-        return 'accent';
-      case 'user':
-        return 'primary';
-      default:
-        return 'primary';
-    }
+    const colorMap: { [key: string]: string } = {
+      'Admin': 'primary',
+      'Manager': 'accent',
+      'User': 'basic',
+      'Moderator': 'warn'
+    };
+    return colorMap[role] || 'basic';
+  }
+
+  getRoleIcon(role: string): string {
+    const iconMap: { [key: string]: string } = {
+      'Admin': 'admin_panel_settings',
+      'Manager': 'supervisor_account',
+      'User': 'person',
+      'Moderator': 'shield'
+    };
+    return iconMap[role] || 'person';
   }
 
   getRoleDisplayName(role: string): string {
@@ -212,7 +299,19 @@ export class UsersListComponent implements OnInit, OnDestroy {
     return displayNames[role] || role;
   }
 
+  formatDate(date: string | Date): string {
+    if (!date) return 'Never';
+    const dateObj = new Date(date);
+    return dateObj.toLocaleDateString();
+  }
+
+  formatTime(date: string | Date): string {
+    if (!date) return '';
+    const dateObj = new Date(date);
+    return dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
   get filteredUsers(): UserDto[] {
-    return this.users;
+    return this.dataSource.filteredData;
   }
 }

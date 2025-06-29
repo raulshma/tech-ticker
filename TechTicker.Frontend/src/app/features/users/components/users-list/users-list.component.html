@@ -1,144 +1,299 @@
-<div class="users-container">
-  <div class="header-section">
-    <h1>User Management</h1>
-    <button mat-raised-button color="primary" (click)="createUser()" *hasPermission="'Users.Create'">
-      <mat-icon>person_add</mat-icon>
-      Add User
-    </button>
-  </div>
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Manage System Users</mat-card-title>
-      <mat-card-subtitle>View and manage user accounts and permissions</mat-card-subtitle>
-    </mat-card-header>
-
-    <mat-card-content>
-      <!-- Filters -->
-      <div class="filters-section">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Search users</mat-label>
-          <input matInput [formControl]="searchControl" placeholder="Search by name or email">
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
-
-        <button mat-button (click)="clearFilters()" class="clear-filters-btn">
-          <mat-icon>clear</mat-icon>
-          Clear Filters
-        </button>
+<div class="users-management-container">
+  <!-- Modern Welcome Header Section -->
+  <header class="welcome-section">
+    <div class="welcome-content">
+      <div class="header-main">
+        <div class="title-section">
+          <h1 class="mat-display-medium">User Management</h1>
+          <p class="mat-body-large welcome-subtitle">Manage system users, roles, and permissions with comprehensive access control</p>
+        </div>
+        <div class="header-actions">
+          <button mat-raised-button color="primary" class="primary-action-btn" (click)="createUser()" *hasPermission="'Users.Create'">
+            <mat-icon>person_add</mat-icon>
+            Add User
+          </button>
+          <button mat-outlined-button class="tertiary-action-btn" (click)="loadUsers()" *hasPermission="'Users.Read'">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+          </button>
+        </div>
       </div>
+    </div>
+  </header>
 
-      <!-- Loading spinner -->
-      <div *ngIf="isLoading" class="loading-container">
-        <mat-spinner diameter="50"></mat-spinner>
-        <p>Loading users...</p>
-      </div>
+  <!-- Enhanced Statistics Overview -->
+  <section class="stats-section" aria-label="User Statistics Overview" *ngIf="!isLoading">
+    <div class="stats-grid">
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon-wrapper primary-surface">
+              <mat-icon class="stat-icon">people</mat-icon>
+            </div>
+            <div class="stat-details">
+              <h3 class="stat-value mat-headline-medium">{{ totalItems }}</h3>
+              <p class="stat-label mat-body-medium">Total Users</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
 
-      <!-- Users table -->
-      <div class="table-container mat-elevation-z8" *ngIf="!isLoading">
-        <table mat-table [dataSource]="dataSource" matSort class="users-table">
-          <!-- Email Column -->
-          <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
-            <td mat-cell *matCellDef="let user">{{ user.email }}</td>
-          </ng-container>
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon-wrapper success-surface">
+              <mat-icon class="stat-icon">person_check</mat-icon>
+            </div>
+            <div class="stat-details">
+              <h3 class="stat-value mat-headline-medium">{{ getActiveUsersCount() }}</h3>
+              <p class="stat-label mat-body-medium">Active Users</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
 
-          <!-- Name Column -->
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-            <td mat-cell *matCellDef="let user">
-              <div class="user-name">
-                <span class="full-name">{{ user.fullName || 'N/A' }}</span>
-                <span class="user-id" *ngIf="user.userId">ID: {{ user.userId }}</span>
-              </div>
-            </td>
-          </ng-container>
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon-wrapper secondary-surface">
+              <mat-icon class="stat-icon">admin_panel_settings</mat-icon>
+            </div>
+            <div class="stat-details">
+              <h3 class="stat-value mat-headline-medium">{{ getAdminUsersCount() }}</h3>
+              <p class="stat-label mat-body-medium">Administrators</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
 
-          <!-- Roles Column -->
-          <ng-container matColumnDef="roles">
-            <th mat-header-cell *matHeaderCellDef>Roles</th>
-            <td mat-cell *matCellDef="let user">
-              <mat-chip-set>
-                <mat-chip 
-                  *ngFor="let role of user.roles" 
-                  [color]="getRoleColor(role)"
-                  class="role-chip">
-                  {{ getRoleDisplayName(role) }}
-                </mat-chip>
-                <span *ngIf="!user.roles || user.roles.length === 0" class="no-roles">
-                  No roles assigned
-                </span>
-              </mat-chip-set>
-            </td>
-          </ng-container>
+      <mat-card class="stat-card" appearance="outlined">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon-wrapper warning-surface">
+              <mat-icon class="stat-icon">trending_up</mat-icon>
+            </div>
+            <div class="stat-details">
+              <h3 class="stat-value mat-headline-medium">{{ getRecentSignupsCount() }}</h3>
+              <p class="stat-label mat-body-medium">Recent Sign-ups</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
 
-          <!-- Status Column -->
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
-            <td mat-cell *matCellDef="let user">
-              <span class="status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
-                <mat-icon>{{ user.isActive ? 'check_circle' : 'block' }}</mat-icon>
-                {{ user.isActive ? 'Active' : 'Inactive' }}
-              </span>
-            </td>
-          </ng-container>
+  <!-- Loading State -->
+  <section *ngIf="isLoading" class="loading-section" aria-label="Loading Users">
+    <mat-card class="loading-card" appearance="outlined">
+      <mat-card-content class="loading-content">
+        <div class="loading-spinner-wrapper">
+          <mat-spinner diameter="56" strokeWidth="4"></mat-spinner>
+        </div>
+        <h3 class="mat-headline-small loading-title">Loading Users</h3>
+        <p class="mat-body-medium loading-message">Please wait while we fetch the user data...</p>
+      </mat-card-content>
+    </mat-card>
+  </section>
 
-          <!-- Created Date Column -->
-          <ng-container matColumnDef="createdAt">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Created</th>
-            <td mat-cell *matCellDef="let user">{{ user.createdAt | date:'short' }}</td>
-          </ng-container>
+  <!-- Enhanced Management Section -->
+  <section class="management-section" aria-label="User Management" *ngIf="!isLoading">
+    <mat-card class="management-card" appearance="outlined">
+      <mat-card-header class="management-header">
+        <mat-card-title class="mat-headline-large">User Directory</mat-card-title>
+        <mat-card-subtitle class="mat-body-large">Search, filter, and manage user accounts and permissions</mat-card-subtitle>
+      </mat-card-header>
 
-          <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let user">
-              <button mat-icon-button [matMenuTriggerFor]="userMenu" matTooltip="User actions">
-                <mat-icon>more_vert</mat-icon>
-              </button>
-              
-              <mat-menu #userMenu="matMenu">
-                <button mat-menu-item (click)="editUser(user)" *hasPermission="'Users.Update'">
-                  <mat-icon>edit</mat-icon>
-                  <span>Edit User</span>
-                </button>
-                
-                <button mat-menu-item (click)="toggleUserStatus(user)" *hasPermission="'Users.Update'">
-                  <mat-icon>{{user.isActive ? 'block' : 'check_circle'}}</mat-icon>
-                  <span>{{user.isActive ? 'Deactivate' : 'Activate'}}</span>
-                </button>
-                
-                <mat-divider></mat-divider>
-                
-                <button mat-menu-item (click)="deleteUser(user)" class="delete-action" *hasPermission="'Users.Delete'">
-                  <mat-icon>delete</mat-icon>
-                  <span>Delete User</span>
-                </button>
-              </mat-menu>
-            </td>
-          </ng-container>
+      <mat-card-content class="management-content">
+        <!-- Enhanced Filter Controls -->
+        <div class="filters-section">
+          <div class="filter-controls">
+            <mat-form-field appearance="outline" class="search-field">
+              <mat-label>Search users</mat-label>
+              <input matInput [formControl]="searchControl" placeholder="Search by name, email, or role">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Status</mat-label>
+              <mat-select [(value)]="statusFilter" (selectionChange)="onFilterChange()">
+                <mat-option value="">All Status</mat-option>
+                <mat-option value="active">Active</mat-option>
+                <mat-option value="inactive">Inactive</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>tune</mat-icon>
+            </mat-form-field>
 
-          <!-- No data row -->
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
-              <div class="no-data">
-                <mat-icon>people_outline</mat-icon>
-                <p>No users found</p>
-                <p class="subtitle">Try adjusting your search criteria</p>
-              </div>
-            </td>
-          </tr>
-        </table>
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Role</mat-label>
+              <mat-select [(value)]="roleFilter" (selectionChange)="onFilterChange()">
+                <mat-option value="">All Roles</mat-option>
+                <mat-option *ngFor="let role of availableRoles" [value]="role">{{ getRoleDisplayName(role) }}</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
+            </mat-form-field>
 
-        <mat-paginator 
-          [pageSizeOptions]="[5, 10, 25, 50]" 
-          showFirstLastButtons
-          aria-label="Select page of users">
-        </mat-paginator>
-      </div>
-    </mat-card-content>
-  </mat-card>
+            <button mat-outlined-button class="clear-filters-btn" (click)="clearFilters()">
+              <mat-icon>clear_all</mat-icon>
+              Clear Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Enhanced Users Table -->
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="dataSource" matSort class="users-table modern-table">
+
+              <!-- Avatar & Name Column -->
+              <ng-container matColumnDef="user">
+                <th mat-header-cell *matHeaderCellDef class="user-header">User</th>
+                <td mat-cell *matCellDef="let user" class="user-cell">
+                  <div class="user-info-modern">
+                    <div class="user-avatar-wrapper">
+                      <mat-icon class="user-avatar-icon">account_circle</mat-icon>
+                    </div>
+                    <div class="user-details">
+                      <h4 class="mat-title-medium user-name">{{ getUserDisplayName(user) }}</h4>
+                      <p class="mat-body-small user-email">{{ user.email }}</p>
+                      <span class="mat-label-small user-id" *ngIf="user.userId">ID: {{ user.userId }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Roles Column -->
+              <ng-container matColumnDef="roles">
+                <th mat-header-cell *matHeaderCellDef class="roles-header">Roles & Permissions</th>
+                <td mat-cell *matCellDef="let user" class="roles-cell">
+                  <div class="roles-container-modern">
+                    <mat-chip-set *ngIf="user.roles && user.roles.length > 0">
+                      <mat-chip 
+                        *ngFor="let role of user.roles" 
+                        [class]="'role-chip-' + getRoleColor(role)"
+                        class="role-chip-modern">
+                        <mat-icon class="role-icon">{{ getRoleIcon(role) }}</mat-icon>
+                        {{ getRoleDisplayName(role) }}
+                      </mat-chip>
+                    </mat-chip-set>
+                    <div *ngIf="!user.roles || user.roles.length === 0" class="no-roles-modern">
+                      <mat-icon class="no-roles-icon">person_outline</mat-icon>
+                      <span class="mat-body-small">No roles assigned</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Status Column -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef class="status-header">Status</th>
+                <td mat-cell *matCellDef="let user" class="status-cell">
+                  <div class="status-container-modern">
+                    <mat-chip [class]="user.isActive ? 'status-chip-active' : 'status-chip-inactive'" class="status-chip-modern">
+                      <mat-icon class="status-icon">{{ user.isActive ? 'check_circle' : 'cancel' }}</mat-icon>
+                      {{ user.isActive ? 'Active' : 'Inactive' }}
+                    </mat-chip>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Last Activity Column -->
+              <ng-container matColumnDef="lastActivity">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="activity-header">Last Activity</th>
+                <td mat-cell *matCellDef="let user" class="activity-cell">
+                  <div class="activity-info-modern">
+                    <span class="mat-body-medium activity-date">{{ formatDate(user.createdAt) }}</span>
+                    <span class="mat-body-small activity-time">{{ formatTime(user.createdAt) }}</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+                <td mat-cell *matCellDef="let user" class="actions-cell">
+                  <div class="actions-group-modern">
+                    <button mat-icon-button
+                            class="action-btn edit-btn"
+                            (click)="editUser(user)"
+                            matTooltip="Edit User"
+                            *hasPermission="'Users.Update'">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+
+                    <button mat-icon-button
+                            [class]="user.isActive ? 'action-btn disable-btn' : 'action-btn enable-btn'"
+                            (click)="toggleUserStatus(user)"
+                            [matTooltip]="user.isActive ? 'Deactivate User' : 'Activate User'"
+                            *hasPermission="'Users.Update'">
+                      <mat-icon>{{ user.isActive ? 'person_off' : 'person' }}</mat-icon>
+                    </button>
+
+                    <button mat-icon-button
+                            [matMenuTriggerFor]="userActionsMenu"
+                            class="action-btn more-btn"
+                            matTooltip="More Actions">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+
+                    <mat-menu #userActionsMenu="matMenu" class="user-actions-menu">
+                      <button mat-menu-item (click)="editUser(user)" *hasPermission="'Users.Update'">
+                        <mat-icon>edit</mat-icon>
+                        <span>Edit Details</span>
+                      </button>
+                      
+                      <button mat-menu-item (click)="managePermissions(user)" *hasPermission="'Users.ManageRoles'">
+                        <mat-icon>admin_panel_settings</mat-icon>
+                        <span>Manage Permissions</span>
+                      </button>
+                      
+                      <mat-divider></mat-divider>
+                      
+                      <button mat-menu-item (click)="deleteUser(user)" class="delete-action" *hasPermission="'Users.Delete'">
+                        <mat-icon>delete</mat-icon>
+                        <span>Delete User</span>
+                      </button>
+                    </mat-menu>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="user-row-modern"></tr>
+
+              <!-- Enhanced No Data Row -->
+              <tr class="mat-row no-data-row" *matNoDataRow>
+                <td class="mat-cell no-data-cell" [attr.colspan]="displayedColumns.length">
+                  <div class="no-data-modern">
+                    <div class="no-data-icon-wrapper">
+                      <mat-icon class="no-data-icon">people_outline</mat-icon>
+                    </div>
+                    <h3 class="mat-headline-small no-data-title">No users found</h3>
+                    <p class="mat-body-medium no-data-message">
+                      {{ searchControl.value || statusFilter || roleFilter ? 
+                         'Try adjusting your search criteria or filters' : 
+                         'Get started by creating your first user account' }}
+                    </p>
+                    <ng-container *ngIf="!searchControl.value && !statusFilter && !roleFilter">
+                      <button mat-raised-button color="primary" (click)="createUser()" *hasPermission="'Users.Create'">
+                        <mat-icon>person_add</mat-icon>
+                        Create First User
+                      </button>
+                    </ng-container>
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Enhanced Paginator -->
+            <mat-paginator 
+              class="modern-paginator"
+              [pageSizeOptions]="[5, 10, 25, 50]" 
+              [showFirstLastButtons]="true"
+              aria-label="Select page of users">
+            </mat-paginator>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
 </div>

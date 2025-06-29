@@ -1,150 +1,231 @@
-<div class="user-form-container">
-  <div class="header-section">
-    <h1>{{ isEditMode ? 'Edit User' : 'Create User' }}</h1>
-    <button mat-button (click)="onCancel()">
-      <mat-icon>arrow_back</mat-icon>
-      Back to Users
-    </button>
-  </div>
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ isEditMode ? 'Edit User Details' : 'New User Details' }}</mat-card-title>
-      <mat-card-subtitle>{{ isEditMode ? 'Update the user information below' : 'Fill in the details to create a new user account' }}</mat-card-subtitle>
-    </mat-card-header>
-
-    <mat-card-content>
-      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
-        
-        <!-- Basic Information -->
-        <div class="form-section">
-          <h3>Basic Information</h3>
-          
-          <div class="form-row">
-            <!-- Email -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Email Address</mat-label>
-              <input matInput 
-                     formControlName="email" 
-                     placeholder="user@example.com"
-                     type="email">
-              <mat-icon matSuffix>email</mat-icon>
-              <mat-hint>This will be used for login and notifications</mat-hint>
-              <mat-error *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched">
-                {{ getFieldErrorMessage('email') }}
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="form-row" *ngIf="!isEditMode">
-            <!-- Password (only for create mode) -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Password</mat-label>
-              <input matInput 
-                     formControlName="password" 
-                     [type]="hidePassword ? 'password' : 'text'"
-                     placeholder="Enter a secure password">
-              <button mat-icon-button 
-                      matSuffix 
-                      type="button"
-                      (click)="togglePasswordVisibility()" 
-                      [attr.aria-label]="'Hide password'" 
-                      [attr.aria-pressed]="hidePassword">
-                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-              </button>
-              <mat-hint>Minimum 6 characters required</mat-hint>
-              <mat-error *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched">
-                {{ getFieldErrorMessage('password') }}
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="form-row two-columns">
-            <!-- First Name -->
-            <mat-form-field appearance="outline">
-              <mat-label>First Name</mat-label>
-              <input matInput 
-                     formControlName="firstName" 
-                     placeholder="John"
-                     maxlength="100">
-              <mat-hint>Optional</mat-hint>
-              <mat-error *ngIf="userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched">
-                {{ getFieldErrorMessage('firstName') }}
-              </mat-error>
-            </mat-form-field>
-
-            <!-- Last Name -->
-            <mat-form-field appearance="outline">
-              <mat-label>Last Name</mat-label>
-              <input matInput 
-                     formControlName="lastName" 
-                     placeholder="Doe"
-                     maxlength="100">
-              <mat-hint>Optional</mat-hint>
-              <mat-error *ngIf="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched">
-                {{ getFieldErrorMessage('lastName') }}
-              </mat-error>
-            </mat-form-field>
-          </div>
+<div class="user-form-management-container">
+  <!-- Modern Welcome Header Section -->
+  <header class="welcome-section">
+    <div class="welcome-content">
+      <div class="header-main">
+        <div class="title-section">
+          <h1 class="mat-display-medium">{{ isEditMode ? 'Edit User' : 'Create User' }}</h1>
+          <p class="mat-body-large welcome-subtitle">
+            {{ isEditMode ? 'Update user account details and permissions' : 'Set up a new user account with roles and permissions' }}
+          </p>
         </div>
+        <div class="header-actions">
+          <button mat-outlined-button class="back-action-btn" (click)="onCancel()">
+            <mat-icon>arrow_back</mat-icon>
+            Back to Users
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
 
-        <!-- Permissions & Status -->
-        <div class="form-section">
-          <h3>Permissions & Status</h3>
+  <!-- Loading State -->
+  <section *ngIf="isLoading" class="loading-section" aria-label="Loading User Data">
+    <mat-card class="loading-card" appearance="outlined">
+      <mat-card-content class="loading-content">
+        <div class="loading-spinner-wrapper">
+          <mat-spinner diameter="56" strokeWidth="4"></mat-spinner>
+        </div>
+        <h3 class="mat-headline-small loading-title">{{ isEditMode ? 'Loading User Data' : 'Preparing Form' }}</h3>
+        <p class="mat-body-medium loading-message">Please wait while we set up the user form...</p>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <!-- Enhanced User Form Section -->
+  <section class="form-section" aria-label="User Form" *ngIf="!isLoading">
+    <mat-card class="form-card" appearance="outlined">
+      <mat-card-header class="form-header">
+        <mat-card-title class="mat-headline-large">{{ isEditMode ? 'User Account Details' : 'New User Setup' }}</mat-card-title>
+        <mat-card-subtitle class="mat-body-large">
+          {{ isEditMode ? 'Modify the user information and settings below' : 'Fill in the details to create a new user account' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="form-content">
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form-modern">
           
-          <div class="form-row">
-            <!-- Roles -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>User Roles</mat-label>
-              <mat-select formControlName="roles" multiple>
-                <mat-option *ngFor="let role of availableRoles" [value]="role">
-                  {{role}}
-                </mat-option>
-              </mat-select>
-              <mat-hint>Select one or more roles for this user</mat-hint>
-            </mat-form-field>
-          </div>
+          <!-- Basic Information Section -->
+          <div class="form-section-modern">
+            <div class="section-header">
+              <mat-icon class="section-icon">person</mat-icon>
+              <div class="section-title">
+                <h3 class="mat-title-large">Basic Information</h3>
+                <p class="mat-body-medium">Essential user account details</p>
+              </div>
+            </div>
+            
+            <div class="section-content">
+              <!-- Email -->
+              <div class="form-row full-width">
+                <mat-form-field appearance="outline" class="enhanced-field">
+                  <mat-label>Email Address</mat-label>
+                  <input matInput 
+                         formControlName="email" 
+                         placeholder="user@example.com"
+                         type="email">
+                  <mat-icon matSuffix class="field-icon">email</mat-icon>
+                  <mat-hint>This will be used for login and notifications</mat-hint>
+                  <mat-error *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched">
+                    {{ getFieldErrorMessage('email') }}
+                  </mat-error>
+                </mat-form-field>
+              </div>
 
-          <div class="form-row" *ngIf="isEditMode">
-            <!-- Active Status (only in edit mode) -->
-            <div class="status-field">
-              <label class="status-label">Account Status</label>
-              <mat-slide-toggle formControlName="isActive" class="status-toggle">
-                {{ userForm.get('isActive')?.value ? 'Active' : 'Inactive' }}
-              </mat-slide-toggle>
-              <div class="status-hint">
-                {{ userForm.get('isActive')?.value ? 'User can log in and access the system' : 'User account is disabled and cannot log in' }}
+              <!-- Password (only for create mode) -->
+              <div class="form-row full-width" *ngIf="!isEditMode">
+                <mat-form-field appearance="outline" class="enhanced-field">
+                  <mat-label>Password</mat-label>
+                  <input matInput 
+                         formControlName="password" 
+                         [type]="hidePassword ? 'password' : 'text'"
+                         placeholder="Enter a secure password">
+                  <button mat-icon-button 
+                          matSuffix 
+                          type="button"
+                          (click)="togglePasswordVisibility()" 
+                          [attr.aria-label]="'Toggle password visibility'" 
+                          [attr.aria-pressed]="!hidePassword"
+                          class="password-toggle">
+                    <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                  </button>
+                  <mat-hint>Minimum 6 characters required</mat-hint>
+                  <mat-error *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched">
+                    {{ getFieldErrorMessage('password') }}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- Name Fields -->
+              <div class="form-row two-columns">
+                <!-- First Name -->
+                <mat-form-field appearance="outline" class="enhanced-field">
+                  <mat-label>First Name</mat-label>
+                  <input matInput 
+                         formControlName="firstName" 
+                         placeholder="John"
+                         maxlength="100">
+                  <mat-icon matSuffix class="field-icon">badge</mat-icon>
+                  <mat-hint>Optional</mat-hint>
+                  <mat-error *ngIf="userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched">
+                    {{ getFieldErrorMessage('firstName') }}
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Last Name -->
+                <mat-form-field appearance="outline" class="enhanced-field">
+                  <mat-label>Last Name</mat-label>
+                  <input matInput 
+                         formControlName="lastName" 
+                         placeholder="Doe"
+                         maxlength="100">
+                  <mat-icon matSuffix class="field-icon">badge</mat-icon>
+                  <mat-hint>Optional</mat-hint>
+                  <mat-error *ngIf="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched">
+                    {{ getFieldErrorMessage('lastName') }}
+                  </mat-error>
+                </mat-form-field>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Form Actions -->
-        <div class="form-actions">
-          <button 
-            type="button" 
-            mat-button 
-            (click)="onCancel()"
-            [disabled]="isLoading">
-            Cancel
-          </button>
-          <button 
-            type="submit" 
-            mat-raised-button 
-            color="primary"
-            [disabled]="userForm.invalid || isLoading">
-            <mat-spinner diameter="16" *ngIf="isLoading"></mat-spinner>
-            <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
-            {{ isEditMode ? 'Update User' : 'Create User' }}
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+          <!-- Permissions & Access Section -->
+          <div class="form-section-modern">
+            <div class="section-header">
+              <mat-icon class="section-icon">admin_panel_settings</mat-icon>
+              <div class="section-title">
+                <h3 class="mat-title-large">Permissions & Access</h3>
+                <p class="mat-body-medium">Configure user roles and account status</p>
+              </div>
+            </div>
+            
+            <div class="section-content">
+              <!-- Roles -->
+              <div class="form-row full-width">
+                <mat-form-field appearance="outline" class="enhanced-field">
+                  <mat-label>User Roles</mat-label>
+                  <mat-select formControlName="roles" multiple>
+                    <mat-option *ngFor="let role of availableRoles" [value]="role">
+                      <div class="role-option">
+                        <mat-icon class="role-option-icon">{{ getRoleIcon(role) }}</mat-icon>
+                        <span>{{ role }}</span>
+                      </div>
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matSuffix class="field-icon">group</mat-icon>
+                  <mat-hint>Select one or more roles for this user</mat-hint>
+                </mat-form-field>
+              </div>
+
+              <!-- Active Status (only in edit mode) -->
+              <div class="form-row full-width" *ngIf="isEditMode">
+                <div class="status-field-modern">
+                  <div class="status-header">
+                    <mat-icon class="status-header-icon">toggle_on</mat-icon>
+                    <div class="status-title">
+                      <label class="mat-title-medium status-label">Account Status</label>
+                      <p class="mat-body-small status-description">Control whether the user can access the system</p>
+                    </div>
+                  </div>
+                  
+                  <div class="status-toggle-container">
+                    <mat-slide-toggle formControlName="isActive" class="status-toggle-modern">
+                      <span class="toggle-label">{{ userForm.get('isActive')?.value ? 'Active' : 'Inactive' }}</span>
+                    </mat-slide-toggle>
+                  </div>
+                  
+                  <div class="status-hint-modern">
+                    <mat-icon class="status-hint-icon">
+                      {{ userForm.get('isActive')?.value ? 'check_circle' : 'cancel' }}
+                    </mat-icon>
+                    <span class="mat-body-small">
+                      {{ userForm.get('isActive')?.value ? 
+                         'User can log in and access the system' : 
+                         'User account is disabled and cannot log in' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Enhanced Form Actions -->
+          <div class="form-actions-modern">
+            <div class="actions-container">
+              <button 
+                type="button" 
+                mat-outlined-button 
+                class="cancel-btn"
+                (click)="onCancel()"
+                [disabled]="isLoading">
+                <mat-icon>close</mat-icon>
+                Cancel
+              </button>
+              
+              <button 
+                type="submit" 
+                mat-raised-button 
+                color="primary"
+                class="submit-btn"
+                [disabled]="userForm.invalid || isLoading">
+                <div class="submit-content" *ngIf="!isLoading">
+                  <mat-icon>{{ isEditMode ? 'save' : 'person_add' }}</mat-icon>
+                  <span>{{ isEditMode ? 'Update User' : 'Create User' }}</span>
+                </div>
+                <div class="submit-loading" *ngIf="isLoading">
+                  <mat-spinner diameter="20" strokeWidth="3"></mat-spinner>
+                  <span>{{ isEditMode ? 'Updating...' : 'Creating...' }}</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </section>
 
   <!-- User Permissions Management (Admin Only) -->
-  <app-user-permissions 
-    *ngIf="isEditMode && currentUser && hasPermission('Users.ManageRoles')"
-    [user]="currentUser">
-  </app-user-permissions>
+  <section class="permissions-section" *ngIf="isEditMode && currentUser && hasPermission('Users.ManageRoles')">
+    <app-user-permissions [user]="currentUser"></app-user-permissions>
+  </section>
 </div>
