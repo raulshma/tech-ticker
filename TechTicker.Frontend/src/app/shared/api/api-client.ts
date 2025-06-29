@@ -384,6 +384,656 @@ export class TechTickerApiClient {
     }
 
     /**
+     * @return OK
+     */
+    getAllConfigurations(): Observable<AiConfigurationDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllConfigurations(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllConfigurations(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AiConfigurationDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AiConfigurationDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetAllConfigurations(response: HttpResponseBase): Observable<AiConfigurationDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AiConfigurationDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createConfiguration(body: CreateAiConfigurationDto | undefined): Observable<AiConfigurationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateConfiguration(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateConfiguration(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AiConfigurationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AiConfigurationDtoApiResponse>;
+        }));
+    }
+
+    protected processCreateConfiguration(response: HttpResponseBase): Observable<AiConfigurationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AiConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getActiveConfigurations(): Observable<AiConfigurationDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations/active";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetActiveConfigurations(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetActiveConfigurations(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AiConfigurationDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AiConfigurationDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processGetActiveConfigurations(response: HttpResponseBase): Observable<AiConfigurationDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AiConfigurationDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getConfigurationById(id: string): Observable<AiConfigurationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetConfigurationById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetConfigurationById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AiConfigurationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AiConfigurationDtoApiResponse>;
+        }));
+    }
+
+    protected processGetConfigurationById(response: HttpResponseBase): Observable<AiConfigurationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AiConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    updateConfiguration(id: string, body: UpdateAiConfigurationDto | undefined): Observable<AiConfigurationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateConfiguration(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateConfiguration(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AiConfigurationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AiConfigurationDtoApiResponse>;
+        }));
+    }
+
+    protected processUpdateConfiguration(response: HttpResponseBase): Observable<AiConfigurationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AiConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    deleteConfiguration(id: string): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteConfiguration(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteConfiguration(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processDeleteConfiguration(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getDefaultConfiguration(): Observable<AiConfigurationDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations/default";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDefaultConfiguration(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDefaultConfiguration(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AiConfigurationDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AiConfigurationDtoApiResponse>;
+        }));
+    }
+
+    protected processGetDefaultConfiguration(response: HttpResponseBase): Observable<AiConfigurationDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AiConfigurationDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    setDefaultConfiguration(id: string): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations/{id}/set-default";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSetDefaultConfiguration(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSetDefaultConfiguration(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processSetDefaultConfiguration(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    testConfiguration(id: string): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations/{id}/test";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTestConfiguration(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTestConfiguration(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processTestConfiguration(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    getAvailableModels(provider: string, body: ProviderModelsRequestDto | undefined): Observable<AiProviderModelsDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations/models/{provider}";
+        if (provider === undefined || provider === null)
+            throw new Error("The parameter 'provider' must be defined.");
+        url_ = url_.replace("{provider}", encodeURIComponent("" + provider));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAvailableModels(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAvailableModels(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AiProviderModelsDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AiProviderModelsDtoApiResponse>;
+        }));
+    }
+
+    protected processGetAvailableModels(response: HttpResponseBase): Observable<AiProviderModelsDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AiProviderModelsDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    generateBrowserActions(body: BrowserActionGenerationRequestDto | undefined): Observable<BrowserActionGenerationResponseDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations/generate-browser-actions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGenerateBrowserActions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGenerateBrowserActions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BrowserActionGenerationResponseDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BrowserActionGenerationResponseDtoApiResponse>;
+        }));
+    }
+
+    protected processGenerateBrowserActions(response: HttpResponseBase): Observable<BrowserActionGenerationResponseDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BrowserActionGenerationResponseDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    checkAiAvailability(): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations/availability";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCheckAiAvailability(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCheckAiAvailability(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processCheckAiAvailability(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param startDate (optional) 
      * @param endDate (optional) 
      * @return OK
@@ -7781,6 +8431,454 @@ export class TechTickerApiClient {
     }
 }
 
+export class AiConfigurationDto implements IAiConfigurationDto {
+    aiConfigurationId?: string;
+    provider?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    openApiCompatibleUrl?: string | undefined;
+    model?: string | undefined;
+    inputTokenLimit?: number | undefined;
+    outputTokenLimit?: number | undefined;
+    capabilities?: string[] | undefined;
+    supportedInputTypes?: string[] | undefined;
+    supportedOutputTypes?: string[] | undefined;
+    rateLimitRpm?: number | undefined;
+    rateLimitTpm?: number | undefined;
+    rateLimitRpd?: number | undefined;
+    isActive?: boolean;
+    isDefault?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+    createdBy?: string;
+    updatedBy?: string;
+
+    constructor(data?: IAiConfigurationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.aiConfigurationId = _data["aiConfigurationId"];
+            this.provider = _data["provider"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.openApiCompatibleUrl = _data["openApiCompatibleUrl"];
+            this.model = _data["model"];
+            this.inputTokenLimit = _data["inputTokenLimit"];
+            this.outputTokenLimit = _data["outputTokenLimit"];
+            if (Array.isArray(_data["capabilities"])) {
+                this.capabilities = [] as any;
+                for (let item of _data["capabilities"])
+                    this.capabilities!.push(item);
+            }
+            if (Array.isArray(_data["supportedInputTypes"])) {
+                this.supportedInputTypes = [] as any;
+                for (let item of _data["supportedInputTypes"])
+                    this.supportedInputTypes!.push(item);
+            }
+            if (Array.isArray(_data["supportedOutputTypes"])) {
+                this.supportedOutputTypes = [] as any;
+                for (let item of _data["supportedOutputTypes"])
+                    this.supportedOutputTypes!.push(item);
+            }
+            this.rateLimitRpm = _data["rateLimitRpm"];
+            this.rateLimitTpm = _data["rateLimitTpm"];
+            this.rateLimitRpd = _data["rateLimitRpd"];
+            this.isActive = _data["isActive"];
+            this.isDefault = _data["isDefault"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.createdBy = _data["createdBy"];
+            this.updatedBy = _data["updatedBy"];
+        }
+    }
+
+    static fromJS(data: any): AiConfigurationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AiConfigurationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["aiConfigurationId"] = this.aiConfigurationId;
+        data["provider"] = this.provider;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["openApiCompatibleUrl"] = this.openApiCompatibleUrl;
+        data["model"] = this.model;
+        data["inputTokenLimit"] = this.inputTokenLimit;
+        data["outputTokenLimit"] = this.outputTokenLimit;
+        if (Array.isArray(this.capabilities)) {
+            data["capabilities"] = [];
+            for (let item of this.capabilities)
+                data["capabilities"].push(item);
+        }
+        if (Array.isArray(this.supportedInputTypes)) {
+            data["supportedInputTypes"] = [];
+            for (let item of this.supportedInputTypes)
+                data["supportedInputTypes"].push(item);
+        }
+        if (Array.isArray(this.supportedOutputTypes)) {
+            data["supportedOutputTypes"] = [];
+            for (let item of this.supportedOutputTypes)
+                data["supportedOutputTypes"].push(item);
+        }
+        data["rateLimitRpm"] = this.rateLimitRpm;
+        data["rateLimitTpm"] = this.rateLimitTpm;
+        data["rateLimitRpd"] = this.rateLimitRpd;
+        data["isActive"] = this.isActive;
+        data["isDefault"] = this.isDefault;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["createdBy"] = this.createdBy;
+        data["updatedBy"] = this.updatedBy;
+        return data;
+    }
+}
+
+export interface IAiConfigurationDto {
+    aiConfigurationId?: string;
+    provider?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    openApiCompatibleUrl?: string | undefined;
+    model?: string | undefined;
+    inputTokenLimit?: number | undefined;
+    outputTokenLimit?: number | undefined;
+    capabilities?: string[] | undefined;
+    supportedInputTypes?: string[] | undefined;
+    supportedOutputTypes?: string[] | undefined;
+    rateLimitRpm?: number | undefined;
+    rateLimitTpm?: number | undefined;
+    rateLimitRpd?: number | undefined;
+    isActive?: boolean;
+    isDefault?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+    createdBy?: string;
+    updatedBy?: string;
+}
+
+export class AiConfigurationDtoApiResponse implements IAiConfigurationDtoApiResponse {
+    success?: boolean;
+    data?: AiConfigurationDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAiConfigurationDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AiConfigurationDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AiConfigurationDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AiConfigurationDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAiConfigurationDtoApiResponse {
+    success?: boolean;
+    data?: AiConfigurationDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AiConfigurationDtoIEnumerableApiResponse implements IAiConfigurationDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: AiConfigurationDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAiConfigurationDtoIEnumerableApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(AiConfigurationDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AiConfigurationDtoIEnumerableApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AiConfigurationDtoIEnumerableApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAiConfigurationDtoIEnumerableApiResponse {
+    success?: boolean;
+    data?: AiConfigurationDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class AiProviderModelsDto implements IAiProviderModelsDto {
+    models?: string[] | undefined;
+    success?: boolean;
+    errorMessage?: string | undefined;
+
+    constructor(data?: IAiProviderModelsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["models"])) {
+                this.models = [] as any;
+                for (let item of _data["models"])
+                    this.models!.push(item);
+            }
+            this.success = _data["success"];
+            this.errorMessage = _data["errorMessage"];
+        }
+    }
+
+    static fromJS(data: any): AiProviderModelsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AiProviderModelsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.models)) {
+            data["models"] = [];
+            for (let item of this.models)
+                data["models"].push(item);
+        }
+        data["success"] = this.success;
+        data["errorMessage"] = this.errorMessage;
+        return data;
+    }
+}
+
+export interface IAiProviderModelsDto {
+    models?: string[] | undefined;
+    success?: boolean;
+    errorMessage?: string | undefined;
+}
+
+export class AiProviderModelsDtoApiResponse implements IAiProviderModelsDtoApiResponse {
+    success?: boolean;
+    data?: AiProviderModelsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAiProviderModelsDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AiProviderModelsDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AiProviderModelsDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AiProviderModelsDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAiProviderModelsDtoApiResponse {
+    success?: boolean;
+    data?: AiProviderModelsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class AlertBulkFilterDto implements IAlertBulkFilterDto {
     userId?: string | undefined;
     productId?: string | undefined;
@@ -10950,6 +12048,198 @@ export interface IBooleanApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class BrowserActionGenerationRequestDto implements IBrowserActionGenerationRequestDto {
+    instructions!: string;
+    context?: string | undefined;
+    aiConfigurationId?: string | undefined;
+
+    constructor(data?: IBrowserActionGenerationRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.instructions = _data["instructions"];
+            this.context = _data["context"];
+            this.aiConfigurationId = _data["aiConfigurationId"];
+        }
+    }
+
+    static fromJS(data: any): BrowserActionGenerationRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserActionGenerationRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["instructions"] = this.instructions;
+        data["context"] = this.context;
+        data["aiConfigurationId"] = this.aiConfigurationId;
+        return data;
+    }
+}
+
+export interface IBrowserActionGenerationRequestDto {
+    instructions: string;
+    context?: string | undefined;
+    aiConfigurationId?: string | undefined;
+}
+
+export class BrowserActionGenerationResponseDto implements IBrowserActionGenerationResponseDto {
+    actions?: GeneratedBrowserAction[] | undefined;
+    explanation?: string | undefined;
+    tokensUsed?: number;
+    model?: string | undefined;
+    success?: boolean;
+    errorMessage?: string | undefined;
+
+    constructor(data?: IBrowserActionGenerationResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["actions"])) {
+                this.actions = [] as any;
+                for (let item of _data["actions"])
+                    this.actions!.push(GeneratedBrowserAction.fromJS(item));
+            }
+            this.explanation = _data["explanation"];
+            this.tokensUsed = _data["tokensUsed"];
+            this.model = _data["model"];
+            this.success = _data["success"];
+            this.errorMessage = _data["errorMessage"];
+        }
+    }
+
+    static fromJS(data: any): BrowserActionGenerationResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserActionGenerationResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.actions)) {
+            data["actions"] = [];
+            for (let item of this.actions)
+                data["actions"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["explanation"] = this.explanation;
+        data["tokensUsed"] = this.tokensUsed;
+        data["model"] = this.model;
+        data["success"] = this.success;
+        data["errorMessage"] = this.errorMessage;
+        return data;
+    }
+}
+
+export interface IBrowserActionGenerationResponseDto {
+    actions?: GeneratedBrowserAction[] | undefined;
+    explanation?: string | undefined;
+    tokensUsed?: number;
+    model?: string | undefined;
+    success?: boolean;
+    errorMessage?: string | undefined;
+}
+
+export class BrowserActionGenerationResponseDtoApiResponse implements IBrowserActionGenerationResponseDtoApiResponse {
+    success?: boolean;
+    data?: BrowserActionGenerationResponseDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IBrowserActionGenerationResponseDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? BrowserActionGenerationResponseDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BrowserActionGenerationResponseDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserActionGenerationResponseDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBrowserActionGenerationResponseDtoApiResponse {
+    success?: boolean;
+    data?: BrowserActionGenerationResponseDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class BulkProxyActiveStatusDto implements IBulkProxyActiveStatusDto {
     proxyIds?: string[] | undefined;
     isActive?: boolean;
@@ -11650,6 +12940,126 @@ export interface ICategoryDtoIEnumerableApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class CreateAiConfigurationDto implements ICreateAiConfigurationDto {
+    provider!: string;
+    name!: string;
+    description?: string | undefined;
+    openApiCompatibleUrl?: string | undefined;
+    apiKey!: string;
+    model!: string;
+    inputTokenLimit?: number | undefined;
+    outputTokenLimit?: number | undefined;
+    capabilities?: string[] | undefined;
+    supportedInputTypes?: string[] | undefined;
+    supportedOutputTypes?: string[] | undefined;
+    rateLimitRpm?: number | undefined;
+    rateLimitTpm?: number | undefined;
+    rateLimitRpd?: number | undefined;
+    isActive?: boolean;
+    isDefault?: boolean;
+
+    constructor(data?: ICreateAiConfigurationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.provider = _data["provider"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.openApiCompatibleUrl = _data["openApiCompatibleUrl"];
+            this.apiKey = _data["apiKey"];
+            this.model = _data["model"];
+            this.inputTokenLimit = _data["inputTokenLimit"];
+            this.outputTokenLimit = _data["outputTokenLimit"];
+            if (Array.isArray(_data["capabilities"])) {
+                this.capabilities = [] as any;
+                for (let item of _data["capabilities"])
+                    this.capabilities!.push(item);
+            }
+            if (Array.isArray(_data["supportedInputTypes"])) {
+                this.supportedInputTypes = [] as any;
+                for (let item of _data["supportedInputTypes"])
+                    this.supportedInputTypes!.push(item);
+            }
+            if (Array.isArray(_data["supportedOutputTypes"])) {
+                this.supportedOutputTypes = [] as any;
+                for (let item of _data["supportedOutputTypes"])
+                    this.supportedOutputTypes!.push(item);
+            }
+            this.rateLimitRpm = _data["rateLimitRpm"];
+            this.rateLimitTpm = _data["rateLimitTpm"];
+            this.rateLimitRpd = _data["rateLimitRpd"];
+            this.isActive = _data["isActive"];
+            this.isDefault = _data["isDefault"];
+        }
+    }
+
+    static fromJS(data: any): CreateAiConfigurationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateAiConfigurationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["provider"] = this.provider;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["openApiCompatibleUrl"] = this.openApiCompatibleUrl;
+        data["apiKey"] = this.apiKey;
+        data["model"] = this.model;
+        data["inputTokenLimit"] = this.inputTokenLimit;
+        data["outputTokenLimit"] = this.outputTokenLimit;
+        if (Array.isArray(this.capabilities)) {
+            data["capabilities"] = [];
+            for (let item of this.capabilities)
+                data["capabilities"].push(item);
+        }
+        if (Array.isArray(this.supportedInputTypes)) {
+            data["supportedInputTypes"] = [];
+            for (let item of this.supportedInputTypes)
+                data["supportedInputTypes"].push(item);
+        }
+        if (Array.isArray(this.supportedOutputTypes)) {
+            data["supportedOutputTypes"] = [];
+            for (let item of this.supportedOutputTypes)
+                data["supportedOutputTypes"].push(item);
+        }
+        data["rateLimitRpm"] = this.rateLimitRpm;
+        data["rateLimitTpm"] = this.rateLimitTpm;
+        data["rateLimitRpd"] = this.rateLimitRpd;
+        data["isActive"] = this.isActive;
+        data["isDefault"] = this.isDefault;
+        return data;
+    }
+}
+
+export interface ICreateAiConfigurationDto {
+    provider: string;
+    name: string;
+    description?: string | undefined;
+    openApiCompatibleUrl?: string | undefined;
+    apiKey: string;
+    model: string;
+    inputTokenLimit?: number | undefined;
+    outputTokenLimit?: number | undefined;
+    capabilities?: string[] | undefined;
+    supportedInputTypes?: string[] | undefined;
+    supportedOutputTypes?: string[] | undefined;
+    rateLimitRpm?: number | undefined;
+    rateLimitTpm?: number | undefined;
+    rateLimitRpd?: number | undefined;
+    isActive?: boolean;
+    isDefault?: boolean;
 }
 
 export class CreateAlertRuleDto implements ICreateAlertRuleDto {
@@ -12514,6 +13924,62 @@ export interface IDashboardStatsDtoApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class GeneratedBrowserAction implements IGeneratedBrowserAction {
+    actionType?: string | undefined;
+    selector?: string | undefined;
+    repeat?: number | undefined;
+    delayMs?: number | undefined;
+    value?: string | undefined;
+    description?: string | undefined;
+
+    constructor(data?: IGeneratedBrowserAction) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.actionType = _data["actionType"];
+            this.selector = _data["selector"];
+            this.repeat = _data["repeat"];
+            this.delayMs = _data["delayMs"];
+            this.value = _data["value"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): GeneratedBrowserAction {
+        data = typeof data === 'object' ? data : {};
+        let result = new GeneratedBrowserAction();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["actionType"] = this.actionType;
+        data["selector"] = this.selector;
+        data["repeat"] = this.repeat;
+        data["delayMs"] = this.delayMs;
+        data["value"] = this.value;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+export interface IGeneratedBrowserAction {
+    actionType?: string | undefined;
+    selector?: string | undefined;
+    repeat?: number | undefined;
+    delayMs?: number | undefined;
+    value?: string | undefined;
+    description?: string | undefined;
 }
 
 export class Int32ApiResponse implements IInt32ApiResponse {
@@ -14874,6 +16340,46 @@ export interface IProductWithCurrentPricesDtoPagedResponse {
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
     pagination?: PaginationMeta;
+}
+
+export class ProviderModelsRequestDto implements IProviderModelsRequestDto {
+    baseUrl?: string | undefined;
+    apiKey?: string | undefined;
+
+    constructor(data?: IProviderModelsRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.baseUrl = _data["baseUrl"];
+            this.apiKey = _data["apiKey"];
+        }
+    }
+
+    static fromJS(data: any): ProviderModelsRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProviderModelsRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["baseUrl"] = this.baseUrl;
+        data["apiKey"] = this.apiKey;
+        return data;
+    }
+}
+
+export interface IProviderModelsRequestDto {
+    baseUrl?: string | undefined;
+    apiKey?: string | undefined;
 }
 
 export class ProxyConfigurationDto implements IProxyConfigurationDto {
@@ -18278,6 +19784,122 @@ export interface ITestPricePointDto {
     sellerName?: string | undefined;
     sourceUrl?: string | undefined;
     timestamp?: Date | undefined;
+}
+
+export class UpdateAiConfigurationDto implements IUpdateAiConfigurationDto {
+    name?: string | undefined;
+    description?: string | undefined;
+    openApiCompatibleUrl?: string | undefined;
+    apiKey?: string | undefined;
+    model?: string | undefined;
+    inputTokenLimit?: number | undefined;
+    outputTokenLimit?: number | undefined;
+    capabilities?: string[] | undefined;
+    supportedInputTypes?: string[] | undefined;
+    supportedOutputTypes?: string[] | undefined;
+    rateLimitRpm?: number | undefined;
+    rateLimitTpm?: number | undefined;
+    rateLimitRpd?: number | undefined;
+    isActive?: boolean | undefined;
+    isDefault?: boolean | undefined;
+
+    constructor(data?: IUpdateAiConfigurationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.openApiCompatibleUrl = _data["openApiCompatibleUrl"];
+            this.apiKey = _data["apiKey"];
+            this.model = _data["model"];
+            this.inputTokenLimit = _data["inputTokenLimit"];
+            this.outputTokenLimit = _data["outputTokenLimit"];
+            if (Array.isArray(_data["capabilities"])) {
+                this.capabilities = [] as any;
+                for (let item of _data["capabilities"])
+                    this.capabilities!.push(item);
+            }
+            if (Array.isArray(_data["supportedInputTypes"])) {
+                this.supportedInputTypes = [] as any;
+                for (let item of _data["supportedInputTypes"])
+                    this.supportedInputTypes!.push(item);
+            }
+            if (Array.isArray(_data["supportedOutputTypes"])) {
+                this.supportedOutputTypes = [] as any;
+                for (let item of _data["supportedOutputTypes"])
+                    this.supportedOutputTypes!.push(item);
+            }
+            this.rateLimitRpm = _data["rateLimitRpm"];
+            this.rateLimitTpm = _data["rateLimitTpm"];
+            this.rateLimitRpd = _data["rateLimitRpd"];
+            this.isActive = _data["isActive"];
+            this.isDefault = _data["isDefault"];
+        }
+    }
+
+    static fromJS(data: any): UpdateAiConfigurationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateAiConfigurationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["openApiCompatibleUrl"] = this.openApiCompatibleUrl;
+        data["apiKey"] = this.apiKey;
+        data["model"] = this.model;
+        data["inputTokenLimit"] = this.inputTokenLimit;
+        data["outputTokenLimit"] = this.outputTokenLimit;
+        if (Array.isArray(this.capabilities)) {
+            data["capabilities"] = [];
+            for (let item of this.capabilities)
+                data["capabilities"].push(item);
+        }
+        if (Array.isArray(this.supportedInputTypes)) {
+            data["supportedInputTypes"] = [];
+            for (let item of this.supportedInputTypes)
+                data["supportedInputTypes"].push(item);
+        }
+        if (Array.isArray(this.supportedOutputTypes)) {
+            data["supportedOutputTypes"] = [];
+            for (let item of this.supportedOutputTypes)
+                data["supportedOutputTypes"].push(item);
+        }
+        data["rateLimitRpm"] = this.rateLimitRpm;
+        data["rateLimitTpm"] = this.rateLimitTpm;
+        data["rateLimitRpd"] = this.rateLimitRpd;
+        data["isActive"] = this.isActive;
+        data["isDefault"] = this.isDefault;
+        return data;
+    }
+}
+
+export interface IUpdateAiConfigurationDto {
+    name?: string | undefined;
+    description?: string | undefined;
+    openApiCompatibleUrl?: string | undefined;
+    apiKey?: string | undefined;
+    model?: string | undefined;
+    inputTokenLimit?: number | undefined;
+    outputTokenLimit?: number | undefined;
+    capabilities?: string[] | undefined;
+    supportedInputTypes?: string[] | undefined;
+    supportedOutputTypes?: string[] | undefined;
+    rateLimitRpm?: number | undefined;
+    rateLimitTpm?: number | undefined;
+    rateLimitRpd?: number | undefined;
+    isActive?: boolean | undefined;
+    isDefault?: boolean | undefined;
 }
 
 export class UpdateAlertRuleDto implements IUpdateAlertRuleDto {

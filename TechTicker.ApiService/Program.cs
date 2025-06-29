@@ -8,6 +8,7 @@ using TechTicker.ApiService.Services;
 using TechTicker.Application.Configuration;
 using TechTicker.Application.Services;
 using TechTicker.Application.Services.Interfaces;
+using TechTicker.Application.Services.AI;
 using TechTicker.DataAccess;
 using TechTicker.DataAccess.Repositories;
 using TechTicker.DataAccess.Repositories.Interfaces;
@@ -88,6 +89,7 @@ builder.Services.Configure<ProxyHealthMonitorConfiguration>(
 
 // Add repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAiConfigurationRepository, AiConfigurationRepository>();
 builder.Services.AddScoped<IMappingService, MappingService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -114,6 +116,12 @@ builder.Services.AddScoped<IScraperRunLogService, ScraperRunLogService>();
 builder.Services.AddScoped<IScrapingOrchestrationService, ScrapingOrchestrationService>();
 builder.Services.AddScoped<IAlertTestingService, AlertTestingService>();
 builder.Services.AddScoped<IAlertPerformanceMonitoringService, AlertPerformanceMonitoringService>();
+
+// Add AI services
+builder.Services.AddScoped<IAiConfigurationService, AiConfigurationService>();
+builder.Services.AddScoped<IAiGenerationService, AiGenerationService>();
+builder.Services.AddScoped<IAiProvider, GoogleGeminiAiProvider>();
+builder.Services.AddHttpClient<GoogleGeminiAiProvider>();
 
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();

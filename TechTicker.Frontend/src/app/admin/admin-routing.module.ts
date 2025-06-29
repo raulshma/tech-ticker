@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProxyListComponent } from './proxy-management/proxy-list/proxy-list.component';
 import { ProxyFormComponent } from './proxy-management/proxy-form/proxy-form.component';
 import { BulkImportComponent } from './proxy-management/bulk-import/bulk-import.component';
+import { AiSettingsComponent } from './ai-settings/ai-settings.component';
 
 const routes: Routes = [
   {
@@ -29,6 +30,11 @@ const routes: Routes = [
     path: 'proxies/bulk-import',
     component: BulkImportComponent,
     data: { title: 'Bulk Import Proxies' }
+  },
+  {
+    path: 'ai-settings',
+    component: AiSettingsComponent,
+    data: { title: 'AI Configuration' }
   }
 ];
 

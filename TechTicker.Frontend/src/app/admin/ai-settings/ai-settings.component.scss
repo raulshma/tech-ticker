@@ -1,0 +1,224 @@
+.ai-settings-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  
+  .header-content {
+    h1 {
+      margin: 0 0 8px 0;
+      font-weight: 600;
+    }
+    
+    .header-subtitle {
+      margin: 0;
+      opacity: 0.7;
+    }
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+.loading-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  
+  p {
+    margin-top: 16px;
+    opacity: 0.7;
+  }
+}
+
+.form-card {
+  margin-bottom: 32px;
+  
+  .ai-form {
+    .form-section {
+      margin-bottom: 32px;
+      
+             h3 {
+         margin: 0 0 16px 0;
+         font-size: 18px;
+         font-weight: 500;
+         color: #1976d2;
+       }
+      
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 16px;
+        
+        .full-width {
+          grid-column: 1 / -1;
+        }
+      }
+      
+      .capabilities-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 24px;
+        
+        .capability-group {
+          h4 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.8;
+          }
+          
+          mat-chip-listbox {
+            width: 100%;
+          }
+        }
+      }
+      
+      .status-controls {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+      }
+    }
+  }
+}
+
+.table-card {
+  .table-container {
+    overflow-x: auto;
+    
+    .configurations-table {
+      width: 100%;
+      min-width: 800px;
+      
+      .config-name {
+        strong {
+          display: block;
+          margin-bottom: 4px;
+        }
+        
+        .description {
+          margin: 0;
+          font-size: 12px;
+          opacity: 0.7;
+          line-height: 1.4;
+        }
+      }
+      
+      .actions-group {
+        display: flex;
+        gap: 4px;
+        
+        button {
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+          }
+        }
+      }
+    }
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    h3 {
+      margin: 0 0 8px 0;
+      font-weight: 500;
+    }
+    
+    p {
+      margin: 0 0 24px 0;
+      opacity: 0.7;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .ai-settings-container {
+    padding: 16px;
+  }
+  
+  .header-section {
+    flex-direction: column;
+    gap: 16px;
+    
+    .header-actions {
+      align-self: stretch;
+    }
+  }
+  
+  .form-card .ai-form .form-section .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-card .ai-form .form-section .capabilities-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Dark theme adjustments
+@media (prefers-color-scheme: dark) {
+  .form-card .ai-form .form-section h3 {
+    color: #f50057;
+  }
+}
+
+// Animation for form transitions
+.form-card {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Chip styling enhancements
+mat-chip-option {
+  &.mat-mdc-chip-selected {
+    background-color: #e3f2fd;
+    color: #1565c0;
+  }
+}
+
+// Table row hover effects
+.configurations-table tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+// Form field spacing
+mat-form-field {
+  width: 100%;
+}
+
+// Status toggle alignment
+.status-controls mat-slide-toggle {
+  .mat-slide-toggle-content {
+    font-weight: 500;
+  }
+} 

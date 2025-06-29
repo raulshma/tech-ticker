@@ -29,6 +29,7 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     // RBAC entities
     public DbSet<Permission> Permissions { get; set; } = null!;
     public DbSet<RolePermission> RolePermissions { get; set; } = null!;
+    public DbSet<AiConfiguration> AiConfigurations { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -310,6 +311,33 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
                   .HasForeignKey(e => e.PermissionId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
+
+        // Configure AiConfiguration entity
+        modelBuilder.Entity<AiConfiguration>(entity =>
+        {
+            entity.HasKey(e => e.AiConfigurationId);
+            entity.Property(e => e.Provider).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.OpenApiCompatibleUrl).HasMaxLength(500);
+            entity.Property(e => e.ApiKey).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Model).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Capabilities).HasColumnType("jsonb");
+            entity.Property(e => e.SupportedInputTypes).HasColumnType("jsonb");
+            entity.Property(e => e.SupportedOutputTypes).HasColumnType("jsonb");
+            entity.Property(e => e.IsActive).IsRequired().HasDefaultValue(true);
+            entity.Property(e => e.IsDefault).IsRequired().HasDefaultValue(false);
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+            entity.Property(e => e.CreatedBy).IsRequired();
+            entity.Property(e => e.UpdatedBy).IsRequired();
+
+            // Indexes
+            entity.HasIndex(e => e.Provider);
+            entity.HasIndex(e => e.IsActive);
+            entity.HasIndex(e => e.IsDefault);
+            entity.HasIndex(e => new { e.Provider, e.Model }).IsUnique();
+        });
     }
 
     public override int SaveChanges()
@@ -382,6 +410,12 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             {
                 if (entry.State == EntityState.Added)
                     rolePermission.CreatedAt = DateTimeOffset.UtcNow;
+            }
+            else if (entry.Entity is AiConfiguration aiConfig)
+            {
+                if (entry.State == EntityState.Added)
+                    aiConfig.CreatedAt = DateTime.UtcNow;
+                aiConfig.UpdatedAt = DateTime.UtcNow;
             }
         }
     }
