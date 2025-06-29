@@ -20,6 +20,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 import { MappingsRoutingModule } from './mappings-routing.module';
 import { MappingsListComponent } from './components/mappings-list/mappings-list.component';
@@ -54,7 +55,8 @@ import { MappingDeleteDialogComponent } from './components/mapping-delete-dialog
     MatSlideToggleModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatExpansionModule,
   ]
 })
 export class MappingsModule { }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -18,7 +18,7 @@ import { MappingDeleteDialogComponent } from '../mapping-delete-dialog/mapping-d
   styleUrls: ['./mappings-list.component.scss'],
   standalone: false
 })
-export class MappingsListComponent implements OnInit {
+export class MappingsListComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['product', 'sellerName', 'exactProductUrl', 'isActiveForScraping', 'lastScrapedAt', 'lastScrapeStatus', 'actions'];
   dataSource = new MatTableDataSource<ProductSellerMappingDto>();
   isLoading = false;
@@ -26,6 +26,8 @@ export class MappingsListComponent implements OnInit {
   // Filters
   productControl = new FormControl('');
   showAllMappingsControl = new FormControl(true);
+  searchText = '';
+  statusFilter = '';
   products: ProductDto[] = [];
 
   // Track scraping progress
@@ -105,26 +107,62 @@ export class MappingsListComponent implements OnInit {
 
   clearFilters(): void {
     this.productControl.setValue('');
+    this.showAllMappingsControl.setValue(true);
+    this.searchText = '';
+    this.statusFilter = '';
+  }
+
+  onFilterChange(): void {
+    this.applyFilters();
+  }
+
+  private applyFilters(): void {
+    // Set up custom filter predicate
+    this.dataSource.filterPredicate = (mapping: ProductSellerMappingDto, filter: string): boolean => {
+      const searchTerm = this.searchText?.toLowerCase() || '';
+      
+      // Search filter
+      const matchesSearch = !searchTerm || 
+        this.getProductName(mapping.canonicalProductId || '').toLowerCase().includes(searchTerm) ||
+        (mapping.sellerName?.toLowerCase().includes(searchTerm) ?? false) ||
+        (mapping.exactProductUrl?.toLowerCase().includes(searchTerm) ?? false);
+
+      // Status filter
+      const matchesStatus = !this.statusFilter ||
+        (this.statusFilter === 'active' && (mapping.isActiveForScraping ?? false)) ||
+        (this.statusFilter === 'inactive' && !(mapping.isActiveForScraping ?? false));
+
+      return Boolean(matchesSearch && matchesStatus);
+    };
+
+    // Trigger filter by setting filter value
+    this.dataSource.filter = 'trigger';
+  }
+
+  editMapping(mapping: ProductSellerMappingDto): void {
+    if (mapping.mappingId) {
+      this.router.navigate(['/mappings/edit', mapping.mappingId]);
+    }
   }
 
   createMapping(): void {
     this.router.navigate(['/mappings/new']);
   }
 
-  editMapping(mapping: ProductSellerMappingDto): void {
-    this.router.navigate(['/mappings/edit', mapping.mappingId]);
-  }
-
   deleteMapping(mapping: ProductSellerMappingDto): void {
+    if (!mapping.mappingId) {
+      this.snackBar.open('Invalid mapping ID', 'Close', { duration: 3000 });
+      return;
+    }
+
     const dialogRef = this.dialog.open(MappingDeleteDialogComponent, {
       width: '400px',
       data: mapping
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.isLoading = true;
-        this.mappingsService.deleteMapping(mapping.mappingId!).subscribe({
+      if (result && mapping.mappingId) {
+        this.mappingsService.deleteMapping(mapping.mappingId).subscribe({
           next: () => {
             this.snackBar.open('Mapping deleted successfully', 'Close', { duration: 3000 });
             this.loadMappings();
@@ -132,11 +170,40 @@ export class MappingsListComponent implements OnInit {
           error: (error) => {
             console.error('Error deleting mapping:', error);
             this.snackBar.open('Failed to delete mapping', 'Close', { duration: 5000 });
-            this.isLoading = false;
           }
         });
       }
     });
+  }
+
+  triggerScraping(mapping: ProductSellerMappingDto): void {
+    if (!mapping.mappingId) {
+      this.snackBar.open('Invalid mapping ID', 'Close', { duration: 3000 });
+      return;
+    }
+
+    this.scrapingInProgress.add(mapping.mappingId);
+    this.mappingsService.triggerManualScraping(mapping.mappingId).subscribe({
+      next: () => {
+        this.snackBar.open('Scraping triggered successfully', 'Close', { duration: 3000 });
+        if (mapping.mappingId) {
+          this.scrapingInProgress.delete(mapping.mappingId);
+        }
+        // Reload mappings after a short delay to show updated status
+        setTimeout(() => this.loadMappings(), 2000);
+      },
+      error: (error) => {
+        console.error('Error triggering scraping:', error);
+        this.snackBar.open('Failed to trigger scraping', 'Close', { duration: 5000 });
+        if (mapping.mappingId) {
+          this.scrapingInProgress.delete(mapping.mappingId);
+        }
+      }
+    });
+  }
+
+  isScrapingInProgress(mappingId: string | undefined): boolean {
+    return mappingId ? this.scrapingInProgress.has(mappingId) : false;
   }
 
   getProductName(productId: string): string {
@@ -144,43 +211,70 @@ export class MappingsListComponent implements OnInit {
     return product?.name || 'Unknown Product';
   }
 
-  getStatusColor(status: string | undefined): string {
-    switch (status?.toLowerCase()) {
+  getStatusColor(status: string | null | undefined): string {
+    if (!status) return 'basic';
+    
+    switch (status.toLowerCase()) {
       case 'success':
-        return 'success';
+      case 'completed':
+        return 'primary';
+      case 'pending':
+      case 'in_progress':
+        return 'accent';
+      case 'error':
+      case 'failed':
+        return 'warn';
+      default:
+        return 'basic';
+    }
+  }
+
+  getStatusIcon(status: string | null | undefined): string {
+    if (!status) return 'help';
+    
+    switch (status.toLowerCase()) {
+      case 'success':
+      case 'completed':
+        return 'check_circle';
+      case 'pending':
+      case 'in_progress':
+        return 'schedule';
       case 'error':
       case 'failed':
         return 'error';
-      case 'pending':
-        return 'pending';
       default:
-        return 'unknown';
+        return 'help';
     }
   }
 
-  triggerScraping(mapping: ProductSellerMappingDto): void {
-    if (!mapping.mappingId || !mapping.isActiveForScraping) {
-      return;
-    }
-
-    this.scrapingInProgress.add(mapping.mappingId);
-
-    this.mappingsService.triggerManualScraping(mapping.mappingId).subscribe({
-      next: (message) => {
-        this.snackBar.open(message, 'Close', { duration: 5000 });
-        this.scrapingInProgress.delete(mapping.mappingId!);
-        // Optionally reload mappings to show updated status
-        // this.loadMappings();
-      },
-      error: (error) => {
-        console.error('Error triggering scraping:', error);
-        this.snackBar.open('Failed to trigger scraping', 'Close', { duration: 5000 });
-        this.scrapingInProgress.delete(mapping.mappingId!);
-      }
-    });
+  // Statistics methods for the dashboard
+  getTotalMappings(): number {
+    return this.dataSource.data.length;
   }
 
-  isScrapingInProgress(mappingId: string | undefined): boolean {
-    return mappingId ? this.scrapingInProgress.has(mappingId) : false;
+  getActiveMappings(): number {
+    return this.dataSource.data.filter(m => m.isActiveForScraping).length;
+  }
+
+  getRecentlyScrapedMappings(): number {
+    const oneDayAgo = new Date();
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+    
+    return this.dataSource.data.filter(m => 
+      m.lastScrapedAt && new Date(m.lastScrapedAt) > oneDayAgo
+    ).length;
+  }
+
+  getFailedMappings(): number {
+    return this.dataSource.data.filter(m => 
+      m.lastScrapeStatus && ['error', 'failed'].includes(m.lastScrapeStatus.toLowerCase())
+    ).length;
+  }
+
+  hasFilters(): boolean {
+    return !!(this.searchText?.trim() || 
+              this.productControl.value || 
+              this.statusFilter ||
+              !this.showAllMappingsControl.value);
   }
 }
