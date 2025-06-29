@@ -215,6 +215,35 @@ public class GoogleGeminiAiProvider : IAiProvider
         }
     }
 
+    public async Task<Result<GenericAiResponseDto>> GenerateGenericResponseAsync(
+        string inputText,
+        string? systemPrompt,
+        string? context,
+        string? jsonSchema,
+        double? temperature,
+        int? maxTokens,
+        AiConfigurationDto configuration)
+    {
+        try
+        {
+            var prompt = BuildGenericPrompt(inputText, systemPrompt, context);
+            var requestBody = BuildGenericGeminiRequest(prompt, jsonSchema, temperature, maxTokens, configuration);
+            
+            var response = await CallGenericGeminiApiAsync(requestBody, configuration, !string.IsNullOrEmpty(jsonSchema));
+            if (!response.IsSuccess)
+            {
+                return Result<GenericAiResponseDto>.Failure(response.ErrorMessage ?? "Failed to generate response");
+            }
+
+            return Result<GenericAiResponseDto>.Success(response.Data!);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating generic response with Google Gemini");
+            return Result<GenericAiResponseDto>.Failure($"Generation failed: {ex.Message}");
+        }
+    }
+
     private string BuildPrompt(string instructions, string? context)
     {
         var promptBuilder = new StringBuilder();
@@ -476,6 +505,153 @@ public class GoogleGeminiAiProvider : IAiProvider
         {
             _logger.LogError(ex, "Unexpected error calling Google Gemini API");
             return Result<BrowserActionGenerationResponseDto>.Failure($"Unexpected error: {ex.Message}");
+        }
+    }
+
+    private string BuildGenericPrompt(string inputText, string? systemPrompt, string? context)
+    {
+        var promptBuilder = new StringBuilder();
+        
+        if (!string.IsNullOrEmpty(systemPrompt))
+        {
+            promptBuilder.AppendLine($"System: {systemPrompt}");
+            promptBuilder.AppendLine();
+        }
+        
+        if (!string.IsNullOrEmpty(context))
+        {
+            promptBuilder.AppendLine($"Context: {context}");
+            promptBuilder.AppendLine();
+        }
+        
+        promptBuilder.AppendLine($"User: {inputText}");
+        
+        return promptBuilder.ToString();
+    }
+
+    private object BuildGenericGeminiRequest(string prompt, string? jsonSchema, double? temperature, int? maxTokens, AiConfigurationDto configuration)
+    {
+        var generationConfig = new Dictionary<string, object>
+        {
+            ["maxOutputTokens"] = maxTokens ?? configuration.OutputTokenLimit ?? 8192,
+            ["temperature"] = temperature ?? 0.7
+        };
+
+        // If JSON schema is provided, use structured output
+        if (!string.IsNullOrEmpty(jsonSchema))
+        {
+            try
+            {
+                var schemaObj = JsonSerializer.Deserialize<object>(jsonSchema);
+                if (schemaObj != null)
+                {
+                    generationConfig["responseMimeType"] = "application/json";
+                    generationConfig["responseSchema"] = schemaObj;
+                }
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex, "Invalid JSON schema provided, falling back to plain text response");
+            }
+        }
+
+        return new
+        {
+            contents = new[]
+            {
+                new
+                {
+                    parts = new[]
+                    {
+                        new { text = prompt }
+                    }
+                }
+            },
+            generationConfig = generationConfig
+        };
+    }
+
+    private async Task<Result<GenericAiResponseDto>> CallGenericGeminiApiAsync(
+        object requestBody, 
+        AiConfigurationDto configuration,
+        bool isStructuredOutput = false)
+    {
+        try
+        {
+            var baseUrl = !string.IsNullOrEmpty(configuration.OpenApiCompatibleUrl)
+                ? configuration.OpenApiCompatibleUrl.TrimEnd('/')
+                : "https://generativelanguage.googleapis.com";
+            
+            var apiKey = configuration.DecryptedApiKey;
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                throw new InvalidOperationException("API key not available");
+            }
+            var url = $"{baseUrl}/v1beta/models/{configuration.Model}:generateContent?key={apiKey}";
+            
+            var json = JsonSerializer.Serialize(requestBody, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
+            
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            
+            _logger.LogDebug("Sending generic request to Google Gemini API: {Url}", url.Replace(apiKey, "***"));
+            
+            var response = await _httpClient.PostAsync(url, content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Google Gemini API error: {StatusCode} - {Content}", response.StatusCode, responseContent);
+                return Result<GenericAiResponseDto>.Failure($"API error: {response.StatusCode}");
+            }
+            
+            var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(responseContent, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+            
+            if (geminiResponse?.Candidates?.Any() != true)
+            {
+                return Result<GenericAiResponseDto>.Failure("No response generated");
+            }
+            
+            var candidate = geminiResponse.Candidates.First();
+            var responseText = candidate.Content?.Parts?.FirstOrDefault()?.Text;
+            
+            if (string.IsNullOrEmpty(responseText))
+            {
+                return Result<GenericAiResponseDto>.Failure("Empty response from AI");
+            }
+            
+            var result = new GenericAiResponseDto
+            {
+                Response = responseText,
+                TokensUsed = geminiResponse.UsageMetadata?.TotalTokenCount ?? 0,
+                Model = configuration.Model,
+                Success = true,
+                IsStructuredOutput = isStructuredOutput,
+                GeneratedAt = DateTime.UtcNow
+            };
+            
+            return Result<GenericAiResponseDto>.Success(result);
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Error parsing Google Gemini API response");
+            return Result<GenericAiResponseDto>.Failure($"Failed to parse response: {ex.Message}");
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP error calling Google Gemini API");
+            return Result<GenericAiResponseDto>.Failure($"Network error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error calling Google Gemini API");
+            return Result<GenericAiResponseDto>.Failure($"Unexpected error: {ex.Message}");
         }
     }
 

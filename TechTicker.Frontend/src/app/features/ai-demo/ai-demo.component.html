@@ -1,0 +1,226 @@
+<div class="ai-demo-container">
+  <div class="demo-header">
+    <h1>
+      <mat-icon>smart_toy</mat-icon>
+      AI Assistant Demo
+    </h1>
+    <p class="demo-description">
+      Explore different configurations of the reusable AI Assistant component. 
+      Each tab demonstrates a specific use case with tailored settings.
+    </p>
+    
+    <!-- Statistics -->
+    <div class="demo-stats" *ngIf="getResultsCount() > 0">
+      <div class="stat-card">
+        <mat-icon>analytics</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ getResultsCount() }}</span>
+          <span class="stat-label">Total Requests</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon>check_circle</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ getSuccessfulResults() }}</span>
+          <span class="stat-label">Successful</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon>token</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ getTotalTokensUsed() }}</span>
+          <span class="stat-label">Tokens Used</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <mat-tab-group class="demo-tabs" animationDuration="300ms">
+    <!-- General AI Assistant Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>help</mat-icon>
+        General Assistant
+      </ng-template>
+      <div class="tab-content">
+        <div class="tab-description">
+          <h3>General Purpose AI Assistant</h3>
+          <p>
+            A versatile AI assistant with full customization options. Users can provide JSON schemas 
+            for structured responses, adjust temperature settings, and select different AI configurations.
+          </p>
+          <div class="features-list">
+            <span class="feature-chip">JSON Schema Support</span>
+            <span class="feature-chip">Advanced Options</span>
+            <span class="feature-chip">Configuration Selection</span>
+            <span class="feature-chip">Custom System Prompts</span>
+          </div>
+        </div>
+        
+        <app-ai-assistant
+          [config]="generalConfig"
+          (result)="onResult('general', $event)"
+          (loading)="onLoading('general', $event)">
+        </app-ai-assistant>
+      </div>
+    </mat-tab>
+
+    <!-- Code Assistant Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>code</mat-icon>
+        Code Assistant
+      </ng-template>
+      <div class="tab-content">
+        <div class="tab-description">
+          <h3>Code Generation Assistant</h3>
+          <p>
+            Specialized for generating clean, well-documented code. Includes a predefined JSON schema 
+            to structure the response with code, language, explanation, and dependencies.
+          </p>
+          <div class="features-list">
+            <span class="feature-chip">Structured Code Output</span>
+            <span class="feature-chip">Language Detection</span>
+            <span class="feature-chip">Code Explanations</span>
+            <span class="feature-chip">Dependency Tracking</span>
+          </div>
+          <div class="example-prompts">
+            <strong>Try these prompts:</strong>
+            <ul>
+              <li>"Create a React component for a todo list"</li>
+              <li>"Write a Python function to calculate Fibonacci numbers"</li>
+              <li>"Generate a SQL query to find top 10 customers by revenue"</li>
+            </ul>
+          </div>
+        </div>
+        
+        <app-ai-assistant
+          [config]="codeConfig"
+          (result)="onResult('code', $event)"
+          (loading)="onLoading('code', $event)">
+        </app-ai-assistant>
+      </div>
+    </mat-tab>
+
+    <!-- Data Analysis Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>analytics</mat-icon>
+        Data Analysis
+      </ng-template>
+      <div class="tab-content">
+        <div class="tab-description">
+          <h3>Data Analysis Assistant</h3>
+          <p>
+            Designed for analyzing data and providing insights. Uses a structured schema to deliver 
+            summaries, key insights, actionable recommendations, and confidence levels.
+          </p>
+          <div class="features-list">
+            <span class="feature-chip">Data Insights</span>
+            <span class="feature-chip">Recommendations</span>
+            <span class="feature-chip">Confidence Scoring</span>
+            <span class="feature-chip">Structured Analysis</span>
+          </div>
+          <div class="example-prompts">
+            <strong>Try these prompts:</strong>
+            <ul>
+              <li>"Analyze sales data: Q1: $100k, Q2: $150k, Q3: $120k, Q4: $180k"</li>
+              <li>"What insights can you provide about user engagement metrics?"</li>
+              <li>"Analyze this customer feedback and suggest improvements"</li>
+            </ul>
+          </div>
+        </div>
+        
+        <app-ai-assistant
+          [config]="analysisConfig"
+          (result)="onResult('analysis', $event)"
+          (loading)="onLoading('analysis', $event)">
+        </app-ai-assistant>
+      </div>
+    </mat-tab>
+
+    <!-- Content Writing Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>edit</mat-icon>
+        Content Writer
+      </ng-template>
+      <div class="tab-content">
+        <div class="tab-description">
+          <h3>Content Writing Assistant</h3>
+          <p>
+            Optimized for creating engaging content. Focuses on natural language output without 
+            structured schemas, perfect for blog posts, marketing copy, and creative writing.
+          </p>
+          <div class="features-list">
+            <span class="feature-chip">Creative Writing</span>
+            <span class="feature-chip">Marketing Copy</span>
+            <span class="feature-chip">Blog Posts</span>
+            <span class="feature-chip">Natural Language</span>
+          </div>
+          <div class="example-prompts">
+            <strong>Try these prompts:</strong>
+            <ul>
+              <li>"Write a blog post about the benefits of AI in healthcare"</li>
+              <li>"Create marketing copy for a new productivity app"</li>
+              <li>"Write a product description for wireless headphones"</li>
+            </ul>
+          </div>
+        </div>
+        
+        <app-ai-assistant
+          [config]="writingConfig"
+          (result)="onResult('writing', $event)"
+          (loading)="onLoading('writing', $event)">
+        </app-ai-assistant>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Usage Instructions -->
+  <mat-card class="usage-instructions">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>info</mat-icon>
+        How to Use the AI Assistant Component
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="instructions-grid">
+        <div class="instruction-item">
+          <h4>1. Import the Component</h4>
+          <pre><code>import &#123; AiAssistantComponent &#125; from './shared/components/ai-assistant/ai-assistant.component';</code></pre>
+        </div>
+        
+        <div class="instruction-item">
+          <h4>2. Configure the Assistant</h4>
+          <pre><code>config: AiAssistantConfig = &#123;
+  title: 'My AI Assistant',
+  placeholder: 'Enter your prompt...',
+  systemPrompt: 'You are a helpful assistant',
+  showJsonSchema: true,
+  showAdvancedOptions: true
+&#125;;</code></pre>
+        </div>
+        
+        <div class="instruction-item">
+          <h4>3. Use in Template</h4>
+          <pre><code>&lt;app-ai-assistant
+  [config]="config"
+  (result)="onResult($event)"
+  (loading)="onLoading($event)"&gt;
+&lt;/app-ai-assistant&gt;</code></pre>
+        </div>
+        
+        <div class="instruction-item">
+          <h4>4. Handle Results</h4>
+          <pre><code>onResult(result: AiAssistantResult) &#123;
+  console.log('Response:', result.response);
+  console.log('Tokens used:', result.tokensUsed);
+  console.log('Model:', result.model);
+&#125;</code></pre>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div> 

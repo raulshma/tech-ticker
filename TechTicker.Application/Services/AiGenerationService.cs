@@ -88,6 +88,77 @@ public class AiGenerationService : IAiGenerationService
         }
     }
 
+    public async Task<Result<GenericAiResponseDto>> GenerateGenericResponseAsync(GenericAiRequestDto request)
+    {
+        try
+        {
+            // Get the AI configuration to use
+            AiConfigurationDto configuration;
+            
+            if (request.AiConfigurationId.HasValue)
+            {
+                var configResult = await _configurationService.GetConfigurationForProviderAsync(request.AiConfigurationId.Value);
+                if (!configResult.IsSuccess)
+                {
+                    return Result<GenericAiResponseDto>.Failure($"Configuration not found: {configResult.ErrorMessage}");
+                }
+                configuration = configResult.Data!;
+            }
+            else
+            {
+                // Use default configuration
+                var defaultConfigResult = await _configurationService.GetDefaultConfigurationForProviderAsync();
+                if (!defaultConfigResult.IsSuccess)
+                {
+                    return Result<GenericAiResponseDto>.Failure("No default AI configuration found. Please configure an AI provider first.");
+                }
+                configuration = defaultConfigResult.Data!;
+            }
+
+            // Check if configuration is active
+            if (!configuration.IsActive)
+            {
+                return Result<GenericAiResponseDto>.Failure("The selected AI configuration is not active");
+            }
+
+            // Get the appropriate AI provider
+            if (!_aiProviders.TryGetValue(configuration.Provider, out var aiProvider))
+            {
+                return Result<GenericAiResponseDto>.Failure($"AI provider '{configuration.Provider}' is not supported");
+            }
+
+            // Generate the generic response
+            _logger.LogInformation("Generating generic AI response using {Provider} with model {Model}", 
+                configuration.Provider, configuration.Model);
+
+            var result = await aiProvider.GenerateGenericResponseAsync(
+                request.InputText,
+                request.SystemPrompt,
+                request.Context,
+                request.JsonSchema,
+                request.Temperature,
+                request.MaxTokens,
+                configuration);
+
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Successfully generated generic AI response using {TokenCount} tokens",
+                    result.Data!.TokensUsed);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to generate generic AI response: {Error}", result.ErrorMessage);
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating generic AI response");
+            return Result<GenericAiResponseDto>.Failure($"Generation failed: {ex.Message}");
+        }
+    }
+
     public async Task<Result<bool>> IsAiConfigurationAvailableAsync()
     {
         try

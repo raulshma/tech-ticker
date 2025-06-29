@@ -166,6 +166,19 @@ public class AiConfigurationController : BaseApiController
     }
 
     /// <summary>
+    /// Generate generic AI response
+    /// </summary>
+    /// <param name="request">Generic AI generation request</param>
+    /// <returns>Generated AI response</returns>
+    [HttpPost("generate")]
+    [Authorize(Roles = "User,Admin")] // Allow users to generate responses
+    public async Task<ActionResult<ApiResponse<GenericAiResponseDto>>> GenerateGenericResponse([FromBody] GenericAiRequestDto request)
+    {
+        var result = await _aiGenerationService.GenerateGenericResponseAsync(request);
+        return HandleResult(result);
+    }
+
+    /// <summary>
     /// Check if AI generation is available
     /// </summary>
     /// <returns>Availability status</returns>

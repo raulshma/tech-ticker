@@ -1,0 +1,277 @@
+.ai-demo-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.demo-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin-bottom: 16px;
+    color: var(--primary-color, #1976d2);
+
+    mat-icon {
+      font-size: 2.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
+
+  .demo-description {
+    font-size: 1.1rem;
+    color: rgba(0, 0, 0, 0.7);
+    max-width: 600px;
+    margin: 0 auto 24px;
+    line-height: 1.6;
+  }
+}
+
+.demo-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 24px;
+
+  .stat-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    mat-icon {
+      color: var(--primary-color, #1976d2);
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .stat-content {
+      display: flex;
+      flex-direction: column;
+
+      .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--primary-color, #1976d2);
+      }
+
+      .stat-label {
+        font-size: 0.875rem;
+        color: rgba(0, 0, 0, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+}
+
+.demo-tabs {
+  margin: 32px 0;
+
+  ::ng-deep .mat-mdc-tab-label {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+
+  ::ng-deep .mat-mdc-tab-body-wrapper {
+    padding-top: 24px;
+  }
+}
+
+.tab-content {
+  .tab-description {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+
+    h3 {
+      margin: 0 0 16px 0;
+      font-size: 1.5rem;
+      font-weight: 500;
+    }
+
+    p {
+      margin: 0 0 20px 0;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    .features-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+
+      .feature-chip {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 6px 12px;
+        border-radius: 16px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+      }
+    }
+
+    .example-prompts {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 16px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+
+      strong {
+        display: block;
+        margin-bottom: 12px;
+        font-size: 0.9rem;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+
+        li {
+          margin-bottom: 8px;
+          font-size: 0.875rem;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+}
+
+.usage-instructions {
+  margin-top: 48px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  mat-card-header {
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.5rem;
+      color: var(--primary-color, #1976d2);
+
+      mat-icon {
+        font-size: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+  }
+
+  .instructions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+
+    .instruction-item {
+      h4 {
+        margin: 0 0 12px 0;
+        color: var(--primary-color, #1976d2);
+        font-weight: 500;
+      }
+
+      pre {
+        background: #f5f5f5;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 0;
+        overflow-x: auto;
+
+        code {
+          font-family: 'Roboto Mono', monospace;
+          font-size: 0.875rem;
+          line-height: 1.5;
+          color: #333;
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .ai-demo-container {
+    padding: 16px;
+  }
+
+  .demo-header h1 {
+    font-size: 2rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .demo-stats {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+
+    .stat-card {
+      width: 100%;
+      max-width: 300px;
+      justify-content: center;
+    }
+  }
+
+  .tab-content .tab-description {
+    padding: 16px;
+
+    .features-list {
+      justify-content: center;
+    }
+  }
+
+  .instructions-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .demo-header .demo-description {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .usage-instructions .instructions-grid .instruction-item pre {
+    background: #2d2d2d;
+    border-color: #404040;
+
+    code {
+      color: #f8f8f2;
+    }
+  }
+}
+
+// Animation for tab transitions
+::ng-deep .mat-mdc-tab-body-content {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

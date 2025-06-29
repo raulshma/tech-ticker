@@ -75,6 +75,11 @@ const routes: Routes = [
         canActivate: [AuthGuard] // Available to all authenticated users for testing
       },
       {
+        path: 'ai-demo',
+        loadComponent: () => import('./features/ai-demo/ai-demo.component').then(c => c.AiDemoComponent),
+        canActivate: [AuthGuard] // Available to all authenticated users
+      },
+      {
         path: 'admin',
         loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
         canActivate: [AdminGuard]

@@ -154,4 +154,39 @@ public class AiProviderModelsDto
     public List<string> Models { get; set; } = new();
     public bool Success { get; set; }
     public string? ErrorMessage { get; set; }
+}
+
+public class GenericAiRequestDto
+{
+    [Required]
+    [MinLength(1, ErrorMessage = "Input text is required")]
+    [MaxLength(10000, ErrorMessage = "Input text cannot exceed 10,000 characters")]
+    public string InputText { get; set; } = null!;
+    
+    [MaxLength(5000, ErrorMessage = "System prompt cannot exceed 5,000 characters")]
+    public string? SystemPrompt { get; set; }
+    
+    [MaxLength(2000, ErrorMessage = "Context cannot exceed 2,000 characters")]
+    public string? Context { get; set; }
+    
+    public string? JsonSchema { get; set; } // Optional JSON schema for structured output
+    
+    public Guid? AiConfigurationId { get; set; } // If not provided, use default
+    
+    [Range(0.0, 2.0, ErrorMessage = "Temperature must be between 0.0 and 2.0")]
+    public double? Temperature { get; set; } = 0.7;
+    
+    [Range(1, 8192, ErrorMessage = "Max tokens must be between 1 and 8192")]
+    public int? MaxTokens { get; set; }
+}
+
+public class GenericAiResponseDto
+{
+    public string Response { get; set; } = null!;
+    public int TokensUsed { get; set; }
+    public string Model { get; set; } = null!;
+    public bool Success { get; set; }
+    public string? ErrorMessage { get; set; }
+    public bool IsStructuredOutput { get; set; }
+    public DateTime GeneratedAt { get; set; }
 } 

@@ -12,6 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AppLayoutComponent } from './components/layout/app-layout.component';
 import { ImageGalleryComponent } from './components/image-gallery/image-gallery.component';
+import { AiAssistantComponent } from './components/ai-assistant/ai-assistant.component';
 import { RbacModule } from './modules/rbac.module';
 
 @NgModule({
@@ -30,11 +31,13 @@ import { RbacModule } from './modules/rbac.module';
     MatMenuModule,
     MatDividerModule,
     MatTooltipModule,
-    RbacModule
+    RbacModule,
+    AiAssistantComponent
   ],
   exports: [
     AppLayoutComponent,
     ImageGalleryComponent,
+    AiAssistantComponent,
     RbacModule,
   ]
 })

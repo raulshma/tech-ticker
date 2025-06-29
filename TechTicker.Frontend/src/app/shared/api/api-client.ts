@@ -983,6 +983,62 @@ export class TechTickerApiClient {
     }
 
     /**
+     * @param body (optional) 
+     * @return OK
+     */
+    generateGenericResponse(body: GenericAiRequestDto | undefined): Observable<GenericAiResponseDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/ai-configurations/generate";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGenerateGenericResponse(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGenerateGenericResponse(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GenericAiResponseDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GenericAiResponseDtoApiResponse>;
+        }));
+    }
+
+    protected processGenerateGenericResponse(response: HttpResponseBase): Observable<GenericAiResponseDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GenericAiResponseDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @return OK
      */
     checkAiAvailability(): Observable<BooleanApiResponse> {
@@ -13980,6 +14036,210 @@ export interface IGeneratedBrowserAction {
     delayMs?: number | undefined;
     value?: string | undefined;
     description?: string | undefined;
+}
+
+export class GenericAiRequestDto implements IGenericAiRequestDto {
+    inputText!: string;
+    systemPrompt?: string | undefined;
+    context?: string | undefined;
+    jsonSchema?: string | undefined;
+    aiConfigurationId?: string | undefined;
+    temperature?: number | undefined;
+    maxTokens?: number | undefined;
+
+    constructor(data?: IGenericAiRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.inputText = _data["inputText"];
+            this.systemPrompt = _data["systemPrompt"];
+            this.context = _data["context"];
+            this.jsonSchema = _data["jsonSchema"];
+            this.aiConfigurationId = _data["aiConfigurationId"];
+            this.temperature = _data["temperature"];
+            this.maxTokens = _data["maxTokens"];
+        }
+    }
+
+    static fromJS(data: any): GenericAiRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GenericAiRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["inputText"] = this.inputText;
+        data["systemPrompt"] = this.systemPrompt;
+        data["context"] = this.context;
+        data["jsonSchema"] = this.jsonSchema;
+        data["aiConfigurationId"] = this.aiConfigurationId;
+        data["temperature"] = this.temperature;
+        data["maxTokens"] = this.maxTokens;
+        return data;
+    }
+}
+
+export interface IGenericAiRequestDto {
+    inputText: string;
+    systemPrompt?: string | undefined;
+    context?: string | undefined;
+    jsonSchema?: string | undefined;
+    aiConfigurationId?: string | undefined;
+    temperature?: number | undefined;
+    maxTokens?: number | undefined;
+}
+
+export class GenericAiResponseDto implements IGenericAiResponseDto {
+    response?: string | undefined;
+    tokensUsed?: number;
+    model?: string | undefined;
+    success?: boolean;
+    errorMessage?: string | undefined;
+    isStructuredOutput?: boolean;
+    generatedAt?: Date;
+
+    constructor(data?: IGenericAiResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.response = _data["response"];
+            this.tokensUsed = _data["tokensUsed"];
+            this.model = _data["model"];
+            this.success = _data["success"];
+            this.errorMessage = _data["errorMessage"];
+            this.isStructuredOutput = _data["isStructuredOutput"];
+            this.generatedAt = _data["generatedAt"] ? new Date(_data["generatedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GenericAiResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GenericAiResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["response"] = this.response;
+        data["tokensUsed"] = this.tokensUsed;
+        data["model"] = this.model;
+        data["success"] = this.success;
+        data["errorMessage"] = this.errorMessage;
+        data["isStructuredOutput"] = this.isStructuredOutput;
+        data["generatedAt"] = this.generatedAt ? this.generatedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGenericAiResponseDto {
+    response?: string | undefined;
+    tokensUsed?: number;
+    model?: string | undefined;
+    success?: boolean;
+    errorMessage?: string | undefined;
+    isStructuredOutput?: boolean;
+    generatedAt?: Date;
+}
+
+export class GenericAiResponseDtoApiResponse implements IGenericAiResponseDtoApiResponse {
+    success?: boolean;
+    data?: GenericAiResponseDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IGenericAiResponseDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? GenericAiResponseDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): GenericAiResponseDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GenericAiResponseDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IGenericAiResponseDtoApiResponse {
+    success?: boolean;
+    data?: GenericAiResponseDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class Int32ApiResponse implements IInt32ApiResponse {
