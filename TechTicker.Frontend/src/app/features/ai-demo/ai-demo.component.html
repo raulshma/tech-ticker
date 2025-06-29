@@ -1,226 +1,384 @@
 <div class="ai-demo-container">
-  <div class="demo-header">
-    <h1>
-      <mat-icon>smart_toy</mat-icon>
-      AI Assistant Demo
-    </h1>
-    <p class="demo-description">
-      Explore different configurations of the reusable AI Assistant component. 
-      Each tab demonstrates a specific use case with tailored settings.
-    </p>
-    
-    <!-- Statistics -->
-    <div class="demo-stats" *ngIf="getResultsCount() > 0">
-      <div class="stat-card">
-        <mat-icon>analytics</mat-icon>
-        <div class="stat-content">
-          <span class="stat-value">{{ getResultsCount() }}</span>
-          <span class="stat-label">Total Requests</span>
+  <!-- Modern Welcome Header Section -->
+  <header class="welcome-section">
+    <div class="welcome-content">
+      <div class="header-main">
+        <div class="title-section">
+          <h1 class="mat-display-medium">AI Assistant Demo</h1>
+          <p class="mat-body-large welcome-subtitle">Explore different AI assistant configurations and capabilities</p>
         </div>
-      </div>
-      <div class="stat-card">
-        <mat-icon>check_circle</mat-icon>
-        <div class="stat-content">
-          <span class="stat-value">{{ getSuccessfulResults() }}</span>
-          <span class="stat-label">Successful</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <mat-icon>token</mat-icon>
-        <div class="stat-content">
-          <span class="stat-value">{{ getTotalTokensUsed() }}</span>
-          <span class="stat-label">Tokens Used</span>
+        <div class="header-stats">
+          <mat-chip class="stat-chip">
+            <mat-icon>psychology</mat-icon>
+            {{ totalRequests }} Requests
+          </mat-chip>
+          <mat-chip class="stat-chip">
+            <mat-icon>check_circle</mat-icon>
+            {{ successfulRequests }} Successful
+          </mat-chip>
         </div>
       </div>
     </div>
-  </div>
+  </header>
 
-  <mat-tab-group class="demo-tabs" animationDuration="300ms">
-    <!-- General AI Assistant Tab -->
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon>help</mat-icon>
-        General Assistant
-      </ng-template>
-      <div class="tab-content">
-        <div class="tab-description">
-          <h3>General Purpose AI Assistant</h3>
-          <p>
-            A versatile AI assistant with full customization options. Users can provide JSON schemas 
-            for structured responses, adjust temperature settings, and select different AI configurations.
-          </p>
-          <div class="features-list">
-            <span class="feature-chip">JSON Schema Support</span>
-            <span class="feature-chip">Advanced Options</span>
-            <span class="feature-chip">Configuration Selection</span>
-            <span class="feature-chip">Custom System Prompts</span>
+  <!-- Enhanced Statistics Overview -->
+  <section class="stats-section" aria-label="Demo Statistics">
+    <div class="stats-grid">
+      <mat-card class="stat-card total-requests" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon primary-surface">
+              <mat-icon aria-hidden="true">auto_awesome</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ totalRequests }}</h3>
+              <p class="mat-body-medium stat-label">Total Requests</p>
+            </div>
           </div>
-        </div>
-        
-        <app-ai-assistant
-          [config]="generalConfig"
-          (result)="onResult('general', $event)"
-          (loading)="onLoading('general', $event)">
-        </app-ai-assistant>
-      </div>
-    </mat-tab>
+        </mat-card-content>
+      </mat-card>
 
-    <!-- Code Assistant Tab -->
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon>code</mat-icon>
-        Code Assistant
-      </ng-template>
-      <div class="tab-content">
-        <div class="tab-description">
-          <h3>Code Generation Assistant</h3>
-          <p>
-            Specialized for generating clean, well-documented code. Includes a predefined JSON schema 
-            to structure the response with code, language, explanation, and dependencies.
-          </p>
-          <div class="features-list">
-            <span class="feature-chip">Structured Code Output</span>
-            <span class="feature-chip">Language Detection</span>
-            <span class="feature-chip">Code Explanations</span>
-            <span class="feature-chip">Dependency Tracking</span>
+      <mat-card class="stat-card successful-requests" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon success-surface">
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ successfulRequests }}</h3>
+              <p class="mat-body-medium stat-label">Successful</p>
+            </div>
           </div>
-          <div class="example-prompts">
-            <strong>Try these prompts:</strong>
-            <ul>
-              <li>"Create a React component for a todo list"</li>
-              <li>"Write a Python function to calculate Fibonacci numbers"</li>
-              <li>"Generate a SQL query to find top 10 customers by revenue"</li>
-            </ul>
-          </div>
-        </div>
-        
-        <app-ai-assistant
-          [config]="codeConfig"
-          (result)="onResult('code', $event)"
-          (loading)="onLoading('code', $event)">
-        </app-ai-assistant>
-      </div>
-    </mat-tab>
+        </mat-card-content>
+      </mat-card>
 
-    <!-- Data Analysis Tab -->
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon>analytics</mat-icon>
-        Data Analysis
-      </ng-template>
-      <div class="tab-content">
-        <div class="tab-description">
-          <h3>Data Analysis Assistant</h3>
-          <p>
-            Designed for analyzing data and providing insights. Uses a structured schema to deliver 
-            summaries, key insights, actionable recommendations, and confidence levels.
-          </p>
-          <div class="features-list">
-            <span class="feature-chip">Data Insights</span>
-            <span class="feature-chip">Recommendations</span>
-            <span class="feature-chip">Confidence Scoring</span>
-            <span class="feature-chip">Structured Analysis</span>
+      <mat-card class="stat-card success-rate" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon secondary-surface">
+              <mat-icon aria-hidden="true">trending_up</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ getSuccessRate() }}%</h3>
+              <p class="mat-body-medium stat-label">Success Rate</p>
+            </div>
           </div>
-          <div class="example-prompts">
-            <strong>Try these prompts:</strong>
-            <ul>
-              <li>"Analyze sales data: Q1: $100k, Q2: $150k, Q3: $120k, Q4: $180k"</li>
-              <li>"What insights can you provide about user engagement metrics?"</li>
-              <li>"Analyze this customer feedback and suggest improvements"</li>
-            </ul>
-          </div>
-        </div>
-        
-        <app-ai-assistant
-          [config]="analysisConfig"
-          (result)="onResult('analysis', $event)"
-          (loading)="onLoading('analysis', $event)">
-        </app-ai-assistant>
-      </div>
-    </mat-tab>
+        </mat-card-content>
+      </mat-card>
 
-    <!-- Content Writing Tab -->
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon>edit</mat-icon>
-        Content Writer
-      </ng-template>
-      <div class="tab-content">
-        <div class="tab-description">
-          <h3>Content Writing Assistant</h3>
-          <p>
-            Optimized for creating engaging content. Focuses on natural language output without 
-            structured schemas, perfect for blog posts, marketing copy, and creative writing.
-          </p>
-          <div class="features-list">
-            <span class="feature-chip">Creative Writing</span>
-            <span class="feature-chip">Marketing Copy</span>
-            <span class="feature-chip">Blog Posts</span>
-            <span class="feature-chip">Natural Language</span>
+      <mat-card class="stat-card active-demo" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon info-surface">
+              <mat-icon aria-hidden="true">tab</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ selectedTabIndex + 1 }}</h3>
+              <p class="mat-body-medium stat-label">Active Demo</p>
+            </div>
           </div>
-          <div class="example-prompts">
-            <strong>Try these prompts:</strong>
-            <ul>
-              <li>"Write a blog post about the benefits of AI in healthcare"</li>
-              <li>"Create marketing copy for a new productivity app"</li>
-              <li>"Write a product description for wireless headphones"</li>
-            </ul>
-          </div>
-        </div>
-        
-        <app-ai-assistant
-          [config]="writingConfig"
-          (result)="onResult('writing', $event)"
-          (loading)="onLoading('writing', $event)">
-        </app-ai-assistant>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
 
-  <!-- Usage Instructions -->
-  <mat-card class="usage-instructions">
-    <mat-card-header>
-      <mat-card-title>
-        <mat-icon>info</mat-icon>
-        How to Use the AI Assistant Component
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="instructions-grid">
-        <div class="instruction-item">
-          <h4>1. Import the Component</h4>
-          <pre><code>import &#123; AiAssistantComponent &#125; from './shared/components/ai-assistant/ai-assistant.component';</code></pre>
-        </div>
-        
-        <div class="instruction-item">
-          <h4>2. Configure the Assistant</h4>
-          <pre><code>config: AiAssistantConfig = &#123;
-  title: 'My AI Assistant',
-  placeholder: 'Enter your prompt...',
-  systemPrompt: 'You are a helpful assistant',
-  showJsonSchema: true,
-  showAdvancedOptions: true
-&#125;;</code></pre>
-        </div>
-        
-        <div class="instruction-item">
-          <h4>3. Use in Template</h4>
-          <pre><code>&lt;app-ai-assistant
-  [config]="config"
+  <!-- Main Demo Section -->
+  <section class="demo-section" aria-label="AI Assistant Demos">
+    <mat-card class="demo-card" appearance="outlined">
+      <mat-card-header class="demo-header">
+        <mat-card-title class="mat-headline-large">
+          <mat-icon class="title-icon">smart_toy</mat-icon>
+          AI Assistant Configurations
+        </mat-card-title>
+        <mat-card-subtitle class="mat-body-large">
+          Try different AI assistant setups with various configurations and use cases
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="demo-content">
+        <!-- Enhanced Tab Navigation -->
+        <mat-tab-group class="demo-tabs" 
+                       [(selectedIndex)]="selectedTabIndex"
+                       (selectedTabChange)="onTabChange($event)"
+                       mat-stretch-tabs="false"
+                       animationDuration="300ms">
+
+          <!-- General Purpose AI Tab -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <div class="tab-label">
+                <mat-icon>auto_awesome</mat-icon>
+                <span>General Purpose</span>
+              </div>
+            </ng-template>
+            
+            <div class="tab-content">
+              <div class="tab-description">
+                <h3 class="mat-title-large">General Purpose AI Assistant</h3>
+                <p class="mat-body-medium">
+                  A versatile AI assistant with full customization options. Perfect for general queries, 
+                  creative tasks, and exploratory conversations.
+                </p>
+                <div class="feature-chips">
+                  <mat-chip class="feature-chip">
+                    <mat-icon>tune</mat-icon>
+                    Full Customization
+                  </mat-chip>
+                  <mat-chip class="feature-chip">
+                    <mat-icon>psychology</mat-icon>
+                    Custom System Prompts
+                  </mat-chip>
+                  <mat-chip class="feature-chip">
+                    <mat-icon>thermostat</mat-icon>
+                    Temperature Control
+                  </mat-chip>
+                </div>
+              </div>
+              
+              <app-ai-assistant 
+                [config]="generalConfig"
+                (result)="onResult($event, 'general')"
+                (loading)="onLoading($event, 'general')">
+              </app-ai-assistant>
+            </div>
+          </mat-tab>
+
+          <!-- Code Assistant Tab -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <div class="tab-label">
+                <mat-icon>code</mat-icon>
+                <span>Code Assistant</span>
+              </div>
+            </ng-template>
+            
+            <div class="tab-content">
+              <div class="tab-description">
+                <h3 class="mat-title-large">Code Assistant</h3>
+                <p class="mat-body-medium">
+                  Specialized for programming tasks with structured JSON output. Get code suggestions, 
+                  explanations, and best practices in a standardized format.
+                </p>
+                <div class="feature-chips">
+                  <mat-chip class="feature-chip">
+                    <mat-icon>schema</mat-icon>
+                    Structured Output
+                  </mat-chip>
+                  <mat-chip class="feature-chip">
+                    <mat-icon>code</mat-icon>
+                    Code Generation
+                  </mat-chip>
+                  <mat-chip class="feature-chip">
+                    <mat-icon>bug_report</mat-icon>
+                    Error Analysis
+                  </mat-chip>
+                </div>
+              </div>
+              
+              <app-ai-assistant 
+                [config]="codeConfig"
+                (result)="onResult($event, 'code')"
+                (loading)="onLoading($event, 'code')">
+              </app-ai-assistant>
+            </div>
+          </mat-tab>
+
+          <!-- Data Analysis Tab -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <div class="tab-label">
+                <mat-icon>analytics</mat-icon>
+                <span>Data Analysis</span>
+              </div>
+            </ng-template>
+            
+            <div class="tab-content">
+              <div class="tab-description">
+                <h3 class="mat-title-large">Data Analysis Assistant</h3>
+                <p class="mat-body-medium">
+                  Focused on data interpretation and insights with structured recommendations. 
+                  Perfect for business intelligence and analytical tasks.
+                </p>
+                <div class="feature-chips">
+                  <mat-chip class="feature-chip">
+                    <mat-icon>insights</mat-icon>
+                    Data Insights
+                  </mat-chip>
+                  <mat-chip class="feature-chip">
+                    <mat-icon>recommend</mat-icon>
+                    Recommendations
+                  </mat-chip>
+                  <mat-chip class="feature-chip">
+                    <mat-icon>assessment</mat-icon>
+                    Metrics Analysis
+                  </mat-chip>
+                </div>
+              </div>
+              
+              <app-ai-assistant 
+                [config]="dataConfig"
+                (result)="onResult($event, 'data')"
+                (loading)="onLoading($event, 'data')">
+              </app-ai-assistant>
+            </div>
+          </mat-tab>
+
+          <!-- Content Writing Tab -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <div class="tab-label">
+                <mat-icon>edit</mat-icon>
+                <span>Content Writing</span>
+              </div>
+            </ng-template>
+            
+            <div class="tab-content">
+              <div class="tab-description">
+                <h3 class="mat-title-large">Content Writing Assistant</h3>
+                <p class="mat-body-medium">
+                  Optimized for creative writing and content generation. Get help with articles, 
+                  marketing copy, and creative storytelling.
+                </p>
+                <div class="feature-chips">
+                  <mat-chip class="feature-chip">
+                    <mat-icon>create</mat-icon>
+                    Creative Writing
+                  </mat-chip>
+                  <mat-chip class="feature-chip">
+                    <mat-icon>campaign</mat-icon>
+                    Marketing Copy
+                  </mat-chip>
+                  <mat-chip class="feature-chip">
+                    <mat-icon>auto_stories</mat-icon>
+                    Storytelling
+                  </mat-chip>
+                </div>
+              </div>
+              
+              <app-ai-assistant 
+                [config]="contentConfig"
+                (result)="onResult($event, 'content')"
+                (loading)="onLoading($event, 'content')">
+              </app-ai-assistant>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <!-- Usage Instructions Section -->
+  <section class="instructions-section" aria-label="Usage Instructions">
+    <mat-card class="instructions-card" appearance="outlined">
+      <mat-card-header class="instructions-header">
+        <mat-card-title class="mat-headline-large">
+          <mat-icon class="title-icon">help_outline</mat-icon>
+          How to Use the AI Assistant Component
+        </mat-card-title>
+        <mat-card-subtitle class="mat-body-large">
+          Learn how to integrate and customize the AI assistant in your own components
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="instructions-content">
+        <mat-expansion-panel class="instruction-panel" [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="panel-title">
+              <mat-icon class="panel-icon">integration_instructions</mat-icon>
+              <span class="mat-title-large">Basic Integration</span>
+            </mat-panel-title>
+            <mat-panel-description class="mat-body-medium">
+              How to add the AI assistant to your components
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="panel-content">
+            <p class="mat-body-medium instruction-text">
+              Import the AI assistant component and add it to your template with a configuration object:
+            </p>
+            <pre class="code-block"><code>&lt;app-ai-assistant 
+  [config]="myConfig"
   (result)="onResult($event)"
   (loading)="onLoading($event)"&gt;
 &lt;/app-ai-assistant&gt;</code></pre>
-        </div>
-        
-        <div class="instruction-item">
-          <h4>4. Handle Results</h4>
-          <pre><code>onResult(result: AiAssistantResult) &#123;
-  console.log('Response:', result.response);
-  console.log('Tokens used:', result.tokensUsed);
-  console.log('Model:', result.model);
+          </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel class="instruction-panel">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="panel-title">
+              <mat-icon class="panel-icon">settings</mat-icon>
+              <span class="mat-title-large">Configuration Options</span>
+            </mat-panel-title>
+            <mat-panel-description class="mat-body-medium">
+              Available configuration properties and their usage
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="panel-content">
+            <div class="config-grid">
+              <div class="config-item">
+                <h4 class="mat-title-medium config-property">title</h4>
+                <p class="mat-body-medium">Display title for the assistant</p>
+              </div>
+              <div class="config-item">
+                <h4 class="mat-title-medium config-property">subtitle</h4>
+                <p class="mat-body-medium">Subtitle description text</p>
+              </div>
+              <div class="config-item">
+                <h4 class="mat-title-medium config-property">placeholder</h4>
+                <p class="mat-body-medium">Input field placeholder text</p>
+              </div>
+              <div class="config-item">
+                <h4 class="mat-title-medium config-property">defaultSystemPrompt</h4>
+                <p class="mat-body-medium">Default system prompt for AI behavior</p>
+              </div>
+              <div class="config-item">
+                <h4 class="mat-title-medium config-property">defaultJsonSchema</h4>
+                <p class="mat-body-medium">Default JSON schema for structured output</p>
+              </div>
+              <div class="config-item">
+                <h4 class="mat-title-medium config-property">showAdvancedOptions</h4>
+                <p class="mat-body-medium">Show/hide advanced configuration panel</p>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel class="instruction-panel">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="panel-title">
+              <mat-icon class="panel-icon">code</mat-icon>
+              <span class="mat-title-large">Example Implementation</span>
+            </mat-panel-title>
+            <mat-panel-description class="mat-body-medium">
+              Complete example with TypeScript configuration
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="panel-content">
+            <pre class="code-block"><code>export class MyComponent &#123;
+  myConfig: AiAssistantConfig = &#123;
+    title: 'Custom AI Assistant',
+    subtitle: 'Specialized for my use case',
+    placeholder: 'Enter your specific request...',
+    defaultSystemPrompt: 'You are a helpful assistant specialized in...',
+    showAdvancedOptions: true,
+    allowJsonSchema: true
+  &#125;;
+
+  onResult(result: AiAssistantResult) &#123;
+    console.log('AI Response:', result);
+    // Handle the AI response
+  &#125;
+
+  onLoading(isLoading: boolean) &#123;
+    // Handle loading state
+  &#125;
 &#125;</code></pre>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+          </div>
+        </mat-expansion-panel>
+      </mat-card-content>
+    </mat-card>
+  </section>
 </div> 

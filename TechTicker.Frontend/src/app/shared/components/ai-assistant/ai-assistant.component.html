@@ -1,236 +1,241 @@
-<mat-card class="ai-assistant-card">
-  <mat-card-header>
-    <mat-card-title>
-      <mat-icon>smart_toy</mat-icon>
-      {{ effectiveConfig.title }}
-    </mat-card-title>
-  </mat-card-header>
+<div class="ai-assistant-container">
+  <mat-card class="ai-assistant-card" appearance="outlined">
+    <mat-card-header class="assistant-header">
+      <mat-card-title class="mat-headline-large">
+        <mat-icon class="title-icon">{{ config.icon || 'smart_toy' }}</mat-icon>
+        {{ config.title || 'AI Assistant' }}
+      </mat-card-title>
+      <mat-card-subtitle class="mat-body-large">
+        {{ config.subtitle || 'Get AI-powered assistance with your tasks' }}
+      </mat-card-subtitle>
+    </mat-card-header>
 
-  <mat-card-content>
-    <form [formGroup]="aiForm" (ngSubmit)="generateResponse()">
-      <!-- Main Input Area -->
-      <div class="input-section">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ effectiveConfig.placeholder || 'Enter your text here...' }}</mat-label>
-          <textarea
-            matInput
-            formControlName="inputText"
-            [placeholder]="effectiveConfig.placeholder || 'Enter your text here...'"
-            rows="4"
-            [maxlength]="effectiveConfig.maxInputLength || 10000"
-            [disabled]="disabled || isLoading">
-          </textarea>
-          <mat-hint align="end">
-            {{ aiForm.get('inputText')?.value?.length || 0 }} / {{ effectiveConfig.maxInputLength || 10000 }}
-          </mat-hint>
-          <mat-error *ngIf="aiForm.get('inputText')?.invalid && aiForm.get('inputText')?.touched">
-            {{ getErrorMessage('inputText') }}
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <!-- Configuration Selection -->
-      <div class="config-section" *ngIf="effectiveConfig.allowConfigurationSelection && configurations.length > 0">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>AI Configuration</mat-label>
-          <mat-select formControlName="aiConfigurationId" [disabled]="disabled || isLoading">
-            <mat-option value="">Use Default Configuration</mat-option>
-            <mat-option *ngFor="let config of configurations" [value]="config.aiConfigurationId">
-              {{ config.name }} ({{ config.provider }} - {{ config.model }})
-            </mat-option>
-          </mat-select>
-          <mat-hint>Select specific AI configuration or leave empty for default</mat-hint>
-        </mat-form-field>
-      </div>
-
-      <!-- JSON Schema Section -->
-      <div class="schema-section" *ngIf="effectiveConfig.showJsonSchema">
-        <mat-expansion-panel class="schema-panel">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <mat-icon>code</mat-icon>
-              JSON Schema (Optional)
-            </mat-panel-title>
-            <mat-panel-description>
-              Define structure for AI response
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>JSON Schema</mat-label>
-            <textarea
-              matInput
-              formControlName="jsonSchema"
-              placeholder='{"type": "object", "properties": {"result": {"type": "string"}}}'
-              rows="8"
-              [disabled]="disabled || isLoading">
-            </textarea>
-            <mat-hint>Provide JSON schema for structured output</mat-hint>
-          </mat-form-field>
-
-          <div class="schema-actions">
-            <button 
-              mat-stroked-button 
-              type="button" 
-              (click)="formatJsonSchema()"
-              [disabled]="disabled || isLoading">
-              <mat-icon>auto_fix_high</mat-icon>
-              Format JSON
-            </button>
-          </div>
-        </mat-expansion-panel>
-      </div>
-
-      <!-- Advanced Options -->
-      <div class="advanced-section" *ngIf="effectiveConfig.showAdvancedOptions">
-        <mat-expansion-panel class="advanced-panel">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              <mat-icon>tune</mat-icon>
-              Advanced Options
-            </mat-panel-title>
-            <mat-panel-description>
-              Fine-tune AI behavior
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-
-          <!-- System Prompt -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>System Prompt</mat-label>
-            <textarea
-              matInput
-              formControlName="systemPrompt"
-              placeholder="You are a helpful assistant..."
-              rows="3"
-              [disabled]="disabled || isLoading">
-            </textarea>
-            <mat-hint>Instructions for AI behavior and context</mat-hint>
-          </mat-form-field>
-
-          <!-- Context -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Context</mat-label>
-            <textarea
-              matInput
-              formControlName="context"
-              placeholder="Additional context or background information..."
-              rows="2"
-              [disabled]="disabled || isLoading">
-            </textarea>
-            <mat-hint>Additional context for the AI</mat-hint>
-          </mat-form-field>
-
-          <!-- Temperature Slider -->
-          <div class="slider-section">
-            <label class="slider-label">Temperature: {{ aiForm.get('temperature')?.value }}</label>
-            <mat-slider
-              class="full-width"
-              [min]="0"
-              [max]="2"
-              [step]="0.1"
-              [disabled]="disabled || isLoading">
-              <input matSliderThumb formControlName="temperature">
-            </mat-slider>
-            <div class="slider-hint">
-              <span>More Focused</span>
-              <span>More Creative</span>
-            </div>
-          </div>
-
-          <!-- Max Tokens -->
-          <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Max Tokens</mat-label>
-            <input
-              matInput
-              type="number"
-              formControlName="maxTokens"
-              placeholder="Auto"
-              [min]="1"
-              [max]="8192"
-              [disabled]="disabled || isLoading">
-            <mat-hint>Maximum response length</mat-hint>
-            <mat-error *ngIf="aiForm.get('maxTokens')?.invalid && aiForm.get('maxTokens')?.touched">
-              {{ getErrorMessage('maxTokens') }}
+    <mat-card-content class="assistant-content">
+      <form [formGroup]="assistantForm" (ngSubmit)="onSubmit()" class="modern-form">
+        
+        <!-- Main Input Section -->
+        <div class="input-section">
+          <mat-form-field appearance="outline" class="input-field">
+            <mat-label>{{ config.inputLabel || 'Enter your request' }}</mat-label>
+            <textarea matInput 
+                      formControlName="inputText"
+                      [placeholder]="config.placeholder || 'Type your message here...'"
+                      rows="4"
+                      maxlength="5000"
+                      required></textarea>
+            <mat-icon matSuffix>edit</mat-icon>
+            <mat-error *ngIf="assistantForm.get('inputText')?.hasError('required')">
+              Input text is required
             </mat-error>
+            <mat-error *ngIf="assistantForm.get('inputText')?.hasError('maxlength')">
+              Maximum 5000 characters allowed
+            </mat-error>
+            <mat-hint align="end">
+              {{ assistantForm.get('inputText')?.value?.length || 0 }}/5000
+            </mat-hint>
           </mat-form-field>
+        </div>
+
+        <!-- Advanced Options Expansion Panel -->
+        <mat-expansion-panel class="config-panel" *ngIf="config.showAdvancedOptions !== false">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="panel-title">
+              <mat-icon class="panel-icon">tune</mat-icon>
+              <span class="mat-title-large">Advanced Options</span>
+            </mat-panel-title>
+            <mat-panel-description class="mat-body-medium">
+              Customize AI behavior and output format
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="panel-content">
+            <div class="form-grid">
+              <!-- AI Configuration Selection -->
+              <mat-form-field appearance="outline" class="field-full" *ngIf="aiConfigurations.length > 0">
+                <mat-label>AI Configuration</mat-label>
+                <mat-select formControlName="aiConfigurationId">
+                  <mat-option [value]="null">Use Default Configuration</mat-option>
+                  <mat-option *ngFor="let config of aiConfigurations" [value]="config.aiConfigurationId">
+                    {{ config.name }} ({{ config.model }})
+                  </mat-option>
+                </mat-select>
+                <mat-icon matSuffix>settings</mat-icon>
+                <mat-hint>Select a specific AI configuration or use default</mat-hint>
+              </mat-form-field>
+
+              <!-- System Prompt -->
+              <mat-form-field appearance="outline" class="field-full" *ngIf="config.allowSystemPrompt !== false">
+                <mat-label>System Prompt</mat-label>
+                <textarea matInput 
+                          formControlName="systemPrompt"
+                          [placeholder]="config.defaultSystemPrompt || 'You are a helpful AI assistant...'"
+                          rows="3"
+                          maxlength="1000"></textarea>
+                <mat-icon matSuffix>psychology</mat-icon>
+                <mat-hint>Define the AI's role and behavior</mat-hint>
+              </mat-form-field>
+
+              <!-- Context -->
+              <mat-form-field appearance="outline" class="field-full" *ngIf="config.allowContext !== false">
+                <mat-label>Context</mat-label>
+                <textarea matInput 
+                          formControlName="context"
+                          placeholder="Additional context or background information..."
+                          rows="2"
+                          maxlength="2000"></textarea>
+                <mat-icon matSuffix>info</mat-icon>
+                <mat-hint>Provide additional context for better responses</mat-hint>
+              </mat-form-field>
+
+              <!-- Temperature and Max Tokens -->
+              <div class="slider-controls">
+                <div class="slider-field">
+                  <label class="mat-body-medium slider-label">
+                    <mat-icon>thermostat</mat-icon>
+                    Temperature: {{ assistantForm.get('temperature')?.value }}
+                  </label>
+                  <mat-slider min="0" max="1" step="0.1" discrete>
+                    <input matSliderThumb formControlName="temperature">
+                  </mat-slider>
+                  <div class="slider-hint mat-caption">
+                    Controls randomness (0 = focused, 1 = creative)
+                  </div>
+                </div>
+
+                <div class="slider-field">
+                  <label class="mat-body-medium slider-label">
+                    <mat-icon>format_size</mat-icon>
+                    Max Tokens: {{ assistantForm.get('maxTokens')?.value }}
+                  </label>
+                  <mat-slider min="100" max="4000" step="100" discrete>
+                    <input matSliderThumb formControlName="maxTokens">
+                  </mat-slider>
+                  <div class="slider-hint mat-caption">
+                    Maximum response length
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </mat-expansion-panel>
-      </div>
 
-      <!-- Action Buttons -->
-      <div class="action-section">
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          [disabled]="aiForm.invalid || disabled || isLoading"
-          class="generate-button">
-          <mat-icon *ngIf="!isLoading">auto_awesome</mat-icon>
-          <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
-          {{ isLoading ? 'Generating...' : effectiveConfig.buttonText }}
-        </button>
+        <!-- JSON Schema Expansion Panel -->
+        <mat-expansion-panel class="config-panel" *ngIf="config.allowJsonSchema !== false">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="panel-title">
+              <mat-icon class="panel-icon">code</mat-icon>
+              <span class="mat-title-large">Structured Output</span>
+            </mat-panel-title>
+            <mat-panel-description class="mat-body-medium">
+              Define JSON schema for structured responses
+            </mat-panel-description>
+          </mat-expansion-panel-header>
 
-        <button
-          mat-stroked-button
-          type="button"
-          (click)="clearForm()"
-          [disabled]="disabled || isLoading"
-          class="clear-button">
-          <mat-icon>clear</mat-icon>
-          Clear
-        </button>
-      </div>
-    </form>
+          <div class="panel-content">
+            <mat-form-field appearance="outline" class="field-full">
+              <mat-label>JSON Schema (Optional)</mat-label>
+              <textarea matInput 
+                        formControlName="jsonSchema"
+                        [placeholder]="config.defaultJsonSchema || getJsonSchemaPlaceholder()"
+                        rows="8"
+                        maxlength="10000"></textarea>
+              <mat-icon matSuffix>schema</mat-icon>
+              <mat-error *ngIf="assistantForm.get('jsonSchema')?.hasError('invalidJson')">
+                Invalid JSON format
+              </mat-error>
+              <mat-hint>Define the structure for AI responses (JSON Schema format)</mat-hint>
+            </mat-form-field>
+          </div>
+        </mat-expansion-panel>
 
-    <!-- Results Section -->
-    <div class="results-section" *ngIf="showResult">
-      <mat-card class="result-card" [ngClass]="{'error-card': !lastResult?.success}">
-        <mat-card-header>
-          <mat-card-title class="result-title">
-            <mat-icon [color]="lastResult?.success ? 'primary' : 'warn'">
-              {{ lastResult?.success ? 'check_circle' : 'error' }}
-            </mat-icon>
-            {{ lastResult?.success ? 'AI Response' : 'Error' }}
-          </mat-card-title>
-          <div class="result-actions" *ngIf="lastResult?.success">
-            <button
-              mat-icon-button
-              (click)="copyResponse()"
-              matTooltip="Copy to clipboard">
-              <mat-icon>content_copy</mat-icon>
+        <!-- Action Buttons -->
+        <div class="action-section">
+          <div class="action-buttons">
+            <button mat-raised-button 
+                    color="primary" 
+                    type="submit"
+                    [disabled]="assistantForm.invalid || isLoading"
+                    class="primary-action-btn">
+              <mat-spinner diameter="20" *ngIf="isLoading" class="btn-spinner"></mat-spinner>
+              <mat-icon *ngIf="!isLoading">send</mat-icon>
+              {{ isLoading ? 'Processing...' : 'Generate Response' }}
+            </button>
+            
+            <button mat-outlined-button 
+                    type="button"
+                    (click)="clearForm()"
+                    [disabled]="isLoading"
+                    class="secondary-action-btn">
+              <mat-icon>clear</mat-icon>
+              Clear
             </button>
           </div>
-        </mat-card-header>
+        </div>
+      </form>
 
-        <mat-card-content>
-          <div class="response-content" *ngIf="lastResult?.success">
-            <pre class="response-text" [ngClass]="{'json-response': isJsonResponse}">{{ formattedResponse }}</pre>
-          </div>
-          
-          <div class="error-content" *ngIf="!lastResult?.success">
-            <p class="error-message">{{ lastResult?.errorMessage }}</p>
-          </div>
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-container" role="status" aria-live="polite">
+        <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>
+        <p class="mat-body-medium loading-text">AI is processing your request...</p>
+      </div>
 
-          <!-- Metadata -->
-          <div class="response-metadata" *ngIf="lastResult?.success">
-            <div class="metadata-row">
-              <span class="metadata-label">Model:</span>
-              <span class="metadata-value">{{ lastResult?.model }}</span>
+      <!-- Results Section -->
+      <div *ngIf="lastResult" class="results-section">
+        <mat-card class="result-card" appearance="outlined">
+          <mat-card-header class="result-header">
+            <mat-card-title class="mat-headline-medium">
+              <mat-icon class="result-icon" [class.success]="lastResult.success" [class.error]="!lastResult.success">
+                {{ lastResult.success ? 'check_circle' : 'error' }}
+              </mat-icon>
+              AI Response
+            </mat-card-title>
+            <mat-card-subtitle class="mat-body-medium">
+              Generated {{ lastResult.generatedAt | date:'medium' }}
+              <span *ngIf="lastResult.model"> • {{ lastResult.model }}</span>
+              <span *ngIf="lastResult.tokensUsed"> • {{ lastResult.tokensUsed }} tokens</span>
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content class="result-content">
+            <div *ngIf="lastResult.success" class="response-container">
+              <div class="response-header">
+                <div class="response-meta">
+                  <mat-chip class="meta-chip" *ngIf="lastResult.isStructuredOutput">
+                    <mat-icon>schema</mat-icon>
+                    Structured Output
+                  </mat-chip>
+                  <mat-chip class="meta-chip" *ngIf="!lastResult.isStructuredOutput">
+                    <mat-icon>text_fields</mat-icon>
+                    Natural Language
+                  </mat-chip>
+                </div>
+                <div class="response-actions">
+                  <button mat-icon-button 
+                          (click)="copyResponse()"
+                          matTooltip="Copy response">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="response-content">
+                <pre *ngIf="lastResult.isStructuredOutput" class="structured-response">{{ formatJsonResponse(lastResult.response) }}</pre>
+                <div *ngIf="!lastResult.isStructuredOutput" class="natural-response" [innerHTML]="formatNaturalResponse(lastResult.response)"></div>
+              </div>
             </div>
-            <div class="metadata-row">
-              <span class="metadata-label">Tokens Used:</span>
-              <span class="metadata-value">{{ lastResult?.tokensUsed }}</span>
+
+            <div *ngIf="!lastResult.success" class="error-response">
+              <div class="error-content">
+                <mat-icon class="error-icon">warning</mat-icon>
+                <div class="error-text">
+                  <h4 class="mat-title-medium">Request Failed</h4>
+                  <p class="mat-body-medium">{{ lastResult.errorMessage }}</p>
+                </div>
+              </div>
             </div>
-            <div class="metadata-row">
-              <span class="metadata-label">Generated:</span>
-              <span class="metadata-value">{{ lastResult?.generatedAt | date:'medium' }}</span>
-            </div>
-            <div class="metadata-row" *ngIf="lastResult?.isStructuredOutput">
-              <span class="metadata-label">Type:</span>
-              <span class="metadata-value structured-badge">Structured JSON</span>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </mat-card-content>
-</mat-card> 
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div> 

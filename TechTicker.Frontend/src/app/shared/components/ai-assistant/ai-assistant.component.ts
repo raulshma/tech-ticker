@@ -1,16 +1,18 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSelectModule } from '@angular/material/select';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { 
   TechTickerApiClient, 
@@ -21,11 +23,16 @@ import {
 
 export interface AiAssistantConfig {
   title?: string;
+  subtitle?: string;
+  icon?: string;
+  inputLabel?: string;
   placeholder?: string;
-  systemPrompt?: string;
+  defaultSystemPrompt?: string;
   defaultJsonSchema?: string;
-  showJsonSchema?: boolean;
+  allowJsonSchema?: boolean;
   showAdvancedOptions?: boolean;
+  allowSystemPrompt?: boolean;
+  allowContext?: boolean;
   allowConfigurationSelection?: boolean;
   maxInputLength?: number;
   buttonText?: string;
@@ -55,10 +62,12 @@ export interface AiAssistantResult {
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatProgressBarModule,
     MatSliderModule,
     MatSelectModule,
     MatExpansionModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatChipsModule
   ]
 })
 export class AiAssistantComponent implements OnInit {
@@ -67,19 +76,24 @@ export class AiAssistantComponent implements OnInit {
   @Output() result = new EventEmitter<AiAssistantResult>();
   @Output() loading = new EventEmitter<boolean>();
 
-  aiForm: FormGroup;
+  assistantForm: FormGroup;
   isLoading = false;
-  configurations: AiConfigurationDto[] = [];
+  aiConfigurations: AiConfigurationDto[] = [];
   lastResult: AiAssistantResult | null = null;
 
   // Default configuration
   defaultConfig: AiAssistantConfig = {
     title: 'AI Assistant',
-    placeholder: 'Enter your text here...',
-    showJsonSchema: true,
+    subtitle: 'Get AI-powered assistance with your tasks',
+    icon: 'smart_toy',
+    inputLabel: 'Enter your request',
+    placeholder: 'Type your message here...',
+    allowJsonSchema: true,
     showAdvancedOptions: true,
+    allowSystemPrompt: true,
+    allowContext: true,
     allowConfigurationSelection: true,
-    maxInputLength: 10000,
+    maxInputLength: 5000,
     buttonText: 'Generate Response'
   };
 
@@ -88,7 +102,7 @@ export class AiAssistantComponent implements OnInit {
     private apiClient: TechTickerApiClient,
     private snackBar: MatSnackBar
   ) {
-    this.aiForm = this.createForm();
+    this.assistantForm = this.createForm();
   }
 
   ngOnInit(): void {
@@ -106,26 +120,39 @@ export class AiAssistantComponent implements OnInit {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      inputText: ['', [Validators.required, Validators.minLength(1)]],
-      systemPrompt: [''],
-      context: [''],
-      jsonSchema: [''],
-      aiConfigurationId: [''],
-      temperature: [0.7, [Validators.min(0), Validators.max(2)]],
-      maxTokens: [null, [Validators.min(1), Validators.max(8192)]]
+      inputText: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(5000)]],
+      systemPrompt: ['', [Validators.maxLength(1000)]],
+      context: ['', [Validators.maxLength(2000)]],
+      jsonSchema: ['', [this.jsonSchemaValidator]],
+      aiConfigurationId: [null],
+      temperature: [0.7, [Validators.min(0), Validators.max(1)]],
+      maxTokens: [1000, [Validators.min(100), Validators.max(4000)]]
     });
   }
 
+  private jsonSchemaValidator(control: AbstractControl): { [key: string]: any } | null {
+    if (!control.value) {
+      return null; // Allow empty values
+    }
+    
+    try {
+      JSON.parse(control.value);
+      return null;
+    } catch (error) {
+      return { invalidJson: true };
+    }
+  }
+
   private updateFormWithConfig(): void {
-    if (this.config.systemPrompt) {
-      this.aiForm.patchValue({ systemPrompt: this.config.systemPrompt });
+    if (this.config.defaultSystemPrompt) {
+      this.assistantForm.patchValue({ systemPrompt: this.config.defaultSystemPrompt });
     }
     if (this.config.defaultJsonSchema) {
-      this.aiForm.patchValue({ jsonSchema: this.config.defaultJsonSchema });
+      this.assistantForm.patchValue({ jsonSchema: this.config.defaultJsonSchema });
     }
     
     // Update validators based on config
-    const inputTextControl = this.aiForm.get('inputText');
+    const inputTextControl = this.assistantForm.get('inputText');
     if (inputTextControl && this.config.maxInputLength) {
       inputTextControl.setValidators([
         Validators.required,
@@ -139,14 +166,14 @@ export class AiAssistantComponent implements OnInit {
   private async loadConfigurations(): Promise<void> {
     try {
       const result = await this.apiClient.getActiveConfigurations().toPromise();
-      this.configurations = result?.data || [];
+      this.aiConfigurations = result?.data || [];
     } catch (error) {
       console.error('Error loading AI configurations:', error);
     }
   }
 
-  async generateResponse(): Promise<void> {
-    if (this.aiForm.invalid || this.disabled) {
+  async onSubmit(): Promise<void> {
+    if (this.assistantForm.invalid || this.disabled) {
       return;
     }
 
@@ -154,11 +181,11 @@ export class AiAssistantComponent implements OnInit {
     this.loading.emit(true);
 
     try {
-      const formValue = this.aiForm.value;
+      const formValue = this.assistantForm.value;
       
       const request = new GenericAiRequestDto({
         inputText: formValue.inputText,
-        systemPrompt: formValue.systemPrompt || this.config.systemPrompt,
+        systemPrompt: formValue.systemPrompt || this.config.defaultSystemPrompt,
         context: formValue.context,
         jsonSchema: formValue.jsonSchema || this.config.defaultJsonSchema,
         aiConfigurationId: formValue.aiConfigurationId || undefined,
@@ -200,14 +227,14 @@ export class AiAssistantComponent implements OnInit {
           success: false,
           errorMessage: errorMessage
         };
-        
+
         this.lastResult = errorResult;
         this.result.emit(errorResult);
       }
     } catch (error: any) {
       console.error('Error generating AI response:', error);
       const errorMessage = error?.message || 'An unexpected error occurred';
-      this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
+      this.snackBar.open(`Error: ${errorMessage}`, 'Close', { duration: 5000 });
       
       const errorResult: AiAssistantResult = {
         response: '',
@@ -218,7 +245,7 @@ export class AiAssistantComponent implements OnInit {
         success: false,
         errorMessage: errorMessage
       };
-      
+
       this.lastResult = errorResult;
       this.result.emit(errorResult);
     } finally {
@@ -228,81 +255,86 @@ export class AiAssistantComponent implements OnInit {
   }
 
   clearForm(): void {
-    this.aiForm.reset({
+    this.assistantForm.reset({
       temperature: 0.7,
-      systemPrompt: this.config.systemPrompt || '',
-      jsonSchema: this.config.defaultJsonSchema || ''
+      maxTokens: 1000
     });
     this.lastResult = null;
+    
+    // Reapply config defaults
+    this.updateFormWithConfig();
   }
 
   copyResponse(): void {
     if (this.lastResult?.response) {
       navigator.clipboard.writeText(this.lastResult.response).then(() => {
         this.snackBar.open('Response copied to clipboard', 'Close', { duration: 2000 });
-      }).catch(() => {
-        this.snackBar.open('Failed to copy to clipboard', 'Close', { duration: 3000 });
+      }).catch(err => {
+        console.error('Failed to copy response:', err);
+        this.snackBar.open('Failed to copy response', 'Close', { duration: 2000 });
       });
     }
   }
 
-  formatJsonSchema(): void {
-    const jsonSchemaControl = this.aiForm.get('jsonSchema');
-    if (jsonSchemaControl?.value) {
-      try {
-        const parsed = JSON.parse(jsonSchemaControl.value);
-        const formatted = JSON.stringify(parsed, null, 2);
-        jsonSchemaControl.setValue(formatted);
-      } catch (error) {
-        this.snackBar.open('Invalid JSON schema format', 'Close', { duration: 3000 });
-      }
+  getJsonSchemaPlaceholder(): string {
+    return `{
+  "type": "object",
+  "properties": {
+    "result": {
+      "type": "string",
+      "description": "The main response"
+    },
+    "confidence": {
+      "type": "number",
+      "description": "Confidence level (0-1)"
     }
+  },
+  "required": ["result"]
+}`;
+  }
+
+  formatJsonResponse(response: string): string {
+    try {
+      const parsed = JSON.parse(response);
+      return JSON.stringify(parsed, null, 2);
+    } catch (error) {
+      return response;
+    }
+  }
+
+  formatNaturalResponse(response: string): string {
+    // Convert markdown-like formatting to HTML
+    return response
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`(.*?)`/g, '<code>$1</code>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>')
+      .replace(/^(.*)$/, '<p>$1</p>');
   }
 
   getErrorMessage(fieldName: string): string {
-    const control = this.aiForm.get(fieldName);
-    if (control?.hasError('required')) {
-      return `${fieldName} is required`;
-    }
-    if (control?.hasError('minlength')) {
-      return `${fieldName} is too short`;
-    }
-    if (control?.hasError('maxlength')) {
-      return `${fieldName} is too long`;
-    }
-    if (control?.hasError('min')) {
-      return `${fieldName} value is too low`;
-    }
-    if (control?.hasError('max')) {
-      return `${fieldName} value is too high`;
-    }
-    return '';
-  }
-
-  get effectiveConfig(): AiAssistantConfig {
-    return this.config;
-  }
-
-  get showResult(): boolean {
-    return this.lastResult !== null;
-  }
-
-  get isJsonResponse(): boolean {
-    return this.lastResult?.isStructuredOutput || false;
-  }
-
-  get formattedResponse(): string {
-    if (!this.lastResult?.response) return '';
-    
-    if (this.isJsonResponse) {
-      try {
-        const parsed = JSON.parse(this.lastResult.response);
-        return JSON.stringify(parsed, null, 2);
-      } catch {
-        return this.lastResult.response;
+    const control = this.assistantForm.get(fieldName);
+    if (control?.errors) {
+      if (control.errors['required']) {
+        return `${fieldName} is required`;
+      }
+      if (control.errors['minlength']) {
+        return `${fieldName} is too short`;
+      }
+      if (control.errors['maxlength']) {
+        return `${fieldName} is too long`;
+      }
+      if (control.errors['min']) {
+        return `${fieldName} value is too low`;
+      }
+      if (control.errors['max']) {
+        return `${fieldName} value is too high`;
+      }
+      if (control.errors['invalidJson']) {
+        return 'Invalid JSON format';
       }
     }
-    
-    return this.lastResult.response;
+    return '';
   }
 } 
