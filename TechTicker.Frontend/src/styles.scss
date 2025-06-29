@@ -1,3 +1,4 @@
+@use 'sass:map';
 @use "@angular/material" as mat;
 @use "./themes/_theme-colors.scss" as theme-colors;
 
@@ -21,6 +22,7 @@ html, body {
         secondary: theme-colors.$secondary-palette,
         tertiary: theme-colors.$tertiary-palette,
         background: theme-colors.$background-palette,
+        surface: map.get(theme-colors.$background-palette, 98),
       ),
       typography: (
         plain-family: 'Roboto',
@@ -41,6 +43,7 @@ html, body {
         secondary: theme-colors.$secondary-palette-dark,
         tertiary: theme-colors.$tertiary-palette-dark,
         background: theme-colors.$background-palette-dark,
+        surface: map.get(theme-colors.$background-palette-dark, 10),
       ),
       typography: (
         plain-family: 'Roboto',
