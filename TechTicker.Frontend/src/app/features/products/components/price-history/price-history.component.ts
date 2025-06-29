@@ -16,13 +16,15 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  LineController
 } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 // Register Chart.js components
 Chart.register(
+  LineController,
   CategoryScale,
   LinearScale,
   PointElement,
