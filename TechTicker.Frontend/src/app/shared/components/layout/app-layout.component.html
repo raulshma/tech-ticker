@@ -1,6 +1,13 @@
 <mat-sidenav-container class="sidenav-container">
   <!-- Sidebar -->
-  <mat-sidenav #drawer class="sidenav modern-sidenav" fixedInViewport="true" mode="side" opened="true">
+  <mat-sidenav #drawer 
+               class="sidenav modern-sidenav" 
+               fixedInViewport="true" 
+               [mode]="isMobile ? 'over' : 'side'" 
+               [opened]="!isMobile" 
+               [disableClose]="!isMobile"
+               (backdropClick)="closeSidenavOnMobile()"
+               (openedChange)="onSidenavStateChange($event)">
     <!-- Brand Header -->
     <div class="sidenav-header">
       <div class="brand-container">
@@ -275,6 +282,13 @@
     <mat-toolbar color="primary" class="main-toolbar">
       <div class="toolbar-content">
         <div class="toolbar-start">
+          <button mat-icon-button 
+                  class="menu-button"
+                  (click)="toggleSidenav()"
+                  *ngIf="isMobile"
+                  [attr.aria-label]="'Toggle navigation menu'">
+            <mat-icon>menu</mat-icon>
+          </button>
           <span class="toolbar-title">TechTicker</span>
         </div>
 

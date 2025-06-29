@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Component, OnInit, OnDestroy, ViewChild, HostListener } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { Subject, takeUntil, filter } from 'rxjs';
+import { MatSidenav } from '@angular/material/sidenav';
 import {
   AuthService,
   CurrentUser,
@@ -14,8 +15,11 @@ import { ThemeService } from '../../services/theme.service';
   standalone: false,
 })
 export class AppLayoutComponent implements OnInit, OnDestroy {
+  @ViewChild('drawer') drawer!: MatSidenav;
+  
   currentUser: CurrentUser | null = null;
   private destroy$ = new Subject<void>();
+  isMobile: boolean = false;
   
   // Track expanded sections for collapsible navigation
   expandedSections: { [key: string]: boolean } = {
@@ -31,7 +35,9 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     private authService: AuthService, 
     private router: Router,
     public themeService: ThemeService
-  ) {}
+  ) {
+    this.checkScreenSize();
+  }
 
   ngOnInit(): void {
     this.authService.currentUser$
@@ -39,11 +45,28 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       .subscribe((user) => {
         this.currentUser = user;
       });
+    
+    // Close sidebar on mobile when navigating
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.closeSidenavOnMobile();
+      });
+    
+    // Initialize body overflow state
+    if (this.isMobile) {
+      document.body.style.overflow = '';
+    }
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    // Restore body scroll on component destroy
+    document.body.style.overflow = '';
   }
 
   logout(): void {
@@ -57,6 +80,52 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
 
   toggleSection(sectionKey: string): void {
     this.expandedSections[sectionKey] = !this.expandedSections[sectionKey];
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any): void {
+    const wasMobile = this.isMobile;
+    this.checkScreenSize();
+    
+    // Handle transition between mobile and desktop
+    if (wasMobile !== this.isMobile) {
+      // Reset body overflow when switching modes
+      document.body.style.overflow = '';
+      
+      // Close sidebar when switching to mobile
+      if (this.isMobile && this.drawer) {
+        this.drawer.close();
+      }
+    }
+  }
+
+  private checkScreenSize(): void {
+    this.isMobile = window.innerWidth < 768;
+  }
+
+  toggleSidenav(): void {
+    if (this.drawer) {
+      this.drawer.toggle();
+    }
+  }
+
+  closeSidenavOnMobile(): void {
+    if (this.isMobile && this.drawer) {
+      this.drawer.close();
+      // Re-enable body scroll
+      document.body.style.overflow = '';
+    }
+  }
+
+  onSidenavStateChange(isOpen: boolean): void {
+    // Handle body scroll for mobile
+    if (this.isMobile) {
+      if (isOpen) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    }
   }
 
   toggleTheme(): void {
