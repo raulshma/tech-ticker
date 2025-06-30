@@ -1,0 +1,411 @@
+<div class="advanced-config-dialog">
+  <h1 mat-dialog-title>
+    <mat-icon>settings</mat-icon>
+    Advanced Test Configuration
+  </h1>
+
+  <div mat-dialog-content class="dialog-content">
+    <form [formGroup]="configForm" class="config-form">
+      <mat-tab-group>
+        
+        <!-- Browser & Recording Tab -->
+        <mat-tab label="Browser & Recording">
+          <div class="tab-content">
+            
+            <!-- Browser Configuration -->
+            <mat-card class="config-section">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>web</mat-icon>
+                  Browser Configuration
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="form-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Browser Engine</mat-label>
+                    <mat-select formControlName="browserEngine">
+                      <mat-option *ngFor="let engine of browserEngines" [value]="engine.value">
+                        <div class="option-content">
+                          <strong>{{ engine.label }}</strong>
+                          <small>{{ engine.description }}</small>
+                        </div>
+                      </mat-option>
+                    </mat-select>
+                    <mat-hint>Choose the browser engine for automation</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Slow Motion (ms)</mat-label>
+                    <input matInput type="number" formControlName="slowMotion" min="0" max="5000">
+                    <mat-hint>Delay between actions for better visualization</mat-hint>
+                  </mat-form-field>
+                </div>
+
+                <div class="toggle-section">
+                  <mat-slide-toggle formControlName="headless" class="config-toggle">
+                    <div class="toggle-content">
+                      <strong>Headless Mode</strong>
+                      <small>Run browser without visible window (faster but no visual feedback)</small>
+                    </div>
+                  </mat-slide-toggle>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Video Recording -->
+            <mat-card class="config-section">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>videocam</mat-icon>
+                  Video Recording
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="toggle-section">
+                  <mat-slide-toggle formControlName="enableVideoRecording" 
+                                   (change)="onVideoRecordingToggle()" 
+                                   class="config-toggle">
+                    <div class="toggle-content">
+                      <strong>Enable Video Recording</strong>
+                      <small>Record the entire test execution as a video file</small>
+                    </div>
+                  </mat-slide-toggle>
+                </div>
+
+                <div class="form-grid" *ngIf="configForm.get('enableVideoRecording')?.value">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Video Quality</mat-label>
+                    <mat-select formControlName="videoQuality">
+                      <mat-option *ngFor="let quality of videoQualities" [value]="quality.value">
+                        <div class="option-content">
+                          <strong>{{ quality.label }}</strong>
+                          <small>{{ quality.description }}</small>
+                        </div>
+                      </mat-option>
+                    </mat-select>
+                    <mat-hint>Higher quality means larger file sizes</mat-hint>
+                  </mat-form-field>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Screenshots -->
+            <mat-card class="config-section">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>camera_alt</mat-icon>
+                  Screenshots
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="toggle-section">
+                  <mat-slide-toggle formControlName="captureScreenshots" class="config-toggle">
+                    <div class="toggle-content">
+                      <strong>Capture Screenshots</strong>
+                      <small>Take screenshots at each automation step</small>
+                    </div>
+                  </mat-slide-toggle>
+                </div>
+
+                <div class="form-grid" *ngIf="configForm.get('captureScreenshots')?.value">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Screenshot Format</mat-label>
+                    <mat-select formControlName="screenshotFormat">
+                      <mat-option *ngFor="let format of screenshotFormats" [value]="format.value">
+                        <div class="option-content">
+                          <strong>{{ format.label }}</strong>
+                          <small>{{ format.description }}</small>
+                        </div>
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" *ngIf="configForm.get('screenshotFormat')?.value === 'jpeg'">
+                    <mat-label>JPEG Quality</mat-label>
+                    <input matInput type="number" formControlName="screenshotQuality" min="1" max="100">
+                    <mat-hint>1-100, higher values mean better quality</mat-hint>
+                  </mat-form-field>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </mat-tab>
+
+        <!-- Logging & Monitoring Tab -->
+        <mat-tab label="Logging & Monitoring">
+          <div class="tab-content">
+            
+            <mat-card class="config-section">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>bug_report</mat-icon>
+                  Logging Options
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="toggle-section">
+                  <mat-slide-toggle formControlName="enableNetworkLogging" class="config-toggle">
+                    <div class="toggle-content">
+                      <strong>Network Logging</strong>
+                      <small>Log all network requests and responses</small>
+                    </div>
+                  </mat-slide-toggle>
+
+                  <mat-slide-toggle formControlName="enableConsoleLogging" class="config-toggle">
+                    <div class="toggle-content">
+                      <strong>Console Logging</strong>
+                      <small>Capture browser console messages (errors, warnings, logs)</small>
+                    </div>
+                  </mat-slide-toggle>
+
+                  <mat-slide-toggle formControlName="enablePerformanceLogging" class="config-toggle">
+                    <div class="toggle-content">
+                      <strong>Performance Logging</strong>
+                      <small>Monitor CPU, memory, and timing metrics</small>
+                    </div>
+                  </mat-slide-toggle>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="config-section">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>analytics</mat-icon>
+                  Advanced Monitoring
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="toggle-section">
+                  <mat-slide-toggle formControlName="enableHAR" class="config-toggle">
+                    <div class="toggle-content">
+                      <strong>HAR Recording</strong>
+                      <small>Generate HTTP Archive files for detailed network analysis</small>
+                    </div>
+                  </mat-slide-toggle>
+
+                  <mat-slide-toggle formControlName="enableTrace" class="config-toggle">
+                    <div class="toggle-content">
+                      <strong>Performance Trace</strong>
+                      <small>Record detailed performance traces for analysis</small>
+                    </div>
+                  </mat-slide-toggle>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </mat-tab>
+
+        <!-- Viewport & Device Tab -->
+        <mat-tab label="Viewport & Device">
+          <div class="tab-content">
+            
+            <mat-card class="config-section">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>devices</mat-icon>
+                  Viewport Settings
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="form-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Viewport Width</mat-label>
+                    <input matInput type="number" formControlName="viewportWidth" min="100" max="3840">
+                    <mat-hint>Browser window width in pixels</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Viewport Height</mat-label>
+                    <input matInput type="number" formControlName="viewportHeight" min="100" max="2160">
+                    <mat-hint>Browser window height in pixels</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Device Emulation</mat-label>
+                    <mat-select formControlName="deviceEmulation">
+                      <mat-option value="desktop">Desktop</mat-option>
+                      <mat-option value="laptop">Laptop</mat-option>
+                      <mat-option value="tablet">Tablet</mat-option>
+                      <mat-option value="mobile">Mobile</mat-option>
+                      <mat-option value="mobile-large">Mobile Large</mat-option>
+                      <mat-option value="custom">Custom</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>User Agent</mat-label>
+                  <textarea matInput formControlName="userAgent" rows="3" 
+                           placeholder="Leave empty for default browser user agent"></textarea>
+                  <mat-hint>Custom user agent string for browser identification</mat-hint>
+                </mat-form-field>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </mat-tab>
+
+        <!-- Network & Proxy Tab -->
+        <mat-tab label="Network & Proxy">
+          <div class="tab-content">
+            
+            <mat-card class="config-section">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>security</mat-icon>
+                  Proxy Configuration
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="toggle-section">
+                  <mat-slide-toggle formControlName="proxyEnabled" 
+                                   (change)="onProxyToggle()" 
+                                   class="config-toggle">
+                    <div class="toggle-content">
+                      <strong>Enable Proxy</strong>
+                      <small>Route browser traffic through a proxy server</small>
+                    </div>
+                  </mat-slide-toggle>
+                </div>
+
+                <div class="form-grid" *ngIf="configForm.get('proxyEnabled')?.value">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Proxy Server</mat-label>
+                    <input matInput formControlName="proxyServer" 
+                           placeholder="http://proxy.example.com:8080">
+                    <mat-hint>Format: protocol://hostname:port</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="proxyUsername">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" formControlName="proxyPassword">
+                  </mat-form-field>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="config-section">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>http</mat-icon>
+                  Custom Headers
+                </mat-card-title>
+                <div class="card-actions">
+                  <button mat-icon-button type="button" (click)="addCustomHeader()" 
+                          matTooltip="Add custom header">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+              </mat-card-header>
+              <mat-card-content>
+                <div formArrayName="customHeaders">
+                  <div *ngFor="let header of customHeadersArray.controls; let i = index" 
+                       [formGroupName]="i" class="header-row">
+                    <mat-form-field appearance="outline" class="header-key">
+                      <mat-label>Header Name</mat-label>
+                      <input matInput formControlName="key" placeholder="X-Custom-Header">
+                    </mat-form-field>
+                    
+                    <mat-form-field appearance="outline" class="header-value">
+                      <mat-label>Header Value</mat-label>
+                      <input matInput formControlName="value" placeholder="custom-value">
+                    </mat-form-field>
+                    
+                    <button mat-icon-button type="button" (click)="removeCustomHeader(i)" 
+                            color="warn" matTooltip="Remove header">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                  
+                  <div *ngIf="customHeadersArray.length === 0" class="empty-state">
+                    <mat-icon>http</mat-icon>
+                    <p>No custom headers configured</p>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </mat-tab>
+
+        <!-- Timeouts Tab -->
+        <mat-tab label="Timeouts">
+          <div class="tab-content">
+            
+            <mat-card class="config-section">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>timer</mat-icon>
+                  Timeout Settings
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="form-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Test Timeout (ms)</mat-label>
+                    <input matInput type="number" formControlName="testTimeoutMs" 
+                           min="1000" max="300000">
+                    <mat-hint>Maximum time for entire test execution</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Action Timeout (ms)</mat-label>
+                    <input matInput type="number" formControlName="actionTimeoutMs" 
+                           min="1000" max="120000">
+                    <mat-hint>Maximum time for individual actions</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Navigation Timeout (ms)</mat-label>
+                    <input matInput type="number" formControlName="navigationTimeoutMs" 
+                           min="1000" max="120000">
+                    <mat-hint>Maximum time for page navigation</mat-hint>
+                  </mat-form-field>
+                </div>
+
+                <div class="timeout-info">
+                  <mat-icon>info</mat-icon>
+                  <div>
+                    <strong>Timeout Guidelines:</strong>
+                    <ul>
+                      <li>Test Timeout: Should be longer than expected test duration</li>
+                      <li>Action Timeout: Time to wait for elements or interactions</li>
+                      <li>Navigation Timeout: Time to wait for page loads</li>
+                    </ul>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+    </form>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button type="button" (click)="resetToDefaults()" 
+            matTooltip="Reset all settings to default values">
+      <mat-icon>restore</mat-icon>
+      Reset to Defaults
+    </button>
+    
+    <div class="spacer"></div>
+    
+    <button mat-button (click)="onCancel()">
+      Cancel
+    </button>
+    
+    <button mat-raised-button color="primary" 
+            (click)="onSave()" 
+            [disabled]="configForm.invalid">
+      <mat-icon>save</mat-icon>
+      Save Configuration
+    </button>
+  </div>
+</div> 

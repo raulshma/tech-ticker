@@ -31,6 +31,11 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
     public DbSet<RolePermission> RolePermissions { get; set; } = null!;
     public DbSet<AiConfiguration> AiConfigurations { get; set; } = null!;
 
+    // Test Results Management entities
+    public DbSet<SavedTestResult> SavedTestResults { get; set; } = null!;
+    public DbSet<SavedTestResultTag> SavedTestResultTags { get; set; } = null!;
+    public DbSet<TestExecutionHistory> TestExecutionHistory { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -337,6 +342,88 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.HasIndex(e => e.IsActive);
             entity.HasIndex(e => e.IsDefault);
             entity.HasIndex(e => new { e.Provider, e.Model }).IsUnique();
+        });
+
+        // Configure SavedTestResult entity
+        modelBuilder.Entity<SavedTestResult>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.TestUrl).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.ProfileHash).IsRequired().HasMaxLength(64);
+            entity.Property(e => e.TestResultJson).HasColumnType("jsonb");
+            entity.Property(e => e.ProfileJson).HasColumnType("jsonb");
+            entity.Property(e => e.OptionsJson).HasColumnType("jsonb");
+            entity.Property(e => e.MetadataJson).HasColumnType("jsonb");
+            entity.Property(e => e.ScreenshotsData).HasColumnType("text");
+            entity.Property(e => e.VideoRecording).HasColumnType("text");
+
+            // Indexes
+            entity.HasIndex(e => e.Name);
+            entity.HasIndex(e => e.TestUrl);
+            entity.HasIndex(e => e.ProfileHash);
+            entity.HasIndex(e => e.Success);
+            entity.HasIndex(e => e.SavedAt);
+            entity.HasIndex(e => e.ExecutedAt);
+            entity.HasIndex(e => e.CreatedBy);
+
+            // Relationships
+            entity.HasOne(e => e.CreatedByUser)
+                  .WithMany()
+                  .HasForeignKey(e => e.CreatedBy)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Configure SavedTestResultTag entity
+        modelBuilder.Entity<SavedTestResultTag>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Tag).IsRequired().HasMaxLength(50);
+
+            // Indexes
+            entity.HasIndex(e => e.Tag);
+            entity.HasIndex(e => e.SavedTestResultId);
+            entity.HasIndex(e => new { e.SavedTestResultId, e.Tag }).IsUnique();
+
+            // Relationships
+            entity.HasOne(e => e.SavedTestResult)
+                  .WithMany(r => r.Tags)
+                  .HasForeignKey(e => e.SavedTestResultId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure TestExecutionHistory entity
+        modelBuilder.Entity<TestExecutionHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.SessionId).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.TestUrl).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.ProfileHash).IsRequired().HasMaxLength(64);
+            entity.Property(e => e.SessionName).HasMaxLength(200);
+            entity.Property(e => e.BrowserEngine).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.DeviceType).IsRequired().HasMaxLength(20);
+
+            // Indexes
+            entity.HasIndex(e => e.SessionId);
+            entity.HasIndex(e => e.TestUrl);
+            entity.HasIndex(e => e.ProfileHash);
+            entity.HasIndex(e => e.ExecutedAt);
+            entity.HasIndex(e => e.Success);
+            entity.HasIndex(e => e.ExecutedBy);
+            entity.HasIndex(e => e.BrowserEngine);
+            entity.HasIndex(e => e.DeviceType);
+
+            // Relationships
+            entity.HasOne(e => e.SavedTestResult)
+                  .WithMany()
+                  .HasForeignKey(e => e.SavedTestResultId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.ExecutedByUser)
+                  .WithMany()
+                  .HasForeignKey(e => e.ExecutedBy)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
     }
 

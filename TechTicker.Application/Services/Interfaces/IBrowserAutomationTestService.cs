@@ -66,21 +66,7 @@ public interface IBrowserAutomationTestService
     Task<Result<List<BrowserTestSessionDto>>> GetActiveTestSessionsAsync(
         CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Save test results for future reference
-    /// </summary>
-    /// <param name="sessionId">Session ID</param>
-    /// <param name="name">Result name</param>
-    /// <param name="description">Result description</param>
-    /// <param name="tags">Result tags</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Saved result ID</returns>
-    Task<Result<string>> SaveTestResultsAsync(
-        string sessionId,
-        string name,
-        string? description = null,
-        List<string>? tags = null,
-        CancellationToken cancellationToken = default);
+
 }
 
 /// <summary>

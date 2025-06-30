@@ -148,6 +148,14 @@ builder.Services.AddScoped<IAiGenerationService, AiGenerationService>();
 builder.Services.AddScoped<IAiProvider, GoogleGeminiAiProvider>();
 builder.Services.AddHttpClient<GoogleGeminiAiProvider>();
 
+// Add browser automation testing services
+builder.Services.AddScoped<IBrowserAutomationTestService, BrowserAutomationTestService>();
+builder.Services.AddScoped<ITestResultsManagementService, TestResultsManagementService>();
+
+// Add Browser Automation Test Repositories (Phase 4: Database Integration)
+builder.Services.AddScoped<ISavedTestResultRepository, SavedTestResultRepository>();
+builder.Services.AddScoped<ITestExecutionHistoryRepository, TestExecutionHistoryRepository>();
+
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
 builder.Services.AddSingleton<IMessageConsumer, RabbitMQConsumer>();
@@ -214,7 +222,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IAlertProcessingService, AlertProcessingService>();
 
 // Add Browser Automation Test Services
-builder.Services.AddScoped<IBrowserAutomationTestService, BrowserAutomationTestService>();
 builder.Services.AddScoped<IBrowserAutomationWebSocketService, BrowserAutomationWebSocketService>();
 
 // Add SignalR

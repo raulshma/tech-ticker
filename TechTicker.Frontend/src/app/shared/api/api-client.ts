@@ -8973,6 +8973,645 @@ export class TechTickerApiClient {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    saveTestResults2(sessionId: string, body: SaveTestResultRequestDto | undefined): Observable<StringApiResponse> {
+        let url_ = this.baseUrl + "/api/test-results/sessions/{sessionId}/save";
+        if (sessionId === undefined || sessionId === null)
+            throw new Error("The parameter 'sessionId' must be defined.");
+        url_ = url_.replace("{sessionId}", encodeURIComponent("" + sessionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveTestResults2(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveTestResults2(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StringApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StringApiResponse>;
+        }));
+    }
+
+    protected processSaveTestResults2(response: HttpResponseBase): Observable<StringApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StringApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param pageNumber (optional) 
+     * @param pageSize (optional) 
+     * @param searchTerm (optional) 
+     * @param tags (optional) 
+     * @return OK
+     */
+    getSavedTestResults(pageNumber: number | undefined, pageSize: number | undefined, searchTerm: string | undefined, tags: string | undefined): Observable<SavedTestResultDtoPagedResponse> {
+        let url_ = this.baseUrl + "/api/test-results/saved?";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "pageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "pageSize=" + encodeURIComponent("" + pageSize) + "&";
+        if (searchTerm === null)
+            throw new Error("The parameter 'searchTerm' cannot be null.");
+        else if (searchTerm !== undefined)
+            url_ += "searchTerm=" + encodeURIComponent("" + searchTerm) + "&";
+        if (tags === null)
+            throw new Error("The parameter 'tags' cannot be null.");
+        else if (tags !== undefined)
+            url_ += "tags=" + encodeURIComponent("" + tags) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSavedTestResults(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSavedTestResults(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SavedTestResultDtoPagedResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SavedTestResultDtoPagedResponse>;
+        }));
+    }
+
+    protected processGetSavedTestResults(response: HttpResponseBase): Observable<SavedTestResultDtoPagedResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SavedTestResultDtoPagedResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getSavedTestResult(savedResultId: string): Observable<SavedTestResultDetailDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/test-results/saved/{savedResultId}";
+        if (savedResultId === undefined || savedResultId === null)
+            throw new Error("The parameter 'savedResultId' must be defined.");
+        url_ = url_.replace("{savedResultId}", encodeURIComponent("" + savedResultId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSavedTestResult(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSavedTestResult(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SavedTestResultDetailDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SavedTestResultDetailDtoApiResponse>;
+        }));
+    }
+
+    protected processGetSavedTestResult(response: HttpResponseBase): Observable<SavedTestResultDetailDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SavedTestResultDetailDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    deleteSavedTestResult(savedResultId: string): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/test-results/saved/{savedResultId}";
+        if (savedResultId === undefined || savedResultId === null)
+            throw new Error("The parameter 'savedResultId' must be defined.");
+        url_ = url_.replace("{savedResultId}", encodeURIComponent("" + savedResultId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteSavedTestResult(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteSavedTestResult(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processDeleteSavedTestResult(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    compareTestResults(body: CompareTestResultsRequestDto | undefined): Observable<TestResultComparisonDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/test-results/compare";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCompareTestResults(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCompareTestResults(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TestResultComparisonDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TestResultComparisonDtoApiResponse>;
+        }));
+    }
+
+    protected processCompareTestResults(response: HttpResponseBase): Observable<TestResultComparisonDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TestResultComparisonDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param profileId (optional) 
+     * @param fromDate (optional) 
+     * @param toDate (optional) 
+     * @return OK
+     */
+    getTestExecutionTrends(profileId: string | undefined, fromDate: Date | undefined, toDate: Date | undefined): Observable<TestExecutionTrendsDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/test-results/trends?";
+        if (profileId === null)
+            throw new Error("The parameter 'profileId' cannot be null.");
+        else if (profileId !== undefined)
+            url_ += "profileId=" + encodeURIComponent("" + profileId) + "&";
+        if (fromDate === null)
+            throw new Error("The parameter 'fromDate' cannot be null.");
+        else if (fromDate !== undefined)
+            url_ += "fromDate=" + encodeURIComponent(fromDate ? "" + fromDate.toISOString() : "") + "&";
+        if (toDate === null)
+            throw new Error("The parameter 'toDate' cannot be null.");
+        else if (toDate !== undefined)
+            url_ += "toDate=" + encodeURIComponent(toDate ? "" + toDate.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTestExecutionTrends(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTestExecutionTrends(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TestExecutionTrendsDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TestExecutionTrendsDtoApiResponse>;
+        }));
+    }
+
+    protected processGetTestExecutionTrends(response: HttpResponseBase): Observable<TestExecutionTrendsDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TestExecutionTrendsDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param format (optional) 
+     * @return OK
+     */
+    exportTestResult(savedResultId: string, format: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/test-results/saved/{savedResultId}/export?";
+        if (savedResultId === undefined || savedResultId === null)
+            throw new Error("The parameter 'savedResultId' must be defined.");
+        url_ = url_.replace("{savedResultId}", encodeURIComponent("" + savedResultId));
+        if (format === null)
+            throw new Error("The parameter 'format' cannot be null.");
+        else if (format !== undefined)
+            url_ += "format=" + encodeURIComponent("" + format) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processExportTestResult(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processExportTestResult(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processExportTestResult(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param testUrl (optional) 
+     * @param profileHash (optional) 
+     * @param limit (optional) 
+     * @return OK
+     */
+    getTestHistory(testUrl: string | undefined, profileHash: string | undefined, limit: number | undefined): Observable<TestHistoryEntryDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/test-results/history?";
+        if (testUrl === null)
+            throw new Error("The parameter 'testUrl' cannot be null.");
+        else if (testUrl !== undefined)
+            url_ += "testUrl=" + encodeURIComponent("" + testUrl) + "&";
+        if (profileHash === null)
+            throw new Error("The parameter 'profileHash' cannot be null.");
+        else if (profileHash !== undefined)
+            url_ += "profileHash=" + encodeURIComponent("" + profileHash) + "&";
+        if (limit === null)
+            throw new Error("The parameter 'limit' cannot be null.");
+        else if (limit !== undefined)
+            url_ += "limit=" + encodeURIComponent("" + limit) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTestHistory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTestHistory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TestHistoryEntryDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TestHistoryEntryDtoListApiResponse>;
+        }));
+    }
+
+    protected processGetTestHistory(response: HttpResponseBase): Observable<TestHistoryEntryDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TestHistoryEntryDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getAvailableTags(): Observable<StringListApiResponse> {
+        let url_ = this.baseUrl + "/api/test-results/tags";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAvailableTags(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAvailableTags(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StringListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StringListApiResponse>;
+        }));
+    }
+
+    protected processGetAvailableTags(response: HttpResponseBase): Observable<StringListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StringListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getTestStatistics(): Observable<TestStatisticsApiResponse> {
+        let url_ = this.baseUrl + "/api/test-results/statistics";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTestStatistics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTestStatistics(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TestStatisticsApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TestStatisticsApiResponse>;
+        }));
+    }
+
+    protected processGetTestStatistics(response: HttpResponseBase): Observable<TestStatisticsApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TestStatisticsApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkDeleteSavedTestResults(body: BulkDeleteTestResultsRequestDto | undefined): Observable<BulkDeleteResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/test-results/saved/bulk-delete";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkDeleteSavedTestResults(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkDeleteSavedTestResults(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BulkDeleteResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BulkDeleteResultDtoApiResponse>;
+        }));
+    }
+
+    protected processBulkDeleteSavedTestResults(response: HttpResponseBase): Observable<BulkDeleteResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BulkDeleteResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 export class ActionExecutionResultDto implements IActionExecutionResultDto {
@@ -13612,6 +14251,190 @@ export interface IBrowserTestSessionDtoListApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class BulkDeleteResultDto implements IBulkDeleteResultDto {
+    totalRequested?: number;
+    successfullyDeleted?: number;
+    failedToDelete?: number;
+    errors?: string[] | undefined;
+
+    constructor(data?: IBulkDeleteResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalRequested = _data["totalRequested"];
+            this.successfullyDeleted = _data["successfullyDeleted"];
+            this.failedToDelete = _data["failedToDelete"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): BulkDeleteResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkDeleteResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalRequested"] = this.totalRequested;
+        data["successfullyDeleted"] = this.successfullyDeleted;
+        data["failedToDelete"] = this.failedToDelete;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IBulkDeleteResultDto {
+    totalRequested?: number;
+    successfullyDeleted?: number;
+    failedToDelete?: number;
+    errors?: string[] | undefined;
+}
+
+export class BulkDeleteResultDtoApiResponse implements IBulkDeleteResultDtoApiResponse {
+    success?: boolean;
+    data?: BulkDeleteResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IBulkDeleteResultDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? BulkDeleteResultDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BulkDeleteResultDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkDeleteResultDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBulkDeleteResultDtoApiResponse {
+    success?: boolean;
+    data?: BulkDeleteResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class BulkDeleteTestResultsRequestDto implements IBulkDeleteTestResultsRequestDto {
+    resultIds?: string[] | undefined;
+
+    constructor(data?: IBulkDeleteTestResultsRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["resultIds"])) {
+                this.resultIds = [] as any;
+                for (let item of _data["resultIds"])
+                    this.resultIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): BulkDeleteTestResultsRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkDeleteTestResultsRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.resultIds)) {
+            data["resultIds"] = [];
+            for (let item of this.resultIds)
+                data["resultIds"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IBulkDeleteTestResultsRequestDto {
+    resultIds?: string[] | undefined;
+}
+
 export class BulkProxyActiveStatusDto implements IBulkProxyActiveStatusDto {
     proxyIds?: string[] | undefined;
     isActive?: boolean;
@@ -14312,6 +15135,64 @@ export interface ICategoryDtoIEnumerableApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class CompareTestResultsRequestDto implements ICompareTestResultsRequestDto {
+    firstResultId?: string | undefined;
+    secondResultId?: string | undefined;
+    includeScreenshots?: boolean;
+    includeNetworkData?: boolean;
+    includeDetailedDifferences?: boolean;
+
+    constructor(data?: ICompareTestResultsRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.firstResultId = _data["firstResultId"];
+            this.secondResultId = _data["secondResultId"];
+            this.includeScreenshots = _data["includeScreenshots"];
+            this.includeNetworkData = _data["includeNetworkData"];
+            this.includeDetailedDifferences = _data["includeDetailedDifferences"];
+        }
+    }
+
+    static fromJS(data: any): CompareTestResultsRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CompareTestResultsRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["firstResultId"] = this.firstResultId;
+        data["secondResultId"] = this.secondResultId;
+        data["includeScreenshots"] = this.includeScreenshots;
+        data["includeNetworkData"] = this.includeNetworkData;
+        data["includeDetailedDifferences"] = this.includeDetailedDifferences;
+        return data;
+    }
+}
+
+export interface ICompareTestResultsRequestDto {
+    firstResultId?: string | undefined;
+    secondResultId?: string | undefined;
+    includeScreenshots?: boolean;
+    includeNetworkData?: boolean;
+    includeDetailedDifferences?: boolean;
+}
+
+export enum ComparisonTrend {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
 }
 
 export class ConsoleMessageDto implements IConsoleMessageDto {
@@ -15350,6 +16231,19 @@ export interface IDashboardStatsDtoApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export enum DifferenceSeverity {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+}
+
+export enum DifferenceType {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+}
+
 export class ExecutionMetricsDto implements IExecutionMetricsDto {
     totalDuration?: number;
     navigationTime?: number;
@@ -15944,6 +16838,58 @@ export class LoginUserDto implements ILoginUserDto {
 export interface ILoginUserDto {
     email: string;
     password: string;
+}
+
+export class MetricComparison implements IMetricComparison {
+    firstValue?: number;
+    secondValue?: number;
+    difference?: number;
+    percentageChange?: number;
+    trend?: ComparisonTrend;
+
+    constructor(data?: IMetricComparison) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.firstValue = _data["firstValue"];
+            this.secondValue = _data["secondValue"];
+            this.difference = _data["difference"];
+            this.percentageChange = _data["percentageChange"];
+            this.trend = _data["trend"];
+        }
+    }
+
+    static fromJS(data: any): MetricComparison {
+        data = typeof data === 'object' ? data : {};
+        let result = new MetricComparison();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["firstValue"] = this.firstValue;
+        data["secondValue"] = this.secondValue;
+        data["difference"] = this.difference;
+        data["percentageChange"] = this.percentageChange;
+        data["trend"] = this.trend;
+        return data;
+    }
+}
+
+export interface IMetricComparison {
+    firstValue?: number;
+    secondValue?: number;
+    difference?: number;
+    percentageChange?: number;
+    trend?: ComparisonTrend;
 }
 
 export class NetworkRequestDto implements INetworkRequestDto {
@@ -16822,12 +17768,120 @@ export interface IPaginationMeta {
     lastItemOnPage?: number;
 }
 
+export class PerformanceDataPoint implements IPerformanceDataPoint {
+    date?: Date;
+    value?: number;
+    sampleCount?: number;
+
+    constructor(data?: IPerformanceDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.value = _data["value"];
+            this.sampleCount = _data["sampleCount"];
+        }
+    }
+
+    static fromJS(data: any): PerformanceDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new PerformanceDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["value"] = this.value;
+        data["sampleCount"] = this.sampleCount;
+        return data;
+    }
+}
+
+export interface IPerformanceDataPoint {
+    date?: Date;
+    value?: number;
+    sampleCount?: number;
+}
+
 export enum PerformanceRating {
     _0 = 0,
     _1 = 1,
     _2 = 2,
     _3 = 3,
     _4 = 4,
+}
+
+export class PerformanceTrendDto implements IPerformanceTrendDto {
+    metricName?: string | undefined;
+    dataPoints?: PerformanceDataPoint[] | undefined;
+    currentAverage?: number;
+    previousAverage?: number;
+    trend?: ComparisonTrend;
+    percentageChange?: number;
+
+    constructor(data?: IPerformanceTrendDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.metricName = _data["metricName"];
+            if (Array.isArray(_data["dataPoints"])) {
+                this.dataPoints = [] as any;
+                for (let item of _data["dataPoints"])
+                    this.dataPoints!.push(PerformanceDataPoint.fromJS(item));
+            }
+            this.currentAverage = _data["currentAverage"];
+            this.previousAverage = _data["previousAverage"];
+            this.trend = _data["trend"];
+            this.percentageChange = _data["percentageChange"];
+        }
+    }
+
+    static fromJS(data: any): PerformanceTrendDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PerformanceTrendDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["metricName"] = this.metricName;
+        if (Array.isArray(this.dataPoints)) {
+            data["dataPoints"] = [];
+            for (let item of this.dataPoints)
+                data["dataPoints"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["currentAverage"] = this.currentAverage;
+        data["previousAverage"] = this.previousAverage;
+        data["trend"] = this.trend;
+        data["percentageChange"] = this.percentageChange;
+        return data;
+    }
+}
+
+export interface IPerformanceTrendDto {
+    metricName?: string | undefined;
+    dataPoints?: PerformanceDataPoint[] | undefined;
+    currentAverage?: number;
+    previousAverage?: number;
+    trend?: ComparisonTrend;
+    percentageChange?: number;
 }
 
 export class PermissionDto implements IPermissionDto {
@@ -17060,6 +18114,58 @@ export interface IPermissionDtoIEnumerableApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class PopularTestUrlDto implements IPopularTestUrlDto {
+    url?: string | undefined;
+    testCount?: number;
+    successRate?: number;
+    averageExecutionTime?: number;
+    lastTested?: Date | undefined;
+
+    constructor(data?: IPopularTestUrlDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.url = _data["url"];
+            this.testCount = _data["testCount"];
+            this.successRate = _data["successRate"];
+            this.averageExecutionTime = _data["averageExecutionTime"];
+            this.lastTested = _data["lastTested"] ? new Date(_data["lastTested"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): PopularTestUrlDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PopularTestUrlDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["url"] = this.url;
+        data["testCount"] = this.testCount;
+        data["successRate"] = this.successRate;
+        data["averageExecutionTime"] = this.averageExecutionTime;
+        data["lastTested"] = this.lastTested ? this.lastTested.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IPopularTestUrlDto {
+    url?: string | undefined;
+    testCount?: number;
+    successRate?: number;
+    averageExecutionTime?: number;
+    lastTested?: Date | undefined;
 }
 
 export class PriceHistoryDto implements IPriceHistoryDto {
@@ -19830,6 +20936,58 @@ export interface IRoleInfoDtoIEnumerableApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class SaveTestResultRequestDto implements ISaveTestResultRequestDto {
+    name?: string | undefined;
+    description?: string | undefined;
+    tags?: string[] | undefined;
+
+    constructor(data?: ISaveTestResultRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.description = _data["description"];
+            if (Array.isArray(_data["tags"])) {
+                this.tags = [] as any;
+                for (let item of _data["tags"])
+                    this.tags!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): SaveTestResultRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaveTestResultRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["description"] = this.description;
+        if (Array.isArray(this.tags)) {
+            data["tags"] = [];
+            for (let item of this.tags)
+                data["tags"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ISaveTestResultRequestDto {
+    name?: string | undefined;
+    description?: string | undefined;
+    tags?: string[] | undefined;
+}
+
 export class SaveTestResultsRequestDto implements ISaveTestResultsRequestDto {
     name?: string | undefined;
     description?: string | undefined;
@@ -19880,6 +21038,414 @@ export interface ISaveTestResultsRequestDto {
     name?: string | undefined;
     description?: string | undefined;
     tags?: string[] | undefined;
+}
+
+export class SavedTestResultDetailDto implements ISavedTestResultDetailDto {
+    id?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    tags?: string[] | undefined;
+    testUrl?: string | undefined;
+    success?: boolean;
+    savedAt?: Date;
+    executedAt?: Date;
+    duration?: number;
+    actionsExecuted?: number;
+    errorCount?: number;
+    profileHash?: string | undefined;
+    createdBy?: string | undefined;
+    testResult?: BrowserAutomationTestResultDto;
+    profile?: BrowserAutomationProfileDto;
+    options?: BrowserTestOptionsDto;
+    screenshots?: string[] | undefined;
+    videoRecording?: string | undefined;
+    metadata?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISavedTestResultDetailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            if (Array.isArray(_data["tags"])) {
+                this.tags = [] as any;
+                for (let item of _data["tags"])
+                    this.tags!.push(item);
+            }
+            this.testUrl = _data["testUrl"];
+            this.success = _data["success"];
+            this.savedAt = _data["savedAt"] ? new Date(_data["savedAt"].toString()) : <any>undefined;
+            this.executedAt = _data["executedAt"] ? new Date(_data["executedAt"].toString()) : <any>undefined;
+            this.duration = _data["duration"];
+            this.actionsExecuted = _data["actionsExecuted"];
+            this.errorCount = _data["errorCount"];
+            this.profileHash = _data["profileHash"];
+            this.createdBy = _data["createdBy"];
+            this.testResult = _data["testResult"] ? BrowserAutomationTestResultDto.fromJS(_data["testResult"]) : <any>undefined;
+            this.profile = _data["profile"] ? BrowserAutomationProfileDto.fromJS(_data["profile"]) : <any>undefined;
+            this.options = _data["options"] ? BrowserTestOptionsDto.fromJS(_data["options"]) : <any>undefined;
+            if (Array.isArray(_data["screenshots"])) {
+                this.screenshots = [] as any;
+                for (let item of _data["screenshots"])
+                    this.screenshots!.push(item);
+            }
+            this.videoRecording = _data["videoRecording"];
+            if (_data["metadata"]) {
+                this.metadata = {} as any;
+                for (let key in _data["metadata"]) {
+                    if (_data["metadata"].hasOwnProperty(key))
+                        (<any>this.metadata)![key] = _data["metadata"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SavedTestResultDetailDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SavedTestResultDetailDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        if (Array.isArray(this.tags)) {
+            data["tags"] = [];
+            for (let item of this.tags)
+                data["tags"].push(item);
+        }
+        data["testUrl"] = this.testUrl;
+        data["success"] = this.success;
+        data["savedAt"] = this.savedAt ? this.savedAt.toISOString() : <any>undefined;
+        data["executedAt"] = this.executedAt ? this.executedAt.toISOString() : <any>undefined;
+        data["duration"] = this.duration;
+        data["actionsExecuted"] = this.actionsExecuted;
+        data["errorCount"] = this.errorCount;
+        data["profileHash"] = this.profileHash;
+        data["createdBy"] = this.createdBy;
+        data["testResult"] = this.testResult ? this.testResult.toJSON() : <any>undefined;
+        data["profile"] = this.profile ? this.profile.toJSON() : <any>undefined;
+        data["options"] = this.options ? this.options.toJSON() : <any>undefined;
+        if (Array.isArray(this.screenshots)) {
+            data["screenshots"] = [];
+            for (let item of this.screenshots)
+                data["screenshots"].push(item);
+        }
+        data["videoRecording"] = this.videoRecording;
+        if (this.metadata) {
+            data["metadata"] = {};
+            for (let key in this.metadata) {
+                if (this.metadata.hasOwnProperty(key))
+                    (<any>data["metadata"])[key] = (<any>this.metadata)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISavedTestResultDetailDto {
+    id?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    tags?: string[] | undefined;
+    testUrl?: string | undefined;
+    success?: boolean;
+    savedAt?: Date;
+    executedAt?: Date;
+    duration?: number;
+    actionsExecuted?: number;
+    errorCount?: number;
+    profileHash?: string | undefined;
+    createdBy?: string | undefined;
+    testResult?: BrowserAutomationTestResultDto;
+    profile?: BrowserAutomationProfileDto;
+    options?: BrowserTestOptionsDto;
+    screenshots?: string[] | undefined;
+    videoRecording?: string | undefined;
+    metadata?: { [key: string]: any; } | undefined;
+}
+
+export class SavedTestResultDetailDtoApiResponse implements ISavedTestResultDetailDtoApiResponse {
+    success?: boolean;
+    data?: SavedTestResultDetailDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISavedTestResultDetailDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? SavedTestResultDetailDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SavedTestResultDetailDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SavedTestResultDetailDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISavedTestResultDetailDtoApiResponse {
+    success?: boolean;
+    data?: SavedTestResultDetailDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class SavedTestResultDto implements ISavedTestResultDto {
+    id?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    tags?: string[] | undefined;
+    testUrl?: string | undefined;
+    success?: boolean;
+    savedAt?: Date;
+    executedAt?: Date;
+    duration?: number;
+    actionsExecuted?: number;
+    errorCount?: number;
+    profileHash?: string | undefined;
+    createdBy?: string | undefined;
+
+    constructor(data?: ISavedTestResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            if (Array.isArray(_data["tags"])) {
+                this.tags = [] as any;
+                for (let item of _data["tags"])
+                    this.tags!.push(item);
+            }
+            this.testUrl = _data["testUrl"];
+            this.success = _data["success"];
+            this.savedAt = _data["savedAt"] ? new Date(_data["savedAt"].toString()) : <any>undefined;
+            this.executedAt = _data["executedAt"] ? new Date(_data["executedAt"].toString()) : <any>undefined;
+            this.duration = _data["duration"];
+            this.actionsExecuted = _data["actionsExecuted"];
+            this.errorCount = _data["errorCount"];
+            this.profileHash = _data["profileHash"];
+            this.createdBy = _data["createdBy"];
+        }
+    }
+
+    static fromJS(data: any): SavedTestResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SavedTestResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        if (Array.isArray(this.tags)) {
+            data["tags"] = [];
+            for (let item of this.tags)
+                data["tags"].push(item);
+        }
+        data["testUrl"] = this.testUrl;
+        data["success"] = this.success;
+        data["savedAt"] = this.savedAt ? this.savedAt.toISOString() : <any>undefined;
+        data["executedAt"] = this.executedAt ? this.executedAt.toISOString() : <any>undefined;
+        data["duration"] = this.duration;
+        data["actionsExecuted"] = this.actionsExecuted;
+        data["errorCount"] = this.errorCount;
+        data["profileHash"] = this.profileHash;
+        data["createdBy"] = this.createdBy;
+        return data;
+    }
+}
+
+export interface ISavedTestResultDto {
+    id?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    tags?: string[] | undefined;
+    testUrl?: string | undefined;
+    success?: boolean;
+    savedAt?: Date;
+    executedAt?: Date;
+    duration?: number;
+    actionsExecuted?: number;
+    errorCount?: number;
+    profileHash?: string | undefined;
+    createdBy?: string | undefined;
+}
+
+export class SavedTestResultDtoPagedResponse implements ISavedTestResultDtoPagedResponse {
+    success?: boolean;
+    data?: SavedTestResultDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
+
+    constructor(data?: ISavedTestResultDtoPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(SavedTestResultDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+            this.pagination = _data["pagination"] ? PaginationMeta.fromJS(_data["pagination"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): SavedTestResultDtoPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SavedTestResultDtoPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        data["pagination"] = this.pagination ? this.pagination.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ISavedTestResultDtoPagedResponse {
+    success?: boolean;
+    data?: SavedTestResultDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+    pagination?: PaginationMeta;
 }
 
 export class ScraperRunLogDto implements IScraperRunLogDto {
@@ -21430,6 +22996,98 @@ export interface IStringApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class StringListApiResponse implements IStringListApiResponse {
+    success?: boolean;
+    data?: string[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IStringListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(item);
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): StringListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new StringListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IStringListApiResponse {
+    success?: boolean;
+    data?: string[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class StringNotificationChannelStatsDtoDictionaryApiResponse implements IStringNotificationChannelStatsDtoDictionaryApiResponse {
     success?: boolean;
     data?: { [key: string]: NotificationChannelStatsDto; } | undefined;
@@ -21742,6 +23400,194 @@ export interface ITestAlertRuleDto {
     notificationFrequencyMinutes?: number;
 }
 
+export class TestComparisonDifference implements ITestComparisonDifference {
+    category?: string | undefined;
+    field?: string | undefined;
+    firstValue?: string | undefined;
+    secondValue?: string | undefined;
+    type?: DifferenceType;
+    severity?: DifferenceSeverity;
+    description?: string | undefined;
+
+    constructor(data?: ITestComparisonDifference) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.category = _data["category"];
+            this.field = _data["field"];
+            this.firstValue = _data["firstValue"];
+            this.secondValue = _data["secondValue"];
+            this.type = _data["type"];
+            this.severity = _data["severity"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): TestComparisonDifference {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestComparisonDifference();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["category"] = this.category;
+        data["field"] = this.field;
+        data["firstValue"] = this.firstValue;
+        data["secondValue"] = this.secondValue;
+        data["type"] = this.type;
+        data["severity"] = this.severity;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+export interface ITestComparisonDifference {
+    category?: string | undefined;
+    field?: string | undefined;
+    firstValue?: string | undefined;
+    secondValue?: string | undefined;
+    type?: DifferenceType;
+    severity?: DifferenceSeverity;
+    description?: string | undefined;
+}
+
+export class TestComparisonMetrics implements ITestComparisonMetrics {
+    duration?: MetricComparison;
+    actionsExecuted?: MetricComparison;
+    errorCount?: MetricComparison;
+    memoryUsage?: MetricComparison;
+    networkRequests?: MetricComparison;
+    pageLoadTime?: MetricComparison;
+
+    constructor(data?: ITestComparisonMetrics) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.duration = _data["duration"] ? MetricComparison.fromJS(_data["duration"]) : <any>undefined;
+            this.actionsExecuted = _data["actionsExecuted"] ? MetricComparison.fromJS(_data["actionsExecuted"]) : <any>undefined;
+            this.errorCount = _data["errorCount"] ? MetricComparison.fromJS(_data["errorCount"]) : <any>undefined;
+            this.memoryUsage = _data["memoryUsage"] ? MetricComparison.fromJS(_data["memoryUsage"]) : <any>undefined;
+            this.networkRequests = _data["networkRequests"] ? MetricComparison.fromJS(_data["networkRequests"]) : <any>undefined;
+            this.pageLoadTime = _data["pageLoadTime"] ? MetricComparison.fromJS(_data["pageLoadTime"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): TestComparisonMetrics {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestComparisonMetrics();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["duration"] = this.duration ? this.duration.toJSON() : <any>undefined;
+        data["actionsExecuted"] = this.actionsExecuted ? this.actionsExecuted.toJSON() : <any>undefined;
+        data["errorCount"] = this.errorCount ? this.errorCount.toJSON() : <any>undefined;
+        data["memoryUsage"] = this.memoryUsage ? this.memoryUsage.toJSON() : <any>undefined;
+        data["networkRequests"] = this.networkRequests ? this.networkRequests.toJSON() : <any>undefined;
+        data["pageLoadTime"] = this.pageLoadTime ? this.pageLoadTime.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ITestComparisonMetrics {
+    duration?: MetricComparison;
+    actionsExecuted?: MetricComparison;
+    errorCount?: MetricComparison;
+    memoryUsage?: MetricComparison;
+    networkRequests?: MetricComparison;
+    pageLoadTime?: MetricComparison;
+}
+
+export class TestComparisonSummary implements ITestComparisonSummary {
+    areEqual?: boolean;
+    totalDifferences?: number;
+    criticalDifferences?: number;
+    warningDifferences?: number;
+    infoDifferences?: number;
+    similarityScore?: number;
+    overallAssessment?: string | undefined;
+    recommendations?: string[] | undefined;
+
+    constructor(data?: ITestComparisonSummary) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.areEqual = _data["areEqual"];
+            this.totalDifferences = _data["totalDifferences"];
+            this.criticalDifferences = _data["criticalDifferences"];
+            this.warningDifferences = _data["warningDifferences"];
+            this.infoDifferences = _data["infoDifferences"];
+            this.similarityScore = _data["similarityScore"];
+            this.overallAssessment = _data["overallAssessment"];
+            if (Array.isArray(_data["recommendations"])) {
+                this.recommendations = [] as any;
+                for (let item of _data["recommendations"])
+                    this.recommendations!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): TestComparisonSummary {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestComparisonSummary();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["areEqual"] = this.areEqual;
+        data["totalDifferences"] = this.totalDifferences;
+        data["criticalDifferences"] = this.criticalDifferences;
+        data["warningDifferences"] = this.warningDifferences;
+        data["infoDifferences"] = this.infoDifferences;
+        data["similarityScore"] = this.similarityScore;
+        data["overallAssessment"] = this.overallAssessment;
+        if (Array.isArray(this.recommendations)) {
+            data["recommendations"] = [];
+            for (let item of this.recommendations)
+                data["recommendations"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ITestComparisonSummary {
+    areEqual?: boolean;
+    totalDifferences?: number;
+    criticalDifferences?: number;
+    warningDifferences?: number;
+    infoDifferences?: number;
+    similarityScore?: number;
+    overallAssessment?: string | undefined;
+    recommendations?: string[] | undefined;
+}
+
 export class TestDiscordWebhookDto implements ITestDiscordWebhookDto {
     discordWebhookUrl!: string;
     customBotName?: string | undefined;
@@ -21838,6 +23684,354 @@ export interface ITestErrorDto {
     timestamp?: Date;
 }
 
+export class TestExecutionTrendsDto implements ITestExecutionTrendsDto {
+    overallStatistics?: TestStatistics;
+    trendData?: TestTrendDataPoint[] | undefined;
+    topErrors?: TopErrorDto[] | undefined;
+    performanceTrends?: PerformanceTrendDto[] | undefined;
+    popularTestUrls?: PopularTestUrlDto[] | undefined;
+    reliability?: TestReliabilityMetrics;
+
+    constructor(data?: ITestExecutionTrendsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.overallStatistics = _data["overallStatistics"] ? TestStatistics.fromJS(_data["overallStatistics"]) : <any>undefined;
+            if (Array.isArray(_data["trendData"])) {
+                this.trendData = [] as any;
+                for (let item of _data["trendData"])
+                    this.trendData!.push(TestTrendDataPoint.fromJS(item));
+            }
+            if (Array.isArray(_data["topErrors"])) {
+                this.topErrors = [] as any;
+                for (let item of _data["topErrors"])
+                    this.topErrors!.push(TopErrorDto.fromJS(item));
+            }
+            if (Array.isArray(_data["performanceTrends"])) {
+                this.performanceTrends = [] as any;
+                for (let item of _data["performanceTrends"])
+                    this.performanceTrends!.push(PerformanceTrendDto.fromJS(item));
+            }
+            if (Array.isArray(_data["popularTestUrls"])) {
+                this.popularTestUrls = [] as any;
+                for (let item of _data["popularTestUrls"])
+                    this.popularTestUrls!.push(PopularTestUrlDto.fromJS(item));
+            }
+            this.reliability = _data["reliability"] ? TestReliabilityMetrics.fromJS(_data["reliability"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): TestExecutionTrendsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestExecutionTrendsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["overallStatistics"] = this.overallStatistics ? this.overallStatistics.toJSON() : <any>undefined;
+        if (Array.isArray(this.trendData)) {
+            data["trendData"] = [];
+            for (let item of this.trendData)
+                data["trendData"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.topErrors)) {
+            data["topErrors"] = [];
+            for (let item of this.topErrors)
+                data["topErrors"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.performanceTrends)) {
+            data["performanceTrends"] = [];
+            for (let item of this.performanceTrends)
+                data["performanceTrends"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.popularTestUrls)) {
+            data["popularTestUrls"] = [];
+            for (let item of this.popularTestUrls)
+                data["popularTestUrls"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["reliability"] = this.reliability ? this.reliability.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ITestExecutionTrendsDto {
+    overallStatistics?: TestStatistics;
+    trendData?: TestTrendDataPoint[] | undefined;
+    topErrors?: TopErrorDto[] | undefined;
+    performanceTrends?: PerformanceTrendDto[] | undefined;
+    popularTestUrls?: PopularTestUrlDto[] | undefined;
+    reliability?: TestReliabilityMetrics;
+}
+
+export class TestExecutionTrendsDtoApiResponse implements ITestExecutionTrendsDtoApiResponse {
+    success?: boolean;
+    data?: TestExecutionTrendsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ITestExecutionTrendsDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? TestExecutionTrendsDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): TestExecutionTrendsDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestExecutionTrendsDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ITestExecutionTrendsDtoApiResponse {
+    success?: boolean;
+    data?: TestExecutionTrendsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class TestHistoryEntryDto implements ITestHistoryEntryDto {
+    sessionId?: string | undefined;
+    savedResultId?: string | undefined;
+    testUrl?: string | undefined;
+    profileHash?: string | undefined;
+    success?: boolean;
+    executedAt?: Date;
+    duration?: number;
+    actionsExecuted?: number;
+    errorCount?: number;
+    executedBy?: string | undefined;
+    sessionName?: string | undefined;
+    browserEngine?: string | undefined;
+    deviceType?: string | undefined;
+
+    constructor(data?: ITestHistoryEntryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.sessionId = _data["sessionId"];
+            this.savedResultId = _data["savedResultId"];
+            this.testUrl = _data["testUrl"];
+            this.profileHash = _data["profileHash"];
+            this.success = _data["success"];
+            this.executedAt = _data["executedAt"] ? new Date(_data["executedAt"].toString()) : <any>undefined;
+            this.duration = _data["duration"];
+            this.actionsExecuted = _data["actionsExecuted"];
+            this.errorCount = _data["errorCount"];
+            this.executedBy = _data["executedBy"];
+            this.sessionName = _data["sessionName"];
+            this.browserEngine = _data["browserEngine"];
+            this.deviceType = _data["deviceType"];
+        }
+    }
+
+    static fromJS(data: any): TestHistoryEntryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestHistoryEntryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["sessionId"] = this.sessionId;
+        data["savedResultId"] = this.savedResultId;
+        data["testUrl"] = this.testUrl;
+        data["profileHash"] = this.profileHash;
+        data["success"] = this.success;
+        data["executedAt"] = this.executedAt ? this.executedAt.toISOString() : <any>undefined;
+        data["duration"] = this.duration;
+        data["actionsExecuted"] = this.actionsExecuted;
+        data["errorCount"] = this.errorCount;
+        data["executedBy"] = this.executedBy;
+        data["sessionName"] = this.sessionName;
+        data["browserEngine"] = this.browserEngine;
+        data["deviceType"] = this.deviceType;
+        return data;
+    }
+}
+
+export interface ITestHistoryEntryDto {
+    sessionId?: string | undefined;
+    savedResultId?: string | undefined;
+    testUrl?: string | undefined;
+    profileHash?: string | undefined;
+    success?: boolean;
+    executedAt?: Date;
+    duration?: number;
+    actionsExecuted?: number;
+    errorCount?: number;
+    executedBy?: string | undefined;
+    sessionName?: string | undefined;
+    browserEngine?: string | undefined;
+    deviceType?: string | undefined;
+}
+
+export class TestHistoryEntryDtoListApiResponse implements ITestHistoryEntryDtoListApiResponse {
+    success?: boolean;
+    data?: TestHistoryEntryDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ITestHistoryEntryDtoListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(TestHistoryEntryDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): TestHistoryEntryDtoListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestHistoryEntryDtoListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ITestHistoryEntryDtoListApiResponse {
+    success?: boolean;
+    data?: TestHistoryEntryDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class TestPricePointDto implements ITestPricePointDto {
     price!: number;
     stockStatus!: string;
@@ -21888,6 +24082,234 @@ export interface ITestPricePointDto {
     sellerName?: string | undefined;
     sourceUrl?: string | undefined;
     timestamp?: Date | undefined;
+}
+
+export class TestReliabilityMetrics implements ITestReliabilityMetrics {
+    overallReliability?: number;
+    consistencyScore?: number;
+    flakeyTests?: number;
+    mostReliableUrls?: string[] | undefined;
+    leastReliableUrls?: string[] | undefined;
+    reliabilityByBrowser?: { [key: string]: number; } | undefined;
+
+    constructor(data?: ITestReliabilityMetrics) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.overallReliability = _data["overallReliability"];
+            this.consistencyScore = _data["consistencyScore"];
+            this.flakeyTests = _data["flakeyTests"];
+            if (Array.isArray(_data["mostReliableUrls"])) {
+                this.mostReliableUrls = [] as any;
+                for (let item of _data["mostReliableUrls"])
+                    this.mostReliableUrls!.push(item);
+            }
+            if (Array.isArray(_data["leastReliableUrls"])) {
+                this.leastReliableUrls = [] as any;
+                for (let item of _data["leastReliableUrls"])
+                    this.leastReliableUrls!.push(item);
+            }
+            if (_data["reliabilityByBrowser"]) {
+                this.reliabilityByBrowser = {} as any;
+                for (let key in _data["reliabilityByBrowser"]) {
+                    if (_data["reliabilityByBrowser"].hasOwnProperty(key))
+                        (<any>this.reliabilityByBrowser)![key] = _data["reliabilityByBrowser"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): TestReliabilityMetrics {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestReliabilityMetrics();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["overallReliability"] = this.overallReliability;
+        data["consistencyScore"] = this.consistencyScore;
+        data["flakeyTests"] = this.flakeyTests;
+        if (Array.isArray(this.mostReliableUrls)) {
+            data["mostReliableUrls"] = [];
+            for (let item of this.mostReliableUrls)
+                data["mostReliableUrls"].push(item);
+        }
+        if (Array.isArray(this.leastReliableUrls)) {
+            data["leastReliableUrls"] = [];
+            for (let item of this.leastReliableUrls)
+                data["leastReliableUrls"].push(item);
+        }
+        if (this.reliabilityByBrowser) {
+            data["reliabilityByBrowser"] = {};
+            for (let key in this.reliabilityByBrowser) {
+                if (this.reliabilityByBrowser.hasOwnProperty(key))
+                    (<any>data["reliabilityByBrowser"])[key] = (<any>this.reliabilityByBrowser)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ITestReliabilityMetrics {
+    overallReliability?: number;
+    consistencyScore?: number;
+    flakeyTests?: number;
+    mostReliableUrls?: string[] | undefined;
+    leastReliableUrls?: string[] | undefined;
+    reliabilityByBrowser?: { [key: string]: number; } | undefined;
+}
+
+export class TestResultComparisonDto implements ITestResultComparisonDto {
+    firstResult?: SavedTestResultDto;
+    secondResult?: SavedTestResultDto;
+    metrics?: TestComparisonMetrics;
+    differences?: TestComparisonDifference[] | undefined;
+    summary?: TestComparisonSummary;
+
+    constructor(data?: ITestResultComparisonDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.firstResult = _data["firstResult"] ? SavedTestResultDto.fromJS(_data["firstResult"]) : <any>undefined;
+            this.secondResult = _data["secondResult"] ? SavedTestResultDto.fromJS(_data["secondResult"]) : <any>undefined;
+            this.metrics = _data["metrics"] ? TestComparisonMetrics.fromJS(_data["metrics"]) : <any>undefined;
+            if (Array.isArray(_data["differences"])) {
+                this.differences = [] as any;
+                for (let item of _data["differences"])
+                    this.differences!.push(TestComparisonDifference.fromJS(item));
+            }
+            this.summary = _data["summary"] ? TestComparisonSummary.fromJS(_data["summary"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): TestResultComparisonDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestResultComparisonDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["firstResult"] = this.firstResult ? this.firstResult.toJSON() : <any>undefined;
+        data["secondResult"] = this.secondResult ? this.secondResult.toJSON() : <any>undefined;
+        data["metrics"] = this.metrics ? this.metrics.toJSON() : <any>undefined;
+        if (Array.isArray(this.differences)) {
+            data["differences"] = [];
+            for (let item of this.differences)
+                data["differences"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["summary"] = this.summary ? this.summary.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ITestResultComparisonDto {
+    firstResult?: SavedTestResultDto;
+    secondResult?: SavedTestResultDto;
+    metrics?: TestComparisonMetrics;
+    differences?: TestComparisonDifference[] | undefined;
+    summary?: TestComparisonSummary;
+}
+
+export class TestResultComparisonDtoApiResponse implements ITestResultComparisonDtoApiResponse {
+    success?: boolean;
+    data?: TestResultComparisonDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ITestResultComparisonDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? TestResultComparisonDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): TestResultComparisonDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestResultComparisonDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ITestResultComparisonDtoApiResponse {
+    success?: boolean;
+    data?: TestResultComparisonDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class TestSessionStatusDto implements ITestSessionStatusDto {
@@ -22022,6 +24444,218 @@ export interface ITestSessionStatusDtoApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class TestStatistics implements ITestStatistics {
+    totalTests?: number;
+    successfulTests?: number;
+    failedTests?: number;
+    successRate?: number;
+    averageExecutionTime?: number;
+    medianExecutionTime?: number;
+    totalActionsExecuted?: number;
+    firstTestDate?: Date | undefined;
+    lastTestDate?: Date | undefined;
+    uniqueUrls?: number;
+    uniqueProfiles?: number;
+
+    constructor(data?: ITestStatistics) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalTests = _data["totalTests"];
+            this.successfulTests = _data["successfulTests"];
+            this.failedTests = _data["failedTests"];
+            this.successRate = _data["successRate"];
+            this.averageExecutionTime = _data["averageExecutionTime"];
+            this.medianExecutionTime = _data["medianExecutionTime"];
+            this.totalActionsExecuted = _data["totalActionsExecuted"];
+            this.firstTestDate = _data["firstTestDate"] ? new Date(_data["firstTestDate"].toString()) : <any>undefined;
+            this.lastTestDate = _data["lastTestDate"] ? new Date(_data["lastTestDate"].toString()) : <any>undefined;
+            this.uniqueUrls = _data["uniqueUrls"];
+            this.uniqueProfiles = _data["uniqueProfiles"];
+        }
+    }
+
+    static fromJS(data: any): TestStatistics {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestStatistics();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalTests"] = this.totalTests;
+        data["successfulTests"] = this.successfulTests;
+        data["failedTests"] = this.failedTests;
+        data["successRate"] = this.successRate;
+        data["averageExecutionTime"] = this.averageExecutionTime;
+        data["medianExecutionTime"] = this.medianExecutionTime;
+        data["totalActionsExecuted"] = this.totalActionsExecuted;
+        data["firstTestDate"] = this.firstTestDate ? this.firstTestDate.toISOString() : <any>undefined;
+        data["lastTestDate"] = this.lastTestDate ? this.lastTestDate.toISOString() : <any>undefined;
+        data["uniqueUrls"] = this.uniqueUrls;
+        data["uniqueProfiles"] = this.uniqueProfiles;
+        return data;
+    }
+}
+
+export interface ITestStatistics {
+    totalTests?: number;
+    successfulTests?: number;
+    failedTests?: number;
+    successRate?: number;
+    averageExecutionTime?: number;
+    medianExecutionTime?: number;
+    totalActionsExecuted?: number;
+    firstTestDate?: Date | undefined;
+    lastTestDate?: Date | undefined;
+    uniqueUrls?: number;
+    uniqueProfiles?: number;
+}
+
+export class TestStatisticsApiResponse implements ITestStatisticsApiResponse {
+    success?: boolean;
+    data?: TestStatistics;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ITestStatisticsApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? TestStatistics.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): TestStatisticsApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestStatisticsApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ITestStatisticsApiResponse {
+    success?: boolean;
+    data?: TestStatistics;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class TestTrendDataPoint implements ITestTrendDataPoint {
+    date?: Date;
+    testCount?: number;
+    successRate?: number;
+    averageExecutionTime?: number;
+    errorCount?: number;
+
+    constructor(data?: ITestTrendDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.testCount = _data["testCount"];
+            this.successRate = _data["successRate"];
+            this.averageExecutionTime = _data["averageExecutionTime"];
+            this.errorCount = _data["errorCount"];
+        }
+    }
+
+    static fromJS(data: any): TestTrendDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestTrendDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["testCount"] = this.testCount;
+        data["successRate"] = this.successRate;
+        data["averageExecutionTime"] = this.averageExecutionTime;
+        data["errorCount"] = this.errorCount;
+        return data;
+    }
+}
+
+export interface ITestTrendDataPoint {
+    date?: Date;
+    testCount?: number;
+    successRate?: number;
+    averageExecutionTime?: number;
+    errorCount?: number;
+}
+
 export class TestWarningDto implements ITestWarningDto {
     code?: string | undefined;
     message?: string | undefined;
@@ -22072,6 +24706,70 @@ export interface ITestWarningDto {
     details?: string | undefined;
     actionIndex?: number | undefined;
     timestamp?: Date;
+}
+
+export class TopErrorDto implements ITopErrorDto {
+    errorMessage?: string | undefined;
+    occurrences?: number;
+    percentage?: number;
+    affectedUrls?: string[] | undefined;
+    firstOccurrence?: Date | undefined;
+    lastOccurrence?: Date | undefined;
+
+    constructor(data?: ITopErrorDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.errorMessage = _data["errorMessage"];
+            this.occurrences = _data["occurrences"];
+            this.percentage = _data["percentage"];
+            if (Array.isArray(_data["affectedUrls"])) {
+                this.affectedUrls = [] as any;
+                for (let item of _data["affectedUrls"])
+                    this.affectedUrls!.push(item);
+            }
+            this.firstOccurrence = _data["firstOccurrence"] ? new Date(_data["firstOccurrence"].toString()) : <any>undefined;
+            this.lastOccurrence = _data["lastOccurrence"] ? new Date(_data["lastOccurrence"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): TopErrorDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TopErrorDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["errorMessage"] = this.errorMessage;
+        data["occurrences"] = this.occurrences;
+        data["percentage"] = this.percentage;
+        if (Array.isArray(this.affectedUrls)) {
+            data["affectedUrls"] = [];
+            for (let item of this.affectedUrls)
+                data["affectedUrls"].push(item);
+        }
+        data["firstOccurrence"] = this.firstOccurrence ? this.firstOccurrence.toISOString() : <any>undefined;
+        data["lastOccurrence"] = this.lastOccurrence ? this.lastOccurrence.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ITopErrorDto {
+    errorMessage?: string | undefined;
+    occurrences?: number;
+    percentage?: number;
+    affectedUrls?: string[] | undefined;
+    firstOccurrence?: Date | undefined;
+    lastOccurrence?: Date | undefined;
 }
 
 export class UpdateAiConfigurationDto implements IUpdateAiConfigurationDto {

@@ -1,0 +1,391 @@
+.advanced-config-dialog {
+  .dialog-content {
+    padding: 0;
+    margin: 0;
+    min-height: 60vh;
+    max-height: 80vh;
+    overflow: hidden;
+  }
+
+  h1[mat-dialog-title] {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    padding: 24px;
+    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+    color: white;
+    border-radius: 4px 4px 0 0;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .config-form {
+    height: 100%;
+
+    mat-tab-group {
+      height: 100%;
+
+      ::ng-deep .mat-mdc-tab-body-wrapper {
+        height: calc(100% - 48px);
+        overflow: auto;
+      }
+
+      ::ng-deep .mat-mdc-tab-body-content {
+        height: 100%;
+        overflow: auto;
+      }
+    }
+  }
+
+  .tab-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-height: calc(60vh - 120px);
+  }
+
+  .config-section {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    mat-card-header {
+      background: #f8f9fa;
+      border-radius: 8px 8px 0 0;
+      padding: 16px 24px;
+
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin: 0;
+
+        mat-icon {
+          color: #1976d2;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+
+      .card-actions {
+        margin-left: auto;
+      }
+    }
+
+    mat-card-content {
+      padding: 24px;
+    }
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .toggle-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .config-toggle {
+      .mat-mdc-slide-toggle-content {
+        width: 100%;
+      }
+
+      .toggle-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        strong {
+          font-weight: 500;
+          color: #333;
+        }
+
+        small {
+          color: #666;
+          font-size: 0.875rem;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+
+  .option-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px 0;
+
+    strong {
+      font-weight: 500;
+    }
+
+    small {
+      color: #666;
+      font-size: 0.875rem;
+    }
+  }
+
+  .header-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .header-key {
+      min-width: 150px;
+    }
+
+    .header-value {
+      min-width: 200px;
+    }
+
+    button {
+      margin-top: -12px; // Align with form field content
+    }
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 32px;
+    color: #666;
+    text-align: center;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      opacity: 0.5;
+    }
+
+    p {
+      margin: 0;
+      font-style: italic;
+    }
+  }
+
+  .timeout-info {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 16px;
+    background: #f0f7ff;
+    border: 1px solid #bbdefb;
+    border-radius: 4px;
+
+    mat-icon {
+      color: #1976d2;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+    }
+
+    div {
+      flex: 1;
+
+      strong {
+        color: #1976d2;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 16px;
+
+        li {
+          margin-bottom: 4px;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+
+  .dialog-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid #e0e0e0;
+    background: #fafafa;
+    border-radius: 0 0 4px 4px;
+
+    .spacer {
+      flex: 1;
+    }
+
+    button {
+      min-width: 120px;
+
+      &[mat-raised-button] {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+
+  // Dark theme support
+  .dark-theme & {
+    .config-section {
+      border-color: #424242;
+      background: #303030;
+
+      mat-card-header {
+        background: #424242;
+        color: #fff;
+      }
+
+      mat-card-content {
+        background: #303030;
+        color: #fff;
+      }
+    }
+
+    .timeout-info {
+      background: #1a237e;
+      border-color: #3f51b5;
+      color: #fff;
+    }
+
+    .dialog-actions {
+      background: #424242;
+      border-color: #616161;
+    }
+
+    h1[mat-dialog-title] {
+      background: linear-gradient(135deg, #303f9f 0%, #1976d2 100%);
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    .dialog-content {
+      min-height: 50vh;
+    }
+
+    .tab-content {
+      padding: 16px;
+      gap: 16px;
+    }
+
+    .config-section {
+      mat-card-header {
+        padding: 12px 16px;
+      }
+
+      mat-card-content {
+        padding: 16px;
+      }
+    }
+
+    .dialog-actions {
+      flex-direction: column;
+      align-items: stretch;
+
+      button {
+        width: 100%;
+        margin: 4px 0;
+      }
+
+      .spacer {
+        display: none;
+      }
+    }
+
+    .header-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+
+      button {
+        justify-self: center;
+        margin-top: 8px;
+      }
+    }
+  }
+
+  // Animation enhancements
+  .config-section {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // Form field enhancements
+  mat-form-field {
+    .mat-mdc-form-field-hint {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    &.mat-form-field-invalid {
+      .mat-mdc-form-field-error {
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  // Better focus states
+  mat-slide-toggle:focus-visible {
+    outline: 2px solid #1976d2;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  // Enhanced visual hierarchy
+  mat-card-title {
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.025em;
+  }
+
+  // Improved accessibility
+  .toggle-content {
+    cursor: pointer;
+  }
+
+  // Better spacing for large content
+  .full-width {
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+  }
+} 

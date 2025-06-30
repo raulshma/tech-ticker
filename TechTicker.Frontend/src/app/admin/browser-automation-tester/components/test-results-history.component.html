@@ -1,0 +1,342 @@
+<!-- Test Results History Management -->
+<div class="test-results-history">
+  <!-- Header with statistics -->
+  <mat-card class="statistics-card" *ngIf="hasStatistics">
+    <mat-card-header>
+      <mat-card-title>Test Results Overview</mat-card-title>
+      <mat-card-subtitle>Comprehensive test execution analytics</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="statistics-grid">
+        <div class="stat-item">
+          <mat-icon class="stat-icon">assessment</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">{{ statistics?.totalTests || 0 }}</div>
+            <div class="stat-label">Total Tests</div>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <mat-icon class="stat-icon success">check_circle</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">{{ statistics?.successfulTests || 0 }}</div>
+            <div class="stat-label">Successful</div>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <mat-icon class="stat-icon error">error</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">{{ statistics?.failedTests || 0 }}</div>
+            <div class="stat-label">Failed</div>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <mat-icon class="stat-icon" [class]="getSuccessRateColor(statistics?.successRate || 0)">trending_up</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">{{ (statistics?.successRate || 0).toFixed(1) }}%</div>
+            <div class="stat-label">Success Rate</div>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <mat-icon class="stat-icon">timer</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">{{ formatDuration(statistics?.averageExecutionTime || 0) }}</div>
+            <div class="stat-label">Avg Duration</div>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <mat-icon class="stat-icon">language</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">{{ statistics?.uniqueUrls || 0 }}</div>
+            <div class="stat-label">Unique URLs</div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Filters and Search -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <form [formGroup]="filterForm" class="filters-form">
+        <div class="filter-row">
+          <!-- Search -->
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search test results</mat-label>
+            <input matInput 
+                   formControlName="searchTerm"
+                   (input)="onSearchChange()"
+                   placeholder="Search by name, description, or URL">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          
+          <!-- Tag Filter -->
+          <mat-form-field appearance="outline" class="tags-field">
+            <mat-label>Filter by tags</mat-label>
+            <mat-select [(value)]="selectedTags" 
+                        multiple 
+                        (selectionChange)="onTagSelectionChange()">
+              <mat-option *ngFor="let tag of availableTags" [value]="tag">
+                {{ tag }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <!-- Actions -->
+          <div class="filter-actions">
+            <button mat-raised-button 
+                    color="primary" 
+                    [disabled]="!canCompare()"
+                    (click)="compareSelected()"
+                    *ngIf="comparisonMode">
+              <mat-icon>compare</mat-icon>
+              Compare Selected
+            </button>
+            
+            <button mat-button 
+                    color="primary"
+                    (click)="enableComparisonMode()"
+                    *ngIf="!comparisonMode">
+              <mat-icon>compare</mat-icon>
+              Compare Mode
+            </button>
+            
+            <button mat-button 
+                    (click)="disableComparisonMode()"
+                    *ngIf="comparisonMode">
+              <mat-icon>close</mat-icon>
+              Exit Compare
+            </button>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Bulk Actions Bar -->
+  <div class="bulk-actions-bar" *ngIf="hasSelection">
+    <div class="selection-info">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ selectionCount }} selected</span>
+    </div>
+    
+    <div class="bulk-actions">
+      <button mat-button 
+              color="warn"
+              (click)="bulkDelete()">
+        <mat-icon>delete</mat-icon>
+        Delete Selected
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Table -->
+  <mat-card class="results-table-card">
+    <mat-card-content>
+      <!-- Loading Spinner -->
+      <div class="loading-container" *ngIf="isLoading">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading test results...</p>
+      </div>
+
+      <!-- Results Table -->
+      <div class="table-container" *ngIf="!isLoading">
+        <table mat-table [dataSource]="dataSource" matSort class="results-table">
+          <!-- Selection Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox (change)="masterToggle()"
+                           [checked]="selection.hasValue() && isAllSelected()"
+                           [indeterminate]="selection.hasValue() && !isAllSelected()">
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()"
+                           (change)="toggleSelection(row)"
+                           [checked]="selection.isSelected(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+            <td mat-cell *matCellDef="let result">
+              <mat-icon [class]="getStatusColor(result.success)" 
+                        [matTooltip]="result.success ? 'Test Successful' : 'Test Failed'">
+                {{ getStatusIcon(result.success) }}
+              </mat-icon>
+            </td>
+          </ng-container>
+
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell *matCellDef="let result">
+              <div class="name-cell">
+                <div class="name-primary">{{ result.name }}</div>
+                <div class="name-secondary" *ngIf="result.description">{{ result.description }}</div>
+                <div class="tags-container" *ngIf="result.tags && result.tags.length > 0">
+                  <mat-chip-listbox>
+                    <mat-chip-option *ngFor="let tag of result.tags" class="tag-chip">
+                      {{ tag }}
+                    </mat-chip-option>
+                  </mat-chip-listbox>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Test URL Column -->
+          <ng-container matColumnDef="testUrl">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Test URL</th>
+            <td mat-cell *matCellDef="let result">
+              <div class="url-cell" [matTooltip]="result.testUrl">
+                {{ result.testUrl.length > 50 ? (result.testUrl | slice:0:50) + '...' : result.testUrl }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Duration Column -->
+          <ng-container matColumnDef="duration">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Duration</th>
+            <td mat-cell *matCellDef="let result">
+              <div class="duration-cell">
+                <mat-icon class="metric-icon">timer</mat-icon>
+                <span>{{ formatDuration(result.duration) }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Actions Executed Column -->
+          <ng-container matColumnDef="actionsExecuted">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
+            <td mat-cell *matCellDef="let result">
+              <div class="actions-cell">
+                <mat-icon class="metric-icon">play_arrow</mat-icon>
+                <span>{{ result.actionsExecuted }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Error Count Column -->
+          <ng-container matColumnDef="errorCount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Errors</th>
+            <td mat-cell *matCellDef="let result">
+              <div class="errors-cell" [class.has-errors]="result.errorCount > 0">
+                <mat-icon class="metric-icon" [class.error]="result.errorCount > 0">
+                  {{ result.errorCount > 0 ? 'error' : 'check' }}
+                </mat-icon>
+                <span>{{ result.errorCount }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Executed At Column -->
+          <ng-container matColumnDef="executedAt">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Executed At</th>
+            <td mat-cell *matCellDef="let result">
+              <div class="date-cell">
+                <div class="date-primary">{{ formatDate(result.executedAt) }}</div>
+                <div class="date-secondary">{{ result.createdBy }}</div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let result">
+              <div class="actions-cell">
+                <button mat-icon-button 
+                        [matMenuTriggerFor]="actionMenu"
+                        [matTooltip]="'More actions'">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                
+                <mat-menu #actionMenu="matMenu">
+                  <button mat-menu-item (click)="viewDetails(result)">
+                    <mat-icon>visibility</mat-icon>
+                    <span>View Details</span>
+                  </button>
+                  
+                  <mat-divider></mat-divider>
+                  
+                  <button mat-menu-item (click)="exportResult(result, 'json')">
+                    <mat-icon>download</mat-icon>
+                    <span>Export JSON</span>
+                  </button>
+                  
+                  <button mat-menu-item (click)="exportResult(result, 'csv')">
+                    <mat-icon>table_chart</mat-icon>
+                    <span>Export CSV</span>
+                  </button>
+                  
+                  <button mat-menu-item (click)="exportResult(result, 'pdf')">
+                    <mat-icon>picture_as_pdf</mat-icon>
+                    <span>Export PDF</span>
+                  </button>
+                  
+                  <mat-divider></mat-divider>
+                  
+                  <button mat-menu-item 
+                          (click)="deleteResult(result)"
+                          class="delete-action">
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete</span>
+                  </button>
+                </mat-menu>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+              [class.selected]="selection.isSelected(row)"
+              [class.comparison-selected]="comparisonMode && selectedForComparison.includes(row)">
+          </tr>
+        </table>
+
+        <!-- No Results Message -->
+        <div class="no-results" *ngIf="dataSource.data.length === 0 && !isLoading">
+          <mat-icon class="no-results-icon">history</mat-icon>
+          <h3>No Test Results Found</h3>
+          <p>There are no saved test results matching your criteria.</p>
+          <p>Try adjusting your search terms or filters, or run some tests to see results here.</p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator [length]="totalCount"
+                     [pageSize]="pageSize"
+                     [pageSizeOptions]="[10, 20, 50, 100]"
+                     [showFirstLastButtons]="true"
+                     (page)="onPageChange($event)"
+                     *ngIf="totalCount > 0">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Comparison Mode Info -->
+  <div class="comparison-info" *ngIf="comparisonMode">
+    <mat-card class="info-card">
+      <mat-card-content>
+        <div class="comparison-status">
+          <mat-icon>compare</mat-icon>
+          <div class="status-text">
+            <strong>Comparison Mode Active</strong>
+            <p>Select exactly 2 test results to compare their performance and outcomes.</p>
+            <p *ngIf="selectedForComparison.length === 1">1 result selected. Select 1 more to compare.</p>
+            <p *ngIf="selectedForComparison.length === 2" class="ready-to-compare">
+              2 results selected. Click "Compare Selected" to proceed.
+            </p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div> 

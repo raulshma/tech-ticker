@@ -203,40 +203,7 @@ public class BrowserAutomationTestController : BaseApiController
         }
     }
 
-    /// <summary>
-    /// Save test results for future reference
-    /// </summary>
-    /// <param name="sessionId">Session ID</param>
-    /// <param name="request">Save request with name and description</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Saved result ID</returns>
-    [HttpPost("{sessionId}/save")]
-    [RequirePermission(Permissions.ScrapersManageSites)]
-    public async Task<ActionResult<ApiResponse<string>>> SaveTestResults(
-        string sessionId,
-        [FromBody] SaveTestResultsRequestDto request,
-        CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            _logger.LogInformation("Saving test results for session {SessionId} with name {Name}", 
-                sessionId, request.Name);
 
-            var result = await _testService.SaveTestResultsAsync(
-                sessionId, 
-                request.Name, 
-                request.Description, 
-                request.Tags, 
-                cancellationToken);
-            
-            return HandleResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error saving test results for session {SessionId}", sessionId);
-            return StatusCode(500, ApiResponse<string>.FailureResult("Internal server error", 500));
-        }
-    }
 
     /// <summary>
     /// Validate a browser automation profile without executing
@@ -311,15 +278,7 @@ public class BrowserAutomationTestController : BaseApiController
     }
 }
 
-/// <summary>
-/// Request DTO for saving test results
-/// </summary>
-public class SaveTestResultsRequestDto
-{
-    public string Name { get; set; } = null!;
-    public string? Description { get; set; }
-    public List<string>? Tags { get; set; }
-}
+
 
 /// <summary>
 /// Request DTO for profile validation

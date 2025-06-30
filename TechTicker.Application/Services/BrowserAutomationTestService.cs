@@ -128,7 +128,7 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
         }
     }
 
-    public async Task<Result<TestSessionStatusDto>> GetTestSessionStatusAsync(
+    public Task<Result<TestSessionStatusDto>> GetTestSessionStatusAsync(
         string sessionId,
         CancellationToken cancellationToken = default)
     {
@@ -144,23 +144,23 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
                     LastUpdated = DateTimeOffset.UtcNow
                 };
 
-                return Result<TestSessionStatusDto>.Success(status);
+                return Task.FromResult(Result<TestSessionStatusDto>.Success(status));
             }
 
-            return Result<TestSessionStatusDto>.Failure(
+            return Task.FromResult(Result<TestSessionStatusDto>.Failure(
                 "Test session not found", 
-                "TEST_SESSION_NOT_FOUND");
+                "TEST_SESSION_NOT_FOUND"));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting test session status {SessionId}", sessionId);
-            return Result<TestSessionStatusDto>.Failure(
+            return Task.FromResult(Result<TestSessionStatusDto>.Failure(
                 "Failed to get test session status", 
-                "TEST_SESSION_STATUS_ERROR");
+                "TEST_SESSION_STATUS_ERROR"));
         }
     }
 
-    public async Task<Result<BrowserAutomationTestResultDto>> GetTestSessionResultsAsync(
+    public Task<Result<BrowserAutomationTestResultDto>> GetTestSessionResultsAsync(
         string sessionId,
         CancellationToken cancellationToken = default)
     {
@@ -168,23 +168,23 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
         {
             if (_activeSessions.TryGetValue(sessionId, out var session) && session.Result != null)
             {
-                return Result<BrowserAutomationTestResultDto>.Success(session.Result);
+                return Task.FromResult(Result<BrowserAutomationTestResultDto>.Success(session.Result));
             }
 
-            return Result<BrowserAutomationTestResultDto>.Failure(
+            return Task.FromResult(Result<BrowserAutomationTestResultDto>.Failure(
                 "Test results not available", 
-                "TEST_RESULTS_NOT_AVAILABLE");
+                "TEST_RESULTS_NOT_AVAILABLE"));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting test session results {SessionId}", sessionId);
-            return Result<BrowserAutomationTestResultDto>.Failure(
+            return Task.FromResult(Result<BrowserAutomationTestResultDto>.Failure(
                 "Failed to get test session results", 
-                "TEST_SESSION_RESULTS_ERROR");
+                "TEST_SESSION_RESULTS_ERROR"));
         }
     }
 
-    public async Task<Result<string>> GetTestSessionScreenshotAsync(
+    public Task<Result<string>> GetTestSessionScreenshotAsync(
         string sessionId,
         CancellationToken cancellationToken = default)
     {
@@ -193,23 +193,23 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
             if (_activeSessions.TryGetValue(sessionId, out var session) && 
                 !string.IsNullOrEmpty(session.CurrentScreenshot))
             {
-                return Result<string>.Success(session.CurrentScreenshot);
+                return Task.FromResult(Result<string>.Success(session.CurrentScreenshot));
             }
 
-            return Result<string>.Failure(
+            return Task.FromResult(Result<string>.Failure(
                 "Screenshot not available", 
-                "SCREENSHOT_NOT_AVAILABLE");
+                "SCREENSHOT_NOT_AVAILABLE"));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting test session screenshot {SessionId}", sessionId);
-            return Result<string>.Failure(
+            return Task.FromResult(Result<string>.Failure(
                 "Failed to get screenshot", 
-                "SCREENSHOT_ERROR");
+                "SCREENSHOT_ERROR"));
         }
     }
 
-    public async Task<Result<List<BrowserTestSessionDto>>> GetActiveTestSessionsAsync(
+    public Task<Result<List<BrowserTestSessionDto>>> GetActiveTestSessionsAsync(
         CancellationToken cancellationToken = default)
     {
         try
@@ -230,41 +230,18 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
                 })
                 .ToList();
 
-            return Result<List<BrowserTestSessionDto>>.Success(sessions);
+            return Task.FromResult(Result<List<BrowserTestSessionDto>>.Success(sessions));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting active test sessions");
-            return Result<List<BrowserTestSessionDto>>.Failure(
+            return Task.FromResult(Result<List<BrowserTestSessionDto>>.Failure(
                 "Failed to get active test sessions", 
-                "ACTIVE_SESSIONS_ERROR");
+                "ACTIVE_SESSIONS_ERROR"));
         }
     }
 
-    public async Task<Result<string>> SaveTestResultsAsync(
-        string sessionId,
-        string name,
-        string? description = null,
-        List<string>? tags = null,
-        CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            // TODO: Implement test result persistence
-            _logger.LogInformation("Saving test results for session {SessionId} with name {Name}", 
-                sessionId, name);
 
-            var savedResultId = Guid.NewGuid().ToString();
-            return Result<string>.Success(savedResultId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error saving test results for session {SessionId}", sessionId);
-            return Result<string>.Failure(
-                "Failed to save test results", 
-                "SAVE_RESULTS_ERROR");
-        }
-    }
 
     private async Task ExecuteTestAsync(TestSession session, CancellationToken cancellationToken)
     {

@@ -33,7 +33,8 @@ public class AiConfigurationServiceTests : IDisposable
         _aiProviderMock.Setup(p => p.ProviderName).Returns("GoogleGemini");
 
         var aiProviders = new[] { _aiProviderMock.Object };
-        _service = new AiConfigurationService(_repositoryMock.Object, _loggerMock.Object, aiProviders);
+        const string encryptionKey = "test-encryption-key-for-unit-tests";
+        _service = new AiConfigurationService(_repositoryMock.Object, _loggerMock.Object, aiProviders, encryptionKey);
     }
 
     [Fact]
