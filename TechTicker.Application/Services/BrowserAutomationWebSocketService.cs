@@ -16,6 +16,9 @@ public class BrowserAutomationWebSocketService : IBrowserAutomationWebSocketServ
     private readonly ConcurrentDictionary<string, HashSet<string>> _sessionConnections;
     private readonly ConcurrentDictionary<string, string> _connectionSessions;
 
+    // Event to notify API layer about broadcasts
+    public static event Func<string, string, object, Task>? OnBroadcastRequested;
+
     public BrowserAutomationWebSocketService(
         IServiceProvider serviceProvider,
         ILogger<BrowserAutomationWebSocketService> logger)
@@ -192,18 +195,31 @@ public class BrowserAutomationWebSocketService : IBrowserAutomationWebSocketServ
     {
         try
         {
-            // Note: Actual SignalR broadcasting will be handled by the API service layer
-            // This is a placeholder implementation that stores the data for now
-            _logger.LogTrace("Broadcasting {Method} to session {SessionId}", method, sessionId);
+            var groupName = GetSessionGroupName(sessionId);
             
-            // TODO: Implement actual SignalR broadcasting when we have the hub context
-            await Task.CompletedTask;
+            // Use event to notify API layer to handle the actual SignalR broadcasting
+            if (OnBroadcastRequested != null)
+            {
+                await OnBroadcastRequested.Invoke(groupName, method, data);
+                _logger.LogTrace("Successfully requested broadcast of {Method} to session group {GroupName}", method, groupName);
+            }
+            else
+            {
+                _logger.LogWarning("No broadcast handler available for {Method} to session {SessionId}", method, sessionId);
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error broadcasting {Method} to session {SessionId}", method, sessionId);
         }
     }
+
+    /// <summary>
+    /// Get the SignalR group name for a test session
+    /// </summary>
+    /// <param name="sessionId">Test session ID</param>
+    /// <returns>Group name</returns>
+    private static string GetSessionGroupName(string sessionId) => $"test-session-{sessionId}";
 }
 
  

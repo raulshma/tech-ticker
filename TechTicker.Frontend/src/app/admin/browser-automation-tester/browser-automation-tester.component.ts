@@ -252,35 +252,40 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
     this.logs = [];
   }
 
-  exportLogs(): void {
-    const logData = JSON.stringify(this.logs, null, 2);
-    const blob = new Blob([logData], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `test-logs-${new Date().toISOString()}.json`;
-    link.click();
-    window.URL.revokeObjectURL(url);
+  async exportLogs(): Promise<void> {
+    try {
+      const logsData = JSON.stringify(this.logs, null, 2);
+      const blob = new Blob([logsData], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `browser-automation-logs-${new Date().toISOString()}.json`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      this.showSuccessMessage('Logs exported successfully!');
+    } catch (error: any) {
+      console.error('Error exporting logs:', error);
+      this.showErrorMessage(`Failed to export logs: ${error.message}`);
+    }
   }
 
   async saveResults(): Promise<void> {
     if (!this.currentSessionId || !this.testResults) return;
 
     try {
-      const saveRequest = new SaveTestResultsRequestDto({
-        name: `Test Results ${new Date().toLocaleString()}`,
-        description: 'Browser automation test results',
-        tags: ['browser-test', 'automated']
+      const request = new SaveTestResultsRequestDto({
+        name: `Test Session ${new Date().toISOString()}`,
+        description: `Browser automation test for ${this.testerForm.value.testUrl}`,
+        tags: ['browser-automation', 'test']
       });
 
-      const response = await this.apiClient.saveTestResults(this.currentSessionId, saveRequest).toPromise();
-      
+      const response = await this.apiClient.saveTestResults(this.currentSessionId, request).toPromise();
       if (response?.data) {
-        this.showSuccessMessage('Results saved successfully!');
+        this.showSuccessMessage(`Test results saved with ID: ${response.data}`);
       }
     } catch (error: any) {
-      console.error('Error saving results:', error);
-      this.showErrorMessage(`Failed to save results: ${error.message}`);
+      console.error('Error saving test results:', error);
+      this.showErrorMessage(`Failed to save test results: ${error.message}`);
     }
   }
 
@@ -315,12 +320,12 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
       case 'warn': return 'warning';
       case 'info': return 'info';
       case 'debug': return 'bug_report';
-      default: return 'message';
+      default: return 'info';
     }
   }
 
   getLogLevelClass(level: string): string {
-    return `log-${level?.toLowerCase() || 'info'}`;
+    return `log-level-${level?.toLowerCase() || 'info'}`;
   }
 
   getActionIcon(actionType: string): string {
@@ -334,12 +339,31 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatTimestamp(timestamp: string): string {
-    return new Date(timestamp).toLocaleTimeString();
+  formatTimestamp(timestamp: string | Date): string {
+    try {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit',
+        fractionalSecondDigits: 3
+      });
+    } catch {
+      return String(timestamp);
+    }
   }
 
-  formatDuration(ms: number): string {
-    return `${(ms / 1000).toFixed(2)}s`;
+  formatDuration(durationMs: number): string {
+    if (durationMs < 1000) {
+      return `${durationMs}ms`;
+    } else if (durationMs < 60000) {
+      return `${(durationMs / 1000).toFixed(1)}s`;
+    } else {
+      const minutes = Math.floor(durationMs / 60000);
+      const seconds = Math.floor((durationMs % 60000) / 1000);
+      return `${minutes}m ${seconds}s`;
+    }
   }
 
   trackByLogIndex(index: number, item: any): number {

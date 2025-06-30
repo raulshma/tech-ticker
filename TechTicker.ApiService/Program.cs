@@ -14,6 +14,7 @@ using TechTicker.DataAccess.Repositories;
 using TechTicker.DataAccess.Repositories.Interfaces;
 using TechTicker.DataAccess.Seeders;
 using TechTicker.Domain.Entities;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -264,6 +265,16 @@ app.UseStaticFiles();
 
 // Initialize database and roles
 await InitializeDatabaseAsync(app);
+
+// Configure SignalR broadcasting handler
+TechTicker.Application.Services.BrowserAutomationWebSocketService.OnBroadcastRequested += async (groupName, method, data) =>
+{
+    var hubContext = app.Services.GetService<IHubContext<TechTicker.ApiService.Hubs.BrowserAutomationTestHub>>();
+    if (hubContext != null)
+    {
+        await hubContext.Clients.Group(groupName).SendAsync(method, data);
+    }
+};
 
 app.Run();
 
