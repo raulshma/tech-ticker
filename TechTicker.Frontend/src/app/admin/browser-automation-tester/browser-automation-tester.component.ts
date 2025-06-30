@@ -69,6 +69,7 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
   currentSessionId: string | null = null;
   testProgress = 0;
   currentAction = '';
+  loading = false;
 
   // UI state
   browserFullscreen = false;
