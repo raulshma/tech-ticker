@@ -1,14 +1,14 @@
 ## TechTicker: E-commerce Price Tracker & Alerter - Detailed Software Specification
 
-**Version:** 2.2
-**Date:** June 29, 2025
+**Version:** 2.4
+**Date:** January 12, 2025
 **System Model:** Admin-Managed Exact Product URLs (Focus on Reduced Detectability, with Product Categories)
 **Architecture Model:** Monolith with .NET Aspire Backend & Angular SPA Frontend
 **Target Audience:** Development Team / Automated Coding Agent
-**Status:** Fully Implemented and Operational with Advanced Features
+**Status:** Fully Implemented and Operational with Google Gemini AI Integration, Microsoft Playwright Browser Automation, and Advanced Proxy Management
 
 **Preamble:**
-This document provides a comprehensive specification of the fully implemented TechTicker application, including its backend services and Angular frontend for administration and CRM. The system is operational and includes all described features plus recent enhancements. This documentation reflects the actual implemented state of the system as of July 2025, including all APIs, frontend components, background workers, database schema, proxy management, bulk operations, and comprehensive testing infrastructure.
+This document provides a comprehensive specification of the fully implemented TechTicker application, including its backend services and Angular frontend for administration and CRM. The system is operational and includes all described features plus recent enhancements. This documentation reflects the actual implemented state of the system as of January 2025, including all APIs, frontend components, background workers, database schema, proxy management, bulk operations, browser automation, AI integration, and comprehensive testing infrastructure.
 
 **Table of Contents:**
 
@@ -117,13 +117,15 @@ While the backend is a monolith, logical separation of concerns is maintained by
 **2.2.1 Backend Technology Stack**
 *   **Application Framework:** .NET 9.0 with ASP.NET Core (for the main web application/API) and .NET Worker Services (for background tasks).
 *   **Orchestration & Development:** **.NET Aspire 9.3.1**.
-*   **Database:** PostgreSQL. Use **Npgsql** as the ADO.NET provider. Use **Entity Framework Core (EF Core)** as the ORM.
+*   **Database:** PostgreSQL with **Npgsql.EntityFrameworkCore.PostgreSQL 9.0.4** as the provider. **Entity Framework Core 9.0.6** as the ORM.
 *   **Message Broker:** RabbitMQ with **Aspire.RabbitMQ.Client 9.3.1**.
-*   **Web Scraping Library:** **HtmlAgilityPack** for HTML parsing. `HttpClientFactory` for making HTTP requests with proxy support.
-*   **Authentication:** JWT (JSON Web Tokens). Use **ASP.NET Core Identity** for user management and **`Microsoft.AspNetCore.Authentication.JwtBearer`** for JWT validation.
-*   **Notifications:** **Discord.Net.Webhook 3.17.4** for Discord notifications.
-*   **Containerization:** Docker. .NET Aspire will assist in generating Dockerfiles.
-*   **Logging:** **Serilog** integrated with .NET Aspire's OpenTelemetry support. Configure Serilog to write to console (for Aspire Dashboard) and potentially a file or a structured logging sink in production.
+*   **Web Scraping Library:** **AngleSharp 1.3.0** for HTML parsing. `HttpClientFactory` for making HTTP requests with comprehensive proxy support.
+*   **Browser Automation:** **Microsoft.Playwright 1.53.0** for advanced scraping scenarios requiring JavaScript execution, supporting Chromium, Firefox, and WebKit browsers.
+*   **Authentication:** JWT (JSON Web Tokens) with **Microsoft.AspNetCore.Authentication.JwtBearer 9.0.6**. **ASP.NET Core Identity 9.0.6** for user management with comprehensive RBAC.
+*   **Notifications:** Custom Discord webhook implementation using **Discord.Net.Webhook 3.17.4** for Discord notifications with user preference management.
+*   **AI Integration:** **Google Gemini AI** for intelligent browser action generation, content processing, and automated scraping optimization with encrypted API key storage.
+*   **Containerization:** Docker. .NET Aspire assists in generating Dockerfiles for production deployment.
+*   **Logging:** **Serilog** integrated with .NET Aspire's OpenTelemetry support. Configured for console output (Aspire Dashboard) and structured logging.
 *   **Project Structure (Implemented):**
     *   `TechTicker.AppHost`: The Aspire orchestrator project. Defines resources like PostgreSQL, RabbitMQ, and orchestrates all services during development.
     *   `TechTicker.ApiService`: ASP.NET Core Web API project. Contains API Controllers, business logic services, EF Core DbContext, and data repositories. Handles synchronous operations and publishes messages for asynchronous tasks.
@@ -137,22 +139,25 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   `TechTicker.ServiceDefaults`: Shared configurations for health checks, OpenTelemetry, and Serilog setup.
 
 **2.2.2 Frontend Technology Stack**
-*   **Framework:** Angular 20 (latest stable version).
-*   **Language:** TypeScript.
-*   **State Management:** Angular services with RxJS BehaviorSubjects for reactive state management.
-*   **UI Component Library:** Angular Material for comprehensive UI components and consistent design.
+*   **Framework:** Angular 20.0.3 (latest stable version).
+*   **Language:** TypeScript 5.8.3.
+*   **State Management:** Angular services with RxJS 7.8.0 BehaviorSubjects for reactive state management.
+*   **UI Component Library:** Angular Material 20.0.3 for comprehensive UI components and consistent design.
 *   **HTTP Client:** Angular's built-in `HttpClientModule` with NSwag-generated TypeScript client.
-*   **API Client Generation:** NSwag for automatic TypeScript client generation from OpenAPI specifications.
-*   **Routing:** Angular Router with lazy-loaded feature modules.
-*   **Forms:** Angular Reactive Forms with comprehensive validation.
-*   **Styling:** SCSS with Angular Material theming.
-*   **Build Tool:** Angular CLI.
-*   **Testing:** Jasmine and Karma for unit tests, with comprehensive test coverage.
-*   **Authentication:** JWT-based authentication with role-based access control (RBAC).
-*   **Image Handling:** Custom image gallery component with lazy loading and optimization.
-*   **Charts & Visualization:** ng2-charts with Chart.js for performance monitoring and analytics.
-*   **Virtual Scrolling:** Angular CDK virtual scrolling for large datasets and proxy lists.
-*   **Bulk Operations:** Advanced bulk import/export functionality with progress indicators.
+*   **API Client Generation:** NSwag 14.4.0 for automatic TypeScript client generation from OpenAPI specifications.
+*   **Routing:** Angular Router with lazy-loaded feature modules and role-based guards.
+*   **Forms:** Angular Reactive Forms with comprehensive validation and custom components.
+*   **Styling:** SCSS with Angular Material theming and modern design principles.
+*   **Build Tool:** Angular CLI 20.0.2.
+*   **Testing:** Jasmine 5.5.0 and Karma 6.4.0 for unit tests, with comprehensive test coverage.
+*   **Authentication:** JWT-based authentication with comprehensive role-based access control (RBAC) and permission-based directives.
+*   **Image Handling:** Custom image gallery component with lazy loading, optimization, and local storage integration.
+*   **Charts & Visualization:** ng2-charts 8.0.0 with Chart.js 4.5.0 for performance monitoring, analytics, and proxy statistics.
+*   **Virtual Scrolling:** Angular CDK virtual scrolling for large datasets, proxy lists, and scraper logs.
+*   **Bulk Operations:** Advanced bulk import/export functionality with progress indicators for proxies and configurations.
+*   **Browser Automation UI:** Custom browser automation profile builder with AI-powered action generation using Google Gemini integration.
+*   **Proxy Management:** Comprehensive proxy configuration interface with health monitoring, bulk operations, and performance analytics.
+*   **AI Configuration:** Advanced AI provider configuration with model selection, encrypted storage, and testing capabilities.
 
 ---
 
@@ -358,21 +363,35 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   `Scraping:FailureBackoffSeconds` (e.g., array for retry backoffs: `[60, 300, 1800]`)
 
 **3.4 Scraper Module**
-*   **Purpose:** Fetches and parses product pages.
-*   **Implementation:** A message consumer (`ScraperMessageConsumer`) in `TechTicker.ScrapingWorker` that handles `ScrapeProductPageCommand`.
+*   **Purpose:** Fetches and parses product pages using both traditional HTTP scraping and browser automation.
+*   **Implementation:** A message consumer (`WebScrapingService`) in `TechTicker.ScrapingWorker` that handles `ScrapeProductPageCommand`.
+*   **Dual Scraping Approach:**
+    1. **Traditional HTTP Scraping:** Uses `ProxyAwareHttpClientService` with intelligent proxy rotation
+    2. **Browser Automation:** Uses Microsoft Playwright for JavaScript-heavy sites requiring dynamic interaction
 *   **Logic (on receiving `ScrapeProductPageCommand`):**
-    1.  Log reception of command.
-    2.  Create `HttpClient` using `IHttpClientFactory`. Configure it: Set `User-Agent` header from `command.ScrapingProfile.UserAgent`. Add other headers from `command.ScrapingProfile.Headers`. Configure `CookieContainer` (`HttpClientHandler.UseCookies = true`). Set timeout (e.g., 30 seconds, configurable: `Scraper:HttpRequestTimeoutSeconds`).
-    3.  Perform HTTP GET request to `command.ExactProductUrl`.
-    4.  Handle HTTP response: If not success (2xx), log error, publish `ScrapingResultEvent` with `WasSuccessful = false`, `ErrorCode` (e.g., "HTTP_ERROR_XXX", "TIMEOUT"), `HttpStatusCode`, and return.
-    5.  Parse HTML content using HtmlAgilityPack: `var document = new HtmlDocument(); document.LoadHtml(htmlContent);`
-    6.  Extract data using selectors from `command.Selectors`: `productName = document.DocumentNode.SelectSingleNode(command.Selectors.ProductNameSelector)?.InnerText.Trim(); priceStr = document.DocumentNode.SelectSingleNode(command.Selectors.PriceSelector)?.InnerText.Trim(); stockStr = document.DocumentNode.SelectSingleNode(command.Selectors.StockSelector)?.InnerText.Trim();` Handle cases where selectors don't find elements.
-    7.  Attempt to parse price: Remove currency symbols, thousands separators. `Decimal.TryParse(cleanedPriceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price);`
-    8.  Publish `RawPriceDataEvent` (see Section 4) if price is successfully parsed. Include `ScrapedProductName`.
-    9.  Publish `ScrapingResultEvent` (see Section 4) with `WasSuccessful = true` (if core data like price was extracted) or `false` with `ErrorCode` (e.g., "PARSING_ERROR_PRICE") if critical data is missing.
+    1.  Log reception of command and create scraper run log entry.
+    2.  **Route Decision:** Check `command.RequiresBrowserAutomation` flag to determine scraping method.
+    3.  **HTTP Scraping Path:**
+        *   Use `ProxyAwareHttpClientService` with intelligent proxy selection from pool
+        *   Configure headers, user-agent, and proxy settings
+        *   Perform HTTP GET request with retry logic and error handling
+        *   Parse HTML content using AngleSharp: `var document = await BrowsingContext.New().OpenAsync(req => req.Content(htmlContent));`
+        *   Extract data using CSS selectors with comprehensive error handling
+        *   Process images if `ImageSelector` is configured
+    4.  **Browser Automation Path:**
+        *   Launch headless browser (Chromium, Firefox, or WebKit) using Playwright
+        *   Configure proxy, headers, and user-agent in browser context
+        *   Navigate to target URL with configurable timeouts
+        *   Execute custom actions (scroll, click, wait, etc.) from `BrowserAutomationProfile`
+        *   Extract data using selectors after page interactions
+        *   Handle JavaScript-rendered content and dynamic elements
+    5.  **Data Processing:** Parse price, normalize stock status, process product images
+    6.  **Result Publishing:** Publish `RawPriceDataEvent` and `ScrapingResultEvent` with comprehensive metadata
 *   **Configuration Keys (appsettings.json for `TechTicker.ScrapingWorker`):**
-    *   `Scraper:HttpRequestTimeoutSeconds` (e.g., 30)
-*   **Error Handling:** Catch exceptions during HTTP request, parsing. Publish failure `ScrapingResultEvent`. If CAPTCHA is suspected (heuristic: look for keywords), use `ErrorCode = "CAPTCHA_DETECTED"`.
+    *   `ProxyPool:Enabled`, `ProxyPool:SelectionStrategy`, `ProxyPool:MaxConsecutiveFailures`
+    *   `ImageScraping:MaxImagesPerProduct`, `ImageScraping:MaxImageSizeBytes`
+    *   `ImageStorage:BasePath` for local image storage
+*   **Error Handling:** Comprehensive error handling for HTTP failures, parsing errors, browser automation issues, proxy failures, and CAPTCHA detection. Automatic fallback strategies and retry logic with exponential backoff.
 
 **3.5 Price Normalization & Ingestion Module**
 *   **Purpose:** Validates and standardizes raw scraped data.
@@ -490,7 +509,7 @@ While the backend is a monolith, logical separation of concerns is maintained by
 
 **3.10 Notification Module**
 *   **Purpose:** Sends Discord notifications based on user preferences with comprehensive configuration options.
-*   **Implementation:** Message consumer (`AlertNotificationConsumer`) in `TechTicker.NotificationWorker` handles `AlertTriggeredEvent`. Uses **Discord.Net.Webhook 3.17.4** for Discord webhook integration.
+*   **Implementation:** Message consumer (`DiscordService`) in `TechTicker.NotificationWorker` handles `AlertTriggeredEvent`. Uses custom Discord webhook implementation for reliable notification delivery.
 *   **User Notification Preferences:** Each user can configure:
     *   Discord webhook URL (personal Discord server/channel)
     *   Enable/disable Discord notifications
@@ -526,9 +545,82 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   `GET /api/notification-preferences/stats` - Get notification delivery statistics
 *   **Configuration Keys (appsettings.json for `TechTicker.NotificationWorker`):**
     *   `Discord:BotName` (default bot name), `Discord:AvatarUrl` (default avatar), `Discord:EnableDiscordNotifications` (global toggle)
-    *   `Discord:RetryAttempts`, `Discord:RetryDelaySeconds`, `Discord:MaxConcurrentNotifications`
+    *   `Discord:TimeoutSeconds`, `Discord:WebhookUrl` (optional default webhook)
 
-**3.11 Proxy Management Module**
+**3.11 AI Configuration Module**
+*   **Purpose:** Manages AI provider configurations for intelligent browser action generation and content processing.
+*   **Implementation:** Services (`AiConfigurationService`, `AiGenerationService`) and AI providers (`GoogleGeminiAiProvider`) in `TechTicker.Application`.
+*   **AI Provider Support:**
+    *   **Google Gemini AI:** Primary provider with support for latest models (gemini-2.5-pro, gemini-2.5-flash, gemini-2.0-flash-exp)
+    *   **OpenAI Compatible APIs:** Support for custom OpenAI-compatible endpoints
+    *   **Model Auto-Discovery:** Automatic fetching of available models from provider APIs
+*   **Core Features:**
+    *   **Encrypted API Key Storage:** Secure storage of API keys with encryption at rest
+    *   **Browser Action Generation:** AI-powered generation of Playwright automation sequences
+    *   **Model Selection:** Dynamic model selection with fallback options
+    *   **Connection Testing:** Built-in testing of AI provider connectivity and authentication
+    *   **Usage Monitoring:** Tracking of API usage, token consumption, and performance metrics
+*   **API Endpoints (exposed by `TechTicker.ApiService`):**
+    *   `GET /api/ai-configurations` (Admin Only)
+        *   Response (`200 OK`): List of AI configurations with masked API keys
+    *   `POST /api/ai-configurations` (Admin Only)
+        *   Request Body: `{ "name": "Production Gemini", "provider": "Google", "model": "gemini-2.5-pro", "apiKey": "...", "baseUrl": "...", "isActive": true }`
+        *   Response (`201 Created`): Created AI configuration object
+    *   `PUT /api/ai-configurations/{id}` (Admin Only)
+        *   Request Body: AI configuration update object
+        *   Response (`200 OK`): Updated AI configuration
+    *   `DELETE /api/ai-configurations/{id}` (Admin Only)
+        *   Response (`204 No Content`): Soft delete of AI configuration
+    *   `POST /api/ai-configurations/{id}/test-connection` (Admin Only)
+        *   Response (`200 OK`): `{ "isSuccessful": true, "message": "Connection successful", "responseTime": 1250 }`
+    *   `GET /api/ai-configurations/{id}/available-models` (Admin Only)
+        *   Response (`200 OK`): `{ "models": ["gemini-2.5-pro", "gemini-2.5-flash"], "success": true }`
+    *   `POST /api/ai-configurations/generate-browser-actions` (Admin Only)
+        *   Request Body: `{ "instructions": "Click load more button and scroll", "context": "E-commerce product page", "configurationId": "..." }`
+        *   Response (`200 OK`): Generated browser automation actions with explanation
+*   **Browser Action Generation:**
+    *   **Intelligent Action Sequences:** AI generates optimized Playwright action sequences
+    *   **Context-Aware Suggestions:** Actions tailored to specific e-commerce sites and scenarios
+    *   **Error Handling:** Robust error handling for AI generation failures with fallback strategies
+    *   **Action Types Supported:** scroll, click, waitForSelector, type, hover, selectOption, screenshot, evaluate
+*   **Security Features:**
+    *   **API Key Encryption:** AES encryption for stored API keys
+    *   **Access Control:** Admin-only access to AI configurations
+    *   **Audit Logging:** Comprehensive logging of AI usage and configuration changes
+    *   **Rate Limiting:** Built-in rate limiting for AI API calls
+*   **Configuration Keys (appsettings.json):**
+    *   AI configurations are stored in database with encrypted API keys
+    *   No sensitive configuration in appsettings files
+
+**3.12 Proxy Management Module**
+*   **Purpose:** Manages proxy configurations for enhanced scraping capabilities and anti-detection measures.
+*   **Implementation:** Services (`AiConfigurationService`, `AiGenerationService`) in `TechTicker.Application` with API endpoints in `TechTicker.ApiService`.
+*   **Key Features:**
+    *   **AI Provider Management:** Support for Google Gemini AI with encrypted API key storage
+    *   **Browser Action Generation:** AI-powered generation of browser automation actions from natural language descriptions
+    *   **Content Analysis:** AI-assisted analysis of scraped content and error patterns
+    *   **Configuration Management:** Secure storage and management of AI service configurations
+*   **API Endpoints (exposed by `TechTicker.ApiService`):**
+    *   **AI Configuration:**
+        *   `GET /api/ai-configuration` - Get current AI configuration
+        *   `POST /api/ai-configuration` - Create AI configuration
+        *   `PUT /api/ai-configuration/{id}` - Update AI configuration
+        *   `DELETE /api/ai-configuration/{id}` - Delete AI configuration
+        *   `GET /api/ai-configuration/default` - Get default configuration
+    *   **AI Generation:**
+        *   `POST /api/ai-generation/browser-actions` - Generate browser automation actions from instructions
+        *   `POST /api/ai-generation/analyze-content` - Analyze scraped content for patterns
+*   **Security Features:**
+    *   **Encrypted API Keys:** All AI provider API keys are encrypted using AES encryption
+    *   **Secure Configuration:** Sensitive data is protected with proper encryption and access controls
+    *   **Audit Trail:** All AI operations are logged for security and debugging purposes
+*   **Frontend Integration:**
+    *   **AI Settings Component:** Admin interface for managing AI configurations
+    *   **Browser Action Builder:** AI-powered action generation in browser automation profiles
+    *   **Smart Suggestions:** AI-driven suggestions for scraping configurations
+*   **Data Storage:** `AiConfigurations` table with encrypted credentials and configuration metadata
+
+**3.12 Proxy Management Module**
 *   **Purpose:** Comprehensive proxy configuration and management system for enhanced scraping stealth and reliability.
 *   **Implementation:** Services (`ProxyService`, `ProxyPoolService`, `ProxyHealthMonitorService`) in `TechTicker.Application` with API endpoints in `TechTicker.ApiService`.
 *   **Key Features:**
@@ -565,7 +657,7 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   `ProxyHealthMonitorService`: Automated health checking
     *   `ProxyPoolService`: Intelligent proxy selection and rotation
 
-**3.12 API Layer**
+**3.13 API Layer**
 *   **Purpose:** Entry point for client requests (including the Angular Admin Frontend).
 *   **Implementation:** ASP.NET Core Controllers within `TechTicker.ApiService`.
 *   **Responsibilities:**
@@ -610,18 +702,40 @@ While the backend is a monolith, logical separation of concerns is maintained by
                     "productNameSelector": "string (CSS selector)",
                     "priceSelector": "string (CSS selector)",
                     "stockSelector": "string (CSS selector)",
-                    "sellerNameOnPageSelector": "string (CSS selector, optional)"
+                    "sellerNameOnPageSelector": "string (CSS selector, optional)",
+                    "imageSelector": "string (CSS selector, optional)"
                   },
                   "scrapingProfile": {
                     "userAgent": "string", // Selected User-Agent
                     "headers": { /* dictionary of string key-value pairs, optional */ } // Additional headers
+                  },
+                  "requiresBrowserAutomation": "boolean", // Whether to use browser automation
+                  "browserAutomationProfile": { // Optional browser automation settings
+                    "preferredBrowser": "string", // "chromium", "firefox", "webkit"
+                    "timeoutSeconds": "number",
+                    "userAgent": "string (optional)",
+                    "headers": { /* dictionary of string key-value pairs, optional */ },
+                    "proxyServer": "string (optional)", // Full proxy URL
+                    "proxyUsername": "string (optional)",
+                    "proxyPassword": "string (optional)",
+                    "actions": [
+                      {
+                        "actionType": "string", // "scroll", "click", "waitForSelector", "type", "hover", "selectOption", "screenshot", "evaluate"
+                        "selector": "string (CSS selector, optional)",
+                        "value": "string (optional)", // For type, selectOption, setValue, evaluate actions
+                        "repeat": "number (default: 1)",
+                        "delayMs": "number", // Wait time after action
+                        "description": "string" // Brief explanation of the action
+                      }
+                    ]
                   }
                 }
                 ```
-    *   **`scraping_results_exchange` (Topic Exchange)**
+    *   **`techticker.scraping` (Topic Exchange) - Results**
         *   Purpose: Publishes results of scraping attempts, can be consumed by orchestrator or logging/monitoring.
-        *   Message: `ScrapingResultEvent` (Published by `ScraperModule`)
-            *   Routing Key: `scrape.result.{success|failure}.{mappingId}` (e.g., `scrape.result.success.uuid-mapping`, `scrape.result.failure.uuid-mapping`)
+        *   Queue: `scraping.results`
+        *   Message: `ScrapingResultEvent` (Published by `WebScrapingService`)
+            *   Routing Key: `scraping.result`
             *   Payload:
                 ```json
                 {
@@ -629,17 +743,19 @@ While the backend is a monolith, logical separation of concerns is maintained by
                   "wasSuccessful": true, // or false
                   "timestamp": "datetimeoffset (ISO 8601)",
                   "errorMessage": "string, null if successful",
-                  "errorCode": "string, e.g., BLOCKED_BY_CAPTCHA, HTTP_ERROR_403, PARSING_ERROR_PRICE, TIMEOUT, null if successful",
+                  "errorCode": "string, e.g., BLOCKED_BY_CAPTCHA, HTTP_ERROR_403, PARSING_ERROR_PRICE, TIMEOUT, BROWSER_AUTOMATION_FAILED, null if successful",
                   "httpStatusCode": "integer, null if not applicable" // e.g., 200, 403, 404, 500
                 }
                 ```
-    *   **`price_data_exchange` (Topic Exchange)**
+    *   **`techticker.pricedata` (Topic Exchange)**
         *   Purpose: Handles the flow of price data from raw scraped info to normalized and recorded points.
-        *   Message: `RawPriceDataEvent` (Published by `ScraperModule` after successful parsing)
-            *   Routing Key: `price.data.raw.{canonicalProductId}`
+        *   Queue: `pricedata.raw`
+        *   Message: `RawPriceDataEvent` (Published by `WebScrapingService` after successful parsing)
+            *   Routing Key: `pricedata.raw`
             *   Payload:
                 ```json
                 {
+                  "mappingId": "uuid", // ProductSellerMapping.MappingId
                   "canonicalProductId": "uuid",
                   "sellerName": "string",
                   "scrapedPrice": 123.45, // Decimal as number
@@ -647,9 +763,9 @@ While the backend is a monolith, logical separation of concerns is maintained by
                   "timestamp": "datetimeoffset (ISO 8601)", // Time of scrape
                   "sourceUrl": "string (URL)", // The URL that was scraped
                   "scrapedProductName": "string, optional", // Product name as seen on the page
-                  "primaryImageUrl": "string, optional", // Primary product image URL
-                  "additionalImageUrls": ["string"], // Additional product image URLs
-                  "originalImageUrls": ["string"] // Original scraped image URLs
+                  "primaryImageUrl": "string, optional", // Local path to primary product image
+                  "additionalImageUrls": ["string"], // Local paths to additional product images
+                  "originalImageUrls": ["string"] // Original scraped image URLs for reference
                 }
                 ```
         *   Message: `PricePointRecordedEvent` (Published by price normalization after validation)
@@ -755,8 +871,11 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   `PriceSelector` (TEXT, NN) - CSS or XPath selector for price.
     *   `StockSelector` (TEXT, NN) - CSS or XPath selector for stock status.
     *   `SellerNameOnPageSelector` (TEXT, NULL) - If seller name needs to be extracted from page (for marketplaces).
+    *   `ImageSelector` (TEXT, NULL) - CSS selector for product images.
     *   `DefaultUserAgent` (TEXT, NULL) - Specific UA for this site if needed.
     *   `AdditionalHeaders` (JSONB, NULL) - Key-value pairs for site-specific headers.
+    *   `RequiresBrowserAutomation` (BOOLEAN, NN, DEFAULT FALSE) - Whether this site requires browser automation.
+    *   `BrowserAutomationProfile` (TEXT, NULL) - JSON configuration for browser automation actions.
     *   `IsEnabled` (BOOLEAN, NN, DEFAULT TRUE)
     *   `CreatedAt` (TIMESTAMPTZ, NN)
     *   `UpdatedAt` (TIMESTAMPTZ, NN)
@@ -1272,13 +1391,21 @@ The TechTicker system has been fully implemented and is operational. All planned
 8.  **✅ Notification System:** Discord notifications with comprehensive user preferences and customization
 9.  **✅ Frontend Application:** Complete Angular 20 SPA with all admin features and responsive design
 10. **✅ Proxy Management:** Comprehensive proxy configuration, health monitoring, and bulk operations
-11. **✅ Testing Infrastructure:** Extensive unit and integration tests with 230+ test cases
+11. **✅ Testing Infrastructure:** Comprehensive testing infrastructure with 8 test projects covering all major components including unit tests, integration tests, and service tests
 12. **✅ Performance Monitoring:** Real-time metrics, analytics, and system health monitoring
 10. **✅ User Management:** Full CRM capabilities with role management
 
 **Additional Features Implemented:**
-*   **Image Processing:** Complete image upload, storage, and gallery system
-*   **Performance Monitoring:** Comprehensive logging and monitoring capabilities
+*   **Image Processing:** Complete image scraping, upload, storage, and gallery system with local file management
+*   **Performance Monitoring:** Comprehensive logging, monitoring capabilities, and scraper run logs with detailed analytics
+*   **Browser Automation:** Full Microsoft Playwright integration with support for multiple browsers and custom action sequences
+*   **AI-Powered Automation:** Google Gemini AI integration for intelligent browser action generation and content processing
+*   **Advanced Proxy Management:** Comprehensive proxy pool management with health monitoring, intelligent rotation, and bulk operations
+*   **Enhanced RBAC:** Permission-based authorization system with granular access control and role management
+*   **Real-time Notifications:** Discord webhook integration with rich embeds and user preference management
+*   **Comprehensive Testing:** Full test coverage across all modules with 8 dedicated test projects
+*   **Image Gallery Components:** Advanced Angular components for image display with lazy loading and optimization
+*   **Bulk Operations:** Advanced bulk import/export functionality for proxies, configurations, and data management
 *   **Scraper Run Logging:** Detailed scraping activity tracking and analysis
 *   **Advanced RBAC:** Permission-based authorization beyond basic roles
 *   **Product Catalog:** Public-facing product browsing with price history
