@@ -15,16 +15,18 @@ public class AiConfigurationService : IAiConfigurationService
     private readonly IAiConfigurationRepository _repository;
     private readonly ILogger<AiConfigurationService> _logger;
     private readonly Dictionary<string, IAiProvider> _aiProviders;
-    private const string EncryptionKey = "TechTicker-AI-Config-Key-2024-32Chars"; // In production, use a proper key management system
+    private readonly string _encryptionKey;
 
     public AiConfigurationService(
         IAiConfigurationRepository repository,
         ILogger<AiConfigurationService> logger,
-        IEnumerable<IAiProvider> aiProviders)
+        IEnumerable<IAiProvider> aiProviders,
+        string encryptionKey)
     {
         _repository = repository;
         _logger = logger;
         _aiProviders = aiProviders.ToDictionary(p => p.ProviderName, p => p);
+        _encryptionKey = encryptionKey;
     }
 
     public async Task<Result<IEnumerable<AiConfigurationDto>>> GetAllConfigurationsAsync()
@@ -325,8 +327,11 @@ public class AiConfigurationService : IAiConfigurationService
     {
         try
         {
+            var keyBytes = Encoding.UTF8.GetBytes(_encryptionKey);
+            if (keyBytes.Length != 16 && keyBytes.Length != 24 && keyBytes.Length != 32)
+                throw new CryptographicException($"Encryption key must be 16, 24, or 32 bytes. Current length: {keyBytes.Length}");
             using var aes = Aes.Create();
-            aes.Key = Encoding.UTF8.GetBytes(EncryptionKey);
+            aes.Key = keyBytes;
             aes.IV = new byte[16]; // Using zero IV for simplicity - in production, use proper IV
 
             using var encryptor = aes.CreateEncryptor();
@@ -345,8 +350,11 @@ public class AiConfigurationService : IAiConfigurationService
     {
         try
         {
+            var keyBytes = Encoding.UTF8.GetBytes(_encryptionKey);
+            if (keyBytes.Length != 16 && keyBytes.Length != 24 && keyBytes.Length != 32)
+                throw new CryptographicException($"Encryption key must be 16, 24, or 32 bytes. Current length: {keyBytes.Length}");
             using var aes = Aes.Create();
-            aes.Key = Encoding.UTF8.GetBytes(EncryptionKey);
+            aes.Key = keyBytes;
             aes.IV = new byte[16]; // Using zero IV for simplicity - in production, use proper IV
 
             using var decryptor = aes.CreateDecryptor();

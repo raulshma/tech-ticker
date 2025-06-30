@@ -118,7 +118,13 @@ builder.Services.AddScoped<IAlertTestingService, AlertTestingService>();
 builder.Services.AddScoped<IAlertPerformanceMonitoringService, AlertPerformanceMonitoringService>();
 
 // Add AI services
-builder.Services.AddScoped<IAiConfigurationService, AiConfigurationService>();
+var aiConfigKey = builder.Configuration["AiConfiguration:EncryptionKey"] ?? throw new Exception("Missing AiConfiguration:EncryptionKey in appsettings");
+builder.Services.AddScoped<IAiConfigurationService>(sp =>
+    new AiConfigurationService(
+        sp.GetRequiredService<IAiConfigurationRepository>(),
+        sp.GetRequiredService<ILogger<AiConfigurationService>>(),
+        sp.GetServices<IAiProvider>(),
+        aiConfigKey));
 builder.Services.AddScoped<IAiGenerationService, AiGenerationService>();
 builder.Services.AddScoped<IAiProvider, GoogleGeminiAiProvider>();
 builder.Services.AddHttpClient<GoogleGeminiAiProvider>();
