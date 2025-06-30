@@ -2,8 +2,7 @@
   <h3>Categories</h3>
   <div class="category-list">
     <button 
-      mat-button 
-      class="category-item"
+      matButton 
       [class.selected]="selectedCategoryId === null"
       (click)="onCategoryClick(null)">
       <mat-icon>all_inclusive</mat-icon>
@@ -11,8 +10,7 @@
     </button>
     
     <button 
-      mat-button 
-      class="category-item"
+      matButton 
       *ngFor="let category of categories"
       [class.selected]="isSelected(category.categoryId!)"
       (click)="onCategoryClick(category.categoryId!)">

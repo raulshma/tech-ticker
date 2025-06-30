@@ -178,11 +178,10 @@
 
           <!-- Form Actions -->
           <div class="form-actions">
-            <button mat-outlined-button
+            <button matButton="outlined"
                     type="button"
                     (click)="onCancel()"
-                    [disabled]="isLoading"
-                    class="cancel-btn">
+                    [disabled]="isLoading">
               <mat-icon>close</mat-icon>
               Cancel
             </button>
