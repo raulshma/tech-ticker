@@ -215,11 +215,10 @@
                     <h4 class="mat-title-medium">Automation Sequence</h4>
                     <p class="mat-body-small">Define a sequence of actions that will be performed automatically</p>
                   </div>
-                  <button mat-fab 
+                  <button matFab 
                           color="primary" 
                           type="button" 
                           (click)="addAction()" 
-                          class="add-action-fab-modern"
                           matTooltip="Add Action">
                     <mat-icon>add</mat-icon>
                   </button>
@@ -266,11 +265,10 @@
                             {{ isGeneratingActions ? 'Generating...' : 'Generate Actions' }}
                           </button>
                           
-                          <button mat-button 
+                          <button matButton 
                                   type="button"
                                   (click)="clearAiInstructions()"
-                                  [disabled]="isGeneratingActions"
-                                  class="clear-btn">
+                                  [disabled]="isGeneratingActions">
                             <mat-icon>clear</mat-icon>
                             Clear
                           </button>

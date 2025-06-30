@@ -52,7 +52,7 @@
           </mat-select>
         </mat-form-field>
 
-        <button mat-raised-button color="accent" (click)="clearFilters()">
+        <button matButton="elevated" color="accent" (click)="clearFilters()">
           Clear Filters
         </button>
       </div>
@@ -145,7 +145,7 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let element">
-              <button mat-icon-button 
+              <button matIconButton 
                       (click)="openSourceUrl(element.sourceUrl)"
                       matTooltip="View Source"
                       *ngIf="element.sourceUrl">

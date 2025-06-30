@@ -187,11 +187,10 @@
               Cancel
             </button>
 
-            <button mat-raised-button
+            <button matButton="elevated"
                     color="primary"
                     type="submit"
-                    [disabled]="mappingForm.invalid || isLoading"
-                    class="submit-btn">
+                    [disabled]="mappingForm.invalid || isLoading">
               <mat-spinner *ngIf="isLoading" diameter="20" class="form-spinner"></mat-spinner>
               <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
               <span *ngIf="!isLoading">{{ isEditMode ? 'Update Mapping' : 'Create Mapping' }}</span>

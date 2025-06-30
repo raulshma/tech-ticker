@@ -24,10 +24,10 @@
         <div class="error-content">
           <mat-icon class="error-icon" aria-hidden="true">error</mat-icon>
           <p class="mat-body-medium">{{error}}</p>
-          <button mat-raised-button color="primary" (click)="onRetry()" class="retry-button">
-            <mat-icon>refresh</mat-icon>
-            Retry
-          </button>
+                  <button matButton="elevated" color="primary" (click)="onRetry()">
+          <mat-icon>refresh</mat-icon>
+          Retry
+        </button>
         </div>
       </mat-card-content>
     </mat-card>
@@ -226,11 +226,10 @@
                     <h4 class="mat-title-medium">HTTP Headers</h4>
                     <p class="mat-body-small">Add custom headers for authentication or other requirements</p>
                   </div>
-                  <button mat-raised-button
+                  <button matButton="elevated"
                           type="button"
                           color="primary"
-                          (click)="addHeader()"
-                          class="add-header-btn-modern">
+                          (click)="addHeader()">
                     <mat-icon>add</mat-icon>
                     Add Header
                   </button>
@@ -260,9 +259,8 @@
                       <mat-icon matSuffix>text_fields</mat-icon>
                     </mat-form-field>
 
-                    <button mat-icon-button
+                    <button matIconButton
                             type="button"
-                            class="delete-header-btn"
                             (click)="removeHeader(i)"
                             matTooltip="Remove header">
                       <mat-icon>delete</mat-icon>
@@ -310,7 +308,7 @@
                   <mat-form-field appearance="outline" class="modern-form-field">
                     <mat-label>Browser Automation Profile</mat-label>
                     <input matInput [value]="browserAutomationProfileSummary()" readonly>
-                    <button mat-icon-button matSuffix type="button" (click)="openAutomationProfileDialog()" matTooltip="Edit Automation Profile">
+                    <button matIconButton matSuffix type="button" (click)="openAutomationProfileDialog()" matTooltip="Edit Automation Profile">
                       <mat-icon>edit</mat-icon>
                     </button>
                     <mat-hint>Configure browser actions for dynamic content</mat-hint>
@@ -323,19 +321,17 @@
           <!-- Enhanced Form Actions -->
           <div class="form-actions-modern">
             <div class="actions-content">
-              <button mat-outlined-button
+              <button matButton="outlined"
                       type="button"
-                      class="cancel-btn"
                       (click)="onCancel()"
                       [disabled]="isLoading">
                 <mat-icon>close</mat-icon>
                 Cancel
               </button>
 
-              <button mat-raised-button
+              <button matButton="elevated"
                       color="primary"
                       type="submit"
-                      class="submit-btn"
                       [disabled]="siteConfigForm.invalid || isLoading">
                 <mat-spinner *ngIf="isLoading" diameter="20" class="form-spinner"></mat-spinner>
                 <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
@@ -348,10 +344,9 @@
 
         <!-- Enhanced Examples Section -->
         <div class="examples-section-modern">
-          <button mat-text-button 
+          <button matButton 
                   color="primary" 
-                  (click)="toggleExamples()" 
-                  class="examples-toggle-btn">
+                  (click)="toggleExamples()">
             <mat-icon>{{ showExamples ? 'expand_less' : 'expand_more' }}</mat-icon>
             {{ showExamples ? 'Hide' : 'Show' }} Example Browser Automation Profiles
           </button>
@@ -366,8 +361,7 @@
               <div *ngFor="let ex of browserAutomationExamples" class="example-card">
                 <div class="example-header">
                   <h5 class="mat-title-medium example-title">{{ ex.title }}</h5>
-                  <button mat-icon-button 
-                          class="copy-btn"
+                  <button matIconButton 
                           (click)="copyExampleToClipboard(ex.json)"
                           matTooltip="Copy to clipboard">
                     <mat-icon>content_copy</mat-icon>

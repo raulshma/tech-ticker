@@ -88,7 +88,7 @@
           
           <!-- Actions -->
           <div class="filter-actions">
-            <button mat-raised-button 
+            <button matButton="elevated" 
                     color="primary" 
                     [disabled]="!canCompare()"
                     (click)="compareSelected()"
@@ -97,7 +97,7 @@
               Compare Selected
             </button>
             
-            <button mat-button 
+            <button matButton 
                     color="primary"
                     (click)="enableComparisonMode()"
                     *ngIf="!comparisonMode">
@@ -105,7 +105,7 @@
               Compare Mode
             </button>
             
-            <button mat-button 
+            <button matButton 
                     (click)="disableComparisonMode()"
                     *ngIf="comparisonMode">
               <mat-icon>close</mat-icon>
@@ -125,7 +125,7 @@
     </div>
     
     <div class="bulk-actions">
-      <button mat-button 
+      <button matButton 
               color="warn"
               (click)="bulkDelete()">
         <mat-icon>delete</mat-icon>
@@ -252,7 +252,7 @@
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let result">
               <div class="actions-cell">
-                <button mat-icon-button 
+                <button matIconButton 
                         [matMenuTriggerFor]="actionMenu"
                         [matTooltip]="'More actions'">
                   <mat-icon>more_vert</mat-icon>

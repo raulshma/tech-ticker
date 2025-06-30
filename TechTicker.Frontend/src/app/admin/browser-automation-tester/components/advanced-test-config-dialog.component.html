@@ -297,7 +297,7 @@
                   Custom Headers
                 </mat-card-title>
                 <div class="card-actions">
-                  <button mat-icon-button type="button" (click)="addCustomHeader()" 
+                  <button matIconButton type="button" (click)="addCustomHeader()" 
                           matTooltip="Add custom header">
                     <mat-icon>add</mat-icon>
                   </button>
@@ -317,7 +317,7 @@
                       <input matInput formControlName="value" placeholder="custom-value">
                     </mat-form-field>
                     
-                    <button mat-icon-button type="button" (click)="removeCustomHeader(i)" 
+                    <button matIconButton type="button" (click)="removeCustomHeader(i)" 
                             color="warn" matTooltip="Remove header">
                       <mat-icon>delete</mat-icon>
                     </button>
@@ -389,7 +389,7 @@
   </div>
 
   <div mat-dialog-actions class="dialog-actions">
-    <button mat-button type="button" (click)="resetToDefaults()" 
+    <button matButton type="button" (click)="resetToDefaults()" 
             matTooltip="Reset all settings to default values">
       <mat-icon>restore</mat-icon>
       Reset to Defaults
@@ -397,11 +397,11 @@
     
     <div class="spacer"></div>
     
-    <button mat-button (click)="onCancel()">
+    <button matButton (click)="onCancel()">
       Cancel
     </button>
     
-    <button mat-raised-button color="primary" 
+    <button matButton="elevated" color="primary" 
             (click)="onSave()" 
             [disabled]="configForm.invalid">
       <mat-icon>save</mat-icon>

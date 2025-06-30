@@ -36,7 +36,7 @@
               [class.mat-form-field-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
             >
             <button
-              mat-icon-button
+              matIconButton
               matSuffix
               type="button"
               (click)="hidePassword = !hidePassword"
@@ -52,7 +52,7 @@
 
           <div class="login-actions">
             <button
-              mat-raised-button
+              matButton="elevated"
               color="primary"
               type="submit"
               class="login-button full-width"

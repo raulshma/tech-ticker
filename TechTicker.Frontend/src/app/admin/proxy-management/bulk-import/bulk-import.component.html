@@ -98,7 +98,7 @@
         <span>{{ parseProgressMessage }}</span>
         <div class="progress-actions">
           <span class="progress-percentage">{{ parseProgress }}%</span>
-          <button mat-button color="warn" (click)="cancelParsing()" class="cancel-button">
+          <button matButton color="warn" (click)="cancelParsing()">
             <mat-icon>cancel</mat-icon>
             Cancel
           </button>
@@ -108,7 +108,7 @@
 
     <mat-card-actions>
       <div class="action-buttons">
-        <button mat-button (click)="onCancel()" [disabled]="parsing">
+        <button matButton (click)="onCancel()" [disabled]="parsing">
           <mat-icon>cancel</mat-icon>
           Cancel
         </button>
@@ -194,21 +194,21 @@
           <span>{{ getSelectedCount() }} proxies selected</span>
         </div>
         <div class="action-buttons">
-          <button mat-button color="primary" (click)="testSelectedProxies()"
+          <button matButton color="primary" (click)="testSelectedProxies()"
                   [disabled]="bulkTesting">
             <mat-spinner diameter="16" *ngIf="bulkTesting"></mat-spinner>
             <mat-icon *ngIf="!bulkTesting">play_arrow</mat-icon>
             {{ bulkTesting ? 'Testing...' : 'Test Selected' }}
           </button>
-          <button mat-button color="accent" (click)="toggleSelectedProxiesActive(true)">
+          <button matButton color="accent" (click)="toggleSelectedProxiesActive(true)">
             <mat-icon>check_circle</mat-icon>
             Enable Selected
           </button>
-          <button mat-button color="warn" (click)="toggleSelectedProxiesActive(false)">
+          <button matButton color="warn" (click)="toggleSelectedProxiesActive(false)">
             <mat-icon>cancel</mat-icon>
             Disable Selected
           </button>
-          <button mat-button color="warn" (click)="removeSelectedProxies()">
+          <button matButton color="warn" (click)="removeSelectedProxies()">
             <mat-icon>delete</mat-icon>
             Remove Selected
           </button>
@@ -319,11 +319,11 @@
 
     <mat-card-actions>
       <div class="action-buttons">
-        <button mat-button (click)="goBack()" [disabled]="validating || importing">
+        <button matButton (click)="goBack()" [disabled]="validating || importing">
           <mat-icon>arrow_back</mat-icon>
           Back
         </button>
-        <button mat-button color="accent" (click)="validateImport()" [disabled]="validating || importing">
+        <button matButton color="accent" (click)="validateImport()" [disabled]="validating || importing">
           <mat-spinner diameter="20" *ngIf="validating"></mat-spinner>
           <mat-icon *ngIf="!validating">check_circle</mat-icon>
           {{ validating ? 'Validating...' : 'Validate' }}
@@ -383,7 +383,7 @@
 
     <mat-card-actions>
       <div class="action-buttons">
-        <button mat-button (click)="startOver()">
+        <button matButton (click)="startOver()">
           <mat-icon>refresh</mat-icon>
           Import More
         </button>

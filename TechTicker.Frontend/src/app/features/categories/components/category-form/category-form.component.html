@@ -1,7 +1,7 @@
 <div class="category-form-container">
   <div class="header-section">
     <h1>{{ isEditMode ? 'Edit Category' : 'Create Category' }}</h1>
-    <button mat-button (click)="onCancel()">
+    <button matButton (click)="onCancel()">
       <mat-icon>arrow_back</mat-icon>
       Back to Categories
     </button>
@@ -58,14 +58,14 @@
 
         <!-- Form Actions -->
         <div class="form-actions">
-          <button mat-button 
+          <button matButton 
                   type="button" 
                   (click)="onCancel()"
                   [disabled]="isLoading">
             Cancel
           </button>
           
-          <button mat-raised-button 
+          <button matButton="elevated" 
                   color="primary" 
                   type="submit"
                   [disabled]="categoryForm.invalid || isLoading">

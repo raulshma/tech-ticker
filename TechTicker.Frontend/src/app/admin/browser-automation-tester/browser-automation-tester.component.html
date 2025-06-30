@@ -16,28 +16,25 @@
             <mat-icon matSuffix>link</mat-icon>
           </mat-form-field>
           <div class="action-buttons">
-            <button mat-raised-button 
+            <button matButton="elevated"
                     color="primary" 
                     [disabled]="isTestRunning" 
-                    (click)="startTest()"
-                    class="primary-action-btn">
+                    (click)="startTest()">
               <mat-icon>play_arrow</mat-icon>
               Start Test
             </button>
-            <button mat-raised-button 
+            <button matButton="elevated"
                     color="warn" 
                     [disabled]="!isTestRunning" 
-                    (click)="stopTest()"
-                    class="secondary-action-btn">
+                    (click)="stopTest()">
               <mat-icon>stop</mat-icon>
               Stop Test
             </button>
-            <button mat-raised-button 
+            <button matButton="elevated"
                     color="accent" 
                     (click)="openAdvancedSettings()"
                     [disabled]="isTestRunning"
-                    matTooltip="Advanced Configuration"
-                    class="tertiary-action-btn">
+                    matTooltip="Advanced Configuration">
               <mat-icon>tune</mat-icon>
               Advanced
             </button>
@@ -161,19 +158,19 @@
             <div class="quick-actions">
               <h4 class="mat-title-medium">Quick Actions</h4>
               <div class="action-buttons-grid">
-                <button mat-button class="action-btn" 
+                <button matButton 
                         (click)="openAdvancedSettings()"
                         [disabled]="isTestRunning">
                   <mat-icon>tune</mat-icon>
                   Configure
                 </button>
-                <button mat-button class="action-btn" 
+                <button matButton 
                         (click)="captureScreenshot()"
                         [disabled]="!currentSessionId">
                   <mat-icon>camera_alt</mat-icon>
                   Screenshot
                 </button>
-                <button mat-button class="action-btn" 
+                <button matButton 
                         [matMenuTriggerFor]="exportMenu"
                         [disabled]="!testResults && logs.length === 0">
                   <mat-icon>download</mat-icon>
@@ -198,15 +195,13 @@
             Live Browser View
           </mat-card-title>
           <div class="browser-controls">
-            <button mat-icon-button (click)="toggleFullscreen()" 
-                    [matTooltip]="browserFullscreen ? 'Exit Fullscreen' : 'Fullscreen'"
-                    class="control-btn">
+            <button matIconButton (click)="toggleFullscreen()" 
+                    [matTooltip]="browserFullscreen ? 'Exit Fullscreen' : 'Fullscreen'">
               <mat-icon>{{browserFullscreen ? 'fullscreen_exit' : 'fullscreen'}}</mat-icon>
             </button>
-            <button mat-icon-button (click)="captureScreenshot()" 
+            <button matIconButton (click)="captureScreenshot()" 
                     [matTooltip]="'Capture Screenshot'"
-                    [disabled]="!currentSessionId"
-                    class="control-btn">
+                    [disabled]="!currentSessionId">
               <mat-icon>camera_alt</mat-icon>
             </button>
           </div>
@@ -246,7 +241,7 @@
                     <mat-icon class="placeholder-icon">web</mat-icon>
                     <h3 class="mat-headline-large">Browser Automation Tester</h3>
                     <p class="mat-body-large">Start a test to see live browser automation</p>
-                                         <button mat-raised-button color="primary" (click)="startTest()" [disabled]="!testerForm.valid">
+                                         <button matButton="elevated" color="primary" (click)="startTest()" [disabled]="!testerForm.valid">
                        <mat-icon>play_arrow</mat-icon>
                        Start Test
                      </button>
@@ -292,14 +287,12 @@
                     </mat-chip>
                   </div>
                   <div class="logs-actions">
-                    <button mat-icon-button (click)="clearLogs()" 
-                            [matTooltip]="'Clear Logs'"
-                            class="action-btn">
+                    <button matIconButton (click)="clearLogs()" 
+                            [matTooltip]="'Clear Logs'">
                       <mat-icon>clear_all</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="exportLogs()" 
-                            [matTooltip]="'Export Logs'"
-                            class="action-btn">
+                    <button matIconButton (click)="exportLogs()" 
+                            [matTooltip]="'Export Logs'">
                       <mat-icon>download</mat-icon>
                     </button>
                     <mat-slide-toggle [(ngModel)]="autoScroll" class="auto-scroll-toggle">
@@ -406,15 +399,15 @@
                   </mat-card>
                   
                   <div class="result-actions">
-                    <button mat-button color="primary" (click)="saveResults()" [disabled]="!hasTestResults">
+                    <button matButton color="primary" (click)="saveResults()" [disabled]="!hasTestResults">
                       <mat-icon>save</mat-icon>
                       Save Results
                     </button>
-                    <button mat-button (click)="shareResults()" [disabled]="!hasTestResults">
+                    <button matButton (click)="shareResults()" [disabled]="!hasTestResults">
                       <mat-icon>share</mat-icon>
                       Share
                     </button>
-                    <button mat-button [matMenuTriggerFor]="exportMenu" [disabled]="!hasTestResults">
+                    <button matButton [matMenuTriggerFor]="exportMenu" [disabled]="!hasTestResults">
                       <mat-icon>download</mat-icon>
                       Export
                     </button>

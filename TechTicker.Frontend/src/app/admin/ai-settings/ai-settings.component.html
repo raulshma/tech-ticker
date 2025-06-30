@@ -183,7 +183,7 @@
     </mat-card-content>
 
     <mat-card-actions align="end">
-      <button mat-button (click)="cancelEdit()" [disabled]="loading">Cancel</button>
+      <button matButton (click)="cancelEdit()" [disabled]="loading">Cancel</button>
       <button matButton="filled" color="primary" (click)="saveConfiguration()" 
               [disabled]="loading || aiForm.invalid">
         {{ editingConfiguration ? 'Update' : 'Create' }}
