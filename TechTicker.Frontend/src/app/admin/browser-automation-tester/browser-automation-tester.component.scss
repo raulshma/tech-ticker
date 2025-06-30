@@ -1,0 +1,195 @@
+.browser-automation-tester {
+  padding: 24px;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .test-toolbar {
+    background: #f5f5f5;
+    margin-bottom: 16px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    
+    .url-input {
+      flex: 1;
+      margin-right: 16px;
+    }
+    
+    button {
+      margin-left: 8px;
+    }
+  }
+
+  .test-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 16px;
+    min-height: 0;
+
+    .profile-panel, .browser-panel, .info-panel {
+      mat-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        
+        mat-card-content {
+          flex: 1;
+          overflow: auto;
+        }
+      }
+    }
+
+    .browser-panel.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+      grid-column: 1 / -1;
+      margin: 0;
+      
+      mat-card {
+        height: 100vh;
+        border-radius: 0;
+      }
+    }
+  }
+
+  .live-browser-viewer {
+    .browser-viewport {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      background: white;
+      
+      .browser-frame {
+        .address-bar {
+          background: #f0f0f0;
+          padding: 8px 12px;
+          border-bottom: 1px solid #ddd;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          
+          .security-icon {
+            &.secure {
+              color: green;
+            }
+          }
+          
+          .current-url {
+            flex: 1;
+            font-family: monospace;
+            font-size: 14px;
+          }
+        }
+        
+        .page-content {
+          position: relative;
+          min-height: 400px;
+          
+          .browser-screenshot {
+            width: 100%;
+            height: auto;
+            display: block;
+          }
+          
+          .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+          }
+          
+          .action-indicator {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: red;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 10;
+            
+            .action-icon {
+              color: white;
+              font-size: 14px;
+            }
+          }
+        }
+      }
+      
+      .test-progress {
+        height: 4px;
+      }
+    }
+    
+    .viewport-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      
+      .viewport-select, .zoom-select {
+        min-width: 120px;
+      }
+    }
+  }
+
+  .results-panel {
+    mat-card {
+      mat-card-header {
+        .result-actions {
+          display: flex;
+          gap: 8px;
+        }
+      }
+    }
+  }
+
+  .settings-menu {
+    .config-section {
+      padding: 16px;
+      
+      mat-slide-toggle {
+        display: block;
+        margin-bottom: 16px;
+      }
+      
+      mat-form-field {
+        width: 100%;
+        margin-bottom: 16px;
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 1200px) {
+    .test-content {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr;
+      
+      .profile-panel {
+        grid-row: 1;
+      }
+      
+      .browser-panel {
+        grid-row: 2;
+      }
+      
+      .info-panel {
+        grid-row: 3;
+      }
+    }
+  }
+} 

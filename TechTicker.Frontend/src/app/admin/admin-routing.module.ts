@@ -4,6 +4,7 @@ import { ProxyListComponent } from './proxy-management/proxy-list/proxy-list.com
 import { ProxyFormComponent } from './proxy-management/proxy-form/proxy-form.component';
 import { BulkImportComponent } from './proxy-management/bulk-import/bulk-import.component';
 import { AiSettingsComponent } from './ai-settings/ai-settings.component';
+import { BrowserAutomationTesterComponent } from './browser-automation-tester/browser-automation-tester.component';
 
 const routes: Routes = [
   {
@@ -35,6 +36,11 @@ const routes: Routes = [
     path: 'ai-settings',
     component: AiSettingsComponent,
     data: { title: 'AI Configuration' }
+  },
+  {
+    path: 'browser-automation-tester',
+    component: BrowserAutomationTesterComponent,
+    data: { title: 'Browser Automation Tester' }
   }
 ];
 

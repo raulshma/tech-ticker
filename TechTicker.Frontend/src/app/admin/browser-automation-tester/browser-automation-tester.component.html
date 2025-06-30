@@ -1,0 +1,289 @@
+<div class="browser-automation-tester">
+  <!-- Header with test controls -->
+  <mat-toolbar class="test-toolbar">
+    <mat-form-field class="url-input">
+      <mat-label>Test URL</mat-label>
+      <input matInput 
+             formControlName="testUrl"
+             placeholder="https://example.com/product">
+    </mat-form-field>
+    
+    <button mat-raised-button 
+            color="primary" 
+            [disabled]="isTestRunning" 
+            (click)="startTest()">
+      <mat-icon>play_arrow</mat-icon>
+      Start Test
+    </button>
+    
+    <button mat-raised-button 
+            color="warn" 
+            [disabled]="!isTestRunning" 
+            (click)="stopTest()">
+      <mat-icon>stop</mat-icon>
+      Stop Test
+    </button>
+    
+    <button mat-icon-button 
+            [matMenuTriggerFor]="settingsMenu">
+      <mat-icon>settings</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <!-- Main content area -->
+  <div class="test-content">
+    <!-- Left panel: Profile configuration placeholder -->
+    <mat-card class="profile-panel">
+      <mat-card-header>
+        <mat-card-title>Automation Profile</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Profile configuration will be implemented in the next phase.</p>
+        <p>For now, test with basic page loading functionality.</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Center panel: Live browser view -->
+    <mat-card class="browser-panel" [class.fullscreen]="browserFullscreen">
+      <mat-card-header>
+        <mat-card-title>Live Browser View</mat-card-title>
+        <div class="browser-controls">
+          <button mat-icon-button (click)="toggleFullscreen()">
+            <mat-icon>{{browserFullscreen ? 'fullscreen_exit' : 'fullscreen'}}</mat-icon>
+          </button>
+          <button mat-icon-button 
+                  (click)="captureScreenshot()"
+                  [disabled]="!currentSessionId">
+            <mat-icon>camera_alt</mat-icon>
+          </button>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="live-browser-viewer">
+          <!-- Browser viewport -->
+          <div class="browser-viewport" 
+               [style.width.px]="testOptions.viewportWidth" 
+               [style.height.px]="testOptions.viewportHeight">
+            
+            <!-- Browser frame -->
+            <div class="browser-frame">
+              <!-- Address bar -->
+              <div class="address-bar">
+                <mat-icon class="security-icon" [class.secure]="browserState?.currentUrl?.startsWith('https')">
+                  {{browserState?.currentUrl?.startsWith('https') ? 'lock' : 'lock_open'}}
+                </mat-icon>
+                <span class="current-url">{{browserState?.currentUrl || 'about:blank'}}</span>
+                <mat-spinner *ngIf="isTestRunning" diameter="16"></mat-spinner>
+              </div>
+              
+              <!-- Page content -->
+              <div class="page-content">
+                <img [src]="'data:image/png;base64,' + currentScreenshot" 
+                     *ngIf="currentScreenshot"
+                     class="browser-screenshot"
+                     [alt]="'Browser screenshot at ' + browserState?.currentUrl">
+                
+                <div class="placeholder" *ngIf="!currentScreenshot && !isTestRunning">
+                  <mat-icon>web</mat-icon>
+                  <p>Browser view will appear here when test starts</p>
+                </div>
+                
+                <!-- Loading overlay -->
+                <div class="loading-overlay" *ngIf="isTestRunning && !currentScreenshot">
+                  <mat-spinner></mat-spinner>
+                  <p>{{currentAction || 'Initializing browser...'}}</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Progress bar -->
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="testProgress"
+              class="test-progress">
+            </mat-progress-bar>
+          </div>
+          
+          <!-- Viewport controls -->
+          <div class="viewport-controls">
+            <mat-form-field appearance="outline" class="viewport-select">
+              <mat-label>Device</mat-label>
+              <mat-select [(value)]="testOptions.deviceEmulation" (selectionChange)="onDeviceChange()">
+                <mat-option *ngFor="let device of devicePresets" [value]="device.value">
+                  {{device.label}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="zoom-select" *ngIf="testOptions.deviceEmulation === 'custom'">
+              <mat-label>Width</mat-label>
+              <input matInput type="number" [(ngModel)]="testOptions.viewportWidth">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="zoom-select" *ngIf="testOptions.deviceEmulation === 'custom'">
+              <mat-label>Height</mat-label>
+              <input matInput type="number" [(ngModel)]="testOptions.viewportHeight">
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Right panel: Logs and metrics -->
+    <mat-card class="info-panel">
+      <mat-tab-group [(selectedIndex)]="selectedTab">
+        <mat-tab label="Execution Logs">
+          <div class="logs-container">
+            <div class="logs-header">
+              <button mat-button (click)="clearLogs()">
+                <mat-icon>clear</mat-icon>
+                Clear
+              </button>
+              <button mat-button (click)="exportLogs()">
+                <mat-icon>download</mat-icon>
+                Export
+              </button>
+              <mat-slide-toggle [(ngModel)]="autoScroll">
+                Auto-scroll
+              </mat-slide-toggle>
+            </div>
+            
+            <div class="logs-content">
+              <div *ngFor="let log of logs; trackBy: trackByLogIndex" 
+                   class="log-entry"
+                   [ngClass]="getLogLevelClass(log.level)">
+                <mat-icon [ngClass]="'log-icon-' + log.level">
+                  {{getLogLevelIcon(log.level)}}
+                </mat-icon>
+                <span class="log-timestamp">{{formatTimestamp(log.timestamp)}}</span>
+                <span class="log-message">{{log.message}}</span>
+                <div *ngIf="log.details" class="log-details">
+                  {{log.details | json}}
+                </div>
+              </div>
+              
+              <div *ngIf="logs.length === 0" class="no-logs">
+                <mat-icon>info</mat-icon>
+                <p>No logs yet. Start a test to see execution logs.</p>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        
+        <mat-tab label="Performance">
+          <div class="metrics-container">
+            <div *ngIf="metrics">
+              <h3>Execution Metrics</h3>
+              <div class="metric-item">
+                <span class="metric-label">Memory Usage:</span>
+                <span class="metric-value">{{metrics.memoryUsage | number}} MB</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">CPU Usage:</span>
+                <span class="metric-value">{{metrics.cpuUsage | number}}%</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Network Requests:</span>
+                <span class="metric-value">{{metrics.networkRequests?.length || 0}}</span>
+              </div>
+            </div>
+            
+            <div *ngIf="!metrics" class="no-metrics">
+              <mat-icon>assessment</mat-icon>
+              <p>Performance metrics will appear here during test execution.</p>
+            </div>
+          </div>
+        </mat-tab>
+        
+        <mat-tab label="Results">
+          <div class="results-container">
+            <div *ngIf="testResults">
+              <h3>Test Results</h3>
+              <div class="result-summary">
+                <div class="result-item">
+                  <span class="result-label">Status:</span>
+                  <span class="result-value" [ngClass]="testResults.success ? 'success' : 'error'">
+                    {{testResults.success ? 'Success' : 'Failed'}}
+                  </span>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Duration:</span>
+                  <span class="result-value">{{formatDuration(testResults.duration)}}</span>
+                </div>
+                <div class="result-item">
+                  <span class="result-label">Actions Executed:</span>
+                  <span class="result-value">{{testResults.actionsExecuted}}</span>
+                </div>
+              </div>
+              
+              <div class="result-actions">
+                <button mat-button (click)="saveResults()">
+                  <mat-icon>save</mat-icon>
+                  Save Results
+                </button>
+              </div>
+            </div>
+            
+            <div *ngIf="!testResults" class="no-results">
+              <mat-icon>assessment</mat-icon>
+              <p>Test results will appear here when test completes.</p>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card>
+  </div>
+</div>
+
+<!-- Settings menu -->
+<mat-menu #settingsMenu="matMenu" class="settings-menu">
+  <div class="config-section" (click)="$event.stopPropagation()">
+    <h3>Browser Settings</h3>
+    <mat-slide-toggle [(ngModel)]="testOptions.headless">
+      Headless Mode
+    </mat-slide-toggle>
+    
+    <mat-form-field>
+      <mat-label>Slow Motion (ms)</mat-label>
+      <input matInput type="number" [(ngModel)]="testOptions.slowMotion" min="0" max="5000">
+      <mat-hint>Delay between actions for better visualization</mat-hint>
+    </mat-form-field>
+    
+    <mat-slide-toggle [(ngModel)]="testOptions.recordVideo">
+      Record Video
+    </mat-slide-toggle>
+    
+    <mat-slide-toggle [(ngModel)]="testOptions.captureScreenshots">
+      Capture Screenshots
+    </mat-slide-toggle>
+    
+    <h3>Logging Settings</h3>
+    <mat-slide-toggle [(ngModel)]="testOptions.enableNetworkLogging">
+      Network Logging
+    </mat-slide-toggle>
+    
+    <mat-slide-toggle [(ngModel)]="testOptions.enableConsoleLogging">
+      Console Logging
+    </mat-slide-toggle>
+    
+    <mat-slide-toggle [(ngModel)]="testOptions.enablePerformanceLogging">
+      Performance Logging
+    </mat-slide-toggle>
+    
+    <h3>Timeout Settings</h3>
+    <mat-form-field>
+      <mat-label>Test Timeout (ms)</mat-label>
+      <input matInput type="number" [(ngModel)]="testOptions.testTimeoutMs">
+    </mat-form-field>
+    
+    <mat-form-field>
+      <mat-label>Action Timeout (ms)</mat-label>
+      <input matInput type="number" [(ngModel)]="testOptions.actionTimeoutMs">
+    </mat-form-field>
+    
+    <mat-form-field>
+      <mat-label>Navigation Timeout (ms)</mat-label>
+      <input matInput type="number" [(ngModel)]="testOptions.navigationTimeoutMs">
+    </mat-form-field>
+  </div>
+</mat-menu> 

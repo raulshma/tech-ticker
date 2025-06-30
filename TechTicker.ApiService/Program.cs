@@ -188,6 +188,18 @@ builder.Services.AddCors(options =>
 // Add Alert Processing Service
 builder.Services.AddScoped<IAlertProcessingService, AlertProcessingService>();
 
+// Add Browser Automation Test Services
+builder.Services.AddScoped<IBrowserAutomationTestService, BrowserAutomationTestService>();
+builder.Services.AddScoped<IBrowserAutomationWebSocketService, BrowserAutomationWebSocketService>();
+
+// Add SignalR
+builder.Services.AddSignalR(options =>
+{
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+    options.HandshakeTimeout = TimeSpan.FromSeconds(15);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -209,6 +221,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Map SignalR hubs
+app.MapHub<TechTicker.ApiService.Hubs.BrowserAutomationTestHub>("/hubs/browser-automation-test");
 
 // Configure static file serving for images
 var imageStoragePath = builder.Configuration["ImageStorage:BasePath"] ?? "C:\\TechTicker\\Images\\Products";

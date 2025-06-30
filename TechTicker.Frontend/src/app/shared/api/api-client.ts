@@ -3052,6 +3052,494 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
+    startTestSession(body: BrowserAutomationTestRequestDto | undefined): Observable<BrowserTestSessionDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/browser-automation/test/start";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processStartTestSession(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processStartTestSession(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BrowserTestSessionDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BrowserTestSessionDtoApiResponse>;
+        }));
+    }
+
+    protected processStartTestSession(response: HttpResponseBase): Observable<BrowserTestSessionDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BrowserTestSessionDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    stopTestSession(sessionId: string): Observable<BrowserAutomationTestResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/browser-automation/test/{sessionId}/stop";
+        if (sessionId === undefined || sessionId === null)
+            throw new Error("The parameter 'sessionId' must be defined.");
+        url_ = url_.replace("{sessionId}", encodeURIComponent("" + sessionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processStopTestSession(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processStopTestSession(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BrowserAutomationTestResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BrowserAutomationTestResultDtoApiResponse>;
+        }));
+    }
+
+    protected processStopTestSession(response: HttpResponseBase): Observable<BrowserAutomationTestResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BrowserAutomationTestResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getTestSessionStatus(sessionId: string): Observable<TestSessionStatusDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/browser-automation/test/{sessionId}/status";
+        if (sessionId === undefined || sessionId === null)
+            throw new Error("The parameter 'sessionId' must be defined.");
+        url_ = url_.replace("{sessionId}", encodeURIComponent("" + sessionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTestSessionStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTestSessionStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TestSessionStatusDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TestSessionStatusDtoApiResponse>;
+        }));
+    }
+
+    protected processGetTestSessionStatus(response: HttpResponseBase): Observable<TestSessionStatusDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TestSessionStatusDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getTestSessionResults(sessionId: string): Observable<BrowserAutomationTestResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/browser-automation/test/{sessionId}/results";
+        if (sessionId === undefined || sessionId === null)
+            throw new Error("The parameter 'sessionId' must be defined.");
+        url_ = url_.replace("{sessionId}", encodeURIComponent("" + sessionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTestSessionResults(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTestSessionResults(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BrowserAutomationTestResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BrowserAutomationTestResultDtoApiResponse>;
+        }));
+    }
+
+    protected processGetTestSessionResults(response: HttpResponseBase): Observable<BrowserAutomationTestResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BrowserAutomationTestResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getTestSessionScreenshot(sessionId: string): Observable<StringApiResponse> {
+        let url_ = this.baseUrl + "/api/browser-automation/test/{sessionId}/screenshot";
+        if (sessionId === undefined || sessionId === null)
+            throw new Error("The parameter 'sessionId' must be defined.");
+        url_ = url_.replace("{sessionId}", encodeURIComponent("" + sessionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTestSessionScreenshot(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTestSessionScreenshot(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StringApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StringApiResponse>;
+        }));
+    }
+
+    protected processGetTestSessionScreenshot(response: HttpResponseBase): Observable<StringApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StringApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getTestSessionScreenshotImage(sessionId: string): Observable<void> {
+        let url_ = this.baseUrl + "/api/browser-automation/test/{sessionId}/screenshot/image";
+        if (sessionId === undefined || sessionId === null)
+            throw new Error("The parameter 'sessionId' must be defined.");
+        url_ = url_.replace("{sessionId}", encodeURIComponent("" + sessionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTestSessionScreenshotImage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTestSessionScreenshotImage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processGetTestSessionScreenshotImage(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getActiveTestSessions(): Observable<BrowserTestSessionDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/browser-automation/test/sessions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetActiveTestSessions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetActiveTestSessions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BrowserTestSessionDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BrowserTestSessionDtoListApiResponse>;
+        }));
+    }
+
+    protected processGetActiveTestSessions(response: HttpResponseBase): Observable<BrowserTestSessionDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BrowserTestSessionDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    saveTestResults(sessionId: string, body: SaveTestResultsRequestDto | undefined): Observable<StringApiResponse> {
+        let url_ = this.baseUrl + "/api/browser-automation/test/{sessionId}/save";
+        if (sessionId === undefined || sessionId === null)
+            throw new Error("The parameter 'sessionId' must be defined.");
+        url_ = url_.replace("{sessionId}", encodeURIComponent("" + sessionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveTestResults(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveTestResults(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StringApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StringApiResponse>;
+        }));
+    }
+
+    protected processSaveTestResults(response: HttpResponseBase): Observable<StringApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StringApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    validateProfile(body: ProfileValidationRequestDto | undefined): Observable<ProfileValidationResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/browser-automation/test/validate";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processValidateProfile(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processValidateProfile(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProfileValidationResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProfileValidationResultDtoApiResponse>;
+        }));
+    }
+
+    protected processValidateProfile(response: HttpResponseBase): Observable<ProfileValidationResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProfileValidationResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
     createCategory(body: CreateCategoryDto | undefined): Observable<CategoryDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Categories";
         url_ = url_.replace(/[?&]$/, "");
@@ -8487,6 +8975,74 @@ export class TechTickerApiClient {
     }
 }
 
+export class ActionExecutionResultDto implements IActionExecutionResultDto {
+    actionIndex?: number;
+    actionType?: string | undefined;
+    selector?: string | undefined;
+    value?: string | undefined;
+    success?: boolean;
+    duration?: number;
+    screenshot?: string | undefined;
+    error?: string | undefined;
+    retryCount?: number;
+
+    constructor(data?: IActionExecutionResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.actionIndex = _data["actionIndex"];
+            this.actionType = _data["actionType"];
+            this.selector = _data["selector"];
+            this.value = _data["value"];
+            this.success = _data["success"];
+            this.duration = _data["duration"];
+            this.screenshot = _data["screenshot"];
+            this.error = _data["error"];
+            this.retryCount = _data["retryCount"];
+        }
+    }
+
+    static fromJS(data: any): ActionExecutionResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ActionExecutionResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["actionIndex"] = this.actionIndex;
+        data["actionType"] = this.actionType;
+        data["selector"] = this.selector;
+        data["value"] = this.value;
+        data["success"] = this.success;
+        data["duration"] = this.duration;
+        data["screenshot"] = this.screenshot;
+        data["error"] = this.error;
+        data["retryCount"] = this.retryCount;
+        return data;
+    }
+}
+
+export interface IActionExecutionResultDto {
+    actionIndex?: number;
+    actionType?: string | undefined;
+    selector?: string | undefined;
+    value?: string | undefined;
+    success?: boolean;
+    duration?: number;
+    screenshot?: string | undefined;
+    error?: string | undefined;
+    retryCount?: number;
+}
+
 export class AiConfigurationDto implements IAiConfigurationDto {
     aiConfigurationId?: string;
     provider?: string | undefined;
@@ -12296,6 +12852,766 @@ export interface IBrowserActionGenerationResponseDtoApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class BrowserAutomationActionDto implements IBrowserAutomationActionDto {
+    actionType?: string | undefined;
+    selector?: string | undefined;
+    repeat?: number | undefined;
+    delayMs?: number | undefined;
+    value?: string | undefined;
+
+    constructor(data?: IBrowserAutomationActionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.actionType = _data["actionType"];
+            this.selector = _data["selector"];
+            this.repeat = _data["repeat"];
+            this.delayMs = _data["delayMs"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): BrowserAutomationActionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserAutomationActionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["actionType"] = this.actionType;
+        data["selector"] = this.selector;
+        data["repeat"] = this.repeat;
+        data["delayMs"] = this.delayMs;
+        data["value"] = this.value;
+        return data;
+    }
+}
+
+export interface IBrowserAutomationActionDto {
+    actionType?: string | undefined;
+    selector?: string | undefined;
+    repeat?: number | undefined;
+    delayMs?: number | undefined;
+    value?: string | undefined;
+}
+
+export class BrowserAutomationProfileDto implements IBrowserAutomationProfileDto {
+    preferredBrowser?: string | undefined;
+    waitTimeMs?: number | undefined;
+    actions?: BrowserAutomationActionDto[] | undefined;
+    timeoutSeconds?: number | undefined;
+    userAgent?: string | undefined;
+    headers?: { [key: string]: string; } | undefined;
+    proxyServer?: string | undefined;
+    proxyUsername?: string | undefined;
+    proxyPassword?: string | undefined;
+
+    constructor(data?: IBrowserAutomationProfileDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.preferredBrowser = _data["preferredBrowser"];
+            this.waitTimeMs = _data["waitTimeMs"];
+            if (Array.isArray(_data["actions"])) {
+                this.actions = [] as any;
+                for (let item of _data["actions"])
+                    this.actions!.push(BrowserAutomationActionDto.fromJS(item));
+            }
+            this.timeoutSeconds = _data["timeoutSeconds"];
+            this.userAgent = _data["userAgent"];
+            if (_data["headers"]) {
+                this.headers = {} as any;
+                for (let key in _data["headers"]) {
+                    if (_data["headers"].hasOwnProperty(key))
+                        (<any>this.headers)![key] = _data["headers"][key];
+                }
+            }
+            this.proxyServer = _data["proxyServer"];
+            this.proxyUsername = _data["proxyUsername"];
+            this.proxyPassword = _data["proxyPassword"];
+        }
+    }
+
+    static fromJS(data: any): BrowserAutomationProfileDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserAutomationProfileDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["preferredBrowser"] = this.preferredBrowser;
+        data["waitTimeMs"] = this.waitTimeMs;
+        if (Array.isArray(this.actions)) {
+            data["actions"] = [];
+            for (let item of this.actions)
+                data["actions"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["timeoutSeconds"] = this.timeoutSeconds;
+        data["userAgent"] = this.userAgent;
+        if (this.headers) {
+            data["headers"] = {};
+            for (let key in this.headers) {
+                if (this.headers.hasOwnProperty(key))
+                    (<any>data["headers"])[key] = (<any>this.headers)[key];
+            }
+        }
+        data["proxyServer"] = this.proxyServer;
+        data["proxyUsername"] = this.proxyUsername;
+        data["proxyPassword"] = this.proxyPassword;
+        return data;
+    }
+}
+
+export interface IBrowserAutomationProfileDto {
+    preferredBrowser?: string | undefined;
+    waitTimeMs?: number | undefined;
+    actions?: BrowserAutomationActionDto[] | undefined;
+    timeoutSeconds?: number | undefined;
+    userAgent?: string | undefined;
+    headers?: { [key: string]: string; } | undefined;
+    proxyServer?: string | undefined;
+    proxyUsername?: string | undefined;
+    proxyPassword?: string | undefined;
+}
+
+export class BrowserAutomationTestRequestDto implements IBrowserAutomationTestRequestDto {
+    testUrl?: string | undefined;
+    profile?: BrowserAutomationProfileDto;
+    options?: BrowserTestOptionsDto;
+    saveResults?: boolean;
+    sessionName?: string | undefined;
+
+    constructor(data?: IBrowserAutomationTestRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.testUrl = _data["testUrl"];
+            this.profile = _data["profile"] ? BrowserAutomationProfileDto.fromJS(_data["profile"]) : <any>undefined;
+            this.options = _data["options"] ? BrowserTestOptionsDto.fromJS(_data["options"]) : <any>undefined;
+            this.saveResults = _data["saveResults"];
+            this.sessionName = _data["sessionName"];
+        }
+    }
+
+    static fromJS(data: any): BrowserAutomationTestRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserAutomationTestRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["testUrl"] = this.testUrl;
+        data["profile"] = this.profile ? this.profile.toJSON() : <any>undefined;
+        data["options"] = this.options ? this.options.toJSON() : <any>undefined;
+        data["saveResults"] = this.saveResults;
+        data["sessionName"] = this.sessionName;
+        return data;
+    }
+}
+
+export interface IBrowserAutomationTestRequestDto {
+    testUrl?: string | undefined;
+    profile?: BrowserAutomationProfileDto;
+    options?: BrowserTestOptionsDto;
+    saveResults?: boolean;
+    sessionName?: string | undefined;
+}
+
+export class BrowserAutomationTestResultDto implements IBrowserAutomationTestResultDto {
+    sessionId?: string | undefined;
+    success?: boolean;
+    startedAt?: Date;
+    completedAt?: Date | undefined;
+    duration?: number;
+    actionsExecuted?: number;
+    actionResults?: ActionExecutionResultDto[] | undefined;
+    finalScreenshot?: string | undefined;
+    videoRecording?: string | undefined;
+    screenshots?: ScreenshotCaptureDto[] | undefined;
+    metrics?: ExecutionMetricsDto;
+    networkRequests?: NetworkRequestDto[] | undefined;
+    consoleMessages?: ConsoleMessageDto[] | undefined;
+    errors?: TestErrorDto[] | undefined;
+    warnings?: TestWarningDto[] | undefined;
+    extractedData?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IBrowserAutomationTestResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.sessionId = _data["sessionId"];
+            this.success = _data["success"];
+            this.startedAt = _data["startedAt"] ? new Date(_data["startedAt"].toString()) : <any>undefined;
+            this.completedAt = _data["completedAt"] ? new Date(_data["completedAt"].toString()) : <any>undefined;
+            this.duration = _data["duration"];
+            this.actionsExecuted = _data["actionsExecuted"];
+            if (Array.isArray(_data["actionResults"])) {
+                this.actionResults = [] as any;
+                for (let item of _data["actionResults"])
+                    this.actionResults!.push(ActionExecutionResultDto.fromJS(item));
+            }
+            this.finalScreenshot = _data["finalScreenshot"];
+            this.videoRecording = _data["videoRecording"];
+            if (Array.isArray(_data["screenshots"])) {
+                this.screenshots = [] as any;
+                for (let item of _data["screenshots"])
+                    this.screenshots!.push(ScreenshotCaptureDto.fromJS(item));
+            }
+            this.metrics = _data["metrics"] ? ExecutionMetricsDto.fromJS(_data["metrics"]) : <any>undefined;
+            if (Array.isArray(_data["networkRequests"])) {
+                this.networkRequests = [] as any;
+                for (let item of _data["networkRequests"])
+                    this.networkRequests!.push(NetworkRequestDto.fromJS(item));
+            }
+            if (Array.isArray(_data["consoleMessages"])) {
+                this.consoleMessages = [] as any;
+                for (let item of _data["consoleMessages"])
+                    this.consoleMessages!.push(ConsoleMessageDto.fromJS(item));
+            }
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(TestErrorDto.fromJS(item));
+            }
+            if (Array.isArray(_data["warnings"])) {
+                this.warnings = [] as any;
+                for (let item of _data["warnings"])
+                    this.warnings!.push(TestWarningDto.fromJS(item));
+            }
+            if (_data["extractedData"]) {
+                this.extractedData = {} as any;
+                for (let key in _data["extractedData"]) {
+                    if (_data["extractedData"].hasOwnProperty(key))
+                        (<any>this.extractedData)![key] = _data["extractedData"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BrowserAutomationTestResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserAutomationTestResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["sessionId"] = this.sessionId;
+        data["success"] = this.success;
+        data["startedAt"] = this.startedAt ? this.startedAt.toISOString() : <any>undefined;
+        data["completedAt"] = this.completedAt ? this.completedAt.toISOString() : <any>undefined;
+        data["duration"] = this.duration;
+        data["actionsExecuted"] = this.actionsExecuted;
+        if (Array.isArray(this.actionResults)) {
+            data["actionResults"] = [];
+            for (let item of this.actionResults)
+                data["actionResults"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["finalScreenshot"] = this.finalScreenshot;
+        data["videoRecording"] = this.videoRecording;
+        if (Array.isArray(this.screenshots)) {
+            data["screenshots"] = [];
+            for (let item of this.screenshots)
+                data["screenshots"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["metrics"] = this.metrics ? this.metrics.toJSON() : <any>undefined;
+        if (Array.isArray(this.networkRequests)) {
+            data["networkRequests"] = [];
+            for (let item of this.networkRequests)
+                data["networkRequests"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.consoleMessages)) {
+            data["consoleMessages"] = [];
+            for (let item of this.consoleMessages)
+                data["consoleMessages"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.warnings)) {
+            data["warnings"] = [];
+            for (let item of this.warnings)
+                data["warnings"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (this.extractedData) {
+            data["extractedData"] = {};
+            for (let key in this.extractedData) {
+                if (this.extractedData.hasOwnProperty(key))
+                    (<any>data["extractedData"])[key] = (<any>this.extractedData)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBrowserAutomationTestResultDto {
+    sessionId?: string | undefined;
+    success?: boolean;
+    startedAt?: Date;
+    completedAt?: Date | undefined;
+    duration?: number;
+    actionsExecuted?: number;
+    actionResults?: ActionExecutionResultDto[] | undefined;
+    finalScreenshot?: string | undefined;
+    videoRecording?: string | undefined;
+    screenshots?: ScreenshotCaptureDto[] | undefined;
+    metrics?: ExecutionMetricsDto;
+    networkRequests?: NetworkRequestDto[] | undefined;
+    consoleMessages?: ConsoleMessageDto[] | undefined;
+    errors?: TestErrorDto[] | undefined;
+    warnings?: TestWarningDto[] | undefined;
+    extractedData?: { [key: string]: any; } | undefined;
+}
+
+export class BrowserAutomationTestResultDtoApiResponse implements IBrowserAutomationTestResultDtoApiResponse {
+    success?: boolean;
+    data?: BrowserAutomationTestResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IBrowserAutomationTestResultDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? BrowserAutomationTestResultDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BrowserAutomationTestResultDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserAutomationTestResultDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBrowserAutomationTestResultDtoApiResponse {
+    success?: boolean;
+    data?: BrowserAutomationTestResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class BrowserTestOptionsDto implements IBrowserTestOptionsDto {
+    recordVideo?: boolean;
+    captureScreenshots?: boolean;
+    slowMotion?: number;
+    headless?: boolean;
+    enableNetworkLogging?: boolean;
+    enableConsoleLogging?: boolean;
+    enablePerformanceLogging?: boolean;
+    viewportWidth?: number;
+    viewportHeight?: number;
+    deviceEmulation?: string | undefined;
+    testTimeoutMs?: number;
+    actionTimeoutMs?: number;
+    navigationTimeoutMs?: number;
+
+    constructor(data?: IBrowserTestOptionsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.recordVideo = _data["recordVideo"];
+            this.captureScreenshots = _data["captureScreenshots"];
+            this.slowMotion = _data["slowMotion"];
+            this.headless = _data["headless"];
+            this.enableNetworkLogging = _data["enableNetworkLogging"];
+            this.enableConsoleLogging = _data["enableConsoleLogging"];
+            this.enablePerformanceLogging = _data["enablePerformanceLogging"];
+            this.viewportWidth = _data["viewportWidth"];
+            this.viewportHeight = _data["viewportHeight"];
+            this.deviceEmulation = _data["deviceEmulation"];
+            this.testTimeoutMs = _data["testTimeoutMs"];
+            this.actionTimeoutMs = _data["actionTimeoutMs"];
+            this.navigationTimeoutMs = _data["navigationTimeoutMs"];
+        }
+    }
+
+    static fromJS(data: any): BrowserTestOptionsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserTestOptionsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["recordVideo"] = this.recordVideo;
+        data["captureScreenshots"] = this.captureScreenshots;
+        data["slowMotion"] = this.slowMotion;
+        data["headless"] = this.headless;
+        data["enableNetworkLogging"] = this.enableNetworkLogging;
+        data["enableConsoleLogging"] = this.enableConsoleLogging;
+        data["enablePerformanceLogging"] = this.enablePerformanceLogging;
+        data["viewportWidth"] = this.viewportWidth;
+        data["viewportHeight"] = this.viewportHeight;
+        data["deviceEmulation"] = this.deviceEmulation;
+        data["testTimeoutMs"] = this.testTimeoutMs;
+        data["actionTimeoutMs"] = this.actionTimeoutMs;
+        data["navigationTimeoutMs"] = this.navigationTimeoutMs;
+        return data;
+    }
+}
+
+export interface IBrowserTestOptionsDto {
+    recordVideo?: boolean;
+    captureScreenshots?: boolean;
+    slowMotion?: number;
+    headless?: boolean;
+    enableNetworkLogging?: boolean;
+    enableConsoleLogging?: boolean;
+    enablePerformanceLogging?: boolean;
+    viewportWidth?: number;
+    viewportHeight?: number;
+    deviceEmulation?: string | undefined;
+    testTimeoutMs?: number;
+    actionTimeoutMs?: number;
+    navigationTimeoutMs?: number;
+}
+
+export class BrowserTestSessionDto implements IBrowserTestSessionDto {
+    id?: string | undefined;
+    testUrl?: string | undefined;
+    profile?: BrowserAutomationProfileDto;
+    options?: BrowserTestOptionsDto;
+    status?: string | undefined;
+    startedAt?: Date;
+    completedAt?: Date | undefined;
+    sessionName?: string | undefined;
+    webSocketUrl?: string | undefined;
+
+    constructor(data?: IBrowserTestSessionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.testUrl = _data["testUrl"];
+            this.profile = _data["profile"] ? BrowserAutomationProfileDto.fromJS(_data["profile"]) : <any>undefined;
+            this.options = _data["options"] ? BrowserTestOptionsDto.fromJS(_data["options"]) : <any>undefined;
+            this.status = _data["status"];
+            this.startedAt = _data["startedAt"] ? new Date(_data["startedAt"].toString()) : <any>undefined;
+            this.completedAt = _data["completedAt"] ? new Date(_data["completedAt"].toString()) : <any>undefined;
+            this.sessionName = _data["sessionName"];
+            this.webSocketUrl = _data["webSocketUrl"];
+        }
+    }
+
+    static fromJS(data: any): BrowserTestSessionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserTestSessionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["testUrl"] = this.testUrl;
+        data["profile"] = this.profile ? this.profile.toJSON() : <any>undefined;
+        data["options"] = this.options ? this.options.toJSON() : <any>undefined;
+        data["status"] = this.status;
+        data["startedAt"] = this.startedAt ? this.startedAt.toISOString() : <any>undefined;
+        data["completedAt"] = this.completedAt ? this.completedAt.toISOString() : <any>undefined;
+        data["sessionName"] = this.sessionName;
+        data["webSocketUrl"] = this.webSocketUrl;
+        return data;
+    }
+}
+
+export interface IBrowserTestSessionDto {
+    id?: string | undefined;
+    testUrl?: string | undefined;
+    profile?: BrowserAutomationProfileDto;
+    options?: BrowserTestOptionsDto;
+    status?: string | undefined;
+    startedAt?: Date;
+    completedAt?: Date | undefined;
+    sessionName?: string | undefined;
+    webSocketUrl?: string | undefined;
+}
+
+export class BrowserTestSessionDtoApiResponse implements IBrowserTestSessionDtoApiResponse {
+    success?: boolean;
+    data?: BrowserTestSessionDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IBrowserTestSessionDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? BrowserTestSessionDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BrowserTestSessionDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserTestSessionDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBrowserTestSessionDtoApiResponse {
+    success?: boolean;
+    data?: BrowserTestSessionDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class BrowserTestSessionDtoListApiResponse implements IBrowserTestSessionDtoListApiResponse {
+    success?: boolean;
+    data?: BrowserTestSessionDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IBrowserTestSessionDtoListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(BrowserTestSessionDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BrowserTestSessionDtoListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserTestSessionDtoListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBrowserTestSessionDtoListApiResponse {
+    success?: boolean;
+    data?: BrowserTestSessionDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class BulkProxyActiveStatusDto implements IBulkProxyActiveStatusDto {
     proxyIds?: string[] | undefined;
     isActive?: boolean;
@@ -12996,6 +14312,58 @@ export interface ICategoryDtoIEnumerableApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class ConsoleMessageDto implements IConsoleMessageDto {
+    level?: string | undefined;
+    message?: string | undefined;
+    source?: string | undefined;
+    lineNumber?: number | undefined;
+    timestamp?: Date;
+
+    constructor(data?: IConsoleMessageDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.level = _data["level"];
+            this.message = _data["message"];
+            this.source = _data["source"];
+            this.lineNumber = _data["lineNumber"];
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ConsoleMessageDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConsoleMessageDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["level"] = this.level;
+        data["message"] = this.message;
+        data["source"] = this.source;
+        data["lineNumber"] = this.lineNumber;
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IConsoleMessageDto {
+    level?: string | undefined;
+    message?: string | undefined;
+    source?: string | undefined;
+    lineNumber?: number | undefined;
+    timestamp?: Date;
 }
 
 export class CreateAiConfigurationDto implements ICreateAiConfigurationDto {
@@ -13982,6 +15350,70 @@ export interface IDashboardStatsDtoApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class ExecutionMetricsDto implements IExecutionMetricsDto {
+    totalDuration?: number;
+    navigationTime?: number;
+    actionsTime?: number;
+    memoryUsage?: number;
+    cpuUsage?: number;
+    networkRequestCount?: number;
+    networkBytesReceived?: number;
+    networkBytesSent?: number;
+
+    constructor(data?: IExecutionMetricsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalDuration = _data["totalDuration"];
+            this.navigationTime = _data["navigationTime"];
+            this.actionsTime = _data["actionsTime"];
+            this.memoryUsage = _data["memoryUsage"];
+            this.cpuUsage = _data["cpuUsage"];
+            this.networkRequestCount = _data["networkRequestCount"];
+            this.networkBytesReceived = _data["networkBytesReceived"];
+            this.networkBytesSent = _data["networkBytesSent"];
+        }
+    }
+
+    static fromJS(data: any): ExecutionMetricsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ExecutionMetricsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalDuration"] = this.totalDuration;
+        data["navigationTime"] = this.navigationTime;
+        data["actionsTime"] = this.actionsTime;
+        data["memoryUsage"] = this.memoryUsage;
+        data["cpuUsage"] = this.cpuUsage;
+        data["networkRequestCount"] = this.networkRequestCount;
+        data["networkBytesReceived"] = this.networkBytesReceived;
+        data["networkBytesSent"] = this.networkBytesSent;
+        return data;
+    }
+}
+
+export interface IExecutionMetricsDto {
+    totalDuration?: number;
+    navigationTime?: number;
+    actionsTime?: number;
+    memoryUsage?: number;
+    cpuUsage?: number;
+    networkRequestCount?: number;
+    networkBytesReceived?: number;
+    networkBytesSent?: number;
+}
+
 export class GeneratedBrowserAction implements IGeneratedBrowserAction {
     actionType?: string | undefined;
     selector?: string | undefined;
@@ -14512,6 +15944,82 @@ export class LoginUserDto implements ILoginUserDto {
 export interface ILoginUserDto {
     email: string;
     password: string;
+}
+
+export class NetworkRequestDto implements INetworkRequestDto {
+    url?: string | undefined;
+    method?: string | undefined;
+    statusCode?: number;
+    statusText?: string | undefined;
+    headers?: { [key: string]: string; } | undefined;
+    duration?: number;
+    size?: number;
+    timestamp?: Date;
+
+    constructor(data?: INetworkRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.url = _data["url"];
+            this.method = _data["method"];
+            this.statusCode = _data["statusCode"];
+            this.statusText = _data["statusText"];
+            if (_data["headers"]) {
+                this.headers = {} as any;
+                for (let key in _data["headers"]) {
+                    if (_data["headers"].hasOwnProperty(key))
+                        (<any>this.headers)![key] = _data["headers"][key];
+                }
+            }
+            this.duration = _data["duration"];
+            this.size = _data["size"];
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): NetworkRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new NetworkRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["url"] = this.url;
+        data["method"] = this.method;
+        data["statusCode"] = this.statusCode;
+        data["statusText"] = this.statusText;
+        if (this.headers) {
+            data["headers"] = {};
+            for (let key in this.headers) {
+                if (this.headers.hasOwnProperty(key))
+                    (<any>data["headers"])[key] = (<any>this.headers)[key];
+            }
+        }
+        data["duration"] = this.duration;
+        data["size"] = this.size;
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface INetworkRequestDto {
+    url?: string | undefined;
+    method?: string | undefined;
+    statusCode?: number;
+    statusText?: string | undefined;
+    headers?: { [key: string]: string; } | undefined;
+    duration?: number;
+    size?: number;
+    timestamp?: Date;
 }
 
 export class NotificationChannelStatsDto implements INotificationChannelStatsDto {
@@ -16602,6 +18110,186 @@ export interface IProductWithCurrentPricesDtoPagedResponse {
     pagination?: PaginationMeta;
 }
 
+export class ProfileValidationRequestDto implements IProfileValidationRequestDto {
+    profile?: BrowserAutomationProfileDto;
+
+    constructor(data?: IProfileValidationRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.profile = _data["profile"] ? BrowserAutomationProfileDto.fromJS(_data["profile"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProfileValidationRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProfileValidationRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["profile"] = this.profile ? this.profile.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProfileValidationRequestDto {
+    profile?: BrowserAutomationProfileDto;
+}
+
+export class ProfileValidationResultDto implements IProfileValidationResultDto {
+    isValid?: boolean;
+    warnings?: string[] | undefined;
+    errors?: string[] | undefined;
+
+    constructor(data?: IProfileValidationResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isValid = _data["isValid"];
+            if (Array.isArray(_data["warnings"])) {
+                this.warnings = [] as any;
+                for (let item of _data["warnings"])
+                    this.warnings!.push(item);
+            }
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ProfileValidationResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProfileValidationResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isValid"] = this.isValid;
+        if (Array.isArray(this.warnings)) {
+            data["warnings"] = [];
+            for (let item of this.warnings)
+                data["warnings"].push(item);
+        }
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IProfileValidationResultDto {
+    isValid?: boolean;
+    warnings?: string[] | undefined;
+    errors?: string[] | undefined;
+}
+
+export class ProfileValidationResultDtoApiResponse implements IProfileValidationResultDtoApiResponse {
+    success?: boolean;
+    data?: ProfileValidationResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProfileValidationResultDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ProfileValidationResultDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProfileValidationResultDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProfileValidationResultDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProfileValidationResultDtoApiResponse {
+    success?: boolean;
+    data?: ProfileValidationResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class ProviderModelsRequestDto implements IProviderModelsRequestDto {
     baseUrl?: string | undefined;
     apiKey?: string | undefined;
@@ -18142,6 +19830,58 @@ export interface IRoleInfoDtoIEnumerableApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class SaveTestResultsRequestDto implements ISaveTestResultsRequestDto {
+    name?: string | undefined;
+    description?: string | undefined;
+    tags?: string[] | undefined;
+
+    constructor(data?: ISaveTestResultsRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.description = _data["description"];
+            if (Array.isArray(_data["tags"])) {
+                this.tags = [] as any;
+                for (let item of _data["tags"])
+                    this.tags!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): SaveTestResultsRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaveTestResultsRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["description"] = this.description;
+        if (Array.isArray(this.tags)) {
+            data["tags"] = [];
+            for (let item of this.tags)
+                data["tags"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ISaveTestResultsRequestDto {
+    name?: string | undefined;
+    description?: string | undefined;
+    tags?: string[] | undefined;
+}
+
 export class ScraperRunLogDto implements IScraperRunLogDto {
     runId?: string;
     mappingId?: string;
@@ -19406,6 +21146,58 @@ export interface IScrapingSelectorsDto {
     imageSelector?: string | undefined;
 }
 
+export class ScreenshotCaptureDto implements IScreenshotCaptureDto {
+    id?: string | undefined;
+    timestamp?: Date;
+    base64Data?: string | undefined;
+    actionIndex?: number;
+    actionType?: string | undefined;
+
+    constructor(data?: IScreenshotCaptureDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.base64Data = _data["base64Data"];
+            this.actionIndex = _data["actionIndex"];
+            this.actionType = _data["actionType"];
+        }
+    }
+
+    static fromJS(data: any): ScreenshotCaptureDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScreenshotCaptureDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["base64Data"] = this.base64Data;
+        data["actionIndex"] = this.actionIndex;
+        data["actionType"] = this.actionType;
+        return data;
+    }
+}
+
+export interface IScreenshotCaptureDto {
+    id?: string | undefined;
+    timestamp?: Date;
+    base64Data?: string | undefined;
+    actionIndex?: number;
+    actionType?: string | undefined;
+}
+
 export class SellerPerformanceMetricDto implements ISellerPerformanceMetricDto {
     sellerName?: string | undefined;
     totalRuns?: number;
@@ -19994,6 +21786,58 @@ export interface ITestDiscordWebhookDto {
     customAvatarUrl?: string | undefined;
 }
 
+export class TestErrorDto implements ITestErrorDto {
+    code?: string | undefined;
+    message?: string | undefined;
+    details?: string | undefined;
+    actionIndex?: number | undefined;
+    timestamp?: Date;
+
+    constructor(data?: ITestErrorDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.code = _data["code"];
+            this.message = _data["message"];
+            this.details = _data["details"];
+            this.actionIndex = _data["actionIndex"];
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): TestErrorDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestErrorDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["code"] = this.code;
+        data["message"] = this.message;
+        data["details"] = this.details;
+        data["actionIndex"] = this.actionIndex;
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ITestErrorDto {
+    code?: string | undefined;
+    message?: string | undefined;
+    details?: string | undefined;
+    actionIndex?: number | undefined;
+    timestamp?: Date;
+}
+
 export class TestPricePointDto implements ITestPricePointDto {
     price!: number;
     stockStatus!: string;
@@ -20044,6 +21888,190 @@ export interface ITestPricePointDto {
     sellerName?: string | undefined;
     sourceUrl?: string | undefined;
     timestamp?: Date | undefined;
+}
+
+export class TestSessionStatusDto implements ITestSessionStatusDto {
+    status?: string | undefined;
+    progress?: number;
+    currentAction?: string | undefined;
+    lastUpdated?: Date;
+
+    constructor(data?: ITestSessionStatusDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.status = _data["status"];
+            this.progress = _data["progress"];
+            this.currentAction = _data["currentAction"];
+            this.lastUpdated = _data["lastUpdated"] ? new Date(_data["lastUpdated"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): TestSessionStatusDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestSessionStatusDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["status"] = this.status;
+        data["progress"] = this.progress;
+        data["currentAction"] = this.currentAction;
+        data["lastUpdated"] = this.lastUpdated ? this.lastUpdated.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ITestSessionStatusDto {
+    status?: string | undefined;
+    progress?: number;
+    currentAction?: string | undefined;
+    lastUpdated?: Date;
+}
+
+export class TestSessionStatusDtoApiResponse implements ITestSessionStatusDtoApiResponse {
+    success?: boolean;
+    data?: TestSessionStatusDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ITestSessionStatusDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? TestSessionStatusDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): TestSessionStatusDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestSessionStatusDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ITestSessionStatusDtoApiResponse {
+    success?: boolean;
+    data?: TestSessionStatusDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class TestWarningDto implements ITestWarningDto {
+    code?: string | undefined;
+    message?: string | undefined;
+    details?: string | undefined;
+    actionIndex?: number | undefined;
+    timestamp?: Date;
+
+    constructor(data?: ITestWarningDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.code = _data["code"];
+            this.message = _data["message"];
+            this.details = _data["details"];
+            this.actionIndex = _data["actionIndex"];
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): TestWarningDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestWarningDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["code"] = this.code;
+        data["message"] = this.message;
+        data["details"] = this.details;
+        data["actionIndex"] = this.actionIndex;
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ITestWarningDto {
+    code?: string | undefined;
+    message?: string | undefined;
+    details?: string | undefined;
+    actionIndex?: number | undefined;
+    timestamp?: Date;
 }
 
 export class UpdateAiConfigurationDto implements IUpdateAiConfigurationDto {
