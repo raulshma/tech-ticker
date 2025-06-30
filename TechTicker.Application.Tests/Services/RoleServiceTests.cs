@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using TechTicker.Application.Services;
 using TechTicker.DataAccess;
@@ -28,12 +29,24 @@ public class RoleServiceTests : IDisposable
         // Mock RoleManager
         var roleStore = new Mock<IRoleStore<IdentityRole<Guid>>>();
         _roleManagerMock = new Mock<RoleManager<IdentityRole<Guid>>>(
-            roleStore.Object, null, null, null, null);
+            roleStore.Object, 
+            Array.Empty<IRoleValidator<IdentityRole<Guid>>>(), 
+            new Mock<ILookupNormalizer>().Object, 
+            new Mock<IdentityErrorDescriber>().Object, 
+            new Mock<ILogger<RoleManager<IdentityRole<Guid>>>>().Object);
 
         // Mock UserManager
         var userStore = new Mock<IUserStore<ApplicationUser>>();
         _userManagerMock = new Mock<UserManager<ApplicationUser>>(
-            userStore.Object, null, null, null, null, null, null, null, null);
+            userStore.Object, 
+            new Mock<IOptions<IdentityOptions>>().Object, 
+            new Mock<IPasswordHasher<ApplicationUser>>().Object,
+            Array.Empty<IUserValidator<ApplicationUser>>(),
+            Array.Empty<IPasswordValidator<ApplicationUser>>(),
+            new Mock<ILookupNormalizer>().Object,
+            new Mock<IdentityErrorDescriber>().Object,
+            new Mock<IServiceProvider>().Object,
+            new Mock<ILogger<UserManager<ApplicationUser>>>().Object);
 
         _loggerMock = new Mock<ILogger<RoleService>>();
 
@@ -77,6 +90,7 @@ public class RoleServiceTests : IDisposable
 
         // Assert
         Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Data);
         Assert.Equal(roleId, result.Data.Id);
         Assert.Equal("Admin", result.Data.Name);
         Assert.Equal("Administrator", result.Data.DisplayName);
@@ -116,10 +130,10 @@ public class RoleServiceTests : IDisposable
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(roleName, result.Data.Name);
-        Assert.Equal("Moderator", result.Data.DisplayName);
-        Assert.Equal(0, result.Data.UserCount);
-        Assert.False(result.Data.IsSystemRole);
+        Assert.Equal(roleName, result?.Data?.Name);
+        Assert.Equal("Moderator", result?.Data?.DisplayName);
+        Assert.Equal(0, result?.Data?.UserCount);
+        Assert.False(result?.Data?.IsSystemRole);
     }
 
     [Fact]
@@ -232,6 +246,7 @@ public class RoleServiceTests : IDisposable
 
         // Assert
         Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Data);
         Assert.Equal(2, result.Data.Count());
         Assert.Contains("Admin", result.Data);
         Assert.Contains("User", result.Data);
@@ -362,6 +377,7 @@ public class RoleServiceTests : IDisposable
 
         // Assert
         Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Data);
         Assert.Equal(2, result.Data.Count());
         Assert.All(result.Data, userInfo => Assert.Contains("@test.com", userInfo.Email));
     }

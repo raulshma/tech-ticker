@@ -238,7 +238,7 @@ public class AiConfigurationServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task ValidateConfigurationAsync_ShouldReturnValid_WhenConfigurationIsCorrect()
+    public void ValidateConfigurationAsync_ShouldReturnValid_WhenConfigurationIsCorrect()
     {
         // Arrange
         var validateDto = new CreateAiConfigurationDto
@@ -257,7 +257,7 @@ public class AiConfigurationServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task ValidateConfigurationAsync_ShouldReturnInvalid_WhenTemperatureOutOfRange()
+    public void ValidateConfigurationAsync_ShouldReturnInvalid_WhenTemperatureOutOfRange()
     {
         // Arrange
         // Act & Assert - Just testing that validation would catch errors
