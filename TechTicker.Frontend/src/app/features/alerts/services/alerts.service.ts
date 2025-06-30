@@ -7,6 +7,7 @@ import {
   UpdateAlertRuleDto,
   AlertRuleDtoApiResponse,
   AlertRuleDtoIEnumerableApiResponse,
+  AlertRuleDtoPagedResponse,
   ApiResponse
 } from '../../../shared/api/api-client';
 
@@ -87,6 +88,23 @@ export class AlertsService {
         map(() => void 0),
         catchError(error => {
           console.error('Error deleting alert:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  // Admin methods
+  getAllAlerts(userId?: string, productId?: string, page?: number, pageSize?: number): Observable<AlertRuleDto[]> {
+    return this.apiClient.adminGetAllAlerts(userId, productId, page, pageSize)
+      .pipe(
+        map((response: AlertRuleDtoPagedResponse) => {
+          if (!response.success || !response.data) {
+            throw new Error(response.message || 'Failed to fetch all alerts');
+          }
+          return response.data;
+        }),
+        catchError(error => {
+          console.error('Error fetching all alerts:', error);
           return throwError(() => error);
         })
       );

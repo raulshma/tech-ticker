@@ -110,9 +110,61 @@ export class NotificationSettingsComponent implements OnInit {
     });
   }
 
-  onProductSelectionChange(product: NotificationProductSelectionDto, event: any): void {
-    product.isSelected = event.checked;
+  getSelectedProductsCount(): number {
+    return this.availableProducts.filter(p => p.isSelected).length;
+  }
+
+  getMaxProductsAllowed(): number {
+    return this.summary?.maxProductsAllowed || 5;
+  }
+
+  getProductSelectionProgress(): number {
+    const selected = this.getSelectedProductsCount();
+    const max = this.getMaxProductsAllowed();
+    return (selected / max) * 100;
+  }
+
+  isMaxProductsReached(): boolean {
+    return this.getSelectedProductsCount() >= this.getMaxProductsAllowed();
+  }
+
+  getProductsByCategory(): { [category: string]: NotificationProductSelectionDto[] } {
+    const grouped: { [category: string]: NotificationProductSelectionDto[] } = {};
     
+    this.availableProducts.forEach(product => {
+      const category = product.categoryName || 'Uncategorized';
+      if (!grouped[category]) {
+        grouped[category] = [];
+      }
+      grouped[category].push(product);
+    });
+
+    return grouped;
+  }
+
+  selectAllProductsInCategory(categoryProducts: NotificationProductSelectionDto[]): void {
+    const availableSlots = this.getMaxProductsAllowed() - this.getSelectedProductsCount();
+    let slotsUsed = 0;
+
+    categoryProducts.forEach(product => {
+      if (!product.isSelected && slotsUsed < availableSlots) {
+        product.isSelected = true;
+        slotsUsed++;
+      }
+    });
+
+    this.updateSelectedProductIds();
+  }
+
+  deselectAllProductsInCategory(categoryProducts: NotificationProductSelectionDto[]): void {
+    categoryProducts.forEach(product => {
+      product.isSelected = false;
+    });
+
+    this.updateSelectedProductIds();
+  }
+
+  private updateSelectedProductIds(): void {
     const selectedIds = this.availableProducts
       .filter(p => p.isSelected)
       .map(p => p.productId);
@@ -122,8 +174,30 @@ export class NotificationSettingsComponent implements OnInit {
     });
   }
 
-  getSelectedProductsCount(): number {
-    return this.availableProducts.filter(p => p.isSelected).length;
+  onProductSelectionChange(product: NotificationProductSelectionDto, event: any): void {
+    if (event.checked && this.isMaxProductsReached()) {
+      event.source.checked = false;
+      this.snackBar.open(
+        `Maximum of ${this.getMaxProductsAllowed()} products can be selected for notifications`, 
+        'Close', 
+        { duration: 4000 }
+      );
+      return;
+    }
+
+    product.isSelected = event.checked;
+    this.updateSelectedProductIds();
+
+    // Show helpful message when approaching limit
+    const selected = this.getSelectedProductsCount();
+    const max = this.getMaxProductsAllowed();
+    if (selected === max - 1) {
+      this.snackBar.open(
+        `You can select 1 more product for notifications`, 
+        'Close', 
+        { duration: 3000 }
+      );
+    }
   }
 
   testWebhook(): void {

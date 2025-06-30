@@ -1,0 +1,291 @@
+<div class="alert-admin-container">
+  <!-- Modern Welcome Header Section -->
+  <header class="welcome-section">
+    <div class="welcome-content">
+      <div class="header-main">
+        <div class="title-section">
+          <h1 class="mat-display-medium">Alert Administration</h1>
+          <p class="mat-body-large welcome-subtitle">Monitor and manage all user alert rules across the platform</p>
+        </div>
+        <div class="header-actions">
+          <button mat-button variant="filled" color="primary" (click)="refreshData()" [disabled]="isLoading">
+            <mat-icon>refresh</mat-icon>
+            Refresh Data
+          </button>
+          <button mat-button variant="filled" color="accent" routerLink="/alerts/performance">
+            <mat-icon>analytics</mat-icon>
+            Performance
+          </button>
+          <button mat-button variant="outlined" routerLink="/alerts">
+            <mat-icon>arrow_back</mat-icon>
+            Back to Alerts
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Enhanced Statistics Overview -->
+  <section class="stats-section" *ngIf="stats && !isLoading" aria-label="Alert Statistics">
+    <div class="stats-grid">
+      <mat-card class="stat-card total-alerts" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon primary-surface">
+              <mat-icon aria-hidden="true">notifications</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ totalAlerts }}</h3>
+              <p class="mat-body-medium stat-label">Total Alerts</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card active-alerts" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon success-surface">
+              <mat-icon aria-hidden="true">notifications_active</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ getActiveAlertsCount() }}</h3>
+              <p class="mat-body-medium stat-label">Active</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card triggered-today" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon secondary-surface">
+              <mat-icon aria-hidden="true">today</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ getTriggeredTodayCount() }}</h3>
+              <p class="mat-body-medium stat-label">Triggered Today</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card filtered-results" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon info-surface">
+              <mat-icon aria-hidden="true">filter_list</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{ filteredAlerts.length }}</h3>
+              <p class="mat-body-medium stat-label">Filtered</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+
+  <!-- Modern Management Section -->
+  <section class="management-section" aria-label="Alert Management">
+    <mat-card class="management-card" appearance="outlined">
+      <mat-card-header class="management-header">
+        <mat-card-title class="mat-headline-large">Alert Rules Management</mat-card-title>
+        <mat-card-subtitle class="mat-body-large">Search, filter, and manage user alert configurations</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="management-content">
+        <!-- Enhanced Filter Controls -->
+        <div class="filters-section" *ngIf="!isLoading">
+          <div class="filter-controls">
+            <mat-form-field appearance="outline" class="search-field">
+              <mat-label>Search alerts</mat-label>
+              <input matInput [formControl]="searchControl" placeholder="Search by product name, user, or description..." [attr.aria-label]="'Search alerts'">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Status</mat-label>
+              <mat-select [formControl]="statusFilter" [attr.aria-label]="'Filter by status'">
+                <mat-option value="">All Statuses</mat-option>
+                <mat-option value="active">Active</mat-option>
+                <mat-option value="inactive">Inactive</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>tune</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Condition Type</mat-label>
+              <mat-select [formControl]="conditionFilter" [attr.aria-label]="'Filter by condition type'">
+                <mat-option value="">All Conditions</mat-option>
+                <mat-option value="PRICE_BELOW">Price Below</mat-option>
+                <mat-option value="PERCENT_DROP_FROM_LAST">Percentage Drop</mat-option>
+                <mat-option value="BACK_IN_STOCK">Back in Stock</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
+            </mat-form-field>
+
+            <button mat-button variant="outlined" (click)="clearFilters()" class="clear-filters-btn" [attr.aria-label]="'Clear all filters'">
+              <mat-icon>clear</mat-icon>
+              Clear Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading spinner with improved styling -->
+        <div *ngIf="isLoading" class="loading-container" role="status" aria-live="polite">
+          <mat-spinner diameter="48" strokeWidth="4" [attr.aria-label]="'Loading alert rules'"></mat-spinner>
+          <p class="mat-body-large loading-text">Loading alert rules...</p>
+        </div>
+
+        <!-- Enhanced Alerts Table -->
+        <div class="table-container" *ngIf="!isLoading">
+          <table mat-table [dataSource]="filteredAlerts" class="modern-table" [attr.aria-label]="'Alert rules table'">
+            <!-- User Column -->
+            <ng-container matColumnDef="user">
+              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">User</th>
+              <td mat-cell *matCellDef="let alert">
+                <div class="user-info">
+                  <div class="user-avatar" [attr.aria-label]="'User avatar for ' + alert.user?.firstName + ' ' + alert.user?.lastName">
+                    <mat-icon>account_circle</mat-icon>
+                  </div>
+                  <div class="user-details">
+                    <div class="user-name mat-body-medium">{{ alert.user?.firstName }} {{ alert.user?.lastName }}</div>
+                    <div class="user-email mat-body-small">{{ alert.user?.email }}</div>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Product Column -->
+            <ng-container matColumnDef="product">
+              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Product</th>
+              <td mat-cell *matCellDef="let alert">
+                <div class="product-info">
+                  <div class="product-name mat-body-medium">{{ alert.product?.name }}</div>
+                  <div class="product-manufacturer mat-body-small">{{ alert.product?.manufacturer }}</div>
+                  <div class="seller-name mat-body-small" *ngIf="alert.specificSellerName">
+                    Seller: {{ alert.specificSellerName }}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Condition Column -->
+            <ng-container matColumnDef="condition">
+              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Condition</th>
+              <td mat-cell *matCellDef="let alert">
+                <div class="condition-info">
+                  <mat-chip [color]="getConditionColor(alert.conditionType)" class="condition-chip">
+                    <mat-icon>{{ getConditionIcon(alert.conditionType) }}</mat-icon>
+                    {{ getConditionText(alert) }}
+                  </mat-chip>
+                  <div class="alert-type mat-body-small">{{ alert.alertType }}</div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Status</th>
+              <td mat-cell *matCellDef="let alert">
+                <div class="status-info">
+                  <mat-slide-toggle 
+                    [checked]="alert.isActive"
+                    (change)="toggleAlert(alert, $event.checked)"
+                    [disabled]="isUpdating"
+                    [color]="'primary'"
+                    [attr.aria-label]="'Toggle alert ' + (alert.isActive ? 'inactive' : 'active')">
+                  </mat-slide-toggle>
+                  <div class="status-details">
+                    <span class="status-text mat-body-medium">
+                      {{ alert.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                    <span class="status-badge" [class]="alert.isActive ? 'active-badge' : 'inactive-badge'">
+                      {{ alert.isActive ? 'ENABLED' : 'DISABLED' }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Created Column -->
+            <ng-container matColumnDef="created">
+              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Created</th>
+              <td mat-cell *matCellDef="let alert">
+                <div class="created-info">
+                  <div class="created-date mat-body-medium">{{ alert.createdAt | date:'short' }}</div>
+                  <div class="created-relative mat-body-small">{{ getRelativeTime(alert.createdAt) }}</div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Last Triggered Column -->
+            <ng-container matColumnDef="lastTriggered">
+              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Last Triggered</th>
+              <td mat-cell *matCellDef="let alert">
+                <div class="last-triggered">
+                  <div class="triggered-date mat-body-medium" *ngIf="alert.lastNotifiedAt; else neverTriggered">
+                    {{ alert.lastNotifiedAt | date:'short' }}
+                  </div>
+                  <ng-template #neverTriggered>
+                    <div class="never-triggered mat-body-medium">Never</div>
+                  </ng-template>
+                  <div class="triggered-relative mat-body-small" *ngIf="alert.lastNotifiedAt">
+                    {{ getRelativeTime(alert.lastNotifiedAt) }}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Actions</th>
+              <td mat-cell *matCellDef="let alert">
+                <button mat-icon-button [matMenuTriggerFor]="actionsMenu" class="actions-button" [attr.aria-label]="'Actions for alert ' + alert.product?.name">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #actionsMenu="matMenu" class="actions-menu">
+                  <button mat-menu-item (click)="viewAlert(alert)">
+                    <mat-icon>visibility</mat-icon>
+                    <span>View Details</span>
+                  </button>
+                  <button mat-menu-item (click)="editAlert(alert)">
+                    <mat-icon>edit</mat-icon>
+                    <span>Edit Alert</span>
+                  </button>
+                  <button mat-menu-item (click)="testAlert(alert)">
+                    <mat-icon>play_arrow</mat-icon>
+                    <span>Test Alert</span>
+                  </button>
+                  <mat-divider></mat-divider>
+                  <button mat-menu-item (click)="deleteAlert(alert)" class="delete-action">
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete Alert</span>
+                  </button>
+                </mat-menu>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+          </table>
+
+          <!-- Enhanced Pagination -->
+          <div class="pagination-container">
+            <mat-paginator
+              [length]="totalAlerts"
+              [pageSize]="pageSize"
+              [pageSizeOptions]="[10, 25, 50, 100]"
+              [pageIndex]="currentPage"
+              (page)="onPageChange($event)"
+              showFirstLastButtons
+              class="modern-paginator"
+              [attr.aria-label]="'Alert pagination'">
+            </mat-paginator>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
+</div> 

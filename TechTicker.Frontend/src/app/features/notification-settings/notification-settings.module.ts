@@ -13,6 +13,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
 
 // Components
 import { NotificationSettingsComponent } from './components/notification-settings/notification-settings.component';
@@ -46,7 +47,8 @@ const routes: Routes = [
     MatSlideToggleModule,
     MatCheckboxModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatChipsModule
   ]
 })
 export class NotificationSettingsModule { }

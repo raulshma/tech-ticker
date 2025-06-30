@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,7 +12,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
@@ -23,6 +26,7 @@ import { AlertRuleDto, UpdateAlertRuleDto } from '../../../../shared/api/api-cli
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -34,266 +38,29 @@ import { AlertRuleDto, UpdateAlertRuleDto } from '../../../../shared/api/api-cli
     MatChipsModule,
     MatSlideToggleModule,
     MatMenuModule,
+    MatDividerModule,
     MatSnackBarModule,
+    MatProgressSpinnerModule,
     ReactiveFormsModule
   ],
-  template: `
-    <div class="admin-container">
-      <mat-card class="header-card">
-        <mat-card-header>
-          <mat-card-title>Alert Administration</mat-card-title>
-          <mat-card-subtitle>Manage all user alert rules</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-actions>
-          <button mat-raised-button color="primary" (click)="refreshData()">
-            <mat-icon>refresh</mat-icon>
-            Refresh
-          </button>
-          <button mat-raised-button color="accent" routerLink="/alerts/performance">
-            <mat-icon>analytics</mat-icon>
-            Performance
-          </button>
-        </mat-card-actions>
-      </mat-card>
-
-      <!-- Filters -->
-      <mat-card class="filters-card">
-        <mat-card-content>
-          <div class="filters-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Search</mat-label>
-              <input matInput [formControl]="searchControl" placeholder="Search by product name or user...">
-              <mat-icon matSuffix>search</mat-icon>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Status</mat-label>
-              <mat-select [formControl]="statusFilter">
-                <mat-option value="">All</mat-option>
-                <mat-option value="active">Active</mat-option>
-                <mat-option value="inactive">Inactive</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Condition Type</mat-label>
-              <mat-select [formControl]="conditionFilter">
-                <mat-option value="">All</mat-option>
-                <mat-option value="PRICE_BELOW">Price Below</mat-option>
-                <mat-option value="PERCENT_DROP_FROM_LAST">Percentage Drop</mat-option>
-                <mat-option value="BACK_IN_STOCK">Back in Stock</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Alerts Table -->
-      <mat-card class="table-card">
-        <mat-card-content>
-          <div class="table-header">
-            <h3>Alert Rules ({{ totalAlerts }})</h3>
-          </div>
-
-          <table mat-table [dataSource]="alerts" class="alerts-table">
-            <!-- User Column -->
-            <ng-container matColumnDef="user">
-              <th mat-header-cell *matHeaderCellDef>User</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="user-info">
-                  <div class="user-name">{{ alert.user?.firstName }} {{ alert.user?.lastName }}</div>
-                  <div class="user-email">{{ alert.user?.email }}</div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Product Column -->
-            <ng-container matColumnDef="product">
-              <th mat-header-cell *matHeaderCellDef>Product</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="product-info">
-                  <div class="product-name">{{ alert.product?.name }}</div>
-                  <div class="product-manufacturer">{{ alert.product?.manufacturer }}</div>
-                  <div class="seller-name" *ngIf="alert.specificSellerName">
-                    Seller: {{ alert.specificSellerName }}
-                  </div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Condition Column -->
-            <ng-container matColumnDef="condition">
-              <th mat-header-cell *matHeaderCellDef>Condition</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="condition-info">
-                  <mat-chip [color]="getConditionColor(alert.conditionType)">
-                    {{ getConditionText(alert) }}
-                  </mat-chip>
-                  <div class="alert-type">{{ alert.alertType }}</div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Status Column -->
-            <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef>Status</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="status-info">
-                  <mat-slide-toggle 
-                    [checked]="alert.isActive"
-                    (change)="toggleAlert(alert, $event.checked)"
-                    [disabled]="isUpdating">
-                  </mat-slide-toggle>
-                  <span class="status-text">
-                    {{ alert.isActive ? 'Active' : 'Inactive' }}
-                  </span>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Created Column -->
-            <ng-container matColumnDef="created">
-              <th mat-header-cell *matHeaderCellDef>Created</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="created-info">
-                  {{ alert.createdAt | date:'short' }}
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Last Triggered Column -->
-            <ng-container matColumnDef="lastTriggered">
-              <th mat-header-cell *matHeaderCellDef>Last Triggered</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="last-triggered">
-                  {{ alert.lastNotifiedAt ? (alert.lastNotifiedAt | date:'short') : 'Never' }}
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Actions Column -->
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Actions</th>
-              <td mat-cell *matCellDef="let alert">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
-                  <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #actionsMenu="matMenu">
-                  <button mat-menu-item (click)="viewAlert(alert)">
-                    <mat-icon>visibility</mat-icon>
-                    <span>View Details</span>
-                  </button>
-                  <button mat-menu-item (click)="editAlert(alert)">
-                    <mat-icon>edit</mat-icon>
-                    <span>Edit</span>
-                  </button>
-                  <button mat-menu-item (click)="deleteAlert(alert)" class="delete-action">
-                    <mat-icon>delete</mat-icon>
-                    <span>Delete</span>
-                  </button>
-                </mat-menu>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          </table>
-
-          <!-- Pagination -->
-          <mat-paginator
-            [length]="totalAlerts"
-            [pageSize]="pageSize"
-            [pageSizeOptions]="[10, 25, 50, 100]"
-            [pageIndex]="currentPage"
-            (page)="onPageChange($event)"
-            showFirstLastButtons>
-          </mat-paginator>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  `,
-  styles: [`
-    .admin-container {
-      padding: 20px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .header-card, .filters-card, .table-card {
-      margin-bottom: 20px;
-    }
-
-    .filters-row {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .table-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .alerts-table {
-      width: 100%;
-    }
-
-    .user-info, .product-info, .condition-info, .status-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .user-name, .product-name {
-      font-weight: 500;
-    }
-
-    .user-email, .product-manufacturer, .seller-name, .alert-type {
-      font-size: 12px;
-      color: #666;
-    }
-
-    .status-info {
-      flex-direction: row;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .delete-action {
-      color: #f44336;
-    }
-
-    .created-info, .last-triggered {
-      font-size: 12px;
-    }
-
-    @media (max-width: 768px) {
-      .filters-row {
-        grid-template-columns: 1fr;
-      }
-    }
-  `]
+  templateUrl: './alert-admin.component.html',
+  styleUrls: ['./alert-admin.component.scss']
 })
 export class AlertAdminComponent implements OnInit {
   alerts: AlertRuleDto[] = [];
+  filteredAlerts: AlertRuleDto[] = [];
   displayedColumns: string[] = ['user', 'product', 'condition', 'status', 'created', 'lastTriggered', 'actions'];
-  
-  // Pagination
   totalAlerts = 0;
   pageSize = 25;
   currentPage = 0;
-  
-  // Filters
+  isLoading = false;
+  isUpdating = false;
+
   searchControl = new FormControl('');
   statusFilter = new FormControl('');
   conditionFilter = new FormControl('');
-  
-  // State
-  isLoading = false;
-  isUpdating = false;
+
+  stats: any = null;
 
   constructor(
     private alertsService: AlertsService,
@@ -301,44 +68,34 @@ export class AlertAdminComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadData();
     this.setupFilters();
-    this.loadAlerts();
   }
 
   private setupFilters(): void {
-    // Setup search debouncing
-    this.searchControl.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(() => {
-      this.currentPage = 0;
-      this.loadAlerts();
-    });
+    this.searchControl.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(() => this.applyFilters());
 
-    // Setup filter changes
-    this.statusFilter.valueChanges.subscribe(() => {
-      this.currentPage = 0;
-      this.loadAlerts();
-    });
-
-    this.conditionFilter.valueChanges.subscribe(() => {
-      this.currentPage = 0;
-      this.loadAlerts();
-    });
+    this.statusFilter.valueChanges.subscribe(() => this.applyFilters());
+    this.conditionFilter.valueChanges.subscribe(() => this.applyFilters());
   }
 
-  loadAlerts(): void {
+  loadData(): void {
+    this.refreshData();
+  }
+
+  refreshData(): void {
     this.isLoading = true;
-    
-    // For now, we'll use the regular getUserAlerts method
-    // In a real implementation, you'd call the admin endpoint with filters
-    this.alertsService.getUserAlerts().subscribe({
-      next: (alerts) => {
-        this.alerts = this.applyClientSideFilters(alerts);
-        this.totalAlerts = this.alerts.length;
+    this.alertsService.getAllAlerts().subscribe({
+      next: (alerts: AlertRuleDto[]) => {
+        this.alerts = alerts;
+        this.totalAlerts = alerts.length;
+        this.calculateStats();
+        this.applyFilters();
         this.isLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading alerts:', error);
         this.snackBar.open('Failed to load alerts', 'Close', { duration: 3000 });
         this.isLoading = false;
@@ -346,46 +103,113 @@ export class AlertAdminComponent implements OnInit {
     });
   }
 
-  private applyClientSideFilters(alerts: AlertRuleDto[]): AlertRuleDto[] {
-    let filtered = alerts;
+  private calculateStats(): void {
+    this.stats = {
+      totalAlerts: this.alerts.length,
+      activeAlerts: this.alerts.filter(a => a.isActive).length,
+      triggeredToday: this.getTriggeredTodayCount(),
+      filteredResults: this.filteredAlerts.length,
+      uniqueUsers: this.getUniqueUsersCount(),
+      conditionTypeBreakdown: this.getConditionTypeBreakdown(),
+      alertsByStatus: this.getAlertsByStatus()
+    };
+  }
 
-    // Apply search filter
-    const searchTerm = this.searchControl.value?.toLowerCase();
+  private getUniqueUsersCount(): number {
+    const uniqueUserEmails = new Set(this.alerts.map(alert => alert.user?.email).filter(email => email));
+    return uniqueUserEmails.size;
+  }
+
+  private getConditionTypeBreakdown(): { [key: string]: number } {
+    return this.alerts.reduce((breakdown, alert) => {
+      const type = alert.conditionType || 'UNKNOWN';
+      breakdown[type] = (breakdown[type] || 0) + 1;
+      return breakdown;
+    }, {} as { [key: string]: number });
+  }
+
+  private getAlertsByStatus(): { active: number; inactive: number } {
+    return {
+      active: this.alerts.filter(a => a.isActive).length,
+      inactive: this.alerts.filter(a => !a.isActive).length
+    };
+  }
+
+  getTopConditionType(): string {
+    const breakdown = this.stats?.conditionTypeBreakdown || {};
+    const topType = Object.entries(breakdown).reduce((max, [type, count]) => 
+      (count as number) > max.count ? { type, count: count as number } : max, { type: '', count: 0 });
+    return topType.type || 'None';
+  }
+
+  getFilterSummary(): string {
+    const filters: string[] = [];
+    
+    if (this.searchControl.value) {
+      filters.push(`Search: "${this.searchControl.value}"`);
+    }
+    
+    if (this.statusFilter.value) {
+      filters.push(`Status: ${this.statusFilter.value}`);
+    }
+    
+    if (this.conditionFilter.value) {
+      filters.push(`Condition: ${this.conditionFilter.value}`);
+    }
+    
+    return filters.length > 0 ? filters.join(', ') : 'No filters applied';
+  }
+
+  getActiveAlertsCount(): number {
+    return this.alerts.filter(alert => alert.isActive).length;
+  }
+
+  getTriggeredTodayCount(): number {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return this.alerts.filter(alert => 
+      alert.lastNotifiedAt && new Date(alert.lastNotifiedAt) >= today
+    ).length;
+  }
+
+  applyFilters(): void {
+    let filtered = [...this.alerts];
+
+    const searchTerm = this.searchControl.value?.toLowerCase() || '';
     if (searchTerm) {
-      filtered = filtered.filter(alert => 
+      filtered = filtered.filter(alert =>
         alert.product?.name?.toLowerCase().includes(searchTerm) ||
         alert.user?.email?.toLowerCase().includes(searchTerm) ||
         alert.user?.firstName?.toLowerCase().includes(searchTerm) ||
-        alert.user?.lastName?.toLowerCase().includes(searchTerm)
+        alert.user?.lastName?.toLowerCase().includes(searchTerm) ||
+        alert.ruleDescription?.toLowerCase().includes(searchTerm)
       );
     }
 
-    // Apply status filter
     const statusFilter = this.statusFilter.value;
-    if (statusFilter === 'active') {
-      filtered = filtered.filter(alert => alert.isActive);
-    } else if (statusFilter === 'inactive') {
-      filtered = filtered.filter(alert => !alert.isActive);
+    if (statusFilter) {
+      filtered = filtered.filter(alert => 
+        statusFilter === 'active' ? alert.isActive : !alert.isActive
+      );
     }
 
-    // Apply condition filter
     const conditionFilter = this.conditionFilter.value;
     if (conditionFilter) {
       filtered = filtered.filter(alert => alert.conditionType === conditionFilter);
     }
 
-    return filtered;
+    this.filteredAlerts = filtered;
+  }
+
+  clearFilters(): void {
+    this.searchControl.setValue('');
+    this.statusFilter.setValue('');
+    this.conditionFilter.setValue('');
   }
 
   onPageChange(event: PageEvent): void {
-    this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
-    this.loadAlerts();
-  }
-
-  refreshData(): void {
-    this.loadAlerts();
-    this.snackBar.open('Data refreshed', 'Close', { duration: 2000 });
+    this.currentPage = event.pageIndex;
   }
 
   toggleAlert(alert: AlertRuleDto, isActive: boolean): void {
@@ -398,6 +222,8 @@ export class AlertAdminComponent implements OnInit {
         if (index !== -1) {
           this.alerts[index] = updatedAlert;
         }
+        this.applyFilters();
+        this.calculateStats();
         this.isUpdating = false;
         this.snackBar.open(
           `Alert ${isActive ? 'activated' : 'deactivated'}`,
@@ -409,20 +235,21 @@ export class AlertAdminComponent implements OnInit {
         console.error('Error updating alert:', error);
         this.snackBar.open('Failed to update alert', 'Close', { duration: 3000 });
         this.isUpdating = false;
-        // Revert the toggle
         alert.isActive = !isActive;
       }
     });
   }
 
   viewAlert(alert: AlertRuleDto): void {
-    // TODO: Implement alert details view
     this.snackBar.open('Alert details view coming soon', 'Close', { duration: 2000 });
   }
 
   editAlert(alert: AlertRuleDto): void {
-    // TODO: Navigate to edit form or open modal
-    this.snackBar.open('Alert editing coming soon', 'Close', { duration: 2000 });
+    this.snackBar.open('Alert edit functionality coming soon', 'Close', { duration: 2000 });
+  }
+
+  testAlert(alert: AlertRuleDto): void {
+    this.snackBar.open('Alert testing functionality coming soon', 'Close', { duration: 2000 });
   }
 
   deleteAlert(alert: AlertRuleDto): void {
@@ -430,7 +257,8 @@ export class AlertAdminComponent implements OnInit {
       this.alertsService.deleteAlert(alert.alertRuleId!).subscribe({
         next: () => {
           this.alerts = this.alerts.filter(a => a.alertRuleId !== alert.alertRuleId);
-          this.totalAlerts--;
+          this.applyFilters();
+          this.calculateStats();
           this.snackBar.open('Alert deleted successfully', 'Close', { duration: 2000 });
         },
         error: (error) => {
@@ -444,7 +272,7 @@ export class AlertAdminComponent implements OnInit {
   getConditionText(alert: AlertRuleDto): string {
     switch (alert.conditionType) {
       case 'PRICE_BELOW':
-        return `Price below $${alert.thresholdValue}`;
+        return `Below $${alert.thresholdValue}`;
       case 'PERCENT_DROP_FROM_LAST':
         return `${alert.percentageValue}% drop`;
       case 'BACK_IN_STOCK':
@@ -465,5 +293,31 @@ export class AlertAdminComponent implements OnInit {
       default:
         return '';
     }
+  }
+
+  getConditionIcon(conditionType: string): string {
+    switch (conditionType) {
+      case 'PRICE_BELOW':
+        return 'trending_down';
+      case 'PERCENT_DROP_FROM_LAST':
+        return 'percent';
+      case 'BACK_IN_STOCK':
+        return 'inventory';
+      default:
+        return 'help';
+    }
+  }
+
+  getRelativeTime(date: string): string {
+    const now = new Date();
+    const past = new Date(date);
+    const diffMs = now.getTime() - past.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    return `${Math.floor(diffDays / 30)} months ago`;
   }
 }
