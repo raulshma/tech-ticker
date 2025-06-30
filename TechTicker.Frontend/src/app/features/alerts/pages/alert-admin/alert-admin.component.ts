@@ -15,11 +15,13 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { AlertsService } from '../../services/alerts.service';
 import { AlertRuleDto, UpdateAlertRuleDto } from '../../../../shared/api/api-client';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 
 @Component({
   selector: 'app-alert-admin',
@@ -41,15 +43,18 @@ import { AlertRuleDto, UpdateAlertRuleDto } from '../../../../shared/api/api-cli
     MatDividerModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    ReactiveFormsModule
+    MatDialogModule,
+    ReactiveFormsModule,
+    HasPermissionDirective
   ],
   templateUrl: './alert-admin.component.html',
   styleUrls: ['./alert-admin.component.scss']
 })
 export class AlertAdminComponent implements OnInit {
   alerts: AlertRuleDto[] = [];
+  allAlerts: AlertRuleDto[] = [];
   filteredAlerts: AlertRuleDto[] = [];
-  displayedColumns: string[] = ['user', 'product', 'condition', 'status', 'created', 'lastTriggered', 'actions'];
+  displayedColumns: string[] = ['user', 'product', 'condition', 'status', 'lastTriggered', 'actions'];
   totalAlerts = 0;
   pageSize = 25;
   currentPage = 0;
@@ -64,7 +69,8 @@ export class AlertAdminComponent implements OnInit {
 
   constructor(
     private alertsService: AlertsService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -90,6 +96,7 @@ export class AlertAdminComponent implements OnInit {
     this.alertsService.getAllAlerts().subscribe({
       next: (alerts: AlertRuleDto[]) => {
         this.alerts = alerts;
+        this.allAlerts = [...alerts];
         this.totalAlerts = alerts.length;
         this.calculateStats();
         this.applyFilters();
@@ -253,10 +260,17 @@ export class AlertAdminComponent implements OnInit {
   }
 
   deleteAlert(alert: AlertRuleDto): void {
-    if (confirm(`Are you sure you want to delete the alert for "${alert.product?.name}"?`)) {
+    const productName = alert.product?.name || 'this alert';
+    const userName = alert.user?.firstName && alert.user?.lastName 
+      ? `${alert.user.firstName} ${alert.user.lastName}` 
+      : alert.user?.email || 'Unknown User';
+
+    if (confirm(`Are you sure you want to delete the alert for "${productName}" belonging to ${userName}?\n\nThis action cannot be undone.`)) {
       this.alertsService.deleteAlert(alert.alertRuleId!).subscribe({
         next: () => {
           this.alerts = this.alerts.filter(a => a.alertRuleId !== alert.alertRuleId);
+          this.allAlerts = this.allAlerts.filter(a => a.alertRuleId !== alert.alertRuleId);
+          this.totalAlerts = this.alerts.length;
           this.applyFilters();
           this.calculateStats();
           this.snackBar.open('Alert deleted successfully', 'Close', { duration: 2000 });
@@ -295,6 +309,19 @@ export class AlertAdminComponent implements OnInit {
     }
   }
 
+  getConditionChipClass(conditionType: string): string {
+    switch (conditionType) {
+      case 'PRICE_BELOW':
+        return 'primary';
+      case 'PERCENT_DROP_FROM_LAST':
+        return 'secondary';
+      case 'BACK_IN_STOCK':
+        return 'tertiary';
+      default:
+        return 'primary';
+    }
+  }
+
   getConditionIcon(conditionType: string): string {
     switch (conditionType) {
       case 'PRICE_BELOW':
@@ -305,6 +332,17 @@ export class AlertAdminComponent implements OnInit {
         return 'inventory';
       default:
         return 'help';
+    }
+  }
+
+  getAlertTypeIcon(alertType: string): string {
+    switch (alertType) {
+      case 'RECURRING':
+        return 'repeat';
+      case 'ONE_SHOT':
+        return 'play_arrow';
+      default:
+        return 'notification_important';
     }
   }
 

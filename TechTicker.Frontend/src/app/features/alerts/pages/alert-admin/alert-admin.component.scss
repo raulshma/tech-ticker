@@ -63,6 +63,23 @@
         min-width: 120px;
       }
     }
+
+    button {
+      height: 48px;
+      border-radius: 16px;
+      font-weight: 500;
+      box-shadow: var(--mat-sys-elevation-level1);
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--mat-sys-elevation-level2);
+      }
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
   }
 }
 
@@ -183,11 +200,11 @@
   .management-card {
     border-radius: 16px;
     background: var(--mat-sys-surface-container);
+    overflow: visible;
 
     .management-header {
-      padding: 24px 24px 16px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant);
-
+      padding: 24px 24px 0;
+      
       mat-card-title {
         color: var(--mat-sys-on-surface);
         margin-bottom: 8px;
@@ -195,7 +212,7 @@
 
       mat-card-subtitle {
         color: var(--mat-sys-on-surface-variant);
-        margin: 0;
+        margin-bottom: 0;
       }
     }
 
@@ -248,77 +265,114 @@
   }
 }
 
-// ===== LOADING SECTION =====
+// ===== LOADING CONTAINER =====
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px;
-  min-height: 300px;
+  padding: 64px 24px;
+  gap: 24px;
 
   .loading-text {
-    margin-top: 16px;
     color: var(--mat-sys-on-surface-variant);
+    margin: 0;
   }
 }
 
-// ===== TABLE SECTION =====
+// ===== TABLE CONTAINER =====
 .table-container {
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--mat-sys-surface-container);
+  box-shadow: var(--mat-sys-elevation-level1);
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
   .modern-table {
     width: 100%;
-    background: var(--mat-sys-surface);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: var(--mat-sys-elevation-level1);
+    background: transparent;
 
-    .mat-mdc-header-cell {
-      background: var(--mat-sys-surface-variant);
-      color: var(--mat-sys-on-surface-variant);
-      font-weight: 600;
-      padding: 16px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant);
-    }
-
-    .mat-mdc-cell {
-      padding: 16px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant);
+    .table-header {
+      background: var(--mat-sys-surface-container-highest);
+      
+      .mat-mdc-header-cell {
+        color: var(--mat-sys-on-surface);
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 0.1px;
+        padding: 16px 12px;
+        border-bottom: 1px solid var(--mat-sys-outline-variant);
+      }
     }
 
     .table-row {
-      transition: background-color 0.2s ease;
-
       &:hover {
-        background: var(--mat-sys-surface-container);
+        background: var(--mat-sys-surface-variant);
+      }
+
+      .mat-mdc-cell {
+        padding: 16px 12px;
+        border-bottom: 1px solid var(--mat-sys-outline-variant);
+        color: var(--mat-sys-on-surface);
       }
 
       &:last-child .mat-mdc-cell {
         border-bottom: none;
       }
     }
+
+    // Column-specific styling
+    .user-header, .user-cell {
+      min-width: 200px;
+      padding-left: 16px;
+    }
+
+    .product-header, .product-cell {
+      min-width: 250px;
+    }
+
+    .condition-header, .condition-cell {
+      min-width: 180px;
+    }
+
+    .status-header, .status-cell {
+      min-width: 160px;
+    }
+
+    .triggered-header, .triggered-cell {
+      min-width: 140px;
+    }
+
+    .actions-header, .actions-cell {
+      width: 80px;
+      padding-right: 16px;
+    }
   }
 
-  // User info styling
-  .user-info {
+  // Cell content styling
+  .user-info-modern {
     display: flex;
     align-items: center;
     gap: 12px;
 
     .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 20px;
-      background: var(--mat-sys-primary-container);
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
       flex-shrink: 0;
 
       mat-icon {
-        color: var(--mat-sys-on-primary-container);
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
       }
     }
 
@@ -327,205 +381,263 @@
       min-width: 0;
 
       .user-name {
-        font-weight: 500;
-        color: var(--mat-sys-on-surface);
         margin: 0 0 2px 0;
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
+        color: var(--mat-sys-on-surface);
+        font-weight: 500;
         overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .user-email {
-        color: var(--mat-sys-on-surface-variant);
         margin: 0;
-        font-size: 12px;
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
+        color: var(--mat-sys-on-surface-variant);
         overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }
 
-  // Product info styling
-  .product-info {
+  .product-info-modern {
     .product-name {
-      font-weight: 500;
+      margin: 0 0 4px 0;
       color: var(--mat-sys-on-surface);
-      margin: 0 0 2px 0;
+      font-weight: 500;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
 
-    .product-manufacturer, .seller-name {
+    .product-manufacturer {
+      margin: 0 0 4px 0;
       color: var(--mat-sys-on-surface-variant);
-      margin: 0;
-      font-size: 12px;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
       overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .seller-name {
+      margin: 0;
+      color: var(--mat-sys-outline);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .seller-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
     }
   }
 
-  // Condition info styling
-  .condition-info {
+  .condition-info-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
     .condition-chip {
-      margin-bottom: 4px;
-      height: 32px;
       border-radius: 16px;
       font-weight: 500;
       font-size: 12px;
+      height: 32px;
       gap: 4px;
-      
+
       mat-icon {
         font-size: 16px;
         width: 16px;
         height: 16px;
       }
+
+      &.condition-chip-primary {
+        background: var(--mat-sys-primary-container);
+        color: var(--mat-sys-on-primary-container);
+      }
+
+      &.condition-chip-secondary {
+        background: var(--mat-sys-secondary-container);
+        color: var(--mat-sys-on-secondary-container);
+      }
+
+      &.condition-chip-tertiary {
+        background: var(--mat-sys-tertiary-container);
+        color: var(--mat-sys-on-tertiary-container);
+      }
     }
 
-    .alert-type {
+    .alert-type-modern {
+      display: flex;
+      align-items: center;
+      gap: 4px;
       color: var(--mat-sys-on-surface-variant);
-      margin: 0;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+
+      .type-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
     }
   }
 
-  // Status info styling
-  .status-info {
+  .status-container-modern {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    gap: 8px;
 
-    .status-details {
-      .status-text {
-        display: block;
-        margin: 0 0 2px 0;
-        font-weight: 500;
-        color: var(--mat-sys-on-surface);
-      }
+    .status-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
-      .status-badge {
-        font-size: 10px;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: 600;
+      .status-label {
+        color: var(--mat-sys-on-surface-variant);
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        font-weight: 500;
+      }
+    }
 
-        &.active-badge {
-          background: var(--mat-sys-tertiary-container);
-          color: var(--mat-sys-on-tertiary-container);
-        }
+    .status-details {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--mat-sys-on-surface-variant);
 
-        &.inactive-badge {
-          background: var(--mat-sys-error-container);
-          color: var(--mat-sys-on-error-container);
-        }
+      .notification-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
       }
     }
   }
 
-  // Date/time info styling
-  .created-info, .last-triggered {
-    .created-date, .triggered-date, .never-triggered {
+  .triggered-info-modern {
+    .triggered-date {
       margin: 0 0 2px 0;
-      font-weight: 500;
       color: var(--mat-sys-on-surface);
+      font-weight: 500;
     }
 
-    .created-relative, .triggered-relative {
+    .triggered-time {
       margin: 0;
       color: var(--mat-sys-on-surface-variant);
-      font-size: 11px;
-    }
-
-    .never-triggered {
-      color: var(--mat-sys-on-surface-variant);
-      font-style: italic;
     }
   }
 
-  // Actions styling
-  .actions-button {
+  .never-triggered {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     color: var(--mat-sys-on-surface-variant);
-    
-    &:hover {
-      color: var(--mat-sys-on-surface);
-      background: var(--mat-sys-surface-variant);
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
     }
   }
 
-  .actions-menu {
-    .delete-action {
-      color: var(--mat-sys-error);
-      
-      mat-icon {
-        color: var(--mat-sys-error);
-      }
-    }
-  }
+  .actions-container-modern {
+    display: flex;
+    justify-content: center;
 
-  // Pagination styling
-  .pagination-container {
-    margin-top: 16px;
-    padding: 16px 0;
-    border-top: 1px solid var(--mat-sys-outline-variant);
+    button {
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      transition: all 0.2s ease;
 
-    .modern-paginator {
-      background: transparent;
-      
-      ::ng-deep .mat-mdc-paginator-range-label {
-        color: var(--mat-sys-on-surface-variant);
+      &:hover {
+        background: var(--mat-sys-surface-variant);
       }
     }
   }
 }
 
-// ===== RESPONSIVE DESIGN =====
+// ===== PAGINATION =====
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  padding: 16px 0;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+
+  mat-paginator {
+    background: transparent;
+    border-radius: 12px;
+  }
+}
+
+// ===== EMPTY STATE =====
+.empty-state-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  padding: 64px 24px;
+
+  .empty-state-content {
+    text-align: center;
+    max-width: 400px;
+
+    .empty-state-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      color: var(--mat-sys-on-surface-variant);
+      margin-bottom: 24px;
+    }
+
+    h3 {
+      margin: 0 0 16px 0;
+      color: var(--mat-sys-on-surface);
+    }
+
+    p {
+      margin: 0 0 24px 0;
+      color: var(--mat-sys-on-surface-variant);
+    }
+
+    button {
+      border-radius: 16px;
+      height: 48px;
+      font-weight: 500;
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+// ===== MENU STYLING =====
+.delete-action {
+  color: var(--mat-sys-error) !important;
+
+  mat-icon {
+    color: var(--mat-sys-error) !important;
+  }
+}
+
+// ===== RESPONSIVE ADJUSTMENTS =====
 @media (max-width: 768px) {
-  .alert-admin-container {
-    .welcome-section {
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-
-    .stats-section {
-      margin: 0 16px 16px;
-    }
-
-    .management-section {
-      margin: 0 16px;
-      padding: 0;
-
-      .management-card {
-        .management-header,
-        .management-content {
-          padding: 16px !important;
-        }
+  .management-section {
+    .modern-table {
+      .user-header, .user-cell,
+      .product-header, .product-cell,
+      .condition-header, .condition-cell,
+      .status-header, .status-cell,
+      .triggered-header, .triggered-cell {
+        min-width: auto;
+        width: auto;
       }
     }
+  }
 
-    .table-container .modern-table {
-      font-size: 14px;
-
-      .mat-mdc-header-cell,
-      .mat-mdc-cell {
-        padding: 12px 8px;
-      }
-
-      .user-info, .product-info {
-        .user-name, .product-name {
-          font-size: 14px;
-        }
-      }
-    }
+  .stats-section {
+    margin: 0 12px 24px;
   }
 }
 

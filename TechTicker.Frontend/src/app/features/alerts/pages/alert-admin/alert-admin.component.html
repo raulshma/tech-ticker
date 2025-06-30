@@ -4,19 +4,19 @@
     <div class="welcome-content">
       <div class="header-main">
         <div class="title-section">
-          <h1 class="mat-display-medium">Alert Administration</h1>
+          <h1 class="mat-display-medium">Alert Rules Management</h1>
           <p class="mat-body-large welcome-subtitle">Monitor and manage all user alert rules across the platform</p>
         </div>
         <div class="header-actions">
-          <button mat-button variant="filled" color="primary" (click)="refreshData()" [disabled]="isLoading">
+          <button matButton="filled" color="primary" (click)="refreshData()" [disabled]="isLoading" *hasPermission="'AlertRules.Read'">
             <mat-icon>refresh</mat-icon>
             Refresh Data
           </button>
-          <button mat-button variant="filled" color="accent" routerLink="/alerts/performance">
+          <button matButton="filled" color="accent" routerLink="/alerts/performance" *hasPermission="'AlertRules.Analytics'">
             <mat-icon>analytics</mat-icon>
             Performance
           </button>
-          <button mat-button variant="outlined" routerLink="/alerts">
+          <button matButton="outlined" routerLink="/alerts">
             <mat-icon>arrow_back</mat-icon>
             Back to Alerts
           </button>
@@ -90,7 +90,7 @@
   <section class="management-section" aria-label="Alert Management">
     <mat-card class="management-card" appearance="outlined">
       <mat-card-header class="management-header">
-        <mat-card-title class="mat-headline-large">Alert Rules Management</mat-card-title>
+        <mat-card-title class="mat-headline-large">Alert Rules Configuration</mat-card-title>
         <mat-card-subtitle class="mat-body-large">Search, filter, and manage user alert configurations</mat-card-subtitle>
       </mat-card-header>
 
@@ -125,7 +125,7 @@
               <mat-icon matSuffix>category</mat-icon>
             </mat-form-field>
 
-            <button mat-button variant="outlined" (click)="clearFilters()" class="clear-filters-btn" [attr.aria-label]="'Clear all filters'">
+            <button matButton="outlined" (click)="clearFilters()" class="clear-filters-btn" [attr.aria-label]="'Clear all filters'">
               <mat-icon>clear</mat-icon>
               Clear Filters
             </button>
@@ -140,149 +140,156 @@
 
         <!-- Enhanced Alerts Table -->
         <div class="table-container" *ngIf="!isLoading">
-          <table mat-table [dataSource]="filteredAlerts" class="modern-table" [attr.aria-label]="'Alert rules table'">
-            <!-- User Column -->
-            <ng-container matColumnDef="user">
-              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">User</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="user-info">
-                  <div class="user-avatar" [attr.aria-label]="'User avatar for ' + alert.user?.firstName + ' ' + alert.user?.lastName">
-                    <mat-icon>account_circle</mat-icon>
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="filteredAlerts" class="modern-table" [attr.aria-label]="'Alert rules table'">
+              <!-- User Column -->
+              <ng-container matColumnDef="user">
+                <th mat-header-cell *matHeaderCellDef class="mat-title-medium user-header">User</th>
+                <td mat-cell *matCellDef="let alert" class="user-cell">
+                  <div class="user-info-modern">
+                    <div class="user-avatar" [attr.aria-label]="'User avatar for ' + alert.user?.firstName + ' ' + alert.user?.lastName">
+                      <mat-icon>account_circle</mat-icon>
+                    </div>
+                    <div class="user-details">
+                      <div class="user-name mat-body-medium">{{ alert.user?.firstName }} {{ alert.user?.lastName }}</div>
+                      <div class="user-email mat-body-small">{{ alert.user?.email }}</div>
+                    </div>
                   </div>
-                  <div class="user-details">
-                    <div class="user-name mat-body-medium">{{ alert.user?.firstName }} {{ alert.user?.lastName }}</div>
-                    <div class="user-email mat-body-small">{{ alert.user?.email }}</div>
+                </td>
+              </ng-container>
+
+              <!-- Product Column -->
+              <ng-container matColumnDef="product">
+                <th mat-header-cell *matHeaderCellDef class="mat-title-medium product-header">Product</th>
+                <td mat-cell *matCellDef="let alert" class="product-cell">
+                  <div class="product-info-modern">
+                    <div class="product-name mat-body-medium">{{ alert.product?.name }}</div>
+                    <div class="product-manufacturer mat-body-small">{{ alert.product?.manufacturer }}</div>
+                    <div class="seller-name mat-body-small" *ngIf="alert.specificSellerName">
+                      <mat-icon class="seller-icon">store</mat-icon>
+                      {{ alert.specificSellerName }}
+                    </div>
                   </div>
-                </div>
-              </td>
-            </ng-container>
+                </td>
+              </ng-container>
 
-            <!-- Product Column -->
-            <ng-container matColumnDef="product">
-              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Product</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="product-info">
-                  <div class="product-name mat-body-medium">{{ alert.product?.name }}</div>
-                  <div class="product-manufacturer mat-body-small">{{ alert.product?.manufacturer }}</div>
-                  <div class="seller-name mat-body-small" *ngIf="alert.specificSellerName">
-                    Seller: {{ alert.specificSellerName }}
+              <!-- Condition Column -->
+              <ng-container matColumnDef="condition">
+                <th mat-header-cell *matHeaderCellDef class="mat-title-medium condition-header">Condition</th>
+                <td mat-cell *matCellDef="let alert" class="condition-cell">
+                  <div class="condition-info-modern">
+                    <mat-chip [class]="'condition-chip-' + getConditionChipClass(alert.conditionType)" class="condition-chip">
+                      <mat-icon>{{ getConditionIcon(alert.conditionType) }}</mat-icon>
+                      {{ getConditionText(alert) }}
+                    </mat-chip>
+                    <div class="alert-type-modern mat-body-small">
+                      <mat-icon class="type-icon">{{ getAlertTypeIcon(alert.alertType) }}</mat-icon>
+                      {{ alert.alertType }}
+                    </div>
                   </div>
-                </div>
-              </td>
-            </ng-container>
+                </td>
+              </ng-container>
 
-            <!-- Condition Column -->
-            <ng-container matColumnDef="condition">
-              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Condition</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="condition-info">
-                  <mat-chip [color]="getConditionColor(alert.conditionType)" class="condition-chip">
-                    <mat-icon>{{ getConditionIcon(alert.conditionType) }}</mat-icon>
-                    {{ getConditionText(alert) }}
-                  </mat-chip>
-                  <div class="alert-type mat-body-small">{{ alert.alertType }}</div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Status Column -->
-            <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Status</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="status-info">
-                  <mat-slide-toggle 
-                    [checked]="alert.isActive"
-                    (change)="toggleAlert(alert, $event.checked)"
-                    [disabled]="isUpdating"
-                    [color]="'primary'"
-                    [attr.aria-label]="'Toggle alert ' + (alert.isActive ? 'inactive' : 'active')">
-                  </mat-slide-toggle>
-                  <div class="status-details">
-                    <span class="status-text mat-body-medium">
-                      {{ alert.isActive ? 'Active' : 'Inactive' }}
-                    </span>
-                    <span class="status-badge" [class]="alert.isActive ? 'active-badge' : 'inactive-badge'">
-                      {{ alert.isActive ? 'ENABLED' : 'DISABLED' }}
-                    </span>
+              <!-- Status Column -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef class="mat-title-medium status-header">Status</th>
+                <td mat-cell *matCellDef="let alert" class="status-cell">
+                  <div class="status-container-modern">
+                    <div class="status-toggle">
+                      <mat-slide-toggle 
+                        [checked]="alert.isActive"
+                        (change)="toggleAlert(alert, $event.checked)"
+                        [disabled]="isUpdating"
+                        [color]="'primary'"
+                        [attr.aria-label]="'Toggle alert ' + (alert.isActive ? 'inactive' : 'active')">
+                      </mat-slide-toggle>
+                      <span class="status-label mat-body-small">{{ alert.isActive ? 'Active' : 'Inactive' }}</span>
+                    </div>
+                    <div class="status-details mat-body-small">
+                      <mat-icon class="notification-icon">notifications</mat-icon>
+                      Every {{ alert.notificationFrequencyMinutes || 0 }}min
+                    </div>
                   </div>
-                </div>
-              </td>
-            </ng-container>
+                </td>
+              </ng-container>
 
-            <!-- Created Column -->
-            <ng-container matColumnDef="created">
-              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Created</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="created-info">
-                  <div class="created-date mat-body-medium">{{ alert.createdAt | date:'short' }}</div>
-                  <div class="created-relative mat-body-small">{{ getRelativeTime(alert.createdAt) }}</div>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Last Triggered Column -->
-            <ng-container matColumnDef="lastTriggered">
-              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Last Triggered</th>
-              <td mat-cell *matCellDef="let alert">
-                <div class="last-triggered">
-                  <div class="triggered-date mat-body-medium" *ngIf="alert.lastNotifiedAt; else neverTriggered">
-                    {{ alert.lastNotifiedAt | date:'short' }}
+              <!-- Last Triggered Column -->
+              <ng-container matColumnDef="lastTriggered">
+                <th mat-header-cell *matHeaderCellDef class="mat-title-medium triggered-header">Last Triggered</th>
+                <td mat-cell *matCellDef="let alert" class="triggered-cell">
+                  <div class="triggered-info-modern" *ngIf="alert.lastTriggeredAt; else neverTriggered">
+                    <div class="triggered-date mat-body-medium">{{ alert.lastTriggeredAt | date:'MMM d, y' }}</div>
+                    <div class="triggered-time mat-body-small">{{ alert.lastTriggeredAt | date:'h:mm a' }}</div>
                   </div>
                   <ng-template #neverTriggered>
-                    <div class="never-triggered mat-body-medium">Never</div>
+                    <div class="never-triggered mat-body-small">
+                      <mat-icon>schedule</mat-icon>
+                      Never triggered
+                    </div>
                   </ng-template>
-                  <div class="triggered-relative mat-body-small" *ngIf="alert.lastNotifiedAt">
-                    {{ getRelativeTime(alert.lastNotifiedAt) }}
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="mat-title-medium actions-header">Actions</th>
+                <td mat-cell *matCellDef="let alert" class="actions-cell">
+                  <div class="actions-container-modern">
+                    <button mat-icon-button [matMenuTriggerFor]="actionsMenu" [attr.aria-label]="'Alert actions for ' + alert.product?.name">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #actionsMenu="matMenu">
+                      <button mat-menu-item (click)="viewAlert(alert)" *hasPermission="'AlertRules.Read'">
+                        <mat-icon>visibility</mat-icon>
+                        View Details
+                      </button>
+                      <button mat-menu-item (click)="editAlert(alert)" *hasPermission="'AlertRules.Update'">
+                        <mat-icon>edit</mat-icon>
+                        Edit Alert
+                      </button>
+                      <button mat-menu-item (click)="testAlert(alert)" *hasPermission="'AlertRules.Test'">
+                        <mat-icon>play_arrow</mat-icon>
+                        Test Alert
+                      </button>
+                      <mat-divider></mat-divider>
+                      <button mat-menu-item (click)="deleteAlert(alert)" class="delete-action" *hasPermission="'AlertRules.Delete'">
+                        <mat-icon>delete</mat-icon>
+                        Delete Alert
+                      </button>
+                    </mat-menu>
                   </div>
-                </div>
-              </td>
-            </ng-container>
+                </td>
+              </ng-container>
 
-            <!-- Actions Column -->
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef class="mat-title-medium">Actions</th>
-              <td mat-cell *matCellDef="let alert">
-                <button mat-icon-button [matMenuTriggerFor]="actionsMenu" class="actions-button" [attr.aria-label]="'Actions for alert ' + alert.product?.name">
-                  <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #actionsMenu="matMenu" class="actions-menu">
-                  <button mat-menu-item (click)="viewAlert(alert)">
-                    <mat-icon>visibility</mat-icon>
-                    <span>View Details</span>
-                  </button>
-                  <button mat-menu-item (click)="editAlert(alert)">
-                    <mat-icon>edit</mat-icon>
-                    <span>Edit Alert</span>
-                  </button>
-                  <button mat-menu-item (click)="testAlert(alert)">
-                    <mat-icon>play_arrow</mat-icon>
-                    <span>Test Alert</span>
-                  </button>
-                  <mat-divider></mat-divider>
-                  <button mat-menu-item (click)="deleteAlert(alert)" class="delete-action">
-                    <mat-icon>delete</mat-icon>
-                    <span>Delete Alert</span>
-                  </button>
-                </mat-menu>
-              </td>
-            </ng-container>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-header"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+            </table>
+          </div>
+        </div>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
-          </table>
+        <!-- Enhanced Pagination -->
+        <div class="pagination-container" *ngIf="!isLoading && filteredAlerts.length > 0">
+          <mat-paginator 
+            [length]="totalAlerts"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="[10, 25, 50, 100]"
+            [pageIndex]="currentPage"
+            (page)="onPageChange($event)"
+            [showFirstLastButtons]="true"
+            [attr.aria-label]="'Alert rules pagination'">
+          </mat-paginator>
+        </div>
 
-          <!-- Enhanced Pagination -->
-          <div class="pagination-container">
-            <mat-paginator
-              [length]="totalAlerts"
-              [pageSize]="pageSize"
-              [pageSizeOptions]="[10, 25, 50, 100]"
-              [pageIndex]="currentPage"
-              (page)="onPageChange($event)"
-              showFirstLastButtons
-              class="modern-paginator"
-              [attr.aria-label]="'Alert pagination'">
-            </mat-paginator>
+        <!-- Empty State -->
+        <div class="empty-state-container" *ngIf="!isLoading && filteredAlerts.length === 0">
+          <div class="empty-state-content">
+            <mat-icon class="empty-state-icon">notifications_off</mat-icon>
+            <h3 class="mat-headline-small">No alert rules found</h3>
+            <p class="mat-body-medium">{{ allAlerts.length > 0 ? 'Try adjusting your filters to see more results.' : 'No alert rules have been created yet.' }}</p>
+            <button matButton="filled" color="primary" routerLink="/alerts" *ngIf="allAlerts.length === 0">
+              <mat-icon>add</mat-icon>
+              Create First Alert
+            </button>
           </div>
         </div>
       </mat-card-content>

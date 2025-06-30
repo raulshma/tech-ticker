@@ -10,6 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Observable, startWith, map } from 'rxjs';
 
 import { AlertsService } from '../../services/alerts.service';
@@ -35,185 +37,274 @@ import {
     MatIconModule,
     MatSlideToggleModule,
     MatSnackBarModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatDividerModule,
+    MatProgressSpinnerModule
   ],
   template: `
-    <mat-card class="alert-form-card">
-      <mat-card-header>
-        <mat-card-title>
-          {{ isEditMode ? 'Edit Alert Rule' : 'Create Alert Rule' }}
-        </mat-card-title>
-        <mat-card-subtitle>
-          Set up price and availability notifications
-        </mat-card-subtitle>
-      </mat-card-header>
-
-      <mat-card-content>
-        <form [formGroup]="alertForm" (ngSubmit)="onSubmit()">
-          <!-- Product Selection -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Product</mat-label>
-            <input
-              type="text"
-              matInput
-              formControlName="productSearch"
-              [matAutocomplete]="productAuto"
-              placeholder="Search for a product...">
-            <mat-autocomplete #productAuto="matAutocomplete" [displayWith]="displayProduct">
-              <mat-option
-                *ngFor="let product of filteredProducts | async"
-                [value]="product"
-                (onSelectionChange)="onProductSelected(product)">
-                <div class="product-option">
-                  <div class="product-name">{{ product.name }}</div>
-                  <div class="product-details">{{ product.manufacturer }} - {{ product.category?.name }}</div>
-                </div>
-              </mat-option>
-            </mat-autocomplete>
-            <mat-error *ngIf="alertForm.get('productId')?.hasError('required')">
-              Product is required
-            </mat-error>
-          </mat-form-field>
-
-          <!-- Seller Name -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Seller (Optional)</mat-label>
-            <input matInput formControlName="sellerName" placeholder="Specific seller to monitor">
-            <mat-hint>Leave empty to monitor all sellers</mat-hint>
-          </mat-form-field>
-
-          <!-- Alert Type -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Alert Type</mat-label>
-            <mat-select formControlName="alertType">
-              <mat-option value="RECURRING">Recurring</mat-option>
-              <mat-option value="ONE_SHOT">One-time</mat-option>
-            </mat-select>
-            <mat-hint>Recurring alerts continue until disabled, one-time alerts trigger once</mat-hint>
-          </mat-form-field>
-
-          <!-- Condition Type -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Condition</mat-label>
-            <mat-select formControlName="conditionType" (selectionChange)="onConditionTypeChange()">
-              <mat-option value="PRICE_BELOW">Price drops below</mat-option>
-              <mat-option value="PERCENT_DROP_FROM_LAST">Percentage drop from last price</mat-option>
-              <mat-option value="BACK_IN_STOCK">Back in stock</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <!-- Condition Value (for price-based conditions) -->
-          <mat-form-field
-            appearance="outline"
-            class="full-width"
-            *ngIf="showConditionValue()">
-            <mat-label>{{ getConditionValueLabel() }}</mat-label>
-            <input
-              matInput
-              type="number"
-              formControlName="conditionValue"
-              [placeholder]="getConditionValuePlaceholder()">
-            <span matSuffix *ngIf="alertForm.get('conditionType')?.value === 'PRICE_BELOW'">$</span>
-            <span matSuffix *ngIf="alertForm.get('conditionType')?.value === 'PERCENT_DROP_FROM_LAST'">%</span>
-            <mat-error *ngIf="alertForm.get('conditionValue')?.hasError('required')">
-              {{ getConditionValueLabel() }} is required
-            </mat-error>
-            <mat-error *ngIf="alertForm.get('conditionValue')?.hasError('min')">
-              Value must be greater than 0
-            </mat-error>
-          </mat-form-field>
-
-          <!-- Notification Frequency -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Notification Frequency (minutes)</mat-label>
-            <mat-select formControlName="notificationFrequencyMinutes">
-              <mat-option [value]="0">Immediate</mat-option>
-              <mat-option [value]="15">Every 15 minutes</mat-option>
-              <mat-option [value]="30">Every 30 minutes</mat-option>
-              <mat-option [value]="60">Every hour</mat-option>
-              <mat-option [value]="240">Every 4 hours</mat-option>
-              <mat-option [value]="1440">Daily</mat-option>
-            </mat-select>
-            <mat-hint>Minimum time between notifications for the same alert</mat-hint>
-          </mat-form-field>
-
-          <!-- Description -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description (Optional)</mat-label>
-            <textarea
-              matInput
-              formControlName="ruleDescription"
-              rows="3"
-              placeholder="Optional description for this alert rule">
-            </textarea>
-          </mat-form-field>
-
-          <!-- Active Toggle -->
-          <div class="toggle-field">
-            <mat-slide-toggle formControlName="isActive">
-              Active
-            </mat-slide-toggle>
-            <span class="toggle-hint">Alert will only trigger when active</span>
+    <div class="alert-form-container">
+      <!-- Modern Header Section -->
+      <header class="form-header">
+        <div class="header-content">
+          <div class="title-section">
+            <h1 class="mat-display-small">{{ isEditMode ? 'Edit Alert Rule' : 'Create Alert Rule' }}</h1>
+            <p class="mat-body-large form-subtitle">{{ isEditMode ? 'Update your price and availability notification settings' : 'Set up price and availability notifications for your favorite products' }}</p>
           </div>
-        </form>
-      </mat-card-content>
+          <div class="header-icon">
+            <mat-icon>{{ isEditMode ? 'edit_notifications' : 'add_alert' }}</mat-icon>
+          </div>
+        </div>
+      </header>
 
-      <mat-card-actions align="end">
-        <button mat-button type="button" (click)="onCancel()">
-          Cancel
-        </button>
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="onSubmit()"
-          [disabled]="alertForm.invalid || isSubmitting">
-          <mat-icon *ngIf="isSubmitting">hourglass_empty</mat-icon>
-          {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update Alert' : 'Create Alert') }}
-        </button>
-      </mat-card-actions>
-    </mat-card>
+      <!-- Modern Form Section -->
+      <section class="form-section">
+        <mat-card class="form-card" appearance="outlined">
+          <mat-card-content class="form-content">
+            <form [formGroup]="alertForm" (ngSubmit)="onSubmit()">
+              <!-- Product Selection Section -->
+              <div class="form-section-header">
+                <mat-icon class="section-icon">inventory_2</mat-icon>
+                <div class="section-title">
+                  <h3 class="mat-title-large">Product Selection</h3>
+                  <p class="mat-body-medium">Choose the product you want to monitor</p>
+                </div>
+              </div>
+              
+              <div class="form-fields-group">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Product</mat-label>
+                  <input
+                    type="text"
+                    matInput
+                    formControlName="productSearch"
+                    [matAutocomplete]="productAuto"
+                    placeholder="Search for a product..."
+                    required>
+                  <mat-icon matSuffix>search</mat-icon>
+                  <mat-autocomplete #productAuto="matAutocomplete" [displayWith]="displayProduct">
+                    <mat-option
+                      *ngFor="let product of filteredProducts | async"
+                      [value]="product"
+                      (onSelectionChange)="onProductSelected(product)">
+                      <div class="product-option">
+                        <div class="product-option-main">
+                          <div class="product-name">{{ product.name }}</div>
+                          <div class="product-details">{{ product.manufacturer }} • {{ product.category?.name }}</div>
+                        </div>
+                      </div>
+                    </mat-option>
+                  </mat-autocomplete>
+                  <mat-error *ngIf="alertForm.get('productId')?.hasError('required')">
+                    Product selection is required
+                  </mat-error>
+                  <mat-hint>Select a product from the dropdown to monitor</mat-hint>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Specific Seller (Optional)</mat-label>
+                  <input matInput formControlName="sellerName" placeholder="e.g., Amazon, Best Buy, etc.">
+                  <mat-icon matSuffix>store</mat-icon>
+                  <mat-hint>Leave empty to monitor all sellers for this product</mat-hint>
+                </mat-form-field>
+              </div>
+
+              <mat-divider class="section-divider"></mat-divider>
+
+              <!-- Alert Conditions Section -->
+              <div class="form-section-header">
+                <mat-icon class="section-icon">tune</mat-icon>
+                <div class="section-title">
+                  <h3 class="mat-title-large">Alert Conditions</h3>
+                  <p class="mat-body-medium">Define when you want to be notified</p>
+                </div>
+              </div>
+
+              <div class="form-fields-group">
+                <div class="field-row">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Alert Type</mat-label>
+                    <mat-select formControlName="alertType" required>
+                      <mat-option value="RECURRING">
+                        <div class="select-option">
+                          <mat-icon>repeat</mat-icon>
+                          <span>Recurring</span>
+                        </div>
+                      </mat-option>
+                      <mat-option value="ONE_SHOT">
+                        <div class="select-option">
+                          <mat-icon>play_arrow</mat-icon>
+                          <span>One-time</span>
+                        </div>
+                      </mat-option>
+                    </mat-select>
+                    <mat-hint>Recurring alerts continue until disabled</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Condition Type</mat-label>
+                    <mat-select formControlName="conditionType" (selectionChange)="onConditionTypeChange()" required>
+                      <mat-option value="PRICE_BELOW">
+                        <div class="select-option">
+                          <mat-icon>trending_down</mat-icon>
+                          <span>Price drops below</span>
+                        </div>
+                      </mat-option>
+                      <mat-option value="PERCENT_DROP_FROM_LAST">
+                        <div class="select-option">
+                          <mat-icon>percent</mat-icon>
+                          <span>Percentage drop</span>
+                        </div>
+                      </mat-option>
+                      <mat-option value="BACK_IN_STOCK">
+                        <div class="select-option">
+                          <mat-icon>inventory</mat-icon>
+                          <span>Back in stock</span>
+                        </div>
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <!-- Condition Value Field -->
+                <mat-form-field
+                  appearance="outline"
+                  class="full-width"
+                  *ngIf="showConditionValue()">
+                  <mat-label>{{ getConditionValueLabel() }}</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    formControlName="conditionValue"
+                    [placeholder]="getConditionValuePlaceholder()"
+                    required>
+                  <span matSuffix *ngIf="alertForm.get('conditionType')?.value === 'PRICE_BELOW'">USD</span>
+                  <span matSuffix *ngIf="alertForm.get('conditionType')?.value === 'PERCENT_DROP_FROM_LAST'">%</span>
+                  <mat-icon matPrefix>{{ getConditionValueIcon() }}</mat-icon>
+                  <mat-error *ngIf="alertForm.get('conditionValue')?.hasError('required')">
+                    {{ getConditionValueLabel() }} is required
+                  </mat-error>
+                  <mat-error *ngIf="alertForm.get('conditionValue')?.hasError('min')">
+                    Value must be greater than 0
+                  </mat-error>
+                  <mat-hint>{{ getConditionValueHint() }}</mat-hint>
+                </mat-form-field>
+              </div>
+
+              <mat-divider class="section-divider"></mat-divider>
+
+              <!-- Notification Settings Section -->
+              <div class="form-section-header">
+                <mat-icon class="section-icon">notifications</mat-icon>
+                <div class="section-title">
+                  <h3 class="mat-title-large">Notification Settings</h3>
+                  <p class="mat-body-medium">Control how often you receive notifications</p>
+                </div>
+              </div>
+
+              <div class="form-fields-group">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Notification Frequency</mat-label>
+                  <mat-select formControlName="notificationFrequencyMinutes" required>
+                    <mat-option [value]="0">
+                      <div class="select-option">
+                        <mat-icon>flash_on</mat-icon>
+                        <span>Immediate</span>
+                      </div>
+                    </mat-option>
+                    <mat-option [value]="15">
+                      <div class="select-option">
+                        <mat-icon>access_time</mat-icon>
+                        <span>Every 15 minutes</span>
+                      </div>
+                    </mat-option>
+                    <mat-option [value]="30">
+                      <div class="select-option">
+                        <mat-icon>schedule</mat-icon>
+                        <span>Every 30 minutes</span>
+                      </div>
+                    </mat-option>
+                    <mat-option [value]="60">
+                      <div class="select-option">
+                        <mat-icon>schedule</mat-icon>
+                        <span>Every hour</span>
+                      </div>
+                    </mat-option>
+                    <mat-option [value]="240">
+                      <div class="select-option">
+                        <mat-icon>today</mat-icon>
+                        <span>Every 4 hours</span>
+                      </div>
+                    </mat-option>
+                    <mat-option [value]="1440">
+                      <div class="select-option">
+                        <mat-icon>today</mat-icon>
+                        <span>Daily</span>
+                      </div>
+                    </mat-option>
+                  </mat-select>
+                  <mat-hint>Minimum time between notifications for the same alert</mat-hint>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Description (Optional)</mat-label>
+                  <textarea
+                    matInput
+                    formControlName="ruleDescription"
+                    rows="3"
+                    placeholder="Add a custom description for this alert rule...">
+                  </textarea>
+                  <mat-icon matSuffix>description</mat-icon>
+                  <mat-hint>Optional: Add notes to help you identify this alert</mat-hint>
+                </mat-form-field>
+
+                <!-- Active Toggle -->
+                <div class="toggle-section">
+                  <div class="toggle-header">
+                    <mat-icon class="toggle-icon">power_settings_new</mat-icon>
+                    <div class="toggle-info">
+                      <h4 class="mat-title-medium">Alert Status</h4>
+                      <p class="mat-body-small">Enable or disable this alert rule</p>
+                    </div>
+                  </div>
+                  <mat-slide-toggle formControlName="isActive" color="primary">
+                    {{ alertForm.get('isActive')?.value ? 'Active' : 'Inactive' }}
+                  </mat-slide-toggle>
+                </div>
+              </div>
+            </form>
+          </mat-card-content>
+
+          <!-- Enhanced Actions Section -->
+          <mat-card-actions class="form-actions">
+            <div class="actions-content">
+              <div class="actions-left">
+                <button matButton="outlined" type="button" (click)="onCancel()" [disabled]="isSubmitting">
+                  <mat-icon>cancel</mat-icon>
+                  Cancel
+                </button>
+              </div>
+              <div class="actions-right">
+                <button matButton="outlined" type="button" (click)="previewAlert()" [disabled]="alertForm.invalid || isSubmitting">
+                  <mat-icon>preview</mat-icon>
+                  Preview
+                </button>
+                <button
+                  matButton="filled"
+                  color="primary"
+                  (click)="onSubmit()"
+                  [disabled]="alertForm.invalid || isSubmitting">
+                  <mat-spinner diameter="20" *ngIf="isSubmitting" class="button-spinner"></mat-spinner>
+                  <mat-icon *ngIf="!isSubmitting">{{ isEditMode ? 'save' : 'add_alert' }}</mat-icon>
+                  {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update Alert' : 'Create Alert') }}
+                </button>
+              </div>
+            </div>
+          </mat-card-actions>
+        </mat-card>
+      </section>
+    </div>
   `,
-  styles: [`
-    .alert-form-card {
-      max-width: 600px;
-      margin: 20px auto;
-    }
-
-    .full-width {
-      width: 100%;
-      margin-bottom: 16px;
-    }
-
-    .product-option {
-      padding: 8px 0;
-    }
-
-    .product-name {
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-
-    .product-details {
-      font-size: 12px;
-      color: #666;
-    }
-
-    .toggle-field {
-      display: flex;
-      align-items: center;
-      margin: 16px 0;
-    }
-
-    .toggle-hint {
-      margin-left: 16px;
-      font-size: 12px;
-      color: #666;
-    }
-
-    mat-card-actions {
-      padding: 16px 24px;
-    }
-  `]
+  styleUrls: ['./alert-form.component.scss']
 })
 export class AlertFormComponent implements OnInit {
   @Input() alertRule?: AlertRuleDto;
@@ -354,6 +445,67 @@ export class AlertFormComponent implements OnInit {
     }
   }
 
+  getConditionValueIcon(): string {
+    const conditionType = this.alertForm.get('conditionType')?.value;
+    switch (conditionType) {
+      case 'PRICE_BELOW':
+        return 'attach_money';
+      case 'PERCENT_DROP_FROM_LAST':
+        return 'percent';
+      default:
+        return 'help';
+    }
+  }
+
+  getConditionValueHint(): string {
+    const conditionType = this.alertForm.get('conditionType')?.value;
+    switch (conditionType) {
+      case 'PRICE_BELOW':
+        return 'Alert will trigger when price drops below this amount';
+      case 'PERCENT_DROP_FROM_LAST':
+        return 'Alert will trigger when price drops by this percentage';
+      default:
+        return '';
+    }
+  }
+
+  previewAlert(): void {
+    if (this.alertForm.valid) {
+      const formValue = this.alertForm.value;
+      let previewText = `Alert Preview:\n\n`;
+      previewText += `Product: ${formValue.productSearch?.name || 'Selected Product'}\n`;
+      if (formValue.sellerName) {
+        previewText += `Seller: ${formValue.sellerName}\n`;
+      }
+      previewText += `Type: ${formValue.alertType}\n`;
+      previewText += `Condition: ${this.getConditionText(formValue)}\n`;
+      previewText += `Frequency: ${this.getFrequencyText(formValue.notificationFrequencyMinutes)}\n`;
+      previewText += `Status: ${formValue.isActive ? 'Active' : 'Inactive'}`;
+      
+      alert(previewText);
+    }
+  }
+
+  private getConditionText(formValue: any): string {
+    switch (formValue.conditionType) {
+      case 'PRICE_BELOW':
+        return `Price drops below $${formValue.conditionValue}`;
+      case 'PERCENT_DROP_FROM_LAST':
+        return `Price drops by ${formValue.conditionValue}%`;
+      case 'BACK_IN_STOCK':
+        return 'Product comes back in stock';
+      default:
+        return 'Unknown condition';
+    }
+  }
+
+  private getFrequencyText(minutes: number): string {
+    if (minutes === 0) return 'Immediate';
+    if (minutes < 60) return `Every ${minutes} minutes`;
+    if (minutes < 1440) return `Every ${minutes / 60} hour${minutes / 60 > 1 ? 's' : ''}`;
+    return `Every ${minutes / 1440} day${minutes / 1440 > 1 ? 's' : ''}`;
+  }
+
   private populateForm(): void {
     if (!this.alertRule) return;
 
@@ -399,10 +551,11 @@ export class AlertFormComponent implements OnInit {
         alertType: formValue.alertType,
         thresholdValue: formValue.conditionType === 'PRICE_BELOW' ? formValue.conditionValue : undefined,
         percentageValue: formValue.conditionType === 'PERCENT_DROP_FROM_LAST' ? formValue.conditionValue : undefined,
-        specificSellerName: formValue.sellerName || undefined,
         notificationFrequencyMinutes: formValue.notificationFrequencyMinutes,
-        isActive: formValue.isActive
+        isActive: formValue.isActive,
+        specificSellerName: formValue.sellerName || undefined
       });
+
       operation = this.alertsService.updateAlert(this.alertRule!.alertRuleId!, updateData);
     } else {
       // For creation, include all required fields
@@ -412,27 +565,28 @@ export class AlertFormComponent implements OnInit {
         alertType: formValue.alertType,
         thresholdValue: formValue.conditionType === 'PRICE_BELOW' ? formValue.conditionValue : undefined,
         percentageValue: formValue.conditionType === 'PERCENT_DROP_FROM_LAST' ? formValue.conditionValue : undefined,
-        specificSellerName: formValue.sellerName || undefined,
-        notificationFrequencyMinutes: formValue.notificationFrequencyMinutes
+        notificationFrequencyMinutes: formValue.notificationFrequencyMinutes,
+        specificSellerName: formValue.sellerName || undefined
       });
+
       operation = this.alertsService.createAlert(createData);
     }
 
     operation.subscribe({
-      next: (result) => {
+      next: (savedAlert) => {
         this.isSubmitting = false;
         this.snackBar.open(
-          this.isEditMode ? 'Alert updated successfully' : 'Alert created successfully',
+          `Alert ${this.isEditMode ? 'updated' : 'created'} successfully`,
           'Close',
           { duration: 3000 }
         );
-        this.alertSaved.emit(result);
+        this.alertSaved.emit(savedAlert);
       },
       error: (error) => {
-        this.isSubmitting = false;
         console.error('Error saving alert:', error);
+        this.isSubmitting = false;
         this.snackBar.open(
-          'Failed to save alert. Please try again.',
+          `Failed to ${this.isEditMode ? 'update' : 'create'} alert`,
           'Close',
           { duration: 5000 }
         );
