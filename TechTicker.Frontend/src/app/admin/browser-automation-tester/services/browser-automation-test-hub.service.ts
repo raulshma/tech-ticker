@@ -31,12 +31,15 @@ export class BrowserAutomationTestHubService {
   }
 
   private buildConnection(): void {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('techticker_token');
+    
+    // Build URL with access token as query parameter for SignalR authentication
+    const hubUrl = token 
+      ? `${environment.apiUrl}/hubs/browser-automation-test?access_token=${encodeURIComponent(token)}`
+      : `${environment.apiUrl}/hubs/browser-automation-test`;
     
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl(`${environment.apiUrl}/hubs/browser-automation-test`, {
-        accessTokenFactory: () => token || ''
-      })
+      .withUrl(hubUrl)
       .withAutomaticReconnect([0, 2000, 10000, 30000])
       .configureLogging(LogLevel.Information)
       .build();

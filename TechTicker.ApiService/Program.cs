@@ -63,6 +63,24 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
+    
+    // Configure SignalR token handling
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            // If the request is for our SignalR hub...
+            if (!string.IsNullOrEmpty(accessToken) && 
+                path.StartsWithSegments("/hubs"))
+            {
+                // Read the token out of the query string
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 // Add Authorization with permission-based policies
