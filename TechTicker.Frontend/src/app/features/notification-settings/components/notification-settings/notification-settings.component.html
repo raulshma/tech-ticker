@@ -8,17 +8,17 @@
           <p class="mat-body-large welcome-subtitle">Configure Discord notifications for your price alerts</p>
         </div>
         <div class="header-actions">
-          <button mat-button variant="filled" color="primary" (click)="onSave()" [disabled]="!settingsForm.valid || isSaving">
+          <button matButton="filled" color="primary" (click)="onSave()" [disabled]="!settingsForm.valid || isSaving">
             <mat-icon>save</mat-icon>
             {{ isSaving ? 'Saving...' : 'Save Settings' }}
           </button>
-          <button mat-button variant="outlined" (click)="testWebhook()" [disabled]="!settingsForm.get('discordWebhookUrl')?.value || isTestingWebhook">
+          <button matButton="outlined" (click)="testWebhook()" [disabled]="!settingsForm.get('discordWebhookUrl')?.value || isTestingWebhook">
             <mat-icon>send</mat-icon>
             {{ isTestingWebhook ? 'Testing...' : 'Test Webhook' }}
           </button>
-          <button mat-button variant="outlined" routerLink="/alerts">
-            <mat-icon>arrow_back</mat-icon>
-            Back to Alerts
+                  <button matButton="outlined" routerLink="/alerts">
+          <mat-icon>arrow_back</mat-icon>
+          Back to Alerts
           </button>
         </div>
       </div>
@@ -231,7 +231,7 @@
                     </div>
                     <h4 class="mat-headline-small">No Products Available</h4>
                     <p class="mat-body-medium">No products available for notifications. Create some alert rules first to see products here.</p>
-                    <button mat-button variant="filled" color="primary" routerLink="/alerts">
+                    <button matButton="filled" color="primary" routerLink="/alerts">
                       <mat-icon>add</mat-icon>
                       Manage Alert Rules
                     </button>
@@ -245,11 +245,11 @@
       </mat-card-content>
 
       <mat-card-actions class="settings-actions" align="end">
-        <button mat-button variant="outlined" type="button" (click)="onCancel()">
+        <button matButton="outlined" type="button" (click)="onCancel()">
           <mat-icon>cancel</mat-icon>
           Cancel
         </button>
-        <button mat-button variant="filled" color="primary" (click)="onSave()" [disabled]="!settingsForm.valid || isSaving">
+        <button matButton="filled" color="primary" (click)="onSave()" [disabled]="!settingsForm.valid || isSaving">
           <mat-spinner diameter="16" *ngIf="isSaving" class="btn-spinner"></mat-spinner>
           <mat-icon *ngIf="!isSaving">save</mat-icon>
           {{ isSaving ? 'Saving...' : 'Save Settings' }}
