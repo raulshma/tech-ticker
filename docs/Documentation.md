@@ -1,11 +1,11 @@
 ## TechTicker: E-commerce Price Tracker & Alerter - Detailed Software Specification
 
-**Version:** 2.4
-**Date:** January 12, 2025
+**Version:** 2.5
+**Date:** July 2, 2025
 **System Model:** Admin-Managed Exact Product URLs (Focus on Reduced Detectability, with Product Categories)
 **Architecture Model:** Monolith with .NET Aspire Backend & Angular SPA Frontend
 **Target Audience:** Development Team / Automated Coding Agent
-**Status:** Fully Implemented and Operational with Google Gemini AI Integration, Microsoft Playwright Browser Automation, and Advanced Proxy Management
+**Status:** Fully Implemented and Operational with Google Gemini AI Integration, Microsoft Playwright Browser Automation, Advanced Proxy Management, and Enhanced Security Features
 
 **Preamble:**
 This document provides a comprehensive specification of the fully implemented TechTicker application, including its backend services and Angular frontend for administration and CRM. The system is operational and includes all described features plus recent enhancements. This documentation reflects the actual implemented state of the system as of January 2025, including all APIs, frontend components, background workers, database schema, proxy management, bulk operations, browser automation, AI integration, and comprehensive testing infrastructure.
@@ -155,9 +155,9 @@ While the backend is a monolith, logical separation of concerns is maintained by
 *   **Charts & Visualization:** ng2-charts 8.0.0 with Chart.js 4.5.0 for performance monitoring, analytics, and proxy statistics.
 *   **Virtual Scrolling:** Angular CDK virtual scrolling for large datasets, proxy lists, and scraper logs.
 *   **Bulk Operations:** Advanced bulk import/export functionality with progress indicators for proxies and configurations.
-*   **Browser Automation UI:** Custom browser automation profile builder with AI-powered action generation using Google Gemini integration.
-*   **Proxy Management:** Comprehensive proxy configuration interface with health monitoring, bulk operations, and performance analytics.
-*   **AI Configuration:** Advanced AI provider configuration with model selection, encrypted storage, and testing capabilities.
+*   **Browser Automation UI:** Custom browser automation profile builder with AI-powered action generation using Google Gemini integration and 24+ action types with comprehensive testing capabilities.
+*   **Proxy Management:** Comprehensive proxy configuration interface with health monitoring, bulk operations, performance analytics, encrypted credentials, and advanced bulk import/export functionality.
+*   **AI Configuration:** Advanced AI provider configuration with model selection, encrypted storage, testing capabilities, enhanced browser action generation, and comprehensive API key management.
 
 ---
 
@@ -368,6 +368,15 @@ While the backend is a monolith, logical separation of concerns is maintained by
 *   **Dual Scraping Approach:**
     1. **Traditional HTTP Scraping:** Uses `ProxyAwareHttpClientService` with intelligent proxy rotation
     2. **Browser Automation:** Uses Microsoft Playwright for JavaScript-heavy sites requiring dynamic interaction
+*   **📊 Enhanced Browser Actions:** Support for 24+ action types including:
+    *   **Mouse Actions:** click, hover, drag, drop, right-click, double-click
+    *   **Keyboard Actions:** type, keyDown, keyUp, press, hotkey combinations
+    *   **Navigation:** navigate, goBack, goForward, reload, waitForNavigation
+    *   **Window Management:** resize, maximize, minimize, fullscreen, newTab
+    *   **Dialog Handling:** acceptDialog, dismissDialog, waitForDialog
+    *   **Cookie Management:** setCookie, getCookie, deleteCookie, clearCookies
+    *   **File Operations:** upload, download, screenshot, saveAs
+    *   **Advanced Features:** evaluate, waitForSelector, scroll, selectOption, setValue
 *   **Logic (on receiving `ScrapeProductPageCommand`):**
     1.  Log reception of command and create scraper run log entry.
     2.  **Route Decision:** Check `command.RequiresBrowserAutomation` flag to determine scraping method.
@@ -471,6 +480,11 @@ While the backend is a monolith, logical separation of concerns is maintained by
 **3.8 Alert Definition Module**
 *   **Purpose:** Allows users to manage price alert rules.
 *   **Implementation:** Services and repositories in `TechTicker.ApiService`.
+*   **📈 Enhanced Testing & Analytics:**
+    *   **Alert Testing Statistics:** Comprehensive analytics for alert rule testing with real-time metrics
+    *   **Test Result Management:** Detailed test result storage and analysis with performance tracking
+    *   **Administrative Dashboard:** Complete alert management interface with testing capabilities
+    *   **Performance Monitoring:** Real-time alert performance metrics and trend analysis
 *   **API Endpoints (exposed by `TechTicker.ApiService`, all require authentication unless specified otherwise):**
     *   `POST /api/alerts` (Authenticated User)
         *   Request Body: `{ "canonicalProductId": "...", "conditionType": "PRICE_BELOW", "thresholdValue": 99.99, "percentageValue": 10.0, "specificSellerName": "...", "notificationFrequencyMinutes": 1440 }`
@@ -555,11 +569,12 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   **OpenAI Compatible APIs:** Support for custom OpenAI-compatible endpoints
     *   **Model Auto-Discovery:** Automatic fetching of available models from provider APIs
 *   **Core Features:**
-    *   **Encrypted API Key Storage:** Secure storage of API keys with encryption at rest
-    *   **Browser Action Generation:** AI-powered generation of Playwright automation sequences
+    *   **🔒 Encrypted API Key Storage:** Secure storage of API keys with AES encryption at rest
+    *   **📊 Enhanced Browser Action Generation:** AI-powered generation of 24+ Playwright automation action types
     *   **Model Selection:** Dynamic model selection with fallback options
     *   **Connection Testing:** Built-in testing of AI provider connectivity and authentication
     *   **Usage Monitoring:** Tracking of API usage, token consumption, and performance metrics
+    *   **Advanced Action Types:** Support for mouse, keyboard, navigation, window management, and file operations
 *   **API Endpoints (exposed by `TechTicker.ApiService`):**
     *   `GET /api/ai-configurations` (Admin Only)
         *   Response (`200 OK`): List of AI configurations with masked API keys
@@ -582,7 +597,15 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   **Intelligent Action Sequences:** AI generates optimized Playwright action sequences
     *   **Context-Aware Suggestions:** Actions tailored to specific e-commerce sites and scenarios
     *   **Error Handling:** Robust error handling for AI generation failures with fallback strategies
-    *   **Action Types Supported:** scroll, click, waitForSelector, type, hover, selectOption, screenshot, evaluate
+    *   **📊 Enhanced Action Types Supported:** 24+ action types including:
+        *   **Mouse Actions:** click, hover, drag, drop, right-click, double-click
+        *   **Keyboard Actions:** type, keyDown, keyUp, press, hotkey combinations
+        *   **Navigation:** navigate, goBack, goForward, reload, waitForNavigation
+        *   **Window Management:** resize, maximize, minimize, fullscreen, newTab
+        *   **Dialog Handling:** acceptDialog, dismissDialog, waitForDialog
+        *   **Cookie Management:** setCookie, getCookie, deleteCookie, clearCookies
+        *   **File Operations:** upload, download, screenshot, saveAs
+        *   **Advanced Features:** evaluate, waitForSelector, scroll, selectOption, setValue
 *   **Security Features:**
     *   **API Key Encryption:** AES encryption for stored API keys
     *   **Access Control:** Admin-only access to AI configurations
@@ -592,14 +615,15 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   AI configurations are stored in database with encrypted API keys
     *   No sensitive configuration in appsettings files
 
-**3.12 Proxy Management Module**
-*   **Purpose:** Manages proxy configurations for enhanced scraping capabilities and anti-detection measures.
+**3.12 AI Configuration Module (Enhanced)**
+*   **Purpose:** Manages AI provider configurations for intelligent browser action generation and content processing.
 *   **Implementation:** Services (`AiConfigurationService`, `AiGenerationService`) in `TechTicker.Application` with API endpoints in `TechTicker.ApiService`.
 *   **Key Features:**
     *   **AI Provider Management:** Support for Google Gemini AI with encrypted API key storage
-    *   **Browser Action Generation:** AI-powered generation of browser automation actions from natural language descriptions
+    *   **📊 Enhanced Browser Action Generation:** AI-powered generation of 24+ browser automation action types from natural language descriptions
     *   **Content Analysis:** AI-assisted analysis of scraped content and error patterns
     *   **Configuration Management:** Secure storage and management of AI service configurations
+    *   **Advanced Action Types:** Support for mouse, keyboard, navigation, window management, dialog handling, cookie management, file operations, and advanced features
 *   **API Endpoints (exposed by `TechTicker.ApiService`):**
     *   **AI Configuration:**
         *   `GET /api/ai-configuration` - Get current AI configuration
@@ -620,7 +644,7 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   **Smart Suggestions:** AI-driven suggestions for scraping configurations
 *   **Data Storage:** `AiConfigurations` table with encrypted credentials and configuration metadata
 
-**3.12 Proxy Management Module**
+**3.13 Proxy Management Module**
 *   **Purpose:** Comprehensive proxy configuration and management system for enhanced scraping stealth and reliability.
 *   **Implementation:** Services (`ProxyService`, `ProxyPoolService`, `ProxyHealthMonitorService`) in `TechTicker.Application` with API endpoints in `TechTicker.ApiService`.
 *   **Key Features:**
@@ -630,6 +654,8 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   **Pool Management:** Intelligent proxy rotation and selection strategies
     *   **Performance Tracking:** Comprehensive metrics and analytics for proxy performance
     *   **Virtual Scrolling:** Optimized UI for managing large proxy lists
+    *   **🔒 Encrypted Credentials:** AES encryption for all proxy passwords with secure key management
+    *   **🔒 Secure Storage:** All sensitive proxy data encrypted at rest with proper key rotation
 *   **API Endpoints (exposed by `TechTicker.ApiService`):**
     *   **Proxy CRUD Operations:**
         *   `POST /api/proxies` - Create new proxy configuration
@@ -657,7 +683,7 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   `ProxyHealthMonitorService`: Automated health checking
     *   `ProxyPoolService`: Intelligent proxy selection and rotation
 
-**3.13 API Layer**
+**3.14 API Layer**
 *   **Purpose:** Entry point for client requests (including the Angular Admin Frontend).
 *   **Implementation:** ASP.NET Core Controllers within `TechTicker.ApiService`.
 *   **Responsibilities:**
@@ -1031,10 +1057,13 @@ While the backend is a monolith, logical separation of concerns is maintained by
     *   **JWT:** Backend API will use JWTs for stateless authentication. `TechTicker.ApiService` will issue tokens on login.
         *   Claims: `sub` (UserId), `email`, `role` (e.g., "Admin", "User"), `jti` (JWT ID), `exp` (Expiration), `iss` (Issuer), `aud` (Audience).
     *   **ASP.NET Core Identity:** Used for user management (storage, password hashing, role management).
-    *   **Authorization Policies:**
-        *   Admin Role: Define an "Admin" role. Seed an initial admin user.
-        *   Protect admin-specific API endpoints using `[Authorize(Roles = "Admin")]`.
-        *   Protect user-specific API endpoints (e.g., managing their own alerts) with `[Authorize]`. Ownership checks will be done within the service layer (e.g., user can only modify their own alert rules).
+    *   **🛡️ Enhanced Permission-Based Authorization:**
+        *   **Comprehensive RBAC:** Role-based access control with granular permission system
+        *   **Permission Validation:** Proper AuthService integration with comprehensive permission checking
+        *   **Authorization Policies:** Dynamic policy generation for all permissions with proper validation
+        *   **Role Hierarchy:** Support for role inheritance and permission cascading
+        *   **Audit Logging:** Comprehensive logging of authorization decisions and access attempts
+        *   **Frontend Integration:** Permission-based component visibility and route protection
     *   **Frontend Token Handling:** The Angular frontend will store the JWT (e.g., in `localStorage` or `sessionStorage` – consider security implications like XSS) and send it in the `Authorization: Bearer <token>` header for API requests. An HTTP interceptor in Angular will automate this.
     *   **CORS:** Configure CORS policies in `TechTicker.ApiService` to allow requests from the domain where the Angular frontend is hosted (especially important for development with `ng serve` on a different port).
 
@@ -1306,7 +1335,25 @@ The frontend includes comprehensive image handling capabilities:
     *   Automatic image format detection
     *   URL-based image referencing system
 
-**7.7 Notification Settings Interface**
+**7.7 PDF Export & Reporting Features**
+The system includes comprehensive PDF export capabilities:
+
+*   **📄 PDF Export Functionality:**
+    *   **jsPDF Integration:** Dynamic import of jsPDF library with autoTable plugin for professional PDF generation
+    *   **Comprehensive Reports:** Test data, logs, metrics, and performance analytics with structured content
+    *   **Professional Formatting:** Headers, footers, tables, and structured content with consistent styling
+    *   **Multiple Export Formats:** JSON, CSV, and PDF with consistent data structure and metadata
+    *   **Test Result Export:** Detailed test result export with comprehensive metadata and performance metrics
+    *   **Dynamic Import:** Efficient loading of PDF generation libraries to optimize bundle size
+
+*   **Test Result Dialog Components:**
+    *   **TestResultDetailsDialogComponent:** Comprehensive test result viewing with tabbed interface, performance metrics, and detailed action logs
+    *   **TestResultComparisonDialogComponent:** Side-by-side test result comparison with performance analysis, trend indicators, and statistical comparisons
+    *   **Export Capabilities:** Multiple format export from dialog components including JSON, CSV, and PDF
+    *   **Performance Analysis:** Detailed performance metrics, trend analysis, and statistical comparisons between test runs
+    *   **Advanced Analytics:** Success rate calculations, error analysis, and performance benchmarking
+
+**7.8 Notification Settings Interface**
 Comprehensive user notification management:
 
 *   **Discord Integration:**
@@ -1378,7 +1425,7 @@ Comprehensive user notification management:
 
 **✅ All Phases Completed Successfully**
 
-The TechTicker system has been fully implemented and is operational. All planned features have been delivered with additional enhancements:
+The TechTicker system has been fully implemented and is operational. All planned features have been delivered with additional enhancements including critical security improvements and advanced functionality:
 
 **Completed Core Features:**
 1.  **✅ Backend Foundation:** Complete .NET 9.0 Aspire setup with all core services
@@ -1398,8 +1445,8 @@ The TechTicker system has been fully implemented and is operational. All planned
 **Additional Features Implemented:**
 *   **Image Processing:** Complete image scraping, upload, storage, and gallery system with local file management
 *   **Performance Monitoring:** Comprehensive logging, monitoring capabilities, and scraper run logs with detailed analytics
-*   **Browser Automation:** Full Microsoft Playwright integration with support for multiple browsers and custom action sequences
-*   **AI-Powered Automation:** Google Gemini AI integration for intelligent browser action generation and content processing
+*   **Browser Automation:** Full Microsoft Playwright integration with support for multiple browsers and 24+ custom action types with comprehensive testing and validation capabilities
+*   **AI-Powered Automation:** Google Gemini AI integration for intelligent browser action generation and content processing with enhanced action type support and encrypted API key management
 *   **Advanced Proxy Management:** Comprehensive proxy pool management with health monitoring, intelligent rotation, and bulk operations
 *   **Enhanced RBAC:** Permission-based authorization system with granular access control and role management
 *   **Real-time Notifications:** Discord webhook integration with rich embeds and user preference management
@@ -1413,6 +1460,16 @@ The TechTicker system has been fully implemented and is operational. All planned
 *   **Testing Infrastructure:** Comprehensive unit and integration test coverage
 *   **NSwag Integration:** Automatic TypeScript client generation
 
+**Latest Security & Feature Enhancements (v2.5):**
+*   **🔒 Proxy Password Encryption:** Fixed critical security vulnerability with AES encryption for all proxy passwords
+*   **🔒 Permission Checking Implementation:** Fixed authorization bypass with proper AuthService integration and comprehensive permission validation
+*   **🔒 Alert Testing Statistics:** Complete implementation replacing HTTP 501 with real administrative functionality and comprehensive analytics
+*   **📊 Browser Action Type Expansion:** Added 24 new browser action types including mouse actions, keyboard actions, navigation, window management, dialog handling, cookie management, file operations, and advanced features
+*   **📄 PDF Export Functionality:** Added jsPDF library with dynamic import implementation, comprehensive PDF reports with test data, logs, and professional formatting
+*   **🔧 Test Result Dialog Components:** Created detailed TestResultDetailsDialogComponent and TestResultComparisonDialogComponent with comprehensive UI, tabbed interfaces, performance analysis, and export capabilities
+*   **🛡️ Enhanced Security Framework:** Comprehensive permission-based authorization with proper validation, role hierarchy, and audit logging
+*   **📈 Advanced Analytics:** Real-time alert testing statistics, performance monitoring, and comprehensive reporting capabilities
+
 **Current System Capabilities:**
 *   **Fully Operational:** All services running and communicating properly with high availability
 *   **Production Ready:** Containerized with Docker and Aspire orchestration for seamless deployment
@@ -1420,10 +1477,14 @@ The TechTicker system has been fully implemented and is operational. All planned
 *   **Comprehensive Monitoring:** Full observability with logging, metrics, and real-time dashboards
 *   **User-Friendly Interface:** Modern Angular 20 frontend with responsive design and accessibility
 *   **Robust Error Handling:** Comprehensive error handling, recovery mechanisms, and graceful degradation
-*   **Advanced Proxy Support:** Intelligent proxy rotation, health monitoring, and bulk management
+*   **Advanced Proxy Support:** Intelligent proxy rotation, health monitoring, and bulk management with encrypted credentials
 *   **Performance Optimized:** Virtual scrolling, lazy loading, and optimized database queries
 *   **Comprehensive Testing:** 230+ test cases covering all critical business logic and workflows
-*   **Security Hardened:** RBAC authorization, encrypted credentials, and secure communication
+*   **Security Hardened:** RBAC authorization, AES encrypted credentials, secure communication, and comprehensive permission validation with authorization bypass fixes
+*   **Advanced Browser Automation:** 24+ action types with AI-powered generation and comprehensive testing capabilities including real-time validation and performance monitoring
+*   **Professional Reporting:** PDF export functionality with comprehensive test data, analytics, and dynamic import optimization
+*   **Enhanced Analytics:** Real-time alert testing statistics, performance monitoring, and advanced comparison capabilities
+*   **🔒 Security Hardening:** AES encryption for proxy passwords, comprehensive permission validation, authorization framework improvements, and encrypted API key management
 
 ---
 
@@ -1533,7 +1594,7 @@ The TechTicker application includes a robust testing infrastructure with over 23
 
 ### 12. Current System Summary
 
-**TechTicker v2.2** is a fully operational e-commerce price tracking and alerting system with the following key characteristics:
+**TechTicker v2.5** is a fully operational e-commerce price tracking and alerting system with the following key characteristics:
 
 **✅ Implemented Features:**
 - Complete .NET 9.0 backend with Aspire 9.3.1 orchestration
@@ -1552,6 +1613,10 @@ The TechTicker application includes a robust testing infrastructure with over 23
 - Virtual scrolling optimization for large datasets
 - Comprehensive logging, monitoring, and observability
 - Docker containerization ready for production deployment
+- **🔒 Enhanced Security:** AES encryption for proxy passwords, comprehensive permission validation, authorization bypass fixes, and encrypted API key management
+- **📊 Advanced Browser Automation:** 24+ action types with AI-powered generation and comprehensive testing capabilities including real-time validation
+- **📄 Professional Reporting:** PDF export with comprehensive test data, analytics, test result dialog components, and dynamic import optimization
+- **📈 Enhanced Analytics:** Real-time alert testing statistics, performance monitoring, advanced comparison capabilities, and administrative dashboards
 
 **🎯 System Capabilities:**
 - **Multi-user Support:** Admin, Moderator, and User roles
@@ -1566,21 +1631,28 @@ The TechTicker application includes a robust testing infrastructure with over 23
 - Fully tested with comprehensive test coverage (230+ tests)
 - Scalable architecture with horizontal scaling support
 - Robust error handling and recovery mechanisms
-- Security hardened with RBAC and input validation
+- Security hardened with RBAC, AES encrypted credentials, comprehensive permission validation with authorization bypass fixes, and encrypted API key management
 - Monitoring and observability built-in
 - Documentation complete and up-to-date
+- Advanced browser automation with 24+ action types and comprehensive testing capabilities
+- Professional PDF reporting and analytics capabilities with dynamic import optimization
 
 ---
 
 ## 📝 Documentation Update Summary
 
-**Last Updated:** June 29, 2025
-**Version:** 2.2
+**Last Updated:** July 2, 2025
+**Version:** 2.5
 **Status:** Current and Accurate
 
-This documentation has been updated to reflect the current state of the TechTicker application as of July 2025. All features described are fully implemented and operational. Key updates include:
+This documentation has been updated to reflect the current state of the TechTicker application as of July 2, 2025. All features described are fully implemented and operational. Key updates include:
 
 **✅ Recently Completed Features:**
+- **🔒 Security Enhancements:** AES encryption for proxy passwords, comprehensive permission validation, authorization bypass fixes, and encrypted API key management
+- **📊 Browser Action Expansion:** 24+ new browser action types including mouse, keyboard, navigation, window management, dialog handling, cookie management, file operations, and advanced features
+- **📄 PDF Export System:** jsPDF integration with dynamic import, comprehensive test data export, professional reporting, and autoTable plugin
+- **🔧 Test Result Components:** Detailed TestResultDetailsDialogComponent and TestResultComparisonDialogComponent with comprehensive analytics and comparison capabilities
+- **📈 Alert Testing Statistics:** Complete implementation replacing HTTP 501 with real administrative functionality and comprehensive performance monitoring
 - Dedicated ProxyConfigurations table with advanced proxy analytics, health, and usage tracking
 - AlertHistories table for comprehensive alert trigger and notification audit trails
 - AlertType field on AlertRules for categorization and extensibility
@@ -1594,7 +1666,11 @@ This documentation has been updated to reflect the current state of the TechTick
 - Upgraded to .NET 9.0 and Angular 20 with latest dependencies
 
 **🔧 Technical Improvements:**
-- Enhanced proxy analytics and health monitoring
+- **🔒 Security Hardening:** AES encryption implementation, comprehensive permission validation, authorization framework improvements, and encrypted API key management
+- **📊 Enhanced Browser Automation:** 24+ action types with AI-powered generation, comprehensive testing capabilities, and real-time validation
+- **📄 Professional Reporting:** PDF export functionality with jsPDF integration, dynamic import optimization, autoTable plugin, and comprehensive test data export
+- **📈 Advanced Analytics:** Real-time alert testing statistics, performance monitoring, advanced comparison capabilities, and administrative dashboards
+- Enhanced proxy analytics and health monitoring with encrypted credentials
 - Alert history and notification audit trail support
 - Support for new alert types and extensibility
 - Improved proxy usage diagnostics in scraping logs
