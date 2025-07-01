@@ -598,6 +598,8 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
       const response = await this.apiClient.saveTestResults(this.currentSessionId, request).toPromise();
       if (response?.data) {
         this.showSuccessMessage(`Test results saved with ID: ${response.data}`);
+        // Refresh the saved results count to update the badge
+        await this.loadSavedResultsCount();
       }
     } catch (error: any) {
       console.error('Error saving test results:', error);
@@ -688,10 +690,12 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
 
   async loadSavedResultsCount(): Promise<void> {
     try {
-      // For now, set a default count. This would normally call the API
-      // const response = await this.apiClient.getTestStatistics().toPromise();
-      // this.savedResultsCount = response?.data?.totalTests || 0;
-      this.savedResultsCount = 0;
+      const response = await this.apiClient.getTestStatistics().toPromise();
+      if (response?.success && response.data) {
+        this.savedResultsCount = response.data.totalTests || 0;
+      } else {
+        this.savedResultsCount = 0;
+      }
     } catch (error) {
       console.error('Error loading saved results count:', error);
       this.savedResultsCount = 0;

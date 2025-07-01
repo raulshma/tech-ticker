@@ -3,27 +3,38 @@ using Microsoft.Playwright;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
+using TechTicker.DataAccess.Repositories.Interfaces;
+using TechTicker.Domain.Entities;
 using TechTicker.Shared.Utilities;
 
 namespace TechTicker.Application.Services;
 
 /// <summary>
 /// Service for testing browser automation profiles with real-time feedback
+/// Enhanced with automatic execution history logging
 /// </summary>
 public class BrowserAutomationTestService : IBrowserAutomationTestService
 {
     private readonly IBrowserAutomationWebSocketService _webSocketService;
+    private readonly ITestExecutionHistoryRepository _testExecutionHistoryRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<BrowserAutomationTestService> _logger;
     private readonly ConcurrentDictionary<string, TestSession> _activeSessions;
     private readonly ConcurrentDictionary<string, CancellationTokenSource> _sessionCancellationTokens;
 
     public BrowserAutomationTestService(
         IBrowserAutomationWebSocketService webSocketService,
+        ITestExecutionHistoryRepository testExecutionHistoryRepository,
+        IHttpContextAccessor httpContextAccessor,
         ILogger<BrowserAutomationTestService> logger)
     {
         _webSocketService = webSocketService;
+        _testExecutionHistoryRepository = testExecutionHistoryRepository;
+        _httpContextAccessor = httpContextAccessor;
         _logger = logger;
         _activeSessions = new ConcurrentDictionary<string, TestSession>();
         _sessionCancellationTokens = new ConcurrentDictionary<string, CancellationTokenSource>();
@@ -555,6 +566,9 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
                 await browser.CloseAsync();
             }
             
+            // Automatically log test execution to database for analytics and audit trail
+            await LogTestExecutionHistoryAsync(session);
+            
             CleanupSession(session.Id);
         }
     }
@@ -998,6 +1012,129 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
             {
                 await Task.Delay(action.DelayMs.Value);
             }
+        }
+    }
+
+    /// <summary>
+    /// Automatically logs test execution to the database for analytics and audit trail
+    /// This ensures all test executions are tracked regardless of whether the user saves results
+    /// </summary>
+    private async Task LogTestExecutionHistoryAsync(TestSession session)
+    {
+        try
+        {
+            var currentUserId = GetCurrentUserId();
+            
+            if (session?.Result == null)
+            {
+                // Create a basic result for cancelled or failed sessions
+                var duration = session?.CompletedAt?.Subtract(session.StartedAt).TotalMilliseconds ?? 0;
+                
+                var historyEntry = new TestExecutionHistory
+                {
+                    SessionId = session?.Id ?? Guid.NewGuid().ToString(),
+                    TestUrl = session?.TestUrl ?? "Unknown",
+                    ProfileHash = CalculateProfileHash(session?.Profile),
+                    Success = false,
+                    ExecutedAt = session?.StartedAt.DateTime ?? DateTime.UtcNow,
+                    Duration = (int)duration,
+                    ActionsExecuted = 0,
+                    ErrorCount = 1,
+                    ExecutedBy = currentUserId,
+                    SessionName = session?.SessionName,
+                    BrowserEngine = session?.Profile?.PreferredBrowser ?? "chromium",
+                    DeviceType = session?.Options?.DeviceEmulation ?? "desktop"
+                };
+
+                await _testExecutionHistoryRepository.CreateAsync(historyEntry);
+                _logger.LogInformation("Logged incomplete test execution for session {SessionId} by user {UserId}", session?.Id, currentUserId);
+                return;
+            }
+
+            // Create execution history for completed test
+            var completedHistoryEntry = new TestExecutionHistory
+            {
+                SessionId = session.Id,
+                TestUrl = session.TestUrl,
+                ProfileHash = CalculateProfileHash(session.Profile),
+                Success = session.Result.Success,
+                ExecutedAt = session.Result.StartedAt.DateTime,
+                Duration = session.Result.Duration,
+                ActionsExecuted = session.Result.ActionsExecuted,
+                ErrorCount = session.Result.Errors?.Count ?? 0,
+                ExecutedBy = currentUserId,
+                SessionName = session.SessionName,
+                BrowserEngine = session.Profile?.PreferredBrowser ?? "chromium", 
+                DeviceType = session.Options?.DeviceEmulation ?? "desktop"
+            };
+
+            await _testExecutionHistoryRepository.CreateAsync(completedHistoryEntry);
+            
+            _logger.LogInformation("Automatically logged test execution history for session {SessionId} by user {UserId} - Success: {Success}, Duration: {Duration}ms", 
+                session.Id, currentUserId, session.Result.Success, session.Result.Duration);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to log test execution history for session {SessionId}", session?.Id);
+            // Don't throw - this is background logging and shouldn't affect the main test execution
+        }
+    }
+
+    /// <summary>
+    /// Gets the current user ID from the HTTP context claims
+    /// </summary>
+    /// <returns>The current user ID or a fallback unknown user ID</returns>
+    private Guid GetCurrentUserId()
+    {
+        try
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated == true)
+            {
+                var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? httpContext.User.FindFirst("sub")?.Value
+                    ?? httpContext.User.FindFirst("id")?.Value
+                    ?? httpContext.Items["UserId"]?.ToString();
+
+                if (!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out var userId))
+                {
+                    return userId;
+                }
+            }
+
+            // Log warning and return a known "unknown user" ID instead of random GUID
+            _logger.LogWarning("Could not determine current user ID from HTTP context, using unknown user placeholder");
+            return Guid.Empty; // Use Empty instead of NewGuid for consistency
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving current user ID, using unknown user placeholder");
+            return Guid.Empty;
+        }
+    }
+
+    /// <summary>
+    /// Calculate profile hash for grouping related test executions
+    /// </summary>
+    private string CalculateProfileHash(BrowserAutomationProfileDto? profile)
+    {
+        if (profile == null) return "unknown";
+        
+        try
+        {
+            var profileJson = JsonSerializer.Serialize(profile, new JsonSerializerOptions 
+            { 
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase 
+            });
+            
+            using var sha256 = System.Security.Cryptography.SHA256.Create();
+            var hashBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(profileJson));
+            return Convert.ToHexString(hashBytes)[..16]; // Use first 16 characters for readability
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to calculate profile hash, using fallback");
+            return $"fallback_{DateTime.UtcNow:yyyyMMdd}";
         }
     }
 

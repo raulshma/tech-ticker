@@ -107,6 +107,7 @@ builder.Services.Configure<ProxyHealthMonitorConfiguration>(
     builder.Configuration.GetSection(ProxyHealthMonitorConfiguration.SectionName));
 
 // Add repositories and services
+builder.Services.AddHttpContextAccessor(); // Required for services to access HttpContext for user identification
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAiConfigurationRepository, AiConfigurationRepository>();
 builder.Services.AddScoped<IMappingService, MappingService>();

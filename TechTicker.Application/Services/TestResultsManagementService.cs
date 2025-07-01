@@ -1,13 +1,17 @@
 using System.Text;
 using System.Text.Json;
 using System.Security.Cryptography;
+using System.Security.Claims;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
 using TechTicker.Domain.Entities;
 using TechTicker.Shared.Utilities;
 using TechTicker.Shared.Common;
+using iText.Html2pdf;
+using iText.Kernel.Pdf;
 
 namespace TechTicker.Application.Services;
 
@@ -20,17 +24,20 @@ public class TestResultsManagementService : ITestResultsManagementService
     private readonly IBrowserAutomationTestService _testService;
     private readonly ISavedTestResultRepository _savedTestResultRepository;
     private readonly ITestExecutionHistoryRepository _testExecutionHistoryRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<TestResultsManagementService> _logger;
 
     public TestResultsManagementService(
         IBrowserAutomationTestService testService,
         ISavedTestResultRepository savedTestResultRepository,
         ITestExecutionHistoryRepository testExecutionHistoryRepository,
+        IHttpContextAccessor httpContextAccessor,
         ILogger<TestResultsManagementService> logger)
     {
         _testService = testService;
         _savedTestResultRepository = savedTestResultRepository;
         _testExecutionHistoryRepository = testExecutionHistoryRepository;
+        _httpContextAccessor = httpContextAccessor;
         _logger = logger;
     }
 
@@ -64,6 +71,7 @@ public class TestResultsManagementService : ITestResultsManagementService
 
             // Calculate profile hash for grouping
             var profileHash = CalculateProfileHash(testResults.SessionId ?? "unknown");
+            var currentUserId = GetCurrentUserId();
 
             // Create the SavedTestResult entity
             var savedTestResult = new SavedTestResult
@@ -77,7 +85,7 @@ public class TestResultsManagementService : ITestResultsManagementService
                 ActionsExecuted = testResults.ActionsExecuted,
                 ErrorCount = testResults.Errors?.Count ?? 0,
                 ProfileHash = profileHash,
-                CreatedBy = Guid.NewGuid(), // TODO: Get current user ID
+                CreatedBy = currentUserId,
                 TestResultJson = JsonSerializer.Serialize(testResults),
                 ProfileJson = JsonSerializer.Serialize(sessionDetails?.Profile ?? new BrowserAutomationProfileDto()),
                 OptionsJson = JsonSerializer.Serialize(sessionDetails?.Options ?? new BrowserTestOptionsDto()),
@@ -461,10 +469,7 @@ public class TestResultsManagementService : ITestResultsManagementService
                     break;
 
                 case TestResultExportFormat.Pdf:
-                    // For MVP, we'll return a JSON representation
-                    // In production, this would generate a proper PDF
-                    var pdfData = JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
-                    exportData = Encoding.UTF8.GetBytes(pdfData);
+                    exportData = await GeneratePdfReport(result);
                     contentType = "application/pdf";
                     fileName = $"test-result-{result.Name}-{DateTime.UtcNow:yyyyMMdd-HHmmss}.pdf";
                     break;
@@ -589,6 +594,39 @@ public class TestResultsManagementService : ITestResultsManagementService
     }
 
     #region Private Methods
+
+    /// <summary>
+    /// Gets the current user ID from the HTTP context claims
+    /// </summary>
+    /// <returns>The current user ID or a fallback unknown user ID</returns>
+    private Guid GetCurrentUserId()
+    {
+        try
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated == true)
+            {
+                var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? httpContext.User.FindFirst("sub")?.Value
+                    ?? httpContext.User.FindFirst("id")?.Value
+                    ?? httpContext.Items["UserId"]?.ToString();
+
+                if (!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out var userId))
+                {
+                    return userId;
+                }
+            }
+
+            // Log warning and return a known "unknown user" ID instead of random GUID
+            _logger.LogWarning("Could not determine current user ID from HTTP context, using unknown user placeholder");
+            return Guid.Empty; // Use Empty instead of NewGuid for consistency
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving current user ID, using unknown user placeholder");
+            return Guid.Empty;
+        }
+    }
 
     private SavedTestResultDetailDto ConvertToDetailDto(SavedTestResult entity)
     {
@@ -808,12 +846,128 @@ public class TestResultsManagementService : ITestResultsManagementService
         return recommendations;
     }
 
+    private Task<byte[]> GeneratePdfReport(SavedTestResultDetailDto result)
+    {
+        var html = GenerateHtmlReport(result);
+        
+        using var memoryStream = new MemoryStream();
+        var converterProperties = new ConverterProperties();
+        HtmlConverter.ConvertToPdf(html, memoryStream, converterProperties);
+        
+        return Task.FromResult(memoryStream.ToArray());
+    }
+
+    private string GenerateHtmlReport(SavedTestResultDetailDto result)
+    {
+        var html = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Test Result Report - {result.Name}</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; margin: 20px; }}
+        .header {{ background-color: #f4f4f4; padding: 20px; border-radius: 5px; margin-bottom: 20px; }}
+        .section {{ margin-bottom: 20px; }}
+        .section h3 {{ color: #333; border-bottom: 2px solid #ddd; padding-bottom: 5px; }}
+        .status-success {{ color: #4CAF50; font-weight: bold; }}
+        .status-failure {{ color: #f44336; font-weight: bold; }}
+        .details-table {{ width: 100%; border-collapse: collapse; }}
+        .details-table th, .details-table td {{ 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            text-align: left; 
+        }}
+        .details-table th {{ background-color: #f2f2f2; }}
+        .tags {{ display: flex; flex-wrap: wrap; gap: 5px; }}
+        .tag {{ 
+            background-color: #e3f2fd; 
+            color: #1976d2; 
+            padding: 3px 8px; 
+            border-radius: 12px; 
+            font-size: 12px; 
+        }}
+    </style>
+</head>
+<body>
+    <div class='header'>
+        <h1>Test Result Report</h1>
+        <h2>{result.Name}</h2>
+        <p><strong>Status:</strong> <span class='{(result.Success ? "status-success" : "status-failure")}'>{(result.Success ? "SUCCESS" : "FAILURE")}</span></p>
+    </div>
+
+    <div class='section'>
+        <h3>Test Details</h3>
+        <table class='details-table'>
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>Description</td><td>{result.Description ?? "N/A"}</td></tr>
+            <tr><td>Test URL</td><td>{result.TestUrl}</td></tr>
+            <tr><td>Executed At</td><td>{result.ExecutedAt:yyyy-MM-dd HH:mm:ss UTC}</td></tr>
+            <tr><td>Duration</td><td>{result.Duration:N0} ms</td></tr>
+            <tr><td>Actions Executed</td><td>{result.ActionsExecuted}</td></tr>
+            <tr><td>Error Count</td><td>{result.ErrorCount}</td></tr>
+            <tr><td>Created By</td><td>{result.CreatedBy}</td></tr>
+            <tr><td>Saved At</td><td>{result.SavedAt:yyyy-MM-dd HH:mm:ss UTC}</td></tr>
+        </table>
+    </div>";
+
+        if (result.Tags?.Any() == true)
+        {
+            html += $@"
+    <div class='section'>
+        <h3>Tags</h3>
+        <div class='tags'>
+            {string.Join("", result.Tags.Select(tag => $"<span class='tag'>{tag}</span>"))}
+        </div>
+    </div>";
+        }
+
+        if (result.TestResult != null && result.TestResult.ActionResults?.Any() == true)
+        {
+            html += $@"
+    <div class='section'>
+        <h3>Test Actions</h3>
+        <table class='details-table'>
+            <tr><th>Step</th><th>Action</th><th>Status</th><th>Duration</th></tr>";
+
+            for (int i = 0; i < result.TestResult.ActionResults.Count; i++)
+            {
+                var action = result.TestResult.ActionResults[i];
+                html += $@"
+            <tr>
+                <td>{i + 1}</td>
+                <td>{action.ActionType} - {action.Selector ?? "N/A"}</td>
+                <td class='{(action.Success ? "status-success" : "status-failure")}'>{(action.Success ? "SUCCESS" : "FAILURE")}</td>
+                <td>{action.Duration:N0} ms</td>
+            </tr>";
+            }
+
+            html += @"
+        </table>
+    </div>";
+        }
+
+        html += @"
+</body>
+</html>";
+
+        return html;
+    }
+
     private string ConvertToCsv(SavedTestResultDetailDto result)
     {
         var csv = new StringBuilder();
+        
+        // Basic test information
+        csv.AppendLine("Test Result Export");
+        csv.AppendLine("Generated,DateTime,Tags");
+        csv.AppendLine($"{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss UTC},\"{result.Name}\",\"{string.Join("; ", result.Tags ?? new List<string>())}\"");
+        csv.AppendLine();
+        
+        // Test summary
         csv.AppendLine("Field,Value");
         csv.AppendLine($"Name,\"{result.Name}\"");
-        csv.AppendLine($"Description,\"{result.Description}\"");
+        csv.AppendLine($"Description,\"{result.Description ?? "N/A"}\"");
         csv.AppendLine($"Test URL,\"{result.TestUrl}\"");
         csv.AppendLine($"Success,{result.Success}");
         csv.AppendLine($"Executed At,{result.ExecutedAt:yyyy-MM-dd HH:mm:ss}");
@@ -821,6 +975,21 @@ public class TestResultsManagementService : ITestResultsManagementService
         csv.AppendLine($"Actions Executed,{result.ActionsExecuted}");
         csv.AppendLine($"Error Count,{result.ErrorCount}");
         csv.AppendLine($"Created By,\"{result.CreatedBy}\"");
+        csv.AppendLine($"Saved At,{result.SavedAt:yyyy-MM-dd HH:mm:ss}");
+        
+        // Action details if available
+        if (result.TestResult?.ActionResults?.Any() == true)
+        {
+            csv.AppendLine();
+            csv.AppendLine("Action Details");
+            csv.AppendLine("Step,Action Type,Selector,Success,Duration (ms),Error");
+            
+            foreach (var action in result.TestResult.ActionResults)
+            {
+                csv.AppendLine($"{action.ActionIndex + 1},\"{action.ActionType}\",\"{action.Selector ?? "N/A"}\",{action.Success},{action.Duration},\"{action.Error ?? ""}\"");
+            }
+        }
+        
         return csv.ToString();
     }
 
