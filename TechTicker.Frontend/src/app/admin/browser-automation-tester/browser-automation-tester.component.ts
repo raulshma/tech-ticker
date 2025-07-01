@@ -26,6 +26,7 @@ import { TechTickerApiClient, BrowserAutomationTestRequestDto, SaveTestResultReq
 import { BrowserAutomationTestHubService } from './services/browser-automation-test-hub.service';
 import { AdvancedTestConfigDialogComponent } from './components/advanced-test-config-dialog.component';
 import { TestResultsHistoryComponent } from './components/test-results-history.component';
+import { ActionTemplatesDialogComponent, BrowserAutomationAction } from './components/action-templates-dialog.component';
 declare var jsPDF: any;
 
 @Component({
@@ -92,6 +93,10 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
   networkRequests: any[] = [];
   consoleMessages: any[] = [];
   savedResultsCount = 0;
+
+  // Action templates and current actions
+  currentActions: BrowserAutomationAction[] = [];
+  actionTemplatesCount = 0;
 
   // Enhanced test options with Phase 2 features
   testOptions = {
@@ -168,6 +173,7 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.setupSignalRConnection();
     this.loadSavedResultsCount();
+    this.loadActionTemplatesCount();
   }
 
   ngOnDestroy(): void {
@@ -510,14 +516,29 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
       this.testResults = null;
       this.currentScreenshot = null;
 
-      // Create basic profile for MVP (just navigate to URL) using DTOs
-      const basicAction = new BrowserAutomationActionDto({
-        actionType: 'navigate',
-        value: this.testerForm.value.testUrl,
-        delayMs: 2000
-      });
-      const basicProfile = new BrowserAutomationProfileDto({
-        actions: [basicAction],
+      // Create profile with current actions or basic navigation
+      let actions: BrowserAutomationActionDto[] = [];
+      
+      if (this.currentActions.length > 0) {
+        // Convert current actions to DTOs
+        actions = this.currentActions.map(action => new BrowserAutomationActionDto({
+          actionType: action.actionType,
+          selector: action.selector,
+          repeat: action.repeat,
+          delayMs: action.delayMs,
+          value: action.value
+        }));
+      } else {
+        // Fallback to basic navigation action
+        actions = [new BrowserAutomationActionDto({
+          actionType: 'navigate',
+          value: this.testerForm.value.testUrl,
+          delayMs: 2000
+        })];
+      }
+
+      const profile = new BrowserAutomationProfileDto({
+        actions: actions,
         timeoutSeconds: 30
       });
 
@@ -527,7 +548,7 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
       // Prepare test request using DTO constructor
       const testRequest = new BrowserAutomationTestRequestDto({
         testUrl: this.testerForm.value.testUrl,
-        profile: basicProfile,
+        profile: profile,
         options: testOptions,
         saveResults: this.testerForm.value.saveResults,
         sessionName: this.testerForm.value.sessionName || undefined
@@ -732,5 +753,147 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
     }).catch(() => {
       this.showErrorMessage('Failed to copy to clipboard');
     });
+  }
+
+  // Action Templates Methods
+  async loadActionTemplatesCount(): Promise<void> {
+    try {
+      const stored = localStorage.getItem('browser-automation-action-templates');
+      if (stored) {
+        const templates = JSON.parse(stored);
+        this.actionTemplatesCount = templates.length;
+      } else {
+        // Create default templates if none exist
+        this.createDefaultTemplates();
+      }
+    } catch (error) {
+      console.error('Error loading action templates count:', error);
+      this.actionTemplatesCount = 0;
+    }
+  }
+
+  private createDefaultTemplates(): void {
+    const defaultTemplates = [
+      {
+        id: 'basic-navigation',
+        name: 'Basic Navigation',
+        description: 'Simple navigation to a URL with wait',
+        category: 'navigation',
+        actions: [
+          { actionType: 'navigate', value: 'https://example.com', delayMs: 2000 },
+          { actionType: 'wait', value: '3000' }
+        ],
+        createdAt: new Date(),
+        usageCount: 0
+      },
+      {
+        id: 'form-filling',
+        name: 'Form Filling',
+        description: 'Fill out a form with text input',
+        category: 'form-filling',
+        actions: [
+          { actionType: 'waitForSelector', selector: 'input[name="username"]', delayMs: 1000 },
+          { actionType: 'type', selector: 'input[name="username"]', value: 'testuser', delayMs: 500 },
+          { actionType: 'type', selector: 'input[name="password"]', value: 'testpass', delayMs: 500 },
+          { actionType: 'click', selector: 'button[type="submit"]', delayMs: 1000 }
+        ],
+        createdAt: new Date(),
+        usageCount: 0
+      },
+      {
+        id: 'screenshot-sequence',
+        name: 'Screenshot Sequence',
+        description: 'Navigate and take screenshots',
+        category: 'screenshots',
+        actions: [
+          { actionType: 'navigate', value: 'https://example.com', delayMs: 2000 },
+          { actionType: 'screenshot', delayMs: 1000 },
+          { actionType: 'scroll', delayMs: 1000 },
+          { actionType: 'screenshot', delayMs: 1000 }
+        ],
+        createdAt: new Date(),
+        usageCount: 0
+      },
+      {
+        id: 'ecommerce-browse',
+        name: 'E-commerce Browse',
+        description: 'Browse an e-commerce site',
+        category: 'ecommerce',
+        actions: [
+          { actionType: 'navigate', value: 'https://example.com', delayMs: 2000 },
+          { actionType: 'waitForSelector', selector: '.product-grid', delayMs: 1000 },
+          { actionType: 'click', selector: '.product-item:first-child', delayMs: 1000 },
+          { actionType: 'waitForSelector', selector: '.product-details', delayMs: 1000 },
+          { actionType: 'screenshot', delayMs: 1000 }
+        ],
+        createdAt: new Date(),
+        usageCount: 0
+      }
+    ];
+
+    localStorage.setItem('browser-automation-action-templates', JSON.stringify(defaultTemplates));
+    this.actionTemplatesCount = defaultTemplates.length;
+  }
+
+  openActionTemplates(): void {
+    const dialogRef = this.dialog.open(ActionTemplatesDialogComponent, {
+      width: '90vw',
+      maxWidth: '1200px',
+      height: '80vh',
+      maxHeight: '800px',
+      data: { currentActions: this.currentActions }
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result?.action === 'use' && result.actions) {
+        this.currentActions = result.actions;
+        this.showSuccessMessage(`Applied template "${result.template.name}" with ${result.actions.length} actions`);
+        this.loadActionTemplatesCount(); // Refresh count
+      }
+    });
+  }
+
+  saveCurrentActionsAsTemplate(): void {
+    if (this.currentActions.length === 0) {
+      this.snackBar.open('No actions to save. Please add some actions first.', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ActionTemplatesDialogComponent, {
+      width: '90vw',
+      maxWidth: '1200px',
+      height: '80vh',
+      maxHeight: '800px',
+      data: { currentActions: this.currentActions }
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result?.action === 'use') {
+        this.loadActionTemplatesCount(); // Refresh count
+      }
+    });
+  }
+
+  addAction(action: BrowserAutomationAction): void {
+    this.currentActions.push(action);
+  }
+
+  removeAction(index: number): void {
+    this.currentActions.splice(index, 1);
+  }
+
+  clearActions(): void {
+    this.currentActions = [];
+  }
+
+  addQuickAction(): void {
+    // Add a simple navigation action as a quick example
+    const quickAction: BrowserAutomationAction = {
+      actionType: 'navigate',
+      value: this.testerForm.value.testUrl || 'https://example.com',
+      delayMs: 2000
+    };
+    this.addAction(quickAction);
+    this.showSuccessMessage('Quick action added! You can edit it in the action list.');
   }
 } 

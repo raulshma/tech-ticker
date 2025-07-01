@@ -23,6 +23,8 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
     private readonly ITestExecutionHistoryRepository _testExecutionHistoryRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<BrowserAutomationTestService> _logger;
+    private readonly IPerformanceTracker _performanceTracker;
+    private readonly INetworkMonitor _networkMonitor;
     private readonly ConcurrentDictionary<string, TestSession> _activeSessions;
     private readonly ConcurrentDictionary<string, CancellationTokenSource> _sessionCancellationTokens;
 
@@ -30,12 +32,16 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
         IBrowserAutomationWebSocketService webSocketService,
         ITestExecutionHistoryRepository testExecutionHistoryRepository,
         IHttpContextAccessor httpContextAccessor,
-        ILogger<BrowserAutomationTestService> logger)
+        ILogger<BrowserAutomationTestService> logger,
+        IPerformanceTracker performanceTracker,
+        INetworkMonitor networkMonitor)
     {
         _webSocketService = webSocketService;
         _testExecutionHistoryRepository = testExecutionHistoryRepository;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
+        _performanceTracker = performanceTracker;
+        _networkMonitor = networkMonitor;
         _activeSessions = new ConcurrentDictionary<string, TestSession>();
         _sessionCancellationTokens = new ConcurrentDictionary<string, CancellationTokenSource>();
     }
@@ -397,6 +403,10 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
                 };
             }
 
+            // Start performance and network monitoring
+            _performanceTracker.Reset();
+            _networkMonitor.Reset();
+
             // Navigate to the test URL
             session.CurrentAction = "Navigating to test URL";
             session.Progress = 10;
@@ -412,11 +422,28 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
                 Timestamp = DateTimeOffset.UtcNow
             });
 
+            // Start tracking navigation performance
+            _performanceTracker.StartNavigationTracking();
+            _networkMonitor.StartMonitoring(page);
+
             await page.GotoAsync(session.TestUrl, new PageGotoOptions
             {
                 Timeout = session.Options.NavigationTimeoutMs,
-                WaitUntil = WaitUntilState.NetworkIdle
+                WaitUntil = WaitUntilState.DOMContentLoaded
             });
+
+            // Record DOM content loaded
+            _performanceTracker.RecordDomContentLoaded();
+
+            // Wait for network idle to complete full page load
+            await page.WaitForLoadStateAsync(LoadState.NetworkIdle, new PageWaitForLoadStateOptions
+            {
+                Timeout = session.Options.NavigationTimeoutMs
+            });
+
+            // Record network idle and page load completion
+            _performanceTracker.RecordPageLoad();
+            _performanceTracker.RecordNetworkIdle();
 
             // Wait for initial page load if specified
             if (session.Profile.WaitTimeMs.HasValue && session.Profile.WaitTimeMs > 0)
@@ -460,12 +487,20 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
             }
 
             // Capture final screenshot
+            // Capture final screenshot
             var finalScreenshotBytes = await page.ScreenshotAsync(new PageScreenshotOptions
             {
                 Type = ScreenshotType.Png,
                 FullPage = false
             });
             var finalScreenshot = Convert.ToBase64String(finalScreenshotBytes);
+
+            // Stop performance tracking and collect metrics
+            _performanceTracker.StopNavigationTracking();
+            _networkMonitor.StopMonitoring();
+            
+            var navigationMetrics = _performanceTracker.GetNavigationMetrics();
+            var networkMetrics = _networkMonitor.GetNetworkMetrics();
 
             stopwatch.Stop();
 
@@ -496,13 +531,13 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
                 Metrics = new ExecutionMetricsDto
                 {
                     TotalDuration = (int)stopwatch.ElapsedMilliseconds,
-                    NavigationTime = 2000, // TODO: Track actual navigation time
-                    ActionsTime = (int)stopwatch.ElapsedMilliseconds - 2000,
-                    NetworkRequestCount = 0, // TODO: Track network requests
-                    NetworkBytesReceived = 0,
-                    NetworkBytesSent = 0,
+                    NavigationTime = navigationMetrics.TotalNavigationTimeMs,
+                    ActionsTime = (int)stopwatch.ElapsedMilliseconds - navigationMetrics.TotalNavigationTimeMs,
+                    NetworkRequestCount = networkMetrics.RequestCount,
+                    NetworkBytesReceived = networkMetrics.BytesReceived,
+                    NetworkBytesSent = networkMetrics.BytesSent,
                     MemoryUsage = GC.GetTotalMemory(false),
-                    CpuUsage = 0.0
+                    CpuUsage = 0.0 // CPU usage tracking requires more complex implementation
                 }
             };
 
@@ -557,6 +592,16 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
         }
         finally
         {
+            // Cleanup monitoring
+            if (_performanceTracker.IsTracking)
+            {
+                _performanceTracker.StopNavigationTracking();
+            }
+            if (_networkMonitor.IsMonitoring)
+            {
+                _networkMonitor.StopMonitoring();
+            }
+
             if (page != null)
             {
                 await page.CloseAsync();

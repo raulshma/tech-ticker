@@ -6,6 +6,7 @@ using Xunit;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Application.DTOs;
 using TechTicker.ScrapingWorker.Services;
+using TechTicker.ScrapingWorker.Services.Interfaces;
 using TechTicker.Shared.Utilities;
 using TechTicker.Shared.Utilities.Html;
 using Microsoft.Extensions.Caching.Memory;
@@ -34,6 +35,7 @@ public class WebScrapingServiceTests : IDisposable
         var mockOptions = new Mock<Microsoft.Extensions.Options.IOptions<ProxyPoolConfiguration>>();
         mockOptions.Setup(o => o.Value).Returns(new ProxyPoolConfiguration());
         var mockHttpClientFactory = new Mock<IHttpClientFactory>();
+        var mockRetryPolicyService = new Mock<IRetryPolicyService>();
         var mockConfiguration = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
         mockConfiguration.Setup(x => x["AiConfiguration:EncryptionKey"]).Returns("test-encryption-key-32-chars-long");
 
@@ -42,6 +44,7 @@ public class WebScrapingServiceTests : IDisposable
             mockProxyLogger.Object,
             mockOptions.Object,
             mockHttpClientFactory.Object,
+            mockRetryPolicyService.Object,
             mockConfiguration.Object
         );
 

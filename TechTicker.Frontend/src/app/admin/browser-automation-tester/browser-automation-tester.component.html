@@ -425,6 +425,119 @@
 
             <mat-tab>
               <ng-template mat-tab-label>
+                <mat-icon>template</mat-icon>
+                Action Templates
+                <mat-chip *ngIf="actionTemplatesCount > 0" class="tab-badge">{{actionTemplatesCount}}</mat-chip>
+              </ng-template>
+              <div class="tab-content">
+                <div class="action-templates-section">
+                  <div class="templates-header">
+                    <div class="templates-info">
+                      <h4 class="mat-title-medium">Action Templates</h4>
+                      <p class="mat-body-medium">Save and reuse browser automation action sequences</p>
+                    </div>
+                    <div class="templates-actions">
+                      <button matButton="elevated" 
+                              color="primary" 
+                              (click)="openActionTemplates()"
+                              class="manage-templates-button">
+                        <mat-icon>template</mat-icon>
+                        Manage Templates
+                      </button>
+                      <button matButton="elevated" 
+                              (click)="saveCurrentActionsAsTemplate()"
+                              [disabled]="currentActions.length === 0"
+                              class="save-template-button">
+                        <mat-icon>save</mat-icon>
+                        Save Current Actions
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Current Actions Display -->
+                  <div class="current-actions-section">
+                    <div class="section-header">
+                      <h5 class="mat-title-small">Current Actions ({{currentActions.length}})</h5>
+                      <button matButton="text" 
+                              (click)="clearActions()"
+                              [disabled]="currentActions.length === 0"
+                              color="warn">
+                        <mat-icon>clear_all</mat-icon>
+                        Clear All
+                      </button>
+                    </div>
+
+                    <div class="actions-list" *ngIf="currentActions.length > 0">
+                      <div class="action-item" *ngFor="let action of currentActions; let i = index">
+                        <mat-card appearance="outlined" class="action-card">
+                          <mat-card-content>
+                            <div class="action-header">
+                              <div class="action-number">
+                                <span class="action-index">{{i + 1}}</span>
+                              </div>
+                              <button matIconButton 
+                                      (click)="removeAction(i)"
+                                      color="warn"
+                                      class="remove-action-button">
+                                <mat-icon>delete</mat-icon>
+                              </button>
+                            </div>
+                            <div class="action-content">
+                              <div class="action-type">
+                                <mat-icon>{{getActionIcon(action.actionType)}}</mat-icon>
+                                <span class="action-type-label">{{action.actionType}}</span>
+                              </div>
+                              <div class="action-details" *ngIf="action.selector || action.value">
+                                <div class="detail-item" *ngIf="action.selector">
+                                  <span class="detail-label">Selector:</span>
+                                  <span class="detail-value">{{action.selector}}</span>
+                                </div>
+                                <div class="detail-item" *ngIf="action.value">
+                                  <span class="detail-label">Value:</span>
+                                  <span class="detail-value">{{action.value}}</span>
+                                </div>
+                              </div>
+                              <div class="action-options" *ngIf="action.repeat || action.delayMs">
+                                <div class="option-item" *ngIf="action.repeat && action.repeat > 1">
+                                  <mat-icon>repeat</mat-icon>
+                                  <span>{{action.repeat}}x</span>
+                                </div>
+                                <div class="option-item" *ngIf="action.delayMs">
+                                  <mat-icon>schedule</mat-icon>
+                                  <span>{{action.delayMs}}ms</span>
+                                </div>
+                              </div>
+                            </div>
+                          </mat-card-content>
+                        </mat-card>
+                      </div>
+                    </div>
+
+                    <div class="no-actions" *ngIf="currentActions.length === 0">
+                      <mat-icon class="empty-icon">playlist_add</mat-icon>
+                      <h4 class="mat-headline-medium">No actions defined</h4>
+                      <p class="mat-body-large">Add actions to create an automation sequence, or load a template to get started.</p>
+                                           <div class="action-buttons">
+                       <button matButton="elevated" 
+                               color="primary" 
+                               (click)="openActionTemplates()">
+                         <mat-icon>template</mat-icon>
+                         Load Template
+                       </button>
+                       <button matButton="elevated" 
+                               (click)="addQuickAction()">
+                         <mat-icon>add</mat-icon>
+                         Quick Add Action
+                       </button>
+                     </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-tab>
+
+            <mat-tab>
+              <ng-template mat-tab-label>
                 <mat-icon>history</mat-icon>
                 History
               </ng-template>

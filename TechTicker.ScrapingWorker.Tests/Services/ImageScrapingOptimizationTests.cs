@@ -11,6 +11,7 @@ using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
 using TechTicker.Domain.Entities;
 using TechTicker.ScrapingWorker.Services;
+using TechTicker.ScrapingWorker.Services.Interfaces;
 
 namespace TechTicker.ScrapingWorker.Tests.Services;
 
@@ -49,11 +50,14 @@ public class ImageScrapingOptimizationTests
         var mockHttpClient = new Mock<HttpClient>();
         _mockHttpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(mockHttpClient.Object);
         
+        var mockRetryPolicyService = new Mock<IRetryPolicyService>();
+        
         _proxyHttpClient = new ProxyAwareHttpClientService(
             _mockProxyPoolService.Object,
             _mockProxyLogger.Object,
             Microsoft.Extensions.Options.Options.Create(config),
             _mockHttpClientFactory.Object,
+            mockRetryPolicyService.Object,
             mockConfiguration.Object);
         
         _imageScrapingService = new ImageScrapingService(

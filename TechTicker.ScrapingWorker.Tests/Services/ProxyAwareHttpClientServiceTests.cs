@@ -6,6 +6,7 @@ using TechTicker.Application.Configuration;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Domain.Entities;
 using TechTicker.ScrapingWorker.Services;
+using TechTicker.ScrapingWorker.Services.Interfaces;
 
 namespace TechTicker.ScrapingWorker.Tests.Services;
 
@@ -17,6 +18,7 @@ public class ProxyAwareHttpClientServiceTests
     private readonly Mock<IProxyPoolService> _mockProxyPoolService;
     private readonly Mock<ILogger<ProxyAwareHttpClientService>> _mockLogger;
     private readonly Mock<IHttpClientFactory> _mockHttpClientFactory;
+    private readonly Mock<IRetryPolicyService> _mockRetryPolicyService;
     private readonly Mock<IConfiguration> _mockConfiguration;
     private readonly ProxyPoolConfiguration _config;
     private readonly ProxyAwareHttpClientService _service;
@@ -26,6 +28,7 @@ public class ProxyAwareHttpClientServiceTests
         _mockProxyPoolService = new Mock<IProxyPoolService>();
         _mockLogger = new Mock<ILogger<ProxyAwareHttpClientService>>();
         _mockHttpClientFactory = new Mock<IHttpClientFactory>();
+        _mockRetryPolicyService = new Mock<IRetryPolicyService>();
         _mockConfiguration = new Mock<IConfiguration>();
         _config = new ProxyPoolConfiguration
         {
@@ -47,6 +50,7 @@ public class ProxyAwareHttpClientServiceTests
             _mockLogger.Object,
             Options.Create(_config),
             _mockHttpClientFactory.Object,
+            _mockRetryPolicyService.Object,
             _mockConfiguration.Object);
     }
 

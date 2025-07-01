@@ -152,6 +152,8 @@ builder.Services.AddHttpClient<GoogleGeminiAiProvider>();
 // Add browser automation testing services
 builder.Services.AddScoped<IBrowserAutomationTestService, BrowserAutomationTestService>();
 builder.Services.AddScoped<ITestResultsManagementService, TestResultsManagementService>();
+builder.Services.AddScoped<IPerformanceTracker, PerformanceTracker>();
+builder.Services.AddScoped<INetworkMonitor, NetworkMonitor>();
 
 // Add Browser Automation Test Repositories (Phase 4: Database Integration)
 builder.Services.AddScoped<ISavedTestResultRepository, SavedTestResultRepository>();
