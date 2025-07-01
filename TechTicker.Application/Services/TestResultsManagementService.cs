@@ -54,6 +54,10 @@ public class TestResultsManagementService : ITestResultsManagementService
 
             var testResults = testResultsResult.Data;
 
+            // Get session details to extract test URL and other information
+            var sessionDetailsResult = await _testService.GetTestSessionDetailsAsync(sessionId, cancellationToken);
+            var sessionDetails = sessionDetailsResult.IsSuccess ? sessionDetailsResult.Data : null;
+
             // Get additional session details
             var sessionStatusResult = await _testService.GetTestSessionStatusAsync(sessionId, cancellationToken);
             var sessionStatus = sessionStatusResult.Data;
@@ -66,7 +70,7 @@ public class TestResultsManagementService : ITestResultsManagementService
             {
                 Name = name,
                 Description = description,
-                TestUrl = "Unknown", // TODO: Get actual test URL from session
+                TestUrl = sessionDetails?.TestUrl ?? "Unknown",
                 Success = testResults.Success,
                 ExecutedAt = testResults.StartedAt.DateTime,
                 Duration = testResults.Duration,
@@ -75,13 +79,13 @@ public class TestResultsManagementService : ITestResultsManagementService
                 ProfileHash = profileHash,
                 CreatedBy = Guid.NewGuid(), // TODO: Get current user ID
                 TestResultJson = JsonSerializer.Serialize(testResults),
-                ProfileJson = JsonSerializer.Serialize(new BrowserAutomationProfileDto()), // TODO: Get actual profile
-                OptionsJson = JsonSerializer.Serialize(new BrowserTestOptionsDto()), // TODO: Get actual options
+                ProfileJson = JsonSerializer.Serialize(sessionDetails?.Profile ?? new BrowserAutomationProfileDto()),
+                OptionsJson = JsonSerializer.Serialize(sessionDetails?.Options ?? new BrowserTestOptionsDto()),
                 MetadataJson = JsonSerializer.Serialize(new Dictionary<string, object>
                 {
                     { "sessionId", sessionId },
-                    { "browserEngine", "chromium" }, // TODO: Get from options
-                    { "deviceType", "desktop" }, // TODO: Get from options
+                    { "browserEngine", sessionDetails?.Profile?.PreferredBrowser ?? "chromium" },
+                    { "deviceType", sessionDetails?.Options?.DeviceEmulation ?? "desktop" },
                     { "savedBy", "System" }
                 }),
                 ScreenshotsData = testResults.Screenshots != null ? 

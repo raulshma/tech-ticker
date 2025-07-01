@@ -49,6 +49,16 @@ public interface IBrowserAutomationTestService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Get test session details by session ID
+    /// </summary>
+    /// <param name="sessionId">Session ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Test session details</returns>
+    Task<Result<BrowserTestSessionDto?>> GetTestSessionDetailsAsync(
+        string sessionId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Get current screenshot for a test session
     /// </summary>
     /// <param name="sessionId">Session ID</param>
@@ -128,4 +138,4 @@ public interface IBrowserAutomationWebSocketService
     /// <param name="error">Error information</param>
     /// <returns>Task</returns>
     Task BroadcastErrorAsync(string sessionId, TestErrorDto error);
-} 
+}

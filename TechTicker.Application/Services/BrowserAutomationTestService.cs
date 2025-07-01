@@ -184,6 +184,41 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
         }
     }
 
+    public Task<Result<BrowserTestSessionDto?>> GetTestSessionDetailsAsync(
+        string sessionId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (_activeSessions.TryGetValue(sessionId, out var session))
+            {
+                var sessionDto = new BrowserTestSessionDto
+                {
+                    Id = session.Id,
+                    TestUrl = session.TestUrl,
+                    Profile = session.Profile,
+                    Options = session.Options,
+                    Status = session.Status,
+                    StartedAt = session.StartedAt,
+                    CompletedAt = session.CompletedAt,
+                    SessionName = session.SessionName,
+                    WebSocketUrl = $"/hubs/browser-automation-test?sessionId={session.Id}"
+                };
+
+                return Task.FromResult(Result<BrowserTestSessionDto?>.Success(sessionDto));
+            }
+
+            return Task.FromResult(Result<BrowserTestSessionDto?>.Success(null));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting test session details {SessionId}", sessionId);
+            return Task.FromResult(Result<BrowserTestSessionDto?>.Failure(
+                "Failed to get test session details", 
+                "TEST_SESSION_DETAILS_ERROR"));
+        }
+    }
+
     public Task<Result<string>> GetTestSessionScreenshotAsync(
         string sessionId,
         CancellationToken cancellationToken = default)
@@ -427,10 +462,13 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
             session.Result = new BrowserAutomationTestResultDto
             {
                 SessionId = session.Id,
+                TestUrl = session.TestUrl,
                 Success = true,
                 StartedAt = session.StartedAt,
                 CompletedAt = DateTimeOffset.UtcNow,
                 Duration = (int)stopwatch.ElapsedMilliseconds,
+                Profile = session.Profile,
+                Options = session.Options,
                 ActionsExecuted = session.Profile.Actions?.Count ?? 0,
                 FinalScreenshot = finalScreenshot,
                 Screenshots = new List<ScreenshotCaptureDto>
@@ -479,10 +517,13 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
             session.Result = new BrowserAutomationTestResultDto
             {
                 SessionId = session.Id,
+                TestUrl = session.TestUrl,
                 Success = false,
                 StartedAt = session.StartedAt,
                 CompletedAt = DateTimeOffset.UtcNow,
                 Duration = (int)stopwatch.ElapsedMilliseconds,
+                Profile = session.Profile,
+                Options = session.Options,
                 Errors = new List<TestErrorDto>
                 {
                     new()
@@ -606,6 +647,19 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
         {
             switch (action.ActionType.ToLower())
             {
+                case "navigate":
+                case "goto":
+                case "url":
+                    if (!string.IsNullOrEmpty(action.Value))
+                    {
+                        await page.GotoAsync(action.Value, new PageGotoOptions
+                        {
+                            Timeout = options.NavigationTimeoutMs,
+                            WaitUntil = WaitUntilState.NetworkIdle
+                        });
+                    }
+                    break;
+
                 case "scroll":
                     await page.EvaluateAsync("window.scrollBy(0, window.innerHeight);");
                     break;
@@ -932,7 +986,7 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
 
                 default:
                     throw new NotSupportedException($"Action type '{action.ActionType}' is not supported. " +
-                        $"Supported actions: navigate, click, doubleclick, rightclick, type, focus, blur, clear, " +
+                        $"Supported actions: navigate, goto, url, click, doubleclick, rightclick, type, focus, blur, clear, " +
                         $"hover, scroll, wait, press, upload, drag, screenshot, evaluate, selectoption, setvalue, " +
                         $"reload, goback, goforward, maximize, minimize, fullscreen, switchframe, alert, " +
                         $"acceptalert, dismissalert, getcookies, setcookies, deletecookies, waitfornavigation, " +
@@ -971,4 +1025,4 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
         public string? CurrentScreenshot { get; set; }
         public BrowserAutomationTestResultDto? Result { get; set; }
     }
-} 
+}

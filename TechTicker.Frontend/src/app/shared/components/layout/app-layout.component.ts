@@ -20,6 +20,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   currentUser: CurrentUser | null = null;
   private destroy$ = new Subject<void>();
   isMobile: boolean = false;
+  isSidebarOpen: boolean = true; // Track sidebar state for desktop
   
   // Track expanded sections for collapsible navigation
   expandedSections: { [key: string]: boolean } = {
@@ -45,6 +46,14 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       .subscribe((user) => {
         this.currentUser = user;
       });
+    
+    // Load sidebar state from localStorage (desktop only)
+    if (!this.isMobile) {
+      const savedState = localStorage.getItem('sidebarOpen');
+      if (savedState !== null) {
+        this.isSidebarOpen = savedState === 'true';
+      }
+    }
     
     // Close sidebar on mobile when navigating
     this.router.events
@@ -96,6 +105,11 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       if (this.isMobile && this.drawer) {
         this.drawer.close();
       }
+      
+      // Reset sidebar state when switching to desktop
+      if (!this.isMobile) {
+        this.isSidebarOpen = true;
+      }
     }
   }
 
@@ -105,7 +119,20 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
 
   toggleSidenav(): void {
     if (this.drawer) {
-      this.drawer.toggle();
+      if (this.isMobile) {
+        // On mobile, just toggle the drawer
+        this.drawer.toggle();
+      } else {
+        // On desktop, track the state and toggle
+        this.isSidebarOpen = !this.isSidebarOpen;
+        // Save state to localStorage
+        localStorage.setItem('sidebarOpen', this.isSidebarOpen.toString());
+        if (this.isSidebarOpen) {
+          this.drawer.open();
+        } else {
+          this.drawer.close();
+        }
+      }
     }
   }
 
@@ -125,6 +152,11 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       } else {
         document.body.style.overflow = '';
       }
+    } else {
+      // Update desktop sidebar state
+      this.isSidebarOpen = isOpen;
+      // Save state to localStorage
+      localStorage.setItem('sidebarOpen', this.isSidebarOpen.toString());
     }
   }
 

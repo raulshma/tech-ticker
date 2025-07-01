@@ -774,6 +774,17 @@ mat-sidenav-content {
   position: relative;
 }
 
+// Desktop sidebar transitions
+:host ::ng-deep .mat-drawer-container {
+  .mat-drawer-side {
+    transition: transform 300ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  
+  .mat-drawer-content {
+    transition: margin-left 300ms cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
 // Menu Button Styling
 .menu-button {
   margin-right: 12px;
@@ -783,12 +794,24 @@ mat-sidenav-content {
   transition: all 250ms cubic-bezier(0.2, 0, 0, 1);
   
   &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--mat-sys-color-secondary-container);
     transform: scale(1.05);
   }
   
   mat-icon {
-    color: var(--mat-sys-color-on-primary);
+    color: var(--mat-sys-color-on-surface);
+    transition: transform 250ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  
+  // Desktop specific styling
+  @media (min-width: 769px) {
+    &:hover {
+      background-color: var(--mat-sys-color-secondary-container);
+      
+      mat-icon {
+        transform: scale(1.1);
+      }
+    }
   }
 }
 

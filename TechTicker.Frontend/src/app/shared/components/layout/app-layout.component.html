@@ -4,7 +4,7 @@
                class="sidenav modern-sidenav" 
                fixedInViewport="true" 
                [mode]="isMobile ? 'over' : 'side'" 
-               [opened]="!isMobile" 
+               [opened]="isMobile ? false : isSidebarOpen" 
                [disableClose]="!isMobile"
                (backdropClick)="closeSidenavOnMobile()"
                (openedChange)="onSidenavStateChange($event)">
@@ -317,9 +317,10 @@
           <button matIconButton 
                   class="menu-button"
                   (click)="toggleSidenav()"
-                  *ngIf="isMobile"
-                  [attr.aria-label]="'Toggle navigation menu'">
-            <mat-icon>menu</mat-icon>
+                  [attr.aria-label]="'Toggle navigation menu'"
+                  [matTooltip]="isMobile ? 'Toggle navigation menu' : (isSidebarOpen ? 'Hide sidebar' : 'Show sidebar')"
+                  matTooltipPosition="below">
+            <mat-icon>{{ isMobile ? 'menu' : (isSidebarOpen ? 'menu_open' : 'menu') }}</mat-icon>
           </button>
           <!-- <span class="toolbar-title">TechTicker</span> -->
         </div>

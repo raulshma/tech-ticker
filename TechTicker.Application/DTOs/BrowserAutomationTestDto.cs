@@ -47,10 +47,15 @@ public class BrowserTestOptionsDto
 public class BrowserAutomationTestResultDto
 {
     public string SessionId { get; set; } = null!;
+    public string TestUrl { get; set; } = null!;
     public bool Success { get; set; }
     public DateTimeOffset StartedAt { get; set; }
     public DateTimeOffset? CompletedAt { get; set; }
     public int Duration { get; set; } // milliseconds
+
+    // Test configuration
+    public BrowserAutomationProfileDto? Profile { get; set; }
+    public BrowserTestOptionsDto? Options { get; set; }
 
     // Execution details
     public int ActionsExecuted { get; set; }
@@ -221,4 +226,4 @@ public class TestSessionStatusDto
     public int Progress { get; set; }
     public string CurrentAction { get; set; } = null!;
     public DateTimeOffset LastUpdated { get; set; }
-} 
+}
