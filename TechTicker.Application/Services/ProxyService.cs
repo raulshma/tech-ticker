@@ -7,6 +7,7 @@ using TechTicker.DataAccess.Repositories.Interfaces;
 using TechTicker.Domain.Entities;
 using TechTicker.Shared.Common;
 using TechTicker.Shared.Utilities;
+using Microsoft.Extensions.Configuration;
 
 namespace TechTicker.Application.Services;
 
@@ -18,6 +19,8 @@ public class ProxyService : IProxyService
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<ProxyService> _logger;
     private readonly HttpClient _httpClient;
+    private readonly IConfiguration _configuration;
+    private readonly string _encryptionKey;
 
     // Regex patterns for parsing proxy strings
     private static readonly Regex ProxyRegex = new(
@@ -28,11 +31,13 @@ public class ProxyService : IProxyService
         @"^(?<host>[^:]+):(?<port>\d+)(?::(?<username>[^:]+):(?<password>.+))?$",
         RegexOptions.Compiled);
 
-    public ProxyService(IUnitOfWork unitOfWork, ILogger<ProxyService> logger, HttpClient httpClient)
+    public ProxyService(IUnitOfWork unitOfWork, ILogger<ProxyService> logger, HttpClient httpClient, IConfiguration configuration)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _httpClient = httpClient;
+        _configuration = configuration;
+        _encryptionKey = _configuration["AiConfiguration:EncryptionKey"] ?? throw new InvalidOperationException("Encryption key not found in configuration");
     }
 
     public async Task<Result<IEnumerable<ProxyConfigurationDto>>> GetAllProxiesAsync()
@@ -132,7 +137,7 @@ public class ProxyService : IProxyService
                 Port = createDto.Port,
                 ProxyType = createDto.ProxyType.ToUpper(),
                 Username = createDto.Username,
-                Password = createDto.Password, // TODO: Encrypt password
+                Password = !string.IsNullOrEmpty(createDto.Password) ? EncryptionUtilities.EncryptString(createDto.Password, _encryptionKey) : null,
                 Description = createDto.Description,
                 TimeoutSeconds = createDto.TimeoutSeconds,
                 MaxRetries = createDto.MaxRetries,
@@ -179,7 +184,7 @@ public class ProxyService : IProxyService
             proxy.Username = updateDto.Username;
             if (!string.IsNullOrEmpty(updateDto.Password))
             {
-                proxy.Password = updateDto.Password; // TODO: Encrypt password
+                proxy.Password = EncryptionUtilities.EncryptString(updateDto.Password, _encryptionKey);
             }
             proxy.Description = updateDto.Description;
             proxy.TimeoutSeconds = updateDto.TimeoutSeconds;
@@ -625,7 +630,10 @@ public class ProxyService : IProxyService
                         {
                             proxy.ProxyType = proxyItem.ProxyType.ToUpper();
                             proxy.Username = proxyItem.Username;
-                            proxy.Password = proxyItem.Password;
+                            if (!string.IsNullOrEmpty(proxyItem.Password))
+                            {
+                                proxy.Password = EncryptionUtilities.EncryptString(proxyItem.Password, _encryptionKey);
+                            }
                             proxy.Description = proxyItem.Description;
                             proxy.TimeoutSeconds = proxyItem.TimeoutSeconds;
                             proxy.MaxRetries = proxyItem.MaxRetries;
@@ -643,7 +651,7 @@ public class ProxyService : IProxyService
                             Port = proxyItem.Port,
                             ProxyType = proxyItem.ProxyType.ToUpper(),
                             Username = proxyItem.Username,
-                            Password = proxyItem.Password,
+                            Password = !string.IsNullOrEmpty(proxyItem.Password) ? EncryptionUtilities.EncryptString(proxyItem.Password, _encryptionKey) : null,
                             Description = proxyItem.Description,
                             TimeoutSeconds = proxyItem.TimeoutSeconds,
                             MaxRetries = proxyItem.MaxRetries,
@@ -708,9 +716,10 @@ public class ProxyService : IProxyService
                 // .NET 6+ native SOCKS5 support
                 var socksProxy = new WebProxy($"socks5://{proxy.Host}:{proxy.Port}");
 
-                if (!string.IsNullOrEmpty(proxy.Username))
+                if (!string.IsNullOrEmpty(proxy.Username) && !string.IsNullOrEmpty(proxy.Password))
                 {
-                    socksProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                    var decryptedPassword = EncryptionUtilities.DecryptString(proxy.Password, _encryptionKey);
+                    socksProxy.Credentials = new NetworkCredential(proxy.Username, decryptedPassword);
                 }
 
                 handler.Proxy = socksProxy;
@@ -721,9 +730,10 @@ public class ProxyService : IProxyService
                 // .NET 6+ native SOCKS4 support
                 var socksProxy = new WebProxy($"socks4://{proxy.Host}:{proxy.Port}");
 
-                if (!string.IsNullOrEmpty(proxy.Username))
+                if (!string.IsNullOrEmpty(proxy.Username) && !string.IsNullOrEmpty(proxy.Password))
                 {
-                    socksProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                    var decryptedPassword = EncryptionUtilities.DecryptString(proxy.Password, _encryptionKey);
+                    socksProxy.Credentials = new NetworkCredential(proxy.Username, decryptedPassword);
                 }
 
                 handler.Proxy = socksProxy;
@@ -736,9 +746,10 @@ public class ProxyService : IProxyService
                 var proxyUri = new Uri($"http://{proxy.Host}:{proxy.Port}");
                 var webProxy = new WebProxy(proxyUri);
 
-                if (!string.IsNullOrEmpty(proxy.Username))
+                if (!string.IsNullOrEmpty(proxy.Username) && !string.IsNullOrEmpty(proxy.Password))
                 {
-                    webProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                    var decryptedPassword = EncryptionUtilities.DecryptString(proxy.Password, _encryptionKey);
+                    webProxy.Credentials = new NetworkCredential(proxy.Username, decryptedPassword);
                 }
 
                 handler.Proxy = webProxy;
@@ -868,7 +879,7 @@ public class ProxyService : IProxyService
         };
     }
 
-    private static ProxyConfigurationDto MapToDto(ProxyConfiguration proxy)
+    private ProxyConfigurationDto MapToDto(ProxyConfiguration proxy)
     {
         return new ProxyConfigurationDto
         {
@@ -879,7 +890,11 @@ public class ProxyService : IProxyService
             Username = proxy.Username,
             HasPassword = !string.IsNullOrEmpty(proxy.Password),
             Description = proxy.Description,
+            TimeoutSeconds = proxy.TimeoutSeconds,
+            MaxRetries = proxy.MaxRetries,
             IsActive = proxy.IsActive,
+            CreatedAt = proxy.CreatedAt,
+            UpdatedAt = proxy.UpdatedAt,
             IsHealthy = proxy.IsHealthy,
             LastTestedAt = proxy.LastTestedAt,
             LastUsedAt = proxy.LastUsedAt,
@@ -888,12 +903,8 @@ public class ProxyService : IProxyService
             SuccessfulRequests = proxy.SuccessfulRequests,
             FailedRequests = proxy.FailedRequests,
             ConsecutiveFailures = proxy.ConsecutiveFailures,
-            TimeoutSeconds = proxy.TimeoutSeconds,
-            MaxRetries = proxy.MaxRetries,
             LastErrorMessage = proxy.LastErrorMessage,
             LastErrorCode = proxy.LastErrorCode,
-            CreatedAt = proxy.CreatedAt,
-            UpdatedAt = proxy.UpdatedAt,
             DisplayName = proxy.DisplayName,
             RequiresAuthentication = proxy.RequiresAuthentication,
             IsReliable = proxy.IsReliable,

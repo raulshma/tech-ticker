@@ -43,6 +43,9 @@ public class ImageScrapingOptimizationTests
             RetryDelayMs = 1000
         };
         
+        var mockConfiguration = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
+        mockConfiguration.Setup(x => x["AiConfiguration:EncryptionKey"]).Returns("test-encryption-key-32-chars-long");
+        
         var mockHttpClient = new Mock<HttpClient>();
         _mockHttpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(mockHttpClient.Object);
         
@@ -50,7 +53,8 @@ public class ImageScrapingOptimizationTests
             _mockProxyPoolService.Object,
             _mockProxyLogger.Object,
             Microsoft.Extensions.Options.Options.Create(config),
-            _mockHttpClientFactory.Object);
+            _mockHttpClientFactory.Object,
+            mockConfiguration.Object);
         
         _imageScrapingService = new ImageScrapingService(
             _mockLogger.Object,

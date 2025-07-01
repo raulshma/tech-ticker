@@ -1,10 +1,12 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Net;
 using TechTicker.Application.Configuration;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Domain.Entities;
+using TechTicker.Shared.Utilities;
 
 namespace TechTicker.ScrapingWorker.Services;
 
@@ -18,6 +20,7 @@ public class ProxyAwareHttpClientService
     private readonly ILogger<ProxyAwareHttpClientService> _logger;
     private readonly ProxyPoolConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly string _encryptionKey;
 
     // Supported proxy types
     private static readonly string[] SupportedProxyTypes = { "HTTP", "HTTPS", "SOCKS4", "SOCKS5" };
@@ -26,12 +29,14 @@ public class ProxyAwareHttpClientService
         IProxyPoolService proxyPoolService,
         ILogger<ProxyAwareHttpClientService> logger,
         IOptions<ProxyPoolConfiguration> config,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        IConfiguration configuration)
     {
         _proxyPoolService = proxyPoolService;
         _logger = logger;
         _config = config.Value;
         _httpClientFactory = httpClientFactory;
+        _encryptionKey = configuration["AiConfiguration:EncryptionKey"] ?? throw new InvalidOperationException("Encryption key not found in configuration");
     }
 
     /// <summary>
@@ -324,9 +329,10 @@ public class ProxyAwareHttpClientService
                 // .NET 6+ native SOCKS5 support
                 var socksProxy = new WebProxy($"socks5://{proxy.Host}:{proxy.Port}");
 
-                if (!string.IsNullOrEmpty(proxy.Username))
+                if (!string.IsNullOrEmpty(proxy.Username) && !string.IsNullOrEmpty(proxy.Password))
                 {
-                    socksProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                    var decryptedPassword = EncryptionUtilities.DecryptString(proxy.Password, _encryptionKey);
+                    socksProxy.Credentials = new NetworkCredential(proxy.Username, decryptedPassword);
                 }
 
                 handler.Proxy = socksProxy;
@@ -339,9 +345,10 @@ public class ProxyAwareHttpClientService
                 // .NET 6+ native SOCKS4 support
                 var socksProxy = new WebProxy($"socks4://{proxy.Host}:{proxy.Port}");
 
-                if (!string.IsNullOrEmpty(proxy.Username))
+                if (!string.IsNullOrEmpty(proxy.Username) && !string.IsNullOrEmpty(proxy.Password))
                 {
-                    socksProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                    var decryptedPassword = EncryptionUtilities.DecryptString(proxy.Password, _encryptionKey);
+                    socksProxy.Credentials = new NetworkCredential(proxy.Username, decryptedPassword);
                 }
 
                 handler.Proxy = socksProxy;
@@ -355,9 +362,10 @@ public class ProxyAwareHttpClientService
                 var proxyUri = new Uri($"https://{proxy.Host}:{proxy.Port}");
                 var webProxy = new WebProxy(proxyUri);
 
-                if (!string.IsNullOrEmpty(proxy.Username))
+                if (!string.IsNullOrEmpty(proxy.Username) && !string.IsNullOrEmpty(proxy.Password))
                 {
-                    webProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                    var decryptedPassword = EncryptionUtilities.DecryptString(proxy.Password, _encryptionKey);
+                    webProxy.Credentials = new NetworkCredential(proxy.Username, decryptedPassword);
                 }
 
                 handler.Proxy = webProxy;
@@ -382,9 +390,10 @@ public class ProxyAwareHttpClientService
                 var proxyUri = new Uri($"http://{proxy.Host}:{proxy.Port}");
                 var webProxy = new WebProxy(proxyUri);
 
-                if (!string.IsNullOrEmpty(proxy.Username))
+                if (!string.IsNullOrEmpty(proxy.Username) && !string.IsNullOrEmpty(proxy.Password))
                 {
-                    webProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                    var decryptedPassword = EncryptionUtilities.DecryptString(proxy.Password, _encryptionKey);
+                    webProxy.Credentials = new NetworkCredential(proxy.Username, decryptedPassword);
                 }
 
                 handler.Proxy = webProxy;
@@ -402,9 +411,10 @@ public class ProxyAwareHttpClientService
                 var proxyUri = new Uri($"http://{proxy.Host}:{proxy.Port}");
                 var webProxy = new WebProxy(proxyUri);
 
-                if (!string.IsNullOrEmpty(proxy.Username))
+                if (!string.IsNullOrEmpty(proxy.Username) && !string.IsNullOrEmpty(proxy.Password))
                 {
-                    webProxy.Credentials = new NetworkCredential(proxy.Username, proxy.Password);
+                    var decryptedPassword = EncryptionUtilities.DecryptString(proxy.Password, _encryptionKey);
+                    webProxy.Credentials = new NetworkCredential(proxy.Username, decryptedPassword);
                 }
 
                 handler.Proxy = webProxy;

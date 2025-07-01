@@ -29,12 +29,15 @@ public class WebScrapingServiceTests : IDisposable
         var mockOptions = new Mock<Microsoft.Extensions.Options.IOptions<ProxyPoolConfiguration>>();
         mockOptions.Setup(o => o.Value).Returns(new ProxyPoolConfiguration());
         var mockHttpClientFactory = new Mock<IHttpClientFactory>();
+        var mockConfiguration = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
+        mockConfiguration.Setup(x => x["AiConfiguration:EncryptionKey"]).Returns("test-encryption-key-32-chars-long");
 
         _proxyHttpClientService = new ProxyAwareHttpClientService(
             mockProxyPoolService.Object,
             mockProxyLogger.Object,
             mockOptions.Object,
-            mockHttpClientFactory.Object
+            mockHttpClientFactory.Object,
+            mockConfiguration.Object
         );
 
         // Setup default mock responses

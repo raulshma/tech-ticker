@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using TechTicker.Application.Configuration;
 using TechTicker.Application.Services.Interfaces;
@@ -16,6 +17,7 @@ public class ProxyAwareHttpClientServiceTests
     private readonly Mock<IProxyPoolService> _mockProxyPoolService;
     private readonly Mock<ILogger<ProxyAwareHttpClientService>> _mockLogger;
     private readonly Mock<IHttpClientFactory> _mockHttpClientFactory;
+    private readonly Mock<IConfiguration> _mockConfiguration;
     private readonly ProxyPoolConfiguration _config;
     private readonly ProxyAwareHttpClientService _service;
 
@@ -24,6 +26,7 @@ public class ProxyAwareHttpClientServiceTests
         _mockProxyPoolService = new Mock<IProxyPoolService>();
         _mockLogger = new Mock<ILogger<ProxyAwareHttpClientService>>();
         _mockHttpClientFactory = new Mock<IHttpClientFactory>();
+        _mockConfiguration = new Mock<IConfiguration>();
         _config = new ProxyPoolConfiguration
         {
             Enabled = true,
@@ -31,6 +34,9 @@ public class ProxyAwareHttpClientServiceTests
             MaxRetries = 3,
             RetryDelayMs = 1000
         };
+
+        // Setup configuration mock to return a test encryption key
+        _mockConfiguration.Setup(x => x["AiConfiguration:EncryptionKey"]).Returns("test-encryption-key-32-chars-long");
 
         // Setup mock for CreateClient method - only mock the method that actually exists
         var mockHttpClient = new Mock<HttpClient>();
@@ -40,7 +46,8 @@ public class ProxyAwareHttpClientServiceTests
             _mockProxyPoolService.Object,
             _mockLogger.Object,
             Options.Create(_config),
-            _mockHttpClientFactory.Object);
+            _mockHttpClientFactory.Object,
+            _mockConfiguration.Object);
     }
 
     [Fact]
