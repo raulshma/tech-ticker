@@ -250,4 +250,7 @@ public class FailScraperRunDto
     public string? ProxyUsed { get; set; }
 
     public Guid? ProxyId { get; set; }
+    
+    // Specification error handling
+    public string? SpecificationError { get; set; }
 } 

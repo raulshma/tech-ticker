@@ -12,6 +12,7 @@ using Microsoft.Playwright;
 using Microsoft.Extensions.Caching.Memory;
 using TechTicker.Shared.Utilities.Html;
 using System.Text.Json;
+using TechTicker.DataAccess.Repositories.Interfaces;
 
 namespace TechTicker.ScrapingWorker.Services;
 
@@ -26,6 +27,7 @@ public partial class WebScrapingService
     private readonly IImageScrapingService _imageScrapingService;
     private readonly ITableParser _tableParser;
     private readonly IMemoryCache _cache;
+    private readonly IUnitOfWork _unitOfWork;
 
     [GeneratedRegex(@"[\d,]+\.?\d*")]
     private static partial Regex PriceRegex();
@@ -36,7 +38,8 @@ public partial class WebScrapingService
         IScraperRunLogService scraperRunLogService,
         IImageScrapingService imageScrapingService,
         ITableParser tableParser,
-        IMemoryCache cache)
+        IMemoryCache cache,
+        IUnitOfWork unitOfWork)
     {
         _logger = logger;
         _proxyHttpClient = proxyHttpClient;
@@ -44,6 +47,7 @@ public partial class WebScrapingService
         _imageScrapingService = imageScrapingService;
         _tableParser = tableParser;
         _cache = cache;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<ScrapingResult> ScrapeProductPageAsync(TechTicker.Application.Messages.ScrapeProductPageCommand command)
@@ -211,6 +215,16 @@ public partial class WebScrapingService
 
                     _logger.LogInformation("Specification scraping completed for mapping {MappingId}: {SpecCount} specifications parsed",
                         command.MappingId, specificationResult.Specifications?.Count ?? 0);
+
+                    // Update ProductSellerMapping with specification data if successful
+                    if (specificationResult.IsSuccess)
+                    {
+                        await UpdateProductSellerMappingWithSpecifications(command.MappingId, specificationResult);
+                        if (runId.HasValue)
+                        {
+                            await UpdateRunLogWithSpecifications(runId.Value, specificationResult);
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -297,7 +311,7 @@ public partial class WebScrapingService
                     SpecificationParsingStrategy = specificationResult?.Metadata?.Structure.ToString(),
                     SpecificationQualityScore = specificationResult?.Quality?.OverallScore,
                     SpecificationParsingTime = specificationResult?.ParsingTimeMs,
-                    SpecificationError = specificationResult?.IsSuccess == false ? specificationResult.ErrorMessage : null
+                    SpecificationError = specificationResult?.IsSuccess == true ? null : specificationResult?.ErrorMessage
                 });
             }
 
@@ -693,9 +707,36 @@ public partial class WebScrapingService
         _logger.LogInformation("[BrowserAutomation] Starting Playwright scraping for mapping {MappingId} at URL {Url}",
             command.MappingId, command.ExactProductUrl);
 
-        // Set up Playwright
+        Guid? runId = null;
         try
         {
+            // Create initial run log entry
+            var createLogDto = new CreateScraperRunLogDto
+            {
+                MappingId = command.MappingId,
+                TargetUrl = command.ExactProductUrl,
+                UserAgent = command.BrowserAutomationProfile?.UserAgent,
+                AdditionalHeaders = command.BrowserAutomationProfile?.Headers,
+                Selectors = new ScrapingSelectorsDto
+                {
+                    ProductNameSelector = command.Selectors.ProductNameSelector,
+                    PriceSelector = command.Selectors.PriceSelector,
+                    StockSelector = command.Selectors.StockSelector,
+                    SellerNameOnPageSelector = command.Selectors.SellerNameOnPageSelector,
+                    ImageSelector = command.Selectors.ImageSelector,
+                    SpecificationTableSelector = command.Selectors.SpecificationTableSelector,
+                    SpecificationContainerSelector = command.Selectors.SpecificationContainerSelector
+                },
+                AttemptNumber = 1, // TODO: Handle retry logic
+                DebugNotes = "Starting browser automation scraping operation"
+            };
+
+            var createResult = await _scraperRunLogService.CreateRunLogAsync(createLogDto);
+            if (createResult.IsSuccess)
+            {
+                runId = createResult.Data;
+            }
+
             using var playwright = await Microsoft.Playwright.Playwright.CreateAsync();
             var browserType = (command.BrowserAutomationProfile?.PreferredBrowser ?? "chromium").ToLower();
             IBrowser browser = browserType switch
@@ -849,6 +890,49 @@ public partial class WebScrapingService
                 }
             }
 
+            // Scrape specifications if enabled and selector is provided
+            ProductSpecificationResult? specificationResult = null;
+            if (command.ScrapeSpecifications && !string.IsNullOrEmpty(command.Selectors.SpecificationTableSelector))
+            {
+                try
+                {
+                    // Get page content for specification parsing
+                    var pageContent = await page.ContentAsync();
+                    var config = Configuration.Default;
+                    var angleSharpContext = BrowsingContext.New(config);
+                    var document = await angleSharpContext.OpenAsync(req => req.Content(pageContent));
+
+                    specificationResult = await ScrapeProductSpecificationsAsync(
+                        document,
+                        command.Selectors.SpecificationTableSelector,
+                        command.Selectors.SpecificationContainerSelector,
+                        command.Selectors.SpecificationOptions,
+                        command.MappingId);
+
+                    _logger.LogInformation("[BrowserAutomation] Specification scraping completed for mapping {MappingId}: {SpecCount} specifications parsed",
+                        command.MappingId, specificationResult.Specifications?.Count ?? 0);
+
+                    // Update ProductSellerMapping with specification data if successful
+                    if (specificationResult.IsSuccess)
+                    {
+                        await UpdateProductSellerMappingWithSpecifications(command.MappingId, specificationResult);
+                        if (runId.HasValue)
+                        {
+                            await UpdateRunLogWithSpecifications(runId.Value, specificationResult);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "[BrowserAutomation] Specification scraping failed for mapping {MappingId}", command.MappingId);
+                    specificationResult = new ProductSpecificationResult
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = ex.Message
+                    };
+                }
+            }
+
             await browser.CloseAsync();
 
             return new ScrapingResult
@@ -863,7 +947,8 @@ public partial class WebScrapingService
                 ErrorCode = price.HasValue ? null : "BROWSER_AUTOMATION_EXTRACTION_FAILED",
                 PrimaryImageUrl = imageUrls.FirstOrDefault(),
                 AdditionalImageUrls = imageUrls.Skip(1).ToList(),
-                OriginalImageUrls = imageUrls
+                OriginalImageUrls = imageUrls,
+                Specifications = specificationResult
             };
         }
         catch (Exception ex)
@@ -875,6 +960,60 @@ public partial class WebScrapingService
                 ErrorMessage = $"Browser automation failed: {ex.Message}",
                 ErrorCode = "BROWSER_AUTOMATION_ERROR"
             };
+        }
+    }
+
+    private async Task UpdateRunLogWithSpecifications(Guid runId, ProductSpecificationResult specResult)
+    {
+        try
+        {
+            await _scraperRunLogService.UpdateRunLogAsync(runId, new UpdateScraperRunLogDto
+            {
+                SpecificationData = specResult.IsSuccess ? 
+                    JsonSerializer.Serialize(specResult.Specifications) : null,
+                SpecificationMetadata = JsonSerializer.Serialize(specResult.Metadata),
+                SpecificationCount = specResult.Specifications?.Count,
+                SpecificationParsingStrategy = specResult.Metadata?.Structure.ToString(),
+                SpecificationQualityScore = specResult.Quality?.OverallScore,
+                SpecificationParsingTime = specResult.ParsingTimeMs,
+                SpecificationError = specResult.IsSuccess ? null : specResult.ErrorMessage,
+                DebugNotes = $"Specification parsing: {(specResult.IsSuccess ? "Success" : "Failed")} - {specResult.Specifications?.Count ?? 0} specs parsed"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to update run log with specification data for run {RunId}", runId);
+        }
+    }
+
+    private async Task UpdateProductSellerMappingWithSpecifications(Guid mappingId, ProductSpecificationResult specResult)
+    {
+        try
+        {
+            // Get the mapping from the database
+            var mapping = await _unitOfWork.ProductSellerMappings.GetByIdAsync(mappingId);
+            if (mapping == null)
+            {
+                _logger.LogWarning("ProductSellerMapping {MappingId} not found for specification update", mappingId);
+                return;
+            }
+
+            // Update specification-related fields
+            mapping.LatestSpecifications = JsonSerializer.Serialize(specResult.Specifications);
+            mapping.SpecificationsLastUpdated = DateTime.UtcNow;
+            mapping.SpecificationsQualityScore = specResult.Quality?.OverallScore;
+            mapping.UpdatedAt = DateTimeOffset.UtcNow;
+
+            // Save changes
+            _unitOfWork.ProductSellerMappings.Update(mapping);
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Updated ProductSellerMapping {MappingId} with {SpecCount} specifications (quality: {Quality})",
+                mappingId, specResult.Specifications?.Count ?? 0, specResult.Quality?.OverallScore ?? 0);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to update ProductSellerMapping with specification data for mapping {MappingId}", mappingId);
         }
     }
 }

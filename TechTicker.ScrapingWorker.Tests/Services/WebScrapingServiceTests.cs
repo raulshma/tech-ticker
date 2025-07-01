@@ -12,6 +12,7 @@ using Microsoft.Extensions.Caching.Memory;
 using ScrapeProductPageCommand = TechTicker.Application.Messages.ScrapeProductPageCommand;
 using ScrapingSelectors = TechTicker.Application.Messages.ScrapingSelectors;
 using ScrapingProfile = TechTicker.Application.Messages.ScrapingProfile;
+using TechTicker.DataAccess.Repositories.Interfaces;
 
 namespace TechTicker.ScrapingWorker.Tests.Services;
 
@@ -64,6 +65,7 @@ public class WebScrapingServiceTests : IDisposable
         var mockImageScrapingService = new Mock<IImageScrapingService>();
         var mockTableParser = new Mock<ITableParser>();
         var mockMemoryCache = new Mock<IMemoryCache>();
+        var mockUnitOfWork = new Mock<IUnitOfWork>();
         
         _webScrapingService = new WebScrapingService(
             _mockLogger.Object, 
@@ -71,7 +73,8 @@ public class WebScrapingServiceTests : IDisposable
             _mockScraperRunLogService.Object, 
             mockImageScrapingService.Object,
             mockTableParser.Object,
-            mockMemoryCache.Object);
+            mockMemoryCache.Object,
+            mockUnitOfWork.Object);
     }
 
     [Fact]

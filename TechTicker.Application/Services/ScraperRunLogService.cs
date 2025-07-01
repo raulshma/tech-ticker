@@ -282,6 +282,28 @@ public class ScraperRunLogService : IScraperRunLogService
             if (updateDto.ProxyId.HasValue)
                 runLog.ProxyId = updateDto.ProxyId.Value;
 
+            // Handle specification data
+            if (!string.IsNullOrEmpty(updateDto.SpecificationData))
+                runLog.SpecificationData = updateDto.SpecificationData;
+
+            if (!string.IsNullOrEmpty(updateDto.SpecificationMetadata))
+                runLog.SpecificationMetadata = updateDto.SpecificationMetadata;
+
+            if (updateDto.SpecificationCount.HasValue)
+                runLog.SpecificationCount = updateDto.SpecificationCount.Value;
+
+            if (!string.IsNullOrEmpty(updateDto.SpecificationParsingStrategy))
+                runLog.SpecificationParsingStrategy = updateDto.SpecificationParsingStrategy;
+
+            if (updateDto.SpecificationQualityScore.HasValue)
+                runLog.SpecificationQualityScore = updateDto.SpecificationQualityScore.Value;
+
+            if (updateDto.SpecificationParsingTime.HasValue)
+                runLog.SpecificationParsingTime = updateDto.SpecificationParsingTime.Value;
+
+            if (!string.IsNullOrEmpty(updateDto.SpecificationError))
+                runLog.SpecificationError = updateDto.SpecificationError;
+
             _unitOfWork.ScraperRunLogs.Update(runLog);
             await _unitOfWork.SaveChangesAsync();
 
@@ -413,6 +435,10 @@ public class ScraperRunLogService : IScraperRunLogService
 
             if (failDto.ProxyId.HasValue)
                 runLog.ProxyId = failDto.ProxyId.Value;
+
+            // Handle specification errors
+            if (!string.IsNullOrEmpty(failDto.SpecificationError))
+                runLog.SpecificationError = failDto.SpecificationError;
 
             _unitOfWork.ScraperRunLogs.Update(runLog);
             await _unitOfWork.SaveChangesAsync();
