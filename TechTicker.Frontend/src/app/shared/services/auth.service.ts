@@ -17,6 +17,7 @@ export interface CurrentUser {
   lastName?: string;
   roles: string[];
   isActive: boolean;
+  permissions?: string[]; // Cache user permissions
 }
 
 @Injectable({
@@ -127,6 +128,89 @@ export class AuthService {
     return requireAll ? this.hasAllRoles(requiredRoles) : this.hasAnyRole(requiredRoles);
   }
 
+  // Permission-based authorization methods
+  hasPermission(permission: string): boolean {
+    const user = this.currentUserSubject.value;
+    if (!user || !this.isAuthenticated()) return false;
+    
+    // If permissions are cached, use them
+    if (user.permissions) {
+      return user.permissions.includes(permission);
+    }
+    
+    // Fallback to role-based checks for common permission patterns
+    return this.hasPermissionByRole(permission);
+  }
+
+  hasAnyPermission(permissions: string[]): boolean {
+    if (permissions.length === 0) return true;
+    return permissions.some(permission => this.hasPermission(permission));
+  }
+
+  hasAllPermissions(permissions: string[]): boolean {
+    if (permissions.length === 0) return true;
+    return permissions.every(permission => this.hasPermission(permission));
+  }
+
+  private hasPermissionByRole(permission: string): boolean {
+    const user = this.currentUserSubject.value;
+    if (!user?.roles) return false;
+
+    // Admin has all permissions
+    if (user.roles.includes('Admin')) return true;
+
+    // Basic role-to-permission mapping for critical permissions
+    const rolePermissionMap: { [key: string]: string[] } = {
+      'Manager': [
+        'Users.Read', 'Users.Update', 'Products.Read', 'Products.Update',
+        'AlertRules.Read', 'AlertRules.Update', 'Scrapers.ViewLogs'
+      ],
+      'Moderator': [
+        'Users.Read', 'Products.Read', 'AlertRules.Read', 'Scrapers.ViewLogs'
+      ],
+      'User': [
+        'Products.Read', 'PriceHistory.Read', 'AlertRules.Read'
+      ]
+    };
+
+    return user.roles.some(role => 
+      rolePermissionMap[role]?.includes(permission) ?? false
+    );
+  }
+
+  // Load user permissions from API
+  async loadUserPermissions(): Promise<void> {
+    const user = this.currentUserSubject.value;
+    if (!user || !this.isAuthenticated()) return;
+
+    try {
+      const response = await this.apiClient.getUserPermissions(user.userId).toPromise();
+      if (response?.success && response.data) {
+        const permissions = response.data.map(p => p.name || '').filter(name => name !== '');
+        const updatedUser = { ...user, permissions };
+        this.updateCurrentUser(updatedUser);
+      }
+    } catch (error) {
+      console.error('Failed to load user permissions:', error);
+      // Keep the user object without permissions - fallback to role-based checks
+    }
+  }
+
+  // Check specific permission via API (for real-time validation)
+  async checkPermission(permission: string): Promise<boolean> {
+    const user = this.currentUserSubject.value;
+    if (!user || !this.isAuthenticated()) return false;
+
+    try {
+      const response = await this.apiClient.checkUserPermission(user.userId, permission).toPromise();
+      return response?.success === true && response.data === true;
+    } catch (error) {
+      console.error('Failed to check permission:', error);
+      // Fallback to cached/role-based check
+      return this.hasPermission(permission);
+    }
+  }
+
   private isTokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
@@ -153,6 +237,10 @@ export class AuthService {
             throw new Error(response.message || 'Login failed');
           }
           this.setCurrentUser(response.data);
+          // Load user permissions after successful login
+          this.loadUserPermissions().catch(error => 
+            console.warn('Failed to load user permissions on login:', error)
+          );
           return response.data;
         }),
         catchError(error => {

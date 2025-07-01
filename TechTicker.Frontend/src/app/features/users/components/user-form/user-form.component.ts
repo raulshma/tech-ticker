@@ -18,6 +18,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { Subject, takeUntil } from 'rxjs';
 import { UserDto, CreateUserDto, UpdateUserDto } from '../../../../shared/api/api-client';
 import { UsersService } from '../../services/users.service';
+import { AuthService } from '../../../../shared/services/auth.service';
 import { UserPermissionsComponent } from '../user-permissions/user-permissions.component';
 import { RbacModule } from '../../../../shared/modules/rbac.module';
 
@@ -62,6 +63,7 @@ export class UserFormComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private usersService: UsersService,
+    private authService: AuthService,
     private snackBar: MatSnackBar
   ) {
     this.userForm = this.createForm();
@@ -236,8 +238,6 @@ export class UserFormComponent implements OnInit {
   }
 
   hasPermission(permission: string): boolean {
-    // This would typically check the current user's permissions
-    // For now, return true as a placeholder
-    return true;
+    return this.authService.hasPermission(permission);
   }
 }

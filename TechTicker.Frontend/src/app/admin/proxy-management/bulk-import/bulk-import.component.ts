@@ -465,35 +465,39 @@ export class BulkImportComponent implements OnInit {
       dto.maxRetries = proxy.maxRetries || formValue.defaultMaxRetries;
       dto.isActive = formValue.defaultIsActive;
 
-      // TODO: Replace with actual API call once backend is running
-      // const response = await firstValueFrom(
-      //   this.apiClient.testProxyConfiguration(dto, undefined, 30)
-      // );
+      const response = await firstValueFrom(
+        this.apiClient.testProxyConfiguration(undefined, 30, dto)
+      );
 
-      // For now, simulate a test result
-      const mockResult = new ProxyTestResultDto({
-        proxyConfigurationId: '00000000-0000-0000-0000-000000000000',
-        host: proxy.host!,
-        port: proxy.port!,
-        proxyType: proxy.proxyType!,
-        isHealthy: Math.random() > 0.3, // 70% success rate for demo
-        responseTimeMs: Math.floor(Math.random() * 2000) + 100,
-        errorMessage: Math.random() > 0.7 ? 'Connection timeout' : undefined,
-        errorCode: Math.random() > 0.7 ? 'TIMEOUT' : undefined,
-        testedAt: new Date()
-      });
+      let testResult: ProxyTestResultDto;
+      if (response?.success && response.data) {
+        testResult = response.data;
+      } else {
+        // Create a failed test result if API call failed
+        testResult = new ProxyTestResultDto({
+          proxyConfigurationId: '00000000-0000-0000-0000-000000000000',
+          host: proxy.host!,
+          port: proxy.port!,
+          proxyType: proxy.proxyType!,
+          isHealthy: false,
+          responseTimeMs: 0,
+          errorMessage: response?.message || 'API call failed',
+          errorCode: 'API_ERROR',
+          testedAt: new Date()
+        });
+      }
 
-      this.testResults.set(proxyKey, mockResult);
+      this.testResults.set(proxyKey, testResult);
 
-      if (mockResult.isHealthy) {
+      if (testResult.isHealthy) {
         this.snackBar.open(
-          `Proxy test successful for ${proxy.host}:${proxy.port} (${mockResult.responseTimeMs}ms)`,
+          `Proxy test successful for ${proxy.host}:${proxy.port} (${testResult.responseTimeMs}ms)`,
           'Close',
           { duration: 3000 }
         );
       } else {
         this.snackBar.open(
-          `Proxy test failed for ${proxy.host}:${proxy.port}: ${mockResult.errorMessage}`,
+          `Proxy test failed for ${proxy.host}:${proxy.port}: ${testResult.errorMessage}`,
           'Close',
           { duration: 5000 }
         );

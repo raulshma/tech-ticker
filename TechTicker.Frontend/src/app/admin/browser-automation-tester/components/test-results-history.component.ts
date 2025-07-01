@@ -167,20 +167,21 @@ export class TestResultsHistoryComponent implements OnInit, OnDestroy {
       const searchTerm = this.filterForm.get('searchTerm')?.value || '';
       const tags = this.selectedTags.length > 0 ? this.selectedTags.join(',') : undefined;
       
-      // TODO: Replace with actual API call when client is updated
-      // const response = await this.apiClient.getSavedTestResults(
-      //   this.pageNumber,
-      //   this.pageSize,
-      //   searchTerm || undefined,
-      //   tags
-      // ).toPromise();
-      const response = await this.mockApiMethods.getSavedTestResults();
+      const response = await this.apiClient.getSavedTestResults(
+        this.pageNumber,
+        this.pageSize,
+        searchTerm || undefined,
+        tags
+      ).toPromise();
       
       if (response?.success && response.data) {
-        this.dataSource.data = response.data.data || [];
-        this.totalCount = response.data.totalCount || 0;
-        this.statistics = response.data.statistics || null;
-        this.availableTags = response.data.availableTags || [];
+        // Map the API response to our local interface format
+        this.dataSource.data = response.data.map(dto => this.mapSavedTestResultDto(dto));
+        this.totalCount = response.pagination?.totalCount || 0;
+        
+        // Load statistics and tags separately since they might not be included in the paginated response
+        await this.loadStatistics();
+        await this.loadAvailableTags();
       }
     } catch (error) {
       console.error('Error loading test results:', error);
@@ -192,10 +193,21 @@ export class TestResultsHistoryComponent implements OnInit, OnDestroy {
 
   async loadStatistics(): Promise<void> {
     try {
-      // TODO: Replace with actual API call when client is updated
-      const response = await this.mockApiMethods.getTestStatistics();
+      const response = await this.apiClient.getTestStatistics().toPromise();
       if (response?.success && response.data) {
-        this.statistics = response.data;
+        this.statistics = {
+          totalTests: response.data.totalTests || 0,
+          successfulTests: response.data.successfulTests || 0,
+          failedTests: response.data.failedTests || 0,
+          successRate: response.data.successRate || 0,
+          averageExecutionTime: response.data.averageExecutionTime || 0,
+          medianExecutionTime: response.data.medianExecutionTime || 0,
+          totalActionsExecuted: response.data.totalActionsExecuted || 0,
+          firstTestDate: response.data.firstTestDate ? new Date(response.data.firstTestDate) : undefined,
+          lastTestDate: response.data.lastTestDate ? new Date(response.data.lastTestDate) : undefined,
+          uniqueUrls: response.data.uniqueUrls || 0,
+          uniqueProfiles: response.data.uniqueProfiles || 0
+        };
       }
     } catch (error) {
       console.error('Error loading statistics:', error);
@@ -204,10 +216,9 @@ export class TestResultsHistoryComponent implements OnInit, OnDestroy {
 
   async loadAvailableTags(): Promise<void> {
     try {
-      // TODO: Replace with actual API call when client is updated
-      const response = await this.mockApiMethods.getAvailableTags();
+      const response = await this.apiClient.getAvailableTags().toPromise();
       if (response?.success && response.data) {
-        this.availableTags = response.data;
+        this.availableTags = response.data || [];
       }
     } catch (error) {
       console.error('Error loading available tags:', error);
@@ -284,14 +295,10 @@ export class TestResultsHistoryComponent implements OnInit, OnDestroy {
       const [first, second] = this.selectedForComparison;
       const request = {
         firstResultId: first.id,
-        secondResultId: second.id,
-        includeScreenshots: false,
-        includeNetworkData: false,
-        includeDetailedDifferences: true
+        secondResultId: second.id
       };
 
-      // TODO: Replace with actual API call when client is updated
-      const response = await this.mockApiMethods.compareTestResults();
+      const response = await this.apiClient.compareTestResults(request as any).toPromise();
       
       if (response?.success && response.data) {
         // Open comparison dialog
@@ -306,8 +313,7 @@ export class TestResultsHistoryComponent implements OnInit, OnDestroy {
   // Actions
   async viewDetails(result: SavedTestResult): Promise<void> {
     try {
-      // TODO: Replace with actual API call when client is updated
-      const response = await this.mockApiMethods.getSavedTestResult();
+      const response = await this.apiClient.getSavedTestResult(result.id).toPromise();
       
       if (response?.success && response.data) {
         this.openDetailsDialog(response.data);
@@ -321,9 +327,9 @@ export class TestResultsHistoryComponent implements OnInit, OnDestroy {
   async exportResult(result: SavedTestResult, format: 'json' | 'csv' | 'pdf' = 'json'): Promise<void> {
     try {
       // For now, we'll call the export endpoint and handle the download
-      // TODO: Replace with actual API call when client is updated
-      const response = await this.mockApiMethods.exportTestResult();
+      await this.apiClient.exportTestResult(result.id, format).toPromise();
       this.showSuccessMessage(`Export initiated for ${result.name}`);
+      // The API should return the file or a download URL - handle accordingly
     } catch (error) {
       console.error('Error exporting test result:', error);
       this.showErrorMessage('Failed to export test result');
@@ -336,8 +342,7 @@ export class TestResultsHistoryComponent implements OnInit, OnDestroy {
     }
 
     try {
-      // TODO: Replace with actual API call when client is updated
-      const response = await this.mockApiMethods.deleteSavedTestResult();
+      const response = await this.apiClient.deleteSavedTestResult(result.id).toPromise();
       
       if (response?.success) {
         this.showSuccessMessage('Test result deleted successfully');
@@ -366,8 +371,7 @@ export class TestResultsHistoryComponent implements OnInit, OnDestroy {
         resultIds: selected.map(r => r.id)
       };
 
-      // TODO: Replace with actual API call when client is updated
-      const response = await this.mockApiMethods.bulkDeleteSavedTestResults();
+      const response = await this.apiClient.bulkDeleteSavedTestResults(request as any).toPromise();
       
       if (response?.success && response.data) {
         const result = response.data;
@@ -445,6 +449,25 @@ export class TestResultsHistoryComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Data mapping
+  private mapSavedTestResultDto(dto: any): SavedTestResult {
+    return {
+      id: dto.id || '',
+      name: dto.name || 'Unnamed Test',
+      description: dto.description,
+      tags: dto.tags || [],
+      testUrl: dto.testUrl || '',
+      success: dto.success || false,
+      savedAt: dto.savedAt ? new Date(dto.savedAt) : new Date(),
+      executedAt: dto.executedAt ? new Date(dto.executedAt) : new Date(),
+      duration: dto.duration || 0,
+      actionsExecuted: dto.actionsExecuted || 0,
+      errorCount: dto.errorCount || 0,
+      profileHash: dto.profileHash || '',
+      createdBy: dto.createdBy || 'Unknown'
+    };
+  }
+
   // Template helpers
   get hasSelection(): boolean {
     return this.selection.selected.length > 0;
@@ -458,75 +481,5 @@ export class TestResultsHistoryComponent implements OnInit, OnDestroy {
     return this.statistics !== null;
   }
 
-  // Add method signatures that might be missing
-  // Mock API methods until the API client is regenerated
-  private mockApiMethods = {
-    getSavedTestResults: () => Promise.resolve({
-      success: true,
-      data: {
-        data: [],
-        totalCount: 0,
-        pageNumber: 1,
-        pageSize: 20,
-        totalPages: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-        availableTags: [],
-        statistics: {
-          totalTests: 0,
-          successfulTests: 0,
-          failedTests: 0,
-          successRate: 0,
-          averageExecutionTime: 0,
-          medianExecutionTime: 0,
-          totalActionsExecuted: 0,
-          uniqueUrls: 0,
-          uniqueProfiles: 0
-        }
-      }
-    }),
-    getTestStatistics: () => Promise.resolve({
-      success: true,
-      data: {
-        totalTests: 0,
-        successfulTests: 0,
-        failedTests: 0,
-        successRate: 0,
-        averageExecutionTime: 0,
-        medianExecutionTime: 0,
-        totalActionsExecuted: 0,
-        uniqueUrls: 0,
-        uniqueProfiles: 0
-      }
-    }),
-    getAvailableTags: () => Promise.resolve({
-      success: true,
-      data: []
-    }),
-    getSavedTestResult: () => Promise.resolve({
-      success: true,
-      data: null
-    }),
-    exportTestResult: () => Promise.resolve({
-      success: true,
-      data: null
-    }),
-    deleteSavedTestResult: () => Promise.resolve({
-      success: true,
-      data: true
-    }),
-    bulkDeleteSavedTestResults: () => Promise.resolve({
-      success: true,
-      data: {
-        totalRequested: 0,
-        successfullyDeleted: 0,
-        failedToDelete: 0,
-        errors: []
-      }
-    }),
-    compareTestResults: () => Promise.resolve({
-      success: true,
-      data: null
-    })
-  };
+
 } 
