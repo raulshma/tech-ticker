@@ -14,9 +14,7 @@ import { Location } from '@angular/common';
 })
 export class ScraperLogDetailComponent implements OnInit, OnDestroy {
   scraperLog: ScraperRunLogDto | null = null;
-  retryChain: ScraperRunLogDto[] = [];
   isLoading = false;
-  isLoadingRetryChain = false;
   runId: string | null = null;
 
   private destroy$ = new Subject<void>();
@@ -30,15 +28,12 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.route.paramMap
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-        this.runId = params.get('runId');
-        if (this.runId) {
-          this.loadScraperLogDetail();
-          this.loadRetryChain();
-        }
-      });
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      this.runId = params['runId'];
+      if (this.runId) {
+        this.loadScraperLogDetail();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -70,80 +65,122 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
       });
   }
 
-  private loadRetryChain(): void {
-    if (!this.runId) return;
 
-    this.isLoadingRetryChain = true;
-    this.scraperLogsService.getRetryChain(this.runId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (chain) => {
-          this.isLoadingRetryChain = false;
-          this.retryChain = chain;
-        },
-        error: (error) => {
-          this.isLoadingRetryChain = false;
-          console.error('Error loading retry chain:', error);
-        }
-      });
-  }
 
   goBack(): void {
     this.location.back();
   }
 
-  getStatusColor(status?: string): string {
-    return this.scraperLogsService.getStatusColor(status);
+  copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text).then(() => {
+      this.snackBar.open('Copied to clipboard', 'Close', { duration: 2000 });
+    }).catch(err => {
+      console.error('Could not copy text: ', err);
+      this.snackBar.open('Failed to copy to clipboard', 'Close', { duration: 3000 });
+    });
   }
 
-  getStatusIcon(status?: string): string {
-    return this.scraperLogsService.getStatusIcon(status);
+  openUrl(url: string): void {
+    window.open(url, '_blank');
   }
 
-  formatDuration(duration?: string): string {
-    return this.scraperLogsService.formatDuration(duration);
+  formatDate(date: Date | string | undefined): string {
+    if (!date) return '';
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleString();
   }
 
-  formatDate(date?: Date): string {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleString();
-  }
-
-  formatBytes(bytes?: number): string {
-    if (!bytes) return 'N/A';
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-  }
-
-  parseJsonSafely(jsonString?: string): any {
-    if (!jsonString) return null;
-    try {
-      return JSON.parse(jsonString);
-    } catch {
-      return null;
+  formatDuration(duration: string | undefined): string {
+    if (!duration) return '';
+    // Duration might be in format like "00:00:30.123" or just seconds
+    if (duration.includes(':')) {
+      return duration;
+    }
+    // If it's just a number (seconds), format it nicely
+    const seconds = parseFloat(duration);
+    if (isNaN(seconds)) return duration;
+    
+    if (seconds < 1) {
+      return `${Math.round(seconds * 1000)}ms`;
+    } else if (seconds < 60) {
+      return `${seconds.toFixed(2)}s`;
+    } else {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes}m ${remainingSeconds.toFixed(2)}s`;
     }
   }
 
+  formatBytes(bytes: number | undefined): string {
+    if (!bytes) return '';
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+  }
+
   formatJson(obj: any): string {
-    if (!obj) return 'N/A';
-    return JSON.stringify(obj, null, 2);
+    if (!obj) return '';
+    try {
+      if (typeof obj === 'string') {
+        // Try to parse if it's a JSON string
+        const parsed = JSON.parse(obj);
+        return JSON.stringify(parsed, null, 2);
+      }
+      return JSON.stringify(obj, null, 2);
+    } catch (error) {
+      // If parsing fails, return as string
+      return typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
+    }
   }
 
-  formatObjectAsJson(obj: any): string {
-    if (!obj) return 'N/A';
-    return JSON.stringify(obj, null, 2);
+  getStatusIcon(status: string | undefined): string {
+    switch (status?.toUpperCase()) {
+      case 'SUCCESS':
+        return 'check_circle';
+      case 'FAILED':
+        return 'error';
+      case 'STARTED':
+      case 'IN_PROGRESS':
+        return 'hourglass_empty';
+      case 'TIMEOUT':
+        return 'timer_off';
+      case 'CANCELLED':
+        return 'cancel';
+      default:
+        return 'help';
+    }
   }
 
-  hasAdditionalHeaders(): boolean {
-    return !!(this.scraperLog?.additionalHeaders &&
-             (typeof this.scraperLog.additionalHeaders === 'string' ?
-              this.parseJsonSafely(this.scraperLog.additionalHeaders) :
-              this.scraperLog.additionalHeaders));
+  getStatusColor(status: string | undefined): string {
+    switch (status?.toUpperCase()) {
+      case 'SUCCESS':
+        return 'primary';
+      case 'FAILED':
+        return 'warn';
+      case 'STARTED':
+      case 'IN_PROGRESS':
+        return 'accent';
+      case 'TIMEOUT':
+      case 'CANCELLED':
+        return 'warn';
+      default:
+        return 'primary';
+    }
   }
 
-  hasSelectors(): boolean {
-    return !!(this.scraperLog?.selectors);
+  getHttpStatusClass(statusCode: number | undefined): string {
+    if (!statusCode) return '';
+    
+    if (statusCode >= 200 && statusCode < 300) {
+      return 'http-success';
+    } else if (statusCode >= 300 && statusCode < 400) {
+      return 'http-redirect';
+    } else if (statusCode >= 400 && statusCode < 500) {
+      return 'http-client-error';
+    } else if (statusCode >= 500) {
+      return 'http-server-error';
+    }
+    return '';
   }
 
   hasImageData(): boolean {
@@ -153,10 +190,6 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
               this.scraperLog?.imageProcessingCount ||
               this.scraperLog?.imageUploadCount ||
               this.scraperLog?.imageScrapingError);
-  }
-
-  hasProxyData(): boolean {
-    return !!(this.scraperLog?.proxyUsed || this.scraperLog?.proxyId);
   }
 
   getProxyDisplayInfo(): { hasProxy: boolean; proxyInfo: string } {
@@ -169,45 +202,10 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  getAdditionalHeadersJson(): string {
-    if (!this.scraperLog?.additionalHeaders) return 'N/A';
-    if (typeof this.scraperLog.additionalHeaders === 'string') {
-      return this.formatJson(this.parseJsonSafely(this.scraperLog.additionalHeaders));
-    }
-    return this.formatObjectAsJson(this.scraperLog.additionalHeaders);
+  viewRetryDetails(runId: string): void {
+    // Navigate to the retry attempt details
+    this.router.navigate(['/scraper-logs', runId]);
   }
 
-  getSelectorsJson(): string {
-    if (!this.scraperLog?.selectors) return 'N/A';
-    return this.formatObjectAsJson(this.scraperLog.selectors);
-  }
 
-  copyToClipboard(text: string): void {
-    navigator.clipboard.writeText(text).then(() => {
-      this.snackBar.open('Copied to clipboard', 'Close', { duration: 2000 });
-    }).catch(() => {
-      this.snackBar.open('Failed to copy to clipboard', 'Close', { duration: 3000 });
-    });
-  }
-
-  viewRetryDetail(retryRunId: string): void {
-    this.router.navigate(['/scraper-logs', retryRunId]);
-  }
-
-  getHttpStatusClass(statusCode: number): string {
-    if (statusCode >= 200 && statusCode < 300) {
-      return 'success-chip';
-    } else if (statusCode >= 400 && statusCode < 500) {
-      return 'warning-chip';
-    } else if (statusCode >= 500) {
-      return 'error-chip';
-    }
-    return 'info-chip';
-  }
-
-  openUrl(url: string): void {
-    if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
-  }
 }

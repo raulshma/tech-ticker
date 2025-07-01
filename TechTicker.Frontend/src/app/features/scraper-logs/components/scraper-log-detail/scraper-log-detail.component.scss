@@ -93,59 +93,49 @@
   }
 }
 
-// ===== CONTENT SECTION =====
+// ===== MAIN CONTENT =====
 .content-section {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 24px 24px;
 
   @media (max-width: 768px) {
-    padding: 0 16px;
+    padding: 0 16px 16px;
   }
+}
 
-  .content-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
 
-    @media (min-width: 1200px) {
-      grid-template-columns: 1fr 1fr;
-      
-      .status-overview-card {
-        grid-column: 1 / -1;
-      }
-
-      .extracted-data,
-      .image-results,
-      .error-info {
-        grid-column: 1 / -1;
-      }
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+    
+    .status-overview-card {
+      grid-column: 1 / -1;
     }
   }
 }
 
 // ===== CARD STYLES =====
 .info-card {
-  border-radius: 16px;
   background: var(--mat-sys-surface-container-low);
-  box-shadow: var(--mat-sys-elevation-level1);
-  transition: all 0.3s ease;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 16px;
+  transition: all 0.2s ease;
 
   &:hover {
-    box-shadow: var(--mat-sys-elevation-level2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
   }
 
   .mat-mdc-card-header {
-    padding: 20px 20px 16px;
-    border-bottom: 1px solid var(--mat-sys-outline-variant);
-
     .mat-mdc-card-title {
-      color: var(--mat-sys-on-surface);
       display: flex;
       align-items: center;
       gap: 8px;
-      margin: 0;
-      font-weight: 500;
+      color: var(--mat-sys-on-surface);
 
       mat-icon {
         color: var(--mat-sys-primary);
@@ -154,12 +144,8 @@
 
     .mat-mdc-card-subtitle {
       color: var(--mat-sys-on-surface-variant);
-      margin: 4px 0 0 0;
+      margin-top: 4px;
     }
-  }
-
-  .mat-mdc-card-content {
-    padding: 20px !important;
   }
 }
 
@@ -306,6 +292,94 @@
   }
 }
 
+// ===== CHIP STYLES =====
+.retry-chip {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.original-chip {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.http-success {
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+}
+
+.http-redirect {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.http-client-error, .http-server-error {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+// ===== PERFORMANCE METRICS =====
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .performance-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--mat-sys-surface-container);
+    border-radius: 12px;
+    border: 1px solid var(--mat-sys-outline-variant);
+
+    .performance-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--mat-sys-tertiary-container);
+      color: var(--mat-sys-on-tertiary-container);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .performance-content {
+      flex: 1;
+      min-width: 0;
+
+      .performance-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--mat-sys-on-surface-variant);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+      }
+
+      .performance-value {
+        display: block;
+        color: var(--mat-sys-on-surface);
+        font-weight: 600;
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
 // ===== URL DISPLAY =====
 .url-display {
   display: flex;
@@ -352,7 +426,45 @@
   }
 }
 
+// ===== JSON DISPLAY =====
+.json-display {
+  position: relative;
+  background: var(--mat-sys-surface-container);
+  border-radius: 8px;
+  border: 1px solid var(--mat-sys-outline-variant);
+
+  .copy-json-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    background: var(--mat-sys-surface);
+    color: var(--mat-sys-primary);
+
+    &:hover {
+      background: var(--mat-sys-primary-container);
+    }
+  }
+
+  .json-content {
+    margin: 0;
+    padding: 16px 48px 16px 16px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--mat-sys-on-surface);
+    overflow-x: auto;
+    white-space: pre-wrap;
+  }
+}
+
 // ===== PROXY DISPLAY =====
+.proxy-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .proxy-display {
   display: flex;
   align-items: center;
@@ -364,21 +476,32 @@
   }
 }
 
+.proxy-id {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--mat-sys-surface-container);
+  border-radius: 6px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.75rem;
+
+  .proxy-id-label {
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .proxy-id-value {
+    color: var(--mat-sys-on-surface);
+  }
+}
+
 .direct-connection-display {
   .direct-chip {
     background: var(--mat-sys-surface-variant);
     color: var(--mat-sys-on-surface-variant);
   }
-}
-
-.proxy-id {
-  background: var(--mat-sys-surface-container);
-  padding: 6px 8px;
-  border-radius: 6px;
-  font-family: 'Roboto Mono', monospace;
-  font-size: 0.75rem;
-  color: var(--mat-sys-on-surface);
-  border: 1px solid var(--mat-sys-outline-variant);
 }
 
 // ===== EXTRACTED DATA GRID =====
@@ -457,14 +580,10 @@
 
 // ===== IMAGE RESULTS =====
 .image-stats {
-  display: flex;
-  gap: 24px;
-  margin-bottom: 24px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 16px;
-  }
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
 
   .image-stat {
     display: flex;
@@ -473,7 +592,7 @@
     padding: 16px;
     background: var(--mat-sys-surface-container);
     border-radius: 12px;
-    flex: 1;
+    border: 1px solid var(--mat-sys-outline-variant);
 
     .stat-icon {
       width: 40px;
@@ -484,30 +603,29 @@
       justify-content: center;
       flex-shrink: 0;
 
+      &.processed {
+        background: var(--mat-sys-tertiary-container);
+        color: var(--mat-sys-on-tertiary-container);
+      }
+
+      &.uploaded {
+        background: var(--mat-sys-secondary-container);
+        color: var(--mat-sys-on-secondary-container);
+      }
+
       mat-icon {
         font-size: 20px;
         width: 20px;
         height: 20px;
-      }
-
-      &.processed {
-        background: var(--mat-sys-primary-container);
-        color: var(--mat-sys-on-primary-container);
-      }
-
-      &.uploaded {
-        background: var(--mat-sys-tertiary-container);
-        color: var(--mat-sys-on-tertiary-container);
       }
     }
 
     .stat-content {
       display: flex;
       flex-direction: column;
-      gap: 2px;
 
       .stat-number {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: 600;
         color: var(--mat-sys-on-surface);
         line-height: 1;
@@ -515,7 +633,6 @@
 
       .stat-label {
         font-size: 0.75rem;
-        font-weight: 500;
         color: var(--mat-sys-on-surface-variant);
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -524,130 +641,284 @@
   }
 }
 
-.image-urls {
-  .image-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--mat-sys-on-surface);
-    margin-bottom: 12px;
-  }
+.image-url-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-  .image-url-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px;
-    background: var(--mat-sys-surface-container);
-    border-radius: 8px;
-    border: 1px solid var(--mat-sys-outline-variant);
-    margin-bottom: 8px;
+.image-url-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--mat-sys-surface-container-highest);
+  border-radius: 6px;
 
-    .image-index {
-      color: var(--mat-sys-on-surface-variant);
-      font-weight: 500;
-      min-width: 24px;
-    }
+  .image-link {
+    flex: 1;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--mat-sys-primary);
+    text-decoration: none;
+    word-break: break-all;
 
-    .url-display {
-      flex: 1;
-      word-break: break-all;
-      font-family: 'Roboto Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--mat-sys-on-surface);
-      background: none;
-      padding: 0;
-      border: none;
-    }
-
-    .image-actions {
-      display: flex;
-      gap: 4px;
-
-      // copy-small-btn, view-image-btn styles removed - using Angular Material's built-in button styling
-    }
-  }
-
-  .additional-images-list {
-    max-height: 300px;
-    overflow-y: auto;
-    border-radius: 8px;
-    border: 1px solid var(--mat-sys-outline-variant);
-
-    .image-url-item {
-      border: none;
-      border-radius: 0;
-      border-bottom: 1px solid var(--mat-sys-outline-variant);
-      margin-bottom: 0;
-
-      &:last-child {
-        border-bottom: none;
-      }
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
 
-// ===== ERROR DISPLAY =====
-.error-info {
-  .error-title {
-    color: var(--mat-sys-error) !important;
+.image-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+  border-radius: 8px;
+  margin-top: 16px;
 
-    mat-icon {
-      color: var(--mat-sys-error) !important;
-    }
+  .error-icon {
+    flex-shrink: 0;
   }
 
-  .error-display {
+  .error-text {
+    flex: 1;
+    font-size: 0.875rem;
+  }
+}
+
+// ===== ERROR DETAILS =====
+.error-summary {
+  margin-bottom: 16px;
+}
+
+.error-basic-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .error-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .error-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--mat-sys-on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
     .error-content {
       display: flex;
-      gap: 12px;
-      background: var(--mat-sys-error-container);
-      color: var(--mat-sys-on-error-container);
-      padding: 16px;
-      border-radius: 12px;
-      border: 1px solid var(--mat-sys-error);
+      align-items: flex-start;
+      gap: 8px;
 
       .error-message {
         flex: 1;
-        margin: 0;
-        font-family: 'Roboto Mono', monospace;
-        font-size: 0.875rem;
-        line-height: 1.4;
-        white-space: pre-wrap;
+        color: var(--mat-sys-error);
+        font-weight: 500;
         word-break: break-word;
       }
-
-      // copy-error-btn styles removed - using Angular Material's built-in button styling
     }
   }
 }
 
-// ===== HTTP STATUS CHIPS =====
-.success-chip {
-  background: var(--mat-sys-tertiary-container);
-  color: var(--mat-sys-on-tertiary-container);
-}
-
-.warning-chip {
+.error-code-chip, .error-category-chip {
   background: var(--mat-sys-error-container);
   color: var(--mat-sys-on-error-container);
+  font-size: 0.75rem;
 }
 
-.error-chip {
-  background: var(--mat-sys-error-container);
-  color: var(--mat-sys-on-error-container);
+.stack-trace-display {
+  position: relative;
+  background: var(--mat-sys-surface-container);
+  border-radius: 8px;
+  border: 1px solid var(--mat-sys-outline-variant);
+
+  .copy-stack-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    background: var(--mat-sys-surface);
+    color: var(--mat-sys-primary);
+
+    &:hover {
+      background: var(--mat-sys-primary-container);
+    }
+  }
+
+  .stack-trace-content {
+    margin: 0;
+    padding: 16px 48px 16px 16px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: var(--mat-sys-error);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow-y: auto;
+  }
 }
 
-.info-chip {
-  background: var(--mat-sys-surface-variant);
-  color: var(--mat-sys-on-surface-variant);
+// ===== DEBUG INFORMATION =====
+.debug-notes-display, .html-snippet-display {
+  position: relative;
+  background: var(--mat-sys-surface-container);
+  border-radius: 8px;
+  border: 1px solid var(--mat-sys-outline-variant);
+
+  .copy-debug-btn, .copy-html-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    background: var(--mat-sys-surface);
+    color: var(--mat-sys-primary);
+
+    &:hover {
+      background: var(--mat-sys-primary-container);
+    }
+  }
+
+  .debug-notes-content, .html-snippet-content {
+    margin: 0;
+    padding: 16px 48px 16px 16px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--mat-sys-on-surface);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+}
+
+// ===== MAPPING DETAILS =====
+.mapping-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .mapping-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .mapping-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--mat-sys-on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mapping-value {
+      color: var(--mat-sys-on-surface);
+      font-weight: 500;
+      word-break: break-word;
+    }
+  }
+}
+
+// ===== RETRY ATTEMPTS =====
+.retry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .retry-item {
+    padding: 16px;
+    background: var(--mat-sys-surface-container);
+    border-radius: 12px;
+    border: 1px solid var(--mat-sys-outline-variant);
+
+    .retry-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+
+      .retry-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .retry-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+
+          &.status-primary {
+            color: var(--mat-sys-primary);
+          }
+
+          &.status-accent {
+            color: var(--mat-sys-secondary);
+          }
+
+          &.status-warn {
+            color: var(--mat-sys-error);
+          }
+        }
+
+        .retry-status-text {
+          font-weight: 500;
+          color: var(--mat-sys-on-surface);
+        }
+      }
+
+      .retry-attempt {
+        font-size: 0.875rem;
+        color: var(--mat-sys-on-surface-variant);
+        background: var(--mat-sys-surface-variant);
+        padding: 4px 8px;
+        border-radius: 6px;
+      }
+
+      .retry-time {
+        font-size: 0.75rem;
+        color: var(--mat-sys-on-surface-variant);
+        margin-left: auto;
+      }
+    }
+
+    .retry-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px;
+
+      .retry-duration {
+        font-size: 0.875rem;
+        color: var(--mat-sys-on-surface-variant);
+      }
+
+      .retry-error {
+        font-size: 0.875rem;
+        color: var(--mat-sys-error);
+        word-break: break-word;
+      }
+    }
+
+    .retry-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
 }
 
 // ===== ERROR STATE =====
 .error-state-container {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   min-height: 400px;
   padding: 48px 24px;
 
@@ -672,37 +943,26 @@
       color: var(--mat-sys-on-surface-variant);
       margin: 0 0 24px 0;
     }
-
-    // back-to-list-btn styles removed - using Angular Material's built-in button styling
   }
 }
 
 // ===== RESPONSIVE DESIGN =====
 @media (max-width: 768px) {
-  .content-section {
-    .content-grid {
-      gap: 16px;
-    }
+  .content-grid {
+    grid-template-columns: 1fr;
   }
 
-  .status-overview-card {
-    .status-header-content {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-    }
-  }
-
+  .performance-grid,
   .extracted-data-grid {
-    .data-item {
-      padding: 12px;
-    }
+    grid-template-columns: 1fr;
+  }
+
+  .status-metrics {
+    grid-template-columns: 1fr;
   }
 
   .image-stats {
-    .image-stat {
-      padding: 12px;
-    }
+    grid-template-columns: 1fr;
   }
 }
 
