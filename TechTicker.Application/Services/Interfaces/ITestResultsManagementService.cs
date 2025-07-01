@@ -112,6 +112,22 @@ public interface ITestResultsManagementService
         string? profileHash = null,
         int limit = 50,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get available tags for filtering saved test results
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>List of available tags</returns>
+    Task<Result<List<string>>> GetAvailableTagsAsync(
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get test statistics summary
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Overall test statistics</returns>
+    Task<Result<TestStatistics>> GetTestStatisticsAsync(
+        CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -122,4 +138,4 @@ public enum TestResultExportFormat
     Json,
     Csv,
     Pdf
-} 
+}

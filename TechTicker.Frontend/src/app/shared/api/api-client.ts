@@ -13714,10 +13714,13 @@ export interface IBrowserAutomationTestRequestDto {
 
 export class BrowserAutomationTestResultDto implements IBrowserAutomationTestResultDto {
     sessionId?: string | undefined;
+    testUrl?: string | undefined;
     success?: boolean;
     startedAt?: Date;
     completedAt?: Date | undefined;
     duration?: number;
+    profile?: BrowserAutomationProfileDto;
+    options?: BrowserTestOptionsDto;
     actionsExecuted?: number;
     actionResults?: ActionExecutionResultDto[] | undefined;
     finalScreenshot?: string | undefined;
@@ -13742,10 +13745,13 @@ export class BrowserAutomationTestResultDto implements IBrowserAutomationTestRes
     init(_data?: any) {
         if (_data) {
             this.sessionId = _data["sessionId"];
+            this.testUrl = _data["testUrl"];
             this.success = _data["success"];
             this.startedAt = _data["startedAt"] ? new Date(_data["startedAt"].toString()) : <any>undefined;
             this.completedAt = _data["completedAt"] ? new Date(_data["completedAt"].toString()) : <any>undefined;
             this.duration = _data["duration"];
+            this.profile = _data["profile"] ? BrowserAutomationProfileDto.fromJS(_data["profile"]) : <any>undefined;
+            this.options = _data["options"] ? BrowserTestOptionsDto.fromJS(_data["options"]) : <any>undefined;
             this.actionsExecuted = _data["actionsExecuted"];
             if (Array.isArray(_data["actionResults"])) {
                 this.actionResults = [] as any;
@@ -13800,10 +13806,13 @@ export class BrowserAutomationTestResultDto implements IBrowserAutomationTestRes
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["sessionId"] = this.sessionId;
+        data["testUrl"] = this.testUrl;
         data["success"] = this.success;
         data["startedAt"] = this.startedAt ? this.startedAt.toISOString() : <any>undefined;
         data["completedAt"] = this.completedAt ? this.completedAt.toISOString() : <any>undefined;
         data["duration"] = this.duration;
+        data["profile"] = this.profile ? this.profile.toJSON() : <any>undefined;
+        data["options"] = this.options ? this.options.toJSON() : <any>undefined;
         data["actionsExecuted"] = this.actionsExecuted;
         if (Array.isArray(this.actionResults)) {
             data["actionResults"] = [];
@@ -13851,10 +13860,13 @@ export class BrowserAutomationTestResultDto implements IBrowserAutomationTestRes
 
 export interface IBrowserAutomationTestResultDto {
     sessionId?: string | undefined;
+    testUrl?: string | undefined;
     success?: boolean;
     startedAt?: Date;
     completedAt?: Date | undefined;
     duration?: number;
+    profile?: BrowserAutomationProfileDto;
+    options?: BrowserTestOptionsDto;
     actionsExecuted?: number;
     actionResults?: ActionExecutionResultDto[] | undefined;
     finalScreenshot?: string | undefined;

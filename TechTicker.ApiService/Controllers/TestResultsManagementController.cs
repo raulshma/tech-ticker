@@ -310,10 +310,8 @@ public class TestResultsManagementController : BaseApiController
         {
             _logger.LogInformation("Getting available tags for test results");
 
-            // For now, return empty list - this should be implemented as a separate service method
-            var tags = new List<string>();
-            
-            return HandleResult(Result<List<string>>.Success(tags));
+            var result = await _testResultsService.GetAvailableTagsAsync(cancellationToken);
+            return HandleResult(result);
         }
         catch (Exception ex)
         {
@@ -336,10 +334,8 @@ public class TestResultsManagementController : BaseApiController
         {
             _logger.LogInformation("Getting test statistics summary");
 
-            // For now, return empty statistics - this should be implemented as a separate service method
-            var statistics = new TestStatistics();
-            
-            return HandleResult(Result<TestStatistics>.Success(statistics));
+            var result = await _testResultsService.GetTestStatisticsAsync(cancellationToken);
+            return HandleResult(result);
         }
         catch (Exception ex)
         {

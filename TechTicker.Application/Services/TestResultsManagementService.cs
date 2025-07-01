@@ -532,6 +532,62 @@ public class TestResultsManagementService : ITestResultsManagementService
         }
     }
 
+    public async Task<Result<List<string>>> GetAvailableTagsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            _logger.LogInformation("Getting available tags for test results");
+
+            var tags = await _savedTestResultRepository.GetAllTagsAsync();
+            
+            return Result<List<string>>.Success(tags);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting available tags");
+            return Result<List<string>>.Failure("Failed to get available tags", "GET_TAGS_ERROR");
+        }
+    }
+
+    public async Task<Result<TestStatistics>> GetTestStatisticsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            _logger.LogInformation("Getting test statistics summary");
+
+            var (totalTests, successfulTests, failedTests, averageExecutionTime) = 
+                await _savedTestResultRepository.GetStatisticsAsync();
+
+            // Get additional statistics
+            var (results, _) = await _savedTestResultRepository.GetPagedAsync(1, int.MaxValue);
+            var allResults = results.ToList();
+
+            var statistics = new TestStatistics
+            {
+                TotalTests = totalTests,
+                SuccessfulTests = successfulTests,
+                FailedTests = failedTests,
+                SuccessRate = totalTests > 0 ? (double)successfulTests / totalTests * 100 : 0,
+                AverageExecutionTime = averageExecutionTime,
+                MedianExecutionTime = CalculateMedian(allResults.Select(r => (double)r.Duration).ToList()),
+                TotalActionsExecuted = allResults.Sum(r => r.ActionsExecuted),
+                FirstTestDate = allResults.Count > 0 ? allResults.Min(r => r.ExecutedAt) : null,
+                LastTestDate = allResults.Count > 0 ? allResults.Max(r => r.ExecutedAt) : null,
+                UniqueUrls = allResults.Select(r => r.TestUrl).Distinct().Count(),
+                UniqueProfiles = allResults.Select(r => r.ProfileHash).Distinct().Count()
+            };
+
+            return Result<TestStatistics>.Success(statistics);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting test statistics");
+            return Result<TestStatistics>.Failure("Failed to get test statistics", "GET_STATISTICS_ERROR");
+        }
+    }
+
     #region Private Methods
 
     private SavedTestResultDetailDto ConvertToDetailDto(SavedTestResult entity)
@@ -769,4 +825,4 @@ public class TestResultsManagementService : ITestResultsManagementService
     }
 
     #endregion
-} 
+}
