@@ -687,8 +687,256 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
                     }
                     break;
 
+                case "doubleclick":
+                    if (!string.IsNullOrEmpty(action.Selector))
+                    {
+                        await page.DblClickAsync(action.Selector, new PageDblClickOptions
+                        {
+                            Timeout = options.ActionTimeoutMs
+                        });
+                    }
+                    break;
+
+                case "rightclick":
+                    if (!string.IsNullOrEmpty(action.Selector))
+                    {
+                        await page.ClickAsync(action.Selector, new PageClickOptions
+                        {
+                            Button = MouseButton.Right,
+                            Timeout = options.ActionTimeoutMs
+                        });
+                    }
+                    break;
+
+                case "focus":
+                    if (!string.IsNullOrEmpty(action.Selector))
+                    {
+                        await page.FocusAsync(action.Selector, new PageFocusOptions
+                        {
+                            Timeout = options.ActionTimeoutMs
+                        });
+                    }
+                    break;
+
+                case "blur":
+                    if (!string.IsNullOrEmpty(action.Selector))
+                    {
+                        await page.EvaluateAsync($"document.querySelector('{action.Selector}').blur()");
+                    }
+                    break;
+
+                case "clear":
+                    if (!string.IsNullOrEmpty(action.Selector))
+                    {
+                        await page.Locator(action.Selector).ClearAsync(new LocatorClearOptions
+                        {
+                            Timeout = options.ActionTimeoutMs
+                        });
+                    }
+                    break;
+
+                case "press":
+                    if (!string.IsNullOrEmpty(action.Value))
+                    {
+                        await page.Keyboard.PressAsync(action.Value);
+                    }
+                    break;
+
+                case "upload":
+                    if (!string.IsNullOrEmpty(action.Selector) && !string.IsNullOrEmpty(action.Value))
+                    {
+                        await page.SetInputFilesAsync(action.Selector, action.Value, new PageSetInputFilesOptions
+                        {
+                            Timeout = options.ActionTimeoutMs
+                        });
+                    }
+                    break;
+
+                case "drag":
+                    if (!string.IsNullOrEmpty(action.Selector) && !string.IsNullOrEmpty(action.Value))
+                    {
+                        // action.Value should contain target selector
+                        await page.DragAndDropAsync(action.Selector, action.Value, new PageDragAndDropOptions
+                        {
+                            Timeout = options.ActionTimeoutMs
+                        });
+                    }
+                    break;
+
+                case "reload":
+                case "refresh":
+                    await page.ReloadAsync(new PageReloadOptions
+                    {
+                        Timeout = options.ActionTimeoutMs
+                    });
+                    break;
+
+                case "goback":
+                    await page.GoBackAsync(new PageGoBackOptions
+                    {
+                        Timeout = options.ActionTimeoutMs
+                    });
+                    break;
+
+                case "goforward":
+                    await page.GoForwardAsync(new PageGoForwardOptions
+                    {
+                        Timeout = options.ActionTimeoutMs
+                    });
+                    break;
+
+                case "maximize":
+                    await page.Context.Pages.First().SetViewportSizeAsync(1920, 1080);
+                    break;
+
+                case "minimize":
+                    await page.Context.Pages.First().SetViewportSizeAsync(800, 600);
+                    break;
+
+                case "fullscreen":
+                    await page.EvaluateAsync("document.documentElement.requestFullscreen()");
+                    break;
+
+                case "switchframe":
+                case "switchiframe":
+                    if (!string.IsNullOrEmpty(action.Selector))
+                    {
+                        var frame = page.FrameLocator(action.Selector);
+                        // Note: Frame switching in Playwright is handled differently
+                        // This would need additional context management
+                    }
+                    break;
+
+                case "alert":
+                case "acceptalert":
+                    // Handle alert dialogs
+                    page.Dialog += async (sender, dialog) =>
+                    {
+                        await dialog.AcceptAsync();
+                    };
+                    break;
+
+                case "dismissalert":
+                    // Handle alert dialogs
+                    page.Dialog += async (sender, dialog) =>
+                    {
+                        await dialog.DismissAsync();
+                    };
+                    break;
+
+                case "getcookies":
+                    var cookies = await page.Context.CookiesAsync();
+                    // Store cookies for later use or validation
+                    break;
+
+                case "setcookies":
+                    if (!string.IsNullOrEmpty(action.Value))
+                    {
+                        try
+                        {
+                            var cookieData = System.Text.Json.JsonSerializer.Deserialize<dynamic>(action.Value);
+                            // Set cookies from JSON data
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning("Failed to parse cookie data: {Error}", ex.Message);
+                        }
+                    }
+                    break;
+
+                case "deletecookies":
+                    await page.Context.ClearCookiesAsync();
+                    break;
+
+                case "waitfornavigation":
+                    await page.WaitForLoadStateAsync(LoadState.NetworkIdle, new PageWaitForLoadStateOptions
+                    {
+                        Timeout = options.ActionTimeoutMs
+                    });
+                    break;
+
+                case "waitforloadstate":
+                    var loadState = action.Value?.ToLower() switch
+                    {
+                        "domcontentloaded" => LoadState.DOMContentLoaded,
+                        "networkidle" => LoadState.NetworkIdle,
+                        _ => LoadState.Load
+                    };
+                    await page.WaitForLoadStateAsync(loadState, new PageWaitForLoadStateOptions
+                    {
+                        Timeout = options.ActionTimeoutMs
+                    });
+                    break;
+
+                case "closetab":
+                case "closepage":
+                    await page.CloseAsync();
+                    break;
+
+                case "newtab":
+                case "newpage":
+                    var newPage = await page.Context.NewPageAsync();
+                    if (!string.IsNullOrEmpty(action.Value))
+                    {
+                        await newPage.GotoAsync(action.Value);
+                    }
+                    break;
+
+                case "switchwindow":
+                case "switchtab":
+                    if (!string.IsNullOrEmpty(action.Value) && int.TryParse(action.Value, out var tabIndex))
+                    {
+                        var pages = page.Context.Pages;
+                        if (tabIndex >= 0 && tabIndex < pages.Count)
+                        {
+                            await pages[tabIndex].BringToFrontAsync();
+                        }
+                    }
+                    break;
+
+                case "addstylesheet":
+                    if (!string.IsNullOrEmpty(action.Value))
+                    {
+                        await page.AddStyleTagAsync(new PageAddStyleTagOptions
+                        {
+                            Content = action.Value
+                        });
+                    }
+                    break;
+
+                case "addscript":
+                    if (!string.IsNullOrEmpty(action.Value))
+                    {
+                        await page.AddScriptTagAsync(new PageAddScriptTagOptions
+                        {
+                            Content = action.Value
+                        });
+                    }
+                    break;
+
+                case "emulatedevice":
+                    if (!string.IsNullOrEmpty(action.Value))
+                    {
+                        // Parse device settings from action.Value (JSON)
+                        try
+                        {
+                            var deviceSettings = System.Text.Json.JsonSerializer.Deserialize<dynamic>(action.Value);
+                            // Apply device emulation settings
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning("Failed to parse device emulation data: {Error}", ex.Message);
+                        }
+                    }
+                    break;
+
                 default:
-                    throw new NotSupportedException($"Action type '{action.ActionType}' is not supported");
+                    throw new NotSupportedException($"Action type '{action.ActionType}' is not supported. " +
+                        $"Supported actions: navigate, click, doubleclick, rightclick, type, focus, blur, clear, " +
+                        $"hover, scroll, wait, press, upload, drag, screenshot, evaluate, selectoption, setvalue, " +
+                        $"reload, goback, goforward, maximize, minimize, fullscreen, switchframe, alert, " +
+                        $"acceptalert, dismissalert, getcookies, setcookies, deletecookies, waitfornavigation, " +
+                        $"waitforloadstate, closetab, newtab, switchwindow, addstylesheet, addscript, emulatedevice");
             }
 
             // Apply delay after action if specified

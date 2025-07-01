@@ -1,0 +1,344 @@
+<div class="test-result-details-dialog">
+  <div mat-dialog-title class="dialog-header">
+    <div class="header-content">
+      <mat-icon [color]="getStatusColor()" class="status-icon">{{ getStatusIcon() }}</mat-icon>
+      <div class="header-text">
+        <h2>{{ data.name }}</h2>
+        <p class="test-url">{{ data.testUrl }}</p>
+      </div>
+    </div>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="dialog-content">
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <div class="metric">
+            <mat-icon>schedule</mat-icon>
+            <div class="metric-content">
+              <span class="metric-value">{{ formatDuration(data.duration) }}</span>
+              <span class="metric-label">Duration</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <div class="metric">
+            <mat-icon>playlist_play</mat-icon>
+            <div class="metric-content">
+              <span class="metric-value">{{ data.actionsExecuted }}</span>
+              <span class="metric-label">Actions</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <div class="metric">
+            <mat-icon>check_circle</mat-icon>
+            <div class="metric-content">
+              <span class="metric-value">{{ successRate }}%</span>
+              <span class="metric-label">Success Rate</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card" *ngIf="data.errorCount > 0">
+        <mat-card-content>
+          <div class="metric">
+            <mat-icon color="warn">error</mat-icon>
+            <div class="metric-content">
+              <span class="metric-value">{{ data.errorCount }}</span>
+              <span class="metric-label">Errors</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Tabs for detailed information -->
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="detail-tabs">
+      <!-- Overview Tab -->
+      <mat-tab label="Overview">
+        <div class="tab-content">
+          <div class="overview-section">
+            <h3>Test Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Test ID:</span>
+                <span class="info-value">{{ data.id }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Executed At:</span>
+                <span class="info-value">{{ formatTimestamp(data.executedAt) }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Created By:</span>
+                <span class="info-value">{{ data.createdBy }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Profile Hash:</span>
+                <span class="info-value">{{ data.profileHash.substring(0, 8) }}...</span>
+              </div>
+            </div>
+
+            <div class="description" *ngIf="data.description">
+              <h4>Description</h4>
+              <p>{{ data.description }}</p>
+            </div>
+
+            <div class="tags" *ngIf="data.tags && data.tags.length > 0">
+              <h4>Tags</h4>
+              <mat-chip-listbox>
+                <mat-chip *ngFor="let tag of data.tags">{{ tag }}</mat-chip>
+              </mat-chip-listbox>
+            </div>
+          </div>
+
+          <!-- Performance Metrics -->
+          <div class="metrics-section" *ngIf="data.metrics">
+            <h3>Performance Metrics</h3>
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <span class="metric-name">Total Load Time</span>
+                <span class="metric-value">{{ formatDuration(data.metrics.totalLoadTime) }}</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-name">DOM Content Loaded</span>
+                <span class="metric-value">{{ formatDuration(data.metrics.domContentLoaded) }}</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-name">First Contentful Paint</span>
+                <span class="metric-value">{{ formatDuration(data.metrics.firstContentfulPaint) }}</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-name">Largest Contentful Paint</span>
+                <span class="metric-value">{{ formatDuration(data.metrics.largestContentfulPaint) }}</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-name">Network Requests</span>
+                <span class="metric-value">{{ data.metrics.networkRequests }}</span>
+              </div>
+              <div class="metric-card" *ngIf="data.metrics.memoryUsage">
+                <span class="metric-name">Memory Usage</span>
+                <span class="metric-value">{{ formatFileSize(data.metrics.memoryUsage) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Actions Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span class="tab-label">
+            Actions
+            <span class="badge">{{ data.actions.length }}</span>
+          </span>
+        </ng-template>
+        <div class="tab-content">
+          <mat-table [dataSource]="data.actions" class="actions-table">
+            <ng-container matColumnDef="index">
+              <mat-header-cell *matHeaderCellDef>#</mat-header-cell>
+              <mat-cell *matCellDef="let action">{{ action.index + 1 }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="actionType">
+              <mat-header-cell *matHeaderCellDef>Action</mat-header-cell>
+              <mat-cell *matCellDef="let action">
+                <div class="action-cell">
+                  <mat-icon class="action-icon">{{ getActionIcon(action.actionType) }}</mat-icon>
+                  <span>{{ action.actionType }}</span>
+                </div>
+              </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="success">
+              <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+              <mat-cell *matCellDef="let action">
+                <mat-icon [color]="action.success ? 'primary' : 'warn'">
+                  {{ action.success ? 'check_circle' : 'error' }}
+                </mat-icon>
+              </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="duration">
+              <mat-header-cell *matHeaderCellDef>Duration</mat-header-cell>
+              <mat-cell *matCellDef="let action">{{ formatDuration(action.duration) }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+              <mat-cell *matCellDef="let action">
+                <button mat-icon-button *ngIf="action.screenshot" 
+                        (click)="viewScreenshot(action.screenshot)"
+                        matTooltip="View Screenshot">
+                  <mat-icon>camera_alt</mat-icon>
+                </button>
+              </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="actionDisplayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: actionDisplayedColumns;"></mat-row>
+          </mat-table>
+        </div>
+      </mat-tab>
+
+      <!-- Logs Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span class="tab-label">
+            Logs
+            <span class="badge">{{ data.logs.length }}</span>
+          </span>
+        </ng-template>
+        <div class="tab-content">
+          <mat-table [dataSource]="data.logs" class="logs-table">
+            <ng-container matColumnDef="timestamp">
+              <mat-header-cell *matHeaderCellDef>Time</mat-header-cell>
+              <mat-cell *matCellDef="let log">{{ formatTimestamp(log.timestamp) }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="level">
+              <mat-header-cell *matHeaderCellDef>Level</mat-header-cell>
+              <mat-cell *matCellDef="let log">
+                <div class="log-level" [ngClass]="'log-level-' + log.level.toLowerCase()">
+                  <mat-icon [color]="getLogLevelColor(log.level)">{{ getLogLevelIcon(log.level) }}</mat-icon>
+                  <span>{{ log.level.toUpperCase() }}</span>
+                </div>
+              </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="category">
+              <mat-header-cell *matHeaderCellDef>Category</mat-header-cell>
+              <mat-cell *matCellDef="let log">{{ log.category }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="message">
+              <mat-header-cell *matHeaderCellDef>Message</mat-header-cell>
+              <mat-cell *matCellDef="let log">{{ log.message }}</mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="logDisplayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: logDisplayedColumns;"></mat-row>
+          </mat-table>
+        </div>
+      </mat-tab>
+
+      <!-- Network Tab -->
+              <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="tab-label">
+              Network
+              <span class="badge">{{ data.networkRequests.length }}</span>
+            </span>
+          </ng-template>
+        <div class="tab-content">
+          <div class="network-summary">
+            <div class="network-stat">
+              <span class="stat-label">Total Requests:</span>
+              <span class="stat-value">{{ data.networkRequests.length }}</span>
+            </div>
+            <div class="network-stat">
+              <span class="stat-label">Total Size:</span>
+              <span class="stat-value">{{ formatFileSize(totalNetworkSize) }}</span>
+            </div>
+            <div class="network-stat">
+              <span class="stat-label">Avg Response Time:</span>
+              <span class="stat-value">{{ averageResponseTime }}ms</span>
+            </div>
+          </div>
+
+          <mat-table [dataSource]="data.networkRequests" class="network-table">
+            <ng-container matColumnDef="method">
+              <mat-header-cell *matHeaderCellDef>Method</mat-header-cell>
+              <mat-cell *matCellDef="let request">
+                <span class="method-badge" [ngClass]="'method-' + request.method.toLowerCase()">
+                  {{ request.method }}
+                </span>
+              </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="url">
+              <mat-header-cell *matHeaderCellDef>URL</mat-header-cell>
+              <mat-cell *matCellDef="let request" class="url-cell">{{ request.url }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+              <mat-cell *matCellDef="let request">
+                <span class="status-badge" [ngClass]="'status-' + Math.floor(request.status / 100)">
+                  {{ request.status }}
+                </span>
+              </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="responseTime">
+              <mat-header-cell *matHeaderCellDef>Response Time</mat-header-cell>
+              <mat-cell *matCellDef="let request">{{ request.responseTime }}ms</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="size">
+              <mat-header-cell *matHeaderCellDef>Size</mat-header-cell>
+              <mat-cell *matCellDef="let request">{{ formatFileSize(request.size) }}</mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="networkDisplayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: networkDisplayedColumns;"></mat-row>
+          </mat-table>
+        </div>
+      </mat-tab>
+
+      <!-- Console Tab -->
+              <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="tab-label">
+              Console
+              <span class="badge">{{ data.consoleMessages.length }}</span>
+            </span>
+          </ng-template>
+        <div class="tab-content">
+          <mat-table [dataSource]="data.consoleMessages" class="console-table">
+            <ng-container matColumnDef="timestamp">
+              <mat-header-cell *matHeaderCellDef>Time</mat-header-cell>
+              <mat-cell *matCellDef="let message">{{ formatTimestamp(message.timestamp) }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="level">
+              <mat-header-cell *matHeaderCellDef>Level</mat-header-cell>
+              <mat-cell *matCellDef="let message">
+                <span class="console-level" [ngClass]="'console-level-' + message.level.toLowerCase()">
+                  {{ message.level.toUpperCase() }}
+                </span>
+              </mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="text">
+              <mat-header-cell *matHeaderCellDef>Message</mat-header-cell>
+              <mat-cell *matCellDef="let message">{{ message.text }}</mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="consoleDisplayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: consoleDisplayedColumns;"></mat-row>
+          </mat-table>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button (click)="exportResults()">
+      <mat-icon>download</mat-icon>
+      Export
+    </button>
+    <button mat-raised-button color="primary" (click)="close()">Close</button>
+  </div>
+</div> 

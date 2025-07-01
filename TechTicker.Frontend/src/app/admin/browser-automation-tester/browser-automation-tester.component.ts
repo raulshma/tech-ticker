@@ -26,6 +26,7 @@ import { TechTickerApiClient, BrowserAutomationTestRequestDto, SaveTestResultReq
 import { BrowserAutomationTestHubService } from './services/browser-automation-test-hub.service';
 import { AdvancedTestConfigDialogComponent } from './components/advanced-test-config-dialog.component';
 import { TestResultsHistoryComponent } from './components/test-results-history.component';
+declare var jsPDF: any;
 
 @Component({
   selector: 'app-browser-automation-tester',
@@ -380,8 +381,9 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
           extension = 'csv';
           break;
         case 'pdf':
-          // PDF export would require additional library
-          this.showErrorMessage('PDF export not yet implemented');
+          await this.convertToPDF(exportData);
+          // PDF is handled differently, no blob creation needed
+          this.showSuccessMessage(`Test data exported as PDF`);
           return;
         default:
           throw new Error('Unsupported export format');
@@ -414,6 +416,84 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
       headers.join(','),
       ...rows.map((row: any[]) => row.map(cell => `"${cell}"`).join(','))
     ].join('\n');
+  }
+
+  private async convertToPDF(data: any): Promise<void> {
+    try {
+      // Create a new PDF document using dynamic import to avoid build issues
+      const jsPDFModule = await import('jspdf');
+      const jsPDFClass = (jsPDFModule as any).jsPDF || jsPDFModule.default;
+      const doc = new jsPDFClass();
+
+    // Add title
+    doc.setFontSize(18);
+    doc.text('Browser Automation Test Report', 20, 20);
+
+    // Add test information
+    doc.setFontSize(12);
+    let yPosition = 40;
+    
+    if (this.testResults) {
+      doc.text(`Test URL: ${this.testerForm.value.testUrl}`, 20, yPosition);
+      yPosition += 10;
+      doc.text(`Test Status: ${this.isTestSuccessful ? 'Success' : 'Failed'}`, 20, yPosition);
+      yPosition += 10;
+      doc.text(`Duration: ${this.formatDuration(this.testDuration)}`, 20, yPosition);
+      yPosition += 10;
+      doc.text(`Actions Executed: ${this.testActionsExecuted}`, 20, yPosition);
+      yPosition += 10;
+      doc.text(`Error Count: ${this.testErrorCount}`, 20, yPosition);
+      yPosition += 20;
+    }
+
+    // Add logs section
+    doc.setFontSize(14);
+    doc.text('Test Logs', 20, yPosition);
+    yPosition += 15;
+
+    // Prepare logs data for table
+    const logData = data.logs.slice(0, 50).map((log: any) => [
+      new Date(log.timestamp).toLocaleTimeString(),
+      log.level.toUpperCase(),
+      log.category || 'General',
+      log.message.substring(0, 60) + (log.message.length > 60 ? '...' : '')
+    ]);
+
+    // Add table using autoTable plugin
+    (doc as any).autoTable({
+      startY: yPosition,
+      head: [['Time', 'Level', 'Category', 'Message']],
+      body: logData,
+      theme: 'striped',
+      styles: {
+        fontSize: 8,
+        cellPadding: 2
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: 255
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      }
+    });
+
+    // Add footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() - 40, doc.internal.pageSize.getHeight() - 10);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 20, doc.internal.pageSize.getHeight() - 10);
+    }
+
+      // Save the PDF
+      const fileName = `test-report-${Date.now()}.pdf`;
+      doc.save(fileName);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      throw new Error('Failed to generate PDF report');
+    }
   }
 
   async startTest(): Promise<void> {

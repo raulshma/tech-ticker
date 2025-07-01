@@ -1,0 +1,411 @@
+<div class="test-result-comparison-dialog">
+  <div mat-dialog-title class="dialog-header">
+    <div class="header-content">
+      <mat-icon [color]="getPerformanceChangeColor()" class="performance-icon">
+        {{ getPerformanceChangeIcon() }}
+      </mat-icon>
+      <div class="header-text">
+        <h2>Test Results Comparison</h2>
+        <p class="performance-summary">{{ getPerformanceChangeText() }}</p>
+      </div>
+    </div>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="dialog-content">
+    <!-- Overall Comparison Summary -->
+    <div class="comparison-summary">
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <div class="comparison-grid">
+            <div class="comparison-item">
+              <span class="comparison-label">Duration Change</span>
+              <div class="comparison-value">
+                <mat-icon [color]="getComparisonColor(data.comparison.durationPercentageChange, true)">
+                  {{ getComparisonIcon(data.comparison.durationPercentageChange) }}
+                </mat-icon>
+                <span>{{ formatPercentage(data.comparison.durationPercentageChange) }}</span>
+              </div>
+            </div>
+
+            <div class="comparison-item">
+              <span class="comparison-label">Success Rate Change</span>
+              <div class="comparison-value">
+                <mat-icon [color]="getComparisonColor(data.comparison.successRateDifference, true)">
+                  {{ getComparisonIcon(data.comparison.successRateDifference) }}
+                </mat-icon>
+                <span>{{ formatDifference(data.comparison.successRateDifference, '%') }}</span>
+              </div>
+            </div>
+
+            <div class="comparison-item">
+              <span class="comparison-label">Error Count Change</span>
+              <div class="comparison-value">
+                <mat-icon [color]="getComparisonColor(data.comparison.errorsDifference, false)">
+                  {{ getComparisonIcon(data.comparison.errorsDifference) }}
+                </mat-icon>
+                <span>{{ formatDifference(data.comparison.errorsDifference, '') }}</span>
+              </div>
+            </div>
+
+            <div class="comparison-item">
+              <span class="comparison-label">Actions Change</span>
+              <div class="comparison-value">
+                <mat-icon [color]="getComparisonColor(data.comparison.actionsDifference)">
+                  {{ getComparisonIcon(data.comparison.actionsDifference) }}
+                </mat-icon>
+                <span>{{ formatDifference(data.comparison.actionsDifference, '') }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Tabs for detailed comparison -->
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="comparison-tabs">
+      <!-- Side-by-Side Overview -->
+      <mat-tab label="Overview">
+        <div class="tab-content">
+          <div class="side-by-side-comparison">
+            <!-- First Result -->
+            <div class="result-column">
+              <h3>{{ data.firstResult.name }}</h3>
+              <div class="result-details">
+                <div class="detail-item">
+                  <mat-icon [color]="getStatusColor(data.firstResult.success)">
+                    {{ getStatusIcon(data.firstResult.success) }}
+                  </mat-icon>
+                  <span>{{ data.firstResult.success ? 'Success' : 'Failed' }}</span>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>schedule</mat-icon>
+                  <span>{{ formatDuration(data.firstResult.duration) }}</span>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>playlist_play</mat-icon>
+                  <span>{{ data.firstResult.actionsExecuted }} actions</span>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>{{ firstSuccessRate }}% success rate</span>
+                </div>
+
+                <div class="detail-item" *ngIf="data.firstResult.errorCount > 0">
+                  <mat-icon color="warn">error</mat-icon>
+                  <span>{{ data.firstResult.errorCount }} errors</span>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>event</mat-icon>
+                  <span>{{ formatTimestamp(data.firstResult.executedAt) }}</span>
+                </div>
+              </div>
+
+              <!-- Performance Metrics -->
+              <div class="performance-metrics" *ngIf="data.firstResult.metrics">
+                <h4>Performance Metrics</h4>
+                <div class="metrics-list">
+                  <div class="metric-item">
+                    <span class="metric-name">Load Time:</span>
+                    <span class="metric-value">{{ formatDuration(data.firstResult.metrics.totalLoadTime) }}</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-name">DOM Content Loaded:</span>
+                    <span class="metric-value">{{ formatDuration(data.firstResult.metrics.domContentLoaded) }}</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-name">First Contentful Paint:</span>
+                    <span class="metric-value">{{ formatDuration(data.firstResult.metrics.firstContentfulPaint) }}</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-name">Network Requests:</span>
+                    <span class="metric-value">{{ data.firstResult.metrics.networkRequests }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Comparison Arrow -->
+            <div class="comparison-arrow">
+              <mat-icon class="arrow-icon">compare_arrows</mat-icon>
+            </div>
+
+            <!-- Second Result -->
+            <div class="result-column">
+              <h3>{{ data.secondResult.name }}</h3>
+              <div class="result-details">
+                <div class="detail-item">
+                  <mat-icon [color]="getStatusColor(data.secondResult.success)">
+                    {{ getStatusIcon(data.secondResult.success) }}
+                  </mat-icon>
+                  <span>{{ data.secondResult.success ? 'Success' : 'Failed' }}</span>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>schedule</mat-icon>
+                  <span>{{ formatDuration(data.secondResult.duration) }}</span>
+                  <span class="change-indicator" 
+                        [ngClass]="getComparisonColor(data.comparison.durationPercentageChange, true)">
+                    ({{ formatPercentage(data.comparison.durationPercentageChange) }})
+                  </span>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>playlist_play</mat-icon>
+                  <span>{{ data.secondResult.actionsExecuted }} actions</span>
+                  <span class="change-indicator" 
+                        [ngClass]="getComparisonColor(data.comparison.actionsDifference)"
+                        *ngIf="data.comparison.actionsDifference !== 0">
+                    ({{ formatDifference(data.comparison.actionsDifference, '') }})
+                  </span>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>{{ secondSuccessRate }}% success rate</span>
+                  <span class="change-indicator" 
+                        [ngClass]="getComparisonColor(data.comparison.successRateDifference, true)"
+                        *ngIf="data.comparison.successRateDifference !== 0">
+                    ({{ formatDifference(data.comparison.successRateDifference, '%') }})
+                  </span>
+                </div>
+
+                <div class="detail-item" *ngIf="data.secondResult.errorCount > 0">
+                  <mat-icon color="warn">error</mat-icon>
+                  <span>{{ data.secondResult.errorCount }} errors</span>
+                  <span class="change-indicator" 
+                        [ngClass]="getComparisonColor(data.comparison.errorsDifference, false)"
+                        *ngIf="data.comparison.errorsDifference !== 0">
+                    ({{ formatDifference(data.comparison.errorsDifference, '') }})
+                  </span>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>event</mat-icon>
+                  <span>{{ formatTimestamp(data.secondResult.executedAt) }}</span>
+                </div>
+              </div>
+
+              <!-- Performance Metrics with Comparisons -->
+              <div class="performance-metrics" *ngIf="data.secondResult.metrics">
+                <h4>Performance Metrics</h4>
+                <div class="metrics-list">
+                  <div class="metric-item">
+                    <span class="metric-name">Load Time:</span>
+                    <span class="metric-value">{{ formatDuration(data.secondResult.metrics.totalLoadTime) }}</span>
+                    <span class="change-indicator" 
+                          [ngClass]="getComparisonColor(data.comparison.performanceMetrics.loadTimeDifference, true)"
+                          *ngIf="data.comparison.performanceMetrics.loadTimeDifference !== 0">
+                      ({{ formatDifference(data.comparison.performanceMetrics.loadTimeDifference) }})
+                    </span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-name">DOM Content Loaded:</span>
+                    <span class="metric-value">{{ formatDuration(data.secondResult.metrics.domContentLoaded) }}</span>
+                    <span class="change-indicator" 
+                          [ngClass]="getComparisonColor(data.comparison.performanceMetrics.domContentLoadedDifference, true)"
+                          *ngIf="data.comparison.performanceMetrics.domContentLoadedDifference !== 0">
+                      ({{ formatDifference(data.comparison.performanceMetrics.domContentLoadedDifference) }})
+                    </span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-name">First Contentful Paint:</span>
+                    <span class="metric-value">{{ formatDuration(data.secondResult.metrics.firstContentfulPaint) }}</span>
+                    <span class="change-indicator" 
+                          [ngClass]="getComparisonColor(data.comparison.performanceMetrics.firstContentfulPaintDifference, true)"
+                          *ngIf="data.comparison.performanceMetrics.firstContentfulPaintDifference !== 0">
+                      ({{ formatDifference(data.comparison.performanceMetrics.firstContentfulPaintDifference) }})
+                    </span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-name">Network Requests:</span>
+                    <span class="metric-value">{{ data.secondResult.metrics.networkRequests }}</span>
+                    <span class="change-indicator" 
+                          [ngClass]="getComparisonColor(data.comparison.performanceMetrics.networkRequestsDifference)"
+                          *ngIf="data.comparison.performanceMetrics.networkRequestsDifference !== 0">
+                      ({{ formatDifference(data.comparison.performanceMetrics.networkRequestsDifference, '') }})
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Action-by-Action Comparison -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span class="tab-label">
+            Actions
+            <span class="badge">{{ significantActions.length }}</span>
+          </span>
+        </ng-template>
+        <div class="tab-content">
+          <div class="actions-comparison">
+            <div class="comparison-info" *ngIf="significantActions.length > 0">
+              <mat-icon color="accent">info</mat-icon>
+              <span>Showing {{ significantActions.length }} actions with significant differences (status changes or >1s duration difference)</span>
+            </div>
+
+            <mat-table [dataSource]="data.comparison.actionComparisons" class="actions-comparison-table">
+              <ng-container matColumnDef="index">
+                <mat-header-cell *matHeaderCellDef>#</mat-header-cell>
+                <mat-cell *matCellDef="let comparison">{{ comparison.index + 1 }}</mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="actionType">
+                <mat-header-cell *matHeaderCellDef>Action</mat-header-cell>
+                <mat-cell *matCellDef="let comparison">
+                  <div class="action-cell">
+                    <mat-icon class="action-icon">{{ getActionIcon(comparison.actionType) }}</mat-icon>
+                    <span>{{ comparison.actionType }}</span>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="firstResult">
+                <mat-header-cell *matHeaderCellDef>First Result</mat-header-cell>
+                <mat-cell *matCellDef="let comparison">
+                  <div class="result-cell">
+                    <mat-icon [color]="getStatusColor(comparison.firstResult.success)" class="status-icon">
+                      {{ getStatusIcon(comparison.firstResult.success) }}
+                    </mat-icon>
+                    <span class="duration">{{ formatDuration(comparison.firstResult.duration) }}</span>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="secondResult">
+                <mat-header-cell *matHeaderCellDef>Second Result</mat-header-cell>
+                <mat-cell *matCellDef="let comparison">
+                  <div class="result-cell">
+                    <mat-icon [color]="getStatusColor(comparison.secondResult.success)" class="status-icon">
+                      {{ getStatusIcon(comparison.secondResult.success) }}
+                    </mat-icon>
+                    <span class="duration">{{ formatDuration(comparison.secondResult.duration) }}</span>
+                    <mat-icon *ngIf="comparison.statusChanged" 
+                              color="accent" 
+                              class="status-change-icon"
+                              matTooltip="Status changed between tests">
+                      swap_horiz
+                    </mat-icon>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="difference">
+                <mat-header-cell *matHeaderCellDef>Difference</mat-header-cell>
+                <mat-cell *matCellDef="let comparison">
+                  <div class="difference-cell">
+                    <mat-icon [color]="getComparisonColor(comparison.durationDifference, true)">
+                      {{ getComparisonIcon(comparison.durationDifference) }}
+                    </mat-icon>
+                    <span [ngClass]="getComparisonColor(comparison.durationDifference, true)">
+                      {{ formatDifference(comparison.durationDifference) }}
+                    </span>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <mat-header-row *matHeaderRowDef="actionComparisonColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: actionComparisonColumns;"
+                       [ngClass]="{'significant-change': row.statusChanged || Math.abs(row.durationDifference) > 1000}">
+              </mat-row>
+            </mat-table>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Performance Comparison -->
+      <mat-tab label="Performance">
+        <div class="tab-content">
+          <div class="performance-comparison">
+            <div class="performance-summary">
+              <h3>Performance Metrics Comparison</h3>
+              <p>Changes in key performance indicators between the two test runs.</p>
+            </div>
+
+            <div class="performance-grid">
+              <mat-card class="performance-card">
+                <mat-card-header>
+                  <mat-card-title>Page Load Performance</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="metric-comparison">
+                    <div class="metric-row">
+                      <span class="metric-label">Total Load Time:</span>
+                      <span class="metric-change" 
+                            [ngClass]="getComparisonColor(data.comparison.performanceMetrics.loadTimeDifference, true)">
+                        {{ formatDifference(data.comparison.performanceMetrics.loadTimeDifference) }}
+                      </span>
+                    </div>
+                    <div class="metric-row">
+                      <span class="metric-label">DOM Content Loaded:</span>
+                      <span class="metric-change" 
+                            [ngClass]="getComparisonColor(data.comparison.performanceMetrics.domContentLoadedDifference, true)">
+                        {{ formatDifference(data.comparison.performanceMetrics.domContentLoadedDifference) }}
+                      </span>
+                    </div>
+                    <div class="metric-row">
+                      <span class="metric-label">First Contentful Paint:</span>
+                      <span class="metric-change" 
+                            [ngClass]="getComparisonColor(data.comparison.performanceMetrics.firstContentfulPaintDifference, true)">
+                        {{ formatDifference(data.comparison.performanceMetrics.firstContentfulPaintDifference) }}
+                      </span>
+                    </div>
+                    <div class="metric-row">
+                      <span class="metric-label">Largest Contentful Paint:</span>
+                      <span class="metric-change" 
+                            [ngClass]="getComparisonColor(data.comparison.performanceMetrics.largestContentfulPaintDifference, true)">
+                        {{ formatDifference(data.comparison.performanceMetrics.largestContentfulPaintDifference) }}
+                      </span>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+
+              <mat-card class="performance-card">
+                <mat-card-header>
+                  <mat-card-title>Resource Usage</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="metric-comparison">
+                    <div class="metric-row">
+                      <span class="metric-label">Network Requests:</span>
+                      <span class="metric-change" 
+                            [ngClass]="getComparisonColor(data.comparison.performanceMetrics.networkRequestsDifference)">
+                        {{ formatDifference(data.comparison.performanceMetrics.networkRequestsDifference, '') }}
+                      </span>
+                    </div>
+                    <div class="metric-row" *ngIf="data.comparison.performanceMetrics.memoryUsageDifference">
+                      <span class="metric-label">Memory Usage:</span>
+                      <span class="metric-change" 
+                            [ngClass]="getComparisonColor(data.comparison.performanceMetrics.memoryUsageDifference!, false)">
+                        {{ formatFileSize(data.comparison.performanceMetrics.memoryUsageDifference!) }}
+                      </span>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button (click)="exportComparison()">
+      <mat-icon>download</mat-icon>
+      Export Comparison
+    </button>
+    <button mat-raised-button color="primary" (click)="close()">Close</button>
+  </div>
+</div>

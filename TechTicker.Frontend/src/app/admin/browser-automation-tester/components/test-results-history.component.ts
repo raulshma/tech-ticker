@@ -22,6 +22,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { TechTickerApiClient } from '../../../shared/api/api-client';
+import { TestResultDetailsDialogComponent } from './test-result-details-dialog.component';
+import { TestResultComparisonDialogComponent } from './test-result-comparison-dialog.component';
 
 // Define interfaces for the component
 interface SavedTestResult {
@@ -425,13 +427,21 @@ export class TestResultsHistoryComponent implements OnInit, OnDestroy {
 
   // Dialog methods
   private openDetailsDialog(details: any): void {
-    // TODO: Implement details dialog
-    console.log('Opening details dialog for:', details);
+    this.dialog.open(TestResultDetailsDialogComponent, {
+      width: '90vw',
+      maxWidth: '1200px',
+      height: '80vh',
+      data: details
+    });
   }
 
   private openComparisonDialog(comparison: any): void {
-    // TODO: Implement comparison dialog
-    console.log('Opening comparison dialog for:', comparison);
+    this.dialog.open(TestResultComparisonDialogComponent, {
+      width: '95vw',
+      maxWidth: '1400px',
+      height: '85vh',
+      data: comparison
+    });
   }
 
   // Notification methods

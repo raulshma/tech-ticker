@@ -1,0 +1,247 @@
+.comparison-dialog {
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    .title {
+      font-size: 24px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .status-icon {
+      &.improved { color: #4caf50; }
+      &.degraded { color: #f44336; }
+      &.neutral { color: #9e9e9e; }
+    }
+  }
+
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+
+    .metric-card {
+      padding: 16px;
+      text-align: center;
+
+      .metric-value {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 8px;
+
+        &.positive { color: #4caf50; }
+        &.negative { color: #f44336; }
+        &.neutral { color: #9e9e9e; }
+      }
+
+      .metric-label {
+        font-size: 14px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .metric-change {
+        font-size: 12px;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+
+        &.improvement { color: #4caf50; }
+        &.degradation { color: #f44336; }
+      }
+    }
+  }
+
+  .comparison-tabs {
+    .mat-mdc-tab-header {
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .tab-content {
+      padding: 24px 0;
+    }
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+
+    .test-summary {
+      .test-info {
+        h3 {
+          margin: 0 0 16px 0;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .info-row {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 8px;
+
+          .label {
+            font-weight: 500;
+            color: #666;
+          }
+
+          .value {
+            color: #333;
+          }
+        }
+      }
+    }
+  }
+
+  .performance-comparison {
+    .performance-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+
+      .metric-comparison {
+        padding: 16px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+
+        .metric-name {
+          font-weight: 500;
+          color: #666;
+          margin-bottom: 8px;
+        }
+
+        .metric-values {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .value {
+            font-size: 18px;
+            font-weight: 600;
+          }
+
+          .difference {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+
+            &.positive { color: #4caf50; }
+            &.negative { color: #f44336; }
+          }
+        }
+      }
+    }
+  }
+
+  .actions-table {
+    .mat-mdc-table {
+      width: 100%;
+
+      .mat-mdc-header-cell,
+      .mat-mdc-cell {
+        padding: 12px 8px;
+      }
+
+      .action-type-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .result-cell {
+        .result-status {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 4px;
+
+          &.success { color: #4caf50; }
+          &.error { color: #f44336; }
+        }
+
+        .duration {
+          font-size: 12px;
+          color: #666;
+        }
+
+        .error-message {
+          font-size: 11px;
+          color: #f44336;
+          font-style: italic;
+          margin-top: 4px;
+        }
+      }
+
+      .difference-cell {
+        text-align: center;
+
+        .duration-diff {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          justify-content: center;
+
+          &.faster { color: #4caf50; }
+          &.slower { color: #f44336; }
+        }
+
+        .status-change {
+          font-size: 12px;
+          padding: 2px 8px;
+          border-radius: 12px;
+          margin-top: 4px;
+
+          &.improved {
+            background-color: #e8f5e8;
+            color: #4caf50;
+          }
+
+          &.degraded {
+            background-color: #ffeaea;
+            color: #f44336;
+          }
+
+          &.unchanged {
+            background-color: #f5f5f5;
+            color: #666;
+          }
+        }
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .comparison-dialog {
+    .summary-cards {
+      grid-template-columns: 1fr;
+    }
+
+    .overview-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .performance-comparison .performance-metrics {
+      grid-template-columns: 1fr;
+    }
+  }
+} 
