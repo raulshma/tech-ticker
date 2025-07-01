@@ -50,6 +50,22 @@ public class ProductSellerMapping
     [Required]
     public DateTimeOffset UpdatedAt { get; set; }
 
+    // Specification Storage
+    /// <summary>
+    /// JSON string of latest parsed specifications
+    /// </summary>
+    public string? LatestSpecifications { get; set; }
+
+    /// <summary>
+    /// When the specifications were last updated
+    /// </summary>
+    public DateTime? SpecificationsLastUpdated { get; set; }
+
+    /// <summary>
+    /// Quality score of the latest specifications (0.0 to 1.0)
+    /// </summary>
+    public double? SpecificationsQualityScore { get; set; }
+
     // Navigation properties
     [ForeignKey(nameof(CanonicalProductId))]
     public Product Product { get; set; } = null!;

@@ -12,33 +12,7 @@ public class BrowserAutomationTestRequestDto
     public string? SessionName { get; set; }
 }
 
-/// <summary>
-/// Browser automation profile for testing
-/// </summary>
-public class BrowserAutomationProfileDto
-{
-    public string? PreferredBrowser { get; set; }
-    public int? WaitTimeMs { get; set; }
-    public List<BrowserAutomationActionDto>? Actions { get; set; }
-    public int? TimeoutSeconds { get; set; }
-    public string? UserAgent { get; set; }
-    public Dictionary<string, string>? Headers { get; set; }
-    public string? ProxyServer { get; set; }
-    public string? ProxyUsername { get; set; }
-    public string? ProxyPassword { get; set; }
-}
 
-/// <summary>
-/// Browser automation action for testing
-/// </summary>
-public class BrowserAutomationActionDto
-{
-    public string ActionType { get; set; } = null!;
-    public string? Selector { get; set; }
-    public int? Repeat { get; set; }
-    public int? DelayMs { get; set; }
-    public string? Value { get; set; }
-}
 
 /// <summary>
 /// Browser test configuration options

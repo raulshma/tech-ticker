@@ -21,6 +21,24 @@ public class ScraperSiteConfigurationDto
     public DateTimeOffset UpdatedAt { get; set; }
     public bool RequiresBrowserAutomation { get; set; }
     public string? BrowserAutomationProfile { get; set; }
+    
+    // Specification scraping properties
+    public string? SpecificationTableSelector { get; set; }
+    public string? SpecificationContainerSelector { get; set; }
+    public bool EnableSpecificationScraping { get; set; }
+    public SpecificationParsingOptions? SpecificationOptions { get; set; }
+}
+
+/// <summary>
+/// Configuration options for specification parsing
+/// </summary>
+public class SpecificationParsingOptions
+{
+    public bool EnableCaching { get; set; } = true;
+    public bool ThrowOnError { get; set; } = false;
+    public int MaxCacheEntries { get; set; } = 1000;
+    public TimeSpan CacheExpiry { get; set; } = TimeSpan.FromHours(24);
+    public string PreferredVendor { get; set; } = "Generic";
 }
 
 /// <summary>
@@ -53,6 +71,12 @@ public class CreateScraperSiteConfigurationDto
 
     public bool RequiresBrowserAutomation { get; set; } = false;
     public string? BrowserAutomationProfile { get; set; }
+    
+    // Specification scraping properties
+    public string? SpecificationTableSelector { get; set; }
+    public string? SpecificationContainerSelector { get; set; }
+    public bool EnableSpecificationScraping { get; set; } = false;
+    public SpecificationParsingOptions? SpecificationOptions { get; set; }
 }
 
 /// <summary>
@@ -81,4 +105,10 @@ public class UpdateScraperSiteConfigurationDto
 
     public bool? RequiresBrowserAutomation { get; set; }
     public string? BrowserAutomationProfile { get; set; }
+    
+    // Specification scraping properties
+    public string? SpecificationTableSelector { get; set; }
+    public string? SpecificationContainerSelector { get; set; }
+    public bool? EnableSpecificationScraping { get; set; }
+    public SpecificationParsingOptions? SpecificationOptions { get; set; }
 }

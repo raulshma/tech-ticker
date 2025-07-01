@@ -9,6 +9,9 @@ using TechTicker.Application.Messages;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.ScrapingWorker.Services;
 using Microsoft.Playwright;
+using Microsoft.Extensions.Caching.Memory;
+using TechTicker.Shared.Utilities.Html;
+using System.Text.Json;
 
 namespace TechTicker.ScrapingWorker.Services;
 
@@ -21,6 +24,8 @@ public partial class WebScrapingService
     private readonly ProxyAwareHttpClientService _proxyHttpClient;
     private readonly IScraperRunLogService _scraperRunLogService;
     private readonly IImageScrapingService _imageScrapingService;
+    private readonly ITableParser _tableParser;
+    private readonly IMemoryCache _cache;
 
     [GeneratedRegex(@"[\d,]+\.?\d*")]
     private static partial Regex PriceRegex();
@@ -29,15 +34,19 @@ public partial class WebScrapingService
         ILogger<WebScrapingService> logger,
         ProxyAwareHttpClientService proxyHttpClient,
         IScraperRunLogService scraperRunLogService,
-        IImageScrapingService imageScrapingService)
+        IImageScrapingService imageScrapingService,
+        ITableParser tableParser,
+        IMemoryCache cache)
     {
         _logger = logger;
         _proxyHttpClient = proxyHttpClient;
         _scraperRunLogService = scraperRunLogService;
         _imageScrapingService = imageScrapingService;
+        _tableParser = tableParser;
+        _cache = cache;
     }
 
-    public async Task<ScrapingResult> ScrapeProductPageAsync(ScrapeProductPageCommand command)
+    public async Task<ScrapingResult> ScrapeProductPageAsync(TechTicker.Application.Messages.ScrapeProductPageCommand command)
     {
         if (command.RequiresBrowserAutomation)
         {
@@ -183,6 +192,38 @@ public partial class WebScrapingService
                 }
             }
 
+            // Scrape specifications if enabled and selector is provided
+            ProductSpecificationResult? specificationResult = null;
+            if (command.ScrapeSpecifications && !string.IsNullOrEmpty(command.Selectors.SpecificationTableSelector))
+            {
+                var specStopwatch = Stopwatch.StartNew();
+                try
+                {
+                    specificationResult = await ScrapeProductSpecificationsAsync(
+                        document, 
+                        command.Selectors.SpecificationTableSelector,
+                        command.Selectors.SpecificationContainerSelector,
+                        command.Selectors.SpecificationOptions,
+                        command.MappingId);
+                    
+                    specStopwatch.Stop();
+                    specificationResult.ParsingTimeMs = specStopwatch.ElapsedMilliseconds;
+
+                    _logger.LogInformation("Specification scraping completed for mapping {MappingId}: {SpecCount} specifications parsed",
+                        command.MappingId, specificationResult.Specifications?.Count ?? 0);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Specification scraping failed for mapping {MappingId}", command.MappingId);
+                    specificationResult = new ProductSpecificationResult
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = ex.Message,
+                        ParsingTimeMs = specStopwatch.ElapsedMilliseconds
+                    };
+                }
+            }
+
             parsingStopwatch.Stop();
 
             // Get HTML snippet for debugging (first 1000 characters) and sanitize it
@@ -246,7 +287,17 @@ public partial class WebScrapingService
                     RawHtmlSnippet = htmlSnippet,
                     DebugNotes = $"Successfully extracted all data in {overallStopwatch.ElapsedMilliseconds}ms",
                     ProxyUsed = proxyResponse.ProxyUsed,
-                    ProxyId = proxyResponse.ProxyId
+                    ProxyId = proxyResponse.ProxyId,
+                    // Specification data
+                    SpecificationData = specificationResult?.IsSuccess == true ? 
+                        JsonSerializer.Serialize(specificationResult.Specifications) : null,
+                    SpecificationMetadata = specificationResult != null ? 
+                        JsonSerializer.Serialize(specificationResult.Metadata) : null,
+                    SpecificationCount = specificationResult?.Specifications?.Count,
+                    SpecificationParsingStrategy = specificationResult?.Metadata?.Structure.ToString(),
+                    SpecificationQualityScore = specificationResult?.Quality?.OverallScore,
+                    SpecificationParsingTime = specificationResult?.ParsingTimeMs,
+                    SpecificationError = specificationResult?.IsSuccess == false ? specificationResult.ErrorMessage : null
                 });
             }
 
@@ -260,7 +311,8 @@ public partial class WebScrapingService
                 ScrapedAt = DateTimeOffset.UtcNow,
                 PrimaryImageUrl = imageResult?.PrimaryImageUrl,
                 AdditionalImageUrls = imageResult?.AdditionalImageUrls ?? new List<string>(),
-                OriginalImageUrls = imageResult?.OriginalImageUrls ?? new List<string>()
+                OriginalImageUrls = imageResult?.OriginalImageUrls ?? new List<string>(),
+                Specifications = specificationResult
             };
 
             _logger.LogInformation("Successfully scraped product data for mapping {MappingId}: Price={Price}, Stock={Stock}",
@@ -498,7 +550,144 @@ public partial class WebScrapingService
         }
     }
 
-    private async Task<ScrapingResult> ScrapeWithBrowserAutomationAsync(ScrapeProductPageCommand command)
+    private async Task<ProductSpecificationResult> ScrapeProductSpecificationsAsync(
+        IDocument document,
+        string tableSelector,
+        string? containerSelector,
+        TechTicker.Application.DTOs.SpecificationParsingOptions? options,
+        Guid mappingId)
+    {
+        try
+        {
+            _logger.LogInformation("Starting specification parsing for mapping {MappingId}", mappingId);
+
+            // Find specification tables
+            var tables = string.IsNullOrEmpty(containerSelector)
+                ? document.QuerySelectorAll(tableSelector)
+                : document.QuerySelector(containerSelector)?.QuerySelectorAll(tableSelector);
+
+            if (tables == null || !tables.Any())
+            {
+                return new ProductSpecificationResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "No specification tables found with the provided selector"
+                };
+            }
+
+            // Convert to HTML and parse with HtmlUtilities
+            var htmlContent = string.Join("\n", tables.Select(t => t.OuterHtml));
+            
+            var parsingOptions = new ParsingOptions
+            {
+                EnableCaching = options?.EnableCaching ?? true,
+                ThrowOnError = options?.ThrowOnError ?? false,
+                MaxCacheEntries = options?.MaxCacheEntries ?? 1000,
+                CacheExpiry = options?.CacheExpiry ?? TimeSpan.FromHours(24)
+            };
+
+            var parseResult = await _tableParser.ParseAsync(htmlContent, parsingOptions);
+
+            if (!parseResult.Success || !parseResult.Data.Any())
+            {
+                return new ProductSpecificationResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "Failed to parse specification tables",
+                    Metadata = new ParseMetadata
+                    {
+                        Warnings = parseResult.Warnings,
+                        ProcessingTimeMs = (long)parseResult.ProcessingTime.TotalMilliseconds
+                    }
+                };
+            }
+
+            // Merge all parsed specifications
+            var mergedSpec = MergeSpecifications(parseResult.Data);
+
+            _logger.LogInformation("Successfully parsed {SpecCount} specifications for mapping {MappingId}", 
+                mergedSpec.Specifications.Count, mappingId);
+
+            return new ProductSpecificationResult
+            {
+                IsSuccess = true,
+                Specifications = mergedSpec.Specifications,
+                TypedSpecifications = mergedSpec.TypedSpecifications,
+                CategorizedSpecs = mergedSpec.CategorizedSpecs,
+                Metadata = mergedSpec.Metadata,
+                Quality = mergedSpec.Quality,
+                ParsingTimeMs = mergedSpec.Metadata.ProcessingTimeMs
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error parsing specifications for mapping {MappingId}", mappingId);
+            return new ProductSpecificationResult
+            {
+                IsSuccess = false,
+                ErrorMessage = ex.Message
+            };
+        }
+    }
+
+    private ProductSpecification MergeSpecifications(List<ProductSpecification> specifications)
+    {
+        if (specifications.Count == 1)
+            return specifications[0];
+
+        var merged = new ProductSpecification
+        {
+            Id = Guid.NewGuid().ToString(),
+            Metadata = specifications.First().Metadata,
+            Source = specifications.First().Source
+        };
+
+        foreach (var spec in specifications)
+        {
+            // Merge specifications
+            foreach (var kvp in spec.Specifications)
+            {
+                if (!merged.Specifications.ContainsKey(kvp.Key))
+                    merged.Specifications[kvp.Key] = kvp.Value;
+            }
+
+            // Merge typed specifications
+            foreach (var kvp in spec.TypedSpecifications)
+            {
+                if (!merged.TypedSpecifications.ContainsKey(kvp.Key))
+                    merged.TypedSpecifications[kvp.Key] = kvp.Value;
+            }
+
+            // Merge categorized specs
+            foreach (var kvp in spec.CategorizedSpecs)
+            {
+                if (!merged.CategorizedSpecs.ContainsKey(kvp.Key))
+                    merged.CategorizedSpecs[kvp.Key] = kvp.Value;
+                else
+                {
+                    // Merge specifications within the same category
+                    foreach (var specKvp in kvp.Value.Specifications)
+                    {
+                        if (!merged.CategorizedSpecs[kvp.Key].Specifications.ContainsKey(specKvp.Key))
+                            merged.CategorizedSpecs[kvp.Key].Specifications[specKvp.Key] = specKvp.Value;
+                    }
+                }
+            }
+        }
+
+        // Calculate merged quality metrics
+        merged.Quality = new QualityMetrics
+        {
+            OverallScore = specifications.Average(s => s.Quality.OverallScore),
+            StructureConfidence = specifications.Average(s => s.Quality.StructureConfidence),
+            TypeDetectionAccuracy = specifications.Average(s => s.Quality.TypeDetectionAccuracy),
+            CompletenessScore = specifications.Average(s => s.Quality.CompletenessScore)
+        };
+
+        return merged;
+    }
+
+    private async Task<ScrapingResult> ScrapeWithBrowserAutomationAsync(TechTicker.Application.Messages.ScrapeProductPageCommand command)
     {
         // Log start
         _logger.LogInformation("[BrowserAutomation] Starting Playwright scraping for mapping {MappingId} at URL {Url}",
@@ -708,4 +897,7 @@ public class ScrapingResult
     public string? PrimaryImageUrl { get; set; }
     public List<string> AdditionalImageUrls { get; set; } = new();
     public List<string> OriginalImageUrls { get; set; } = new();
+    
+    // Specification scraping result
+    public ProductSpecificationResult? Specifications { get; set; }
 }

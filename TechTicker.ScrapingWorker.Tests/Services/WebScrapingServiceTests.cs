@@ -3,11 +3,15 @@ using TechTicker.Application.Configuration;
 using Moq;
 using FluentAssertions;
 using Xunit;
-using TechTicker.Application.Messages;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Application.DTOs;
 using TechTicker.ScrapingWorker.Services;
 using TechTicker.Shared.Utilities;
+using TechTicker.Shared.Utilities.Html;
+using Microsoft.Extensions.Caching.Memory;
+using ScrapeProductPageCommand = TechTicker.Application.Messages.ScrapeProductPageCommand;
+using ScrapingSelectors = TechTicker.Application.Messages.ScrapingSelectors;
+using ScrapingProfile = TechTicker.Application.Messages.ScrapingProfile;
 
 namespace TechTicker.ScrapingWorker.Tests.Services;
 
@@ -58,7 +62,16 @@ public class WebScrapingServiceTests : IDisposable
             .ReturnsAsync(Result<bool>.Success(true));
 
         var mockImageScrapingService = new Mock<IImageScrapingService>();
-        _webScrapingService = new WebScrapingService(_mockLogger.Object, _proxyHttpClientService, _mockScraperRunLogService.Object, mockImageScrapingService.Object);
+        var mockTableParser = new Mock<ITableParser>();
+        var mockMemoryCache = new Mock<IMemoryCache>();
+        
+        _webScrapingService = new WebScrapingService(
+            _mockLogger.Object, 
+            _proxyHttpClientService, 
+            _mockScraperRunLogService.Object, 
+            mockImageScrapingService.Object,
+            mockTableParser.Object,
+            mockMemoryCache.Object);
     }
 
     [Fact]

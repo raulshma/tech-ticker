@@ -138,6 +138,44 @@ public class ScraperRunLog
     [Required]
     public DateTimeOffset CreatedAt { get; set; }
 
+    // Specification Parsing Results
+    /// <summary>
+    /// JSON string of parsed specifications
+    /// </summary>
+    public string? SpecificationData { get; set; }
+
+    /// <summary>
+    /// JSON string of specification parsing metadata
+    /// </summary>
+    public string? SpecificationMetadata { get; set; }
+
+    /// <summary>
+    /// Number of specifications successfully parsed
+    /// </summary>
+    public int? SpecificationCount { get; set; }
+
+    /// <summary>
+    /// Strategy used for parsing specifications (e.g., "Universal_SimpleKeyValue")
+    /// </summary>
+    [MaxLength(100)]
+    public string? SpecificationParsingStrategy { get; set; }
+
+    /// <summary>
+    /// Quality score of the parsed specifications (0.0 to 1.0)
+    /// </summary>
+    public double? SpecificationQualityScore { get; set; }
+
+    /// <summary>
+    /// Time taken to parse specifications in milliseconds
+    /// </summary>
+    public long? SpecificationParsingTime { get; set; }
+
+    /// <summary>
+    /// Error message if specification parsing failed
+    /// </summary>
+    [MaxLength(500)]
+    public string? SpecificationError { get; set; }
+
     // Navigation properties
     [ForeignKey(nameof(MappingId))]
     public ProductSellerMapping Mapping { get; set; } = null!;

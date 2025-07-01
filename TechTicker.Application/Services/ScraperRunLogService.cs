@@ -343,6 +343,28 @@ public class ScraperRunLogService : IScraperRunLogService
             if (completeDto.ProxyId.HasValue)
                 runLog.ProxyId = completeDto.ProxyId.Value;
 
+            // Handle specification data
+            if (!string.IsNullOrEmpty(completeDto.SpecificationData))
+                runLog.SpecificationData = completeDto.SpecificationData;
+
+            if (!string.IsNullOrEmpty(completeDto.SpecificationMetadata))
+                runLog.SpecificationMetadata = completeDto.SpecificationMetadata;
+
+            if (completeDto.SpecificationCount.HasValue)
+                runLog.SpecificationCount = completeDto.SpecificationCount.Value;
+
+            if (!string.IsNullOrEmpty(completeDto.SpecificationParsingStrategy))
+                runLog.SpecificationParsingStrategy = completeDto.SpecificationParsingStrategy;
+
+            if (completeDto.SpecificationQualityScore.HasValue)
+                runLog.SpecificationQualityScore = completeDto.SpecificationQualityScore.Value;
+
+            if (completeDto.SpecificationParsingTime.HasValue)
+                runLog.SpecificationParsingTime = completeDto.SpecificationParsingTime.Value;
+
+            if (!string.IsNullOrEmpty(completeDto.SpecificationError))
+                runLog.SpecificationError = completeDto.SpecificationError;
+
             _unitOfWork.ScraperRunLogs.Update(runLog);
             await _unitOfWork.SaveChangesAsync();
 

@@ -54,6 +54,26 @@ public class ScraperSiteConfiguration
     /// </summary>
     public string? BrowserAutomationProfile { get; set; }
 
+    /// <summary>
+    /// CSS selector for specification tables on the product page
+    /// </summary>
+    public string? SpecificationTableSelector { get; set; }
+
+    /// <summary>
+    /// CSS selector for the container holding specification tables (optional)
+    /// </summary>
+    public string? SpecificationContainerSelector { get; set; }
+
+    /// <summary>
+    /// Whether specification scraping is enabled for this site
+    /// </summary>
+    public bool EnableSpecificationScraping { get; set; } = false;
+
+    /// <summary>
+    /// Specification parsing options as JSON
+    /// </summary>
+    public string? SpecificationParsingOptions { get; set; }
+
     // Navigation properties
     public ICollection<ProductSellerMapping> ProductSellerMappings { get; set; } = new List<ProductSellerMapping>();
 

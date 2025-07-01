@@ -1,3 +1,5 @@
+using TechTicker.Application.DTOs;
+
 namespace TechTicker.Application.Messages;
 
 /// <summary>
@@ -13,6 +15,7 @@ public class ScrapeProductPageCommand
     public ScrapingProfile ScrapingProfile { get; set; } = null!;
     public bool RequiresBrowserAutomation { get; set; } = false;
     public BrowserAutomationProfile? BrowserAutomationProfile { get; set; }
+    public bool ScrapeSpecifications { get; set; } = false;
 }
 
 public class ScrapingSelectors
@@ -22,6 +25,11 @@ public class ScrapingSelectors
     public string StockSelector { get; set; } = null!;
     public string? SellerNameOnPageSelector { get; set; }
     public string? ImageSelector { get; set; }
+    
+    // Specification scraping selectors
+    public string? SpecificationTableSelector { get; set; }
+    public string? SpecificationContainerSelector { get; set; }
+    public SpecificationParsingOptions? SpecificationOptions { get; set; }
 }
 
 public class ScrapingProfile

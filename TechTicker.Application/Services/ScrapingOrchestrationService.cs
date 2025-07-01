@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TechTicker.Application.Configuration;
+using TechTicker.Application.DTOs;
 using TechTicker.Application.Messages;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
@@ -38,7 +39,7 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
 
             foreach (var mapping in mappingsDueForScraping)
             {
-                var command = new ScrapeProductPageCommand
+                var command = new Messages.ScrapeProductPageCommand
                 {
                     MappingId = mapping.MappingId,
                     CanonicalProductId = mapping.CanonicalProductId,
@@ -50,7 +51,13 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
                         PriceSelector = mapping.SiteConfiguration?.PriceSelector ?? ".price",
                         StockSelector = mapping.SiteConfiguration?.StockSelector ?? ".stock",
                         SellerNameOnPageSelector = mapping.SiteConfiguration?.SellerNameOnPageSelector,
-                        ImageSelector = mapping.SiteConfiguration?.ImageSelector
+                        ImageSelector = mapping.SiteConfiguration?.ImageSelector,
+                        // Specification scraping selectors
+                        SpecificationTableSelector = mapping.SiteConfiguration?.SpecificationTableSelector,
+                        SpecificationContainerSelector = mapping.SiteConfiguration?.SpecificationContainerSelector,
+                        SpecificationOptions = string.IsNullOrEmpty(mapping.SiteConfiguration?.SpecificationParsingOptions)
+                            ? null
+                            : JsonSerializer.Deserialize<SpecificationParsingOptions>(mapping.SiteConfiguration.SpecificationParsingOptions!)
                     },
                     ScrapingProfile = new ScrapingProfile
                     {
@@ -61,7 +68,9 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
                     RequiresBrowserAutomation = mapping.SiteConfiguration?.RequiresBrowserAutomation ?? false,
                     BrowserAutomationProfile = string.IsNullOrEmpty(mapping.SiteConfiguration?.BrowserAutomationProfile)
                         ? null
-                        : JsonSerializer.Deserialize<BrowserAutomationProfile>(mapping.SiteConfiguration.BrowserAutomationProfile!)
+                        : JsonSerializer.Deserialize<BrowserAutomationProfile>(mapping.SiteConfiguration.BrowserAutomationProfile!),
+                    // Enable specification scraping if configured
+                    ScrapeSpecifications = mapping.SiteConfiguration?.EnableSpecificationScraping ?? false
                 };
 
                 await _messagePublisher.PublishAsync(
@@ -160,7 +169,7 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
             }
 
             // Create and publish the scrape command
-            var command = new ScrapeProductPageCommand
+            var command = new Messages.ScrapeProductPageCommand
             {
                 MappingId = mapping.MappingId,
                 CanonicalProductId = mapping.CanonicalProductId,
@@ -172,7 +181,13 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
                     PriceSelector = mapping.SiteConfiguration?.PriceSelector ?? ".price",
                     StockSelector = mapping.SiteConfiguration?.StockSelector ?? ".stock",
                     SellerNameOnPageSelector = mapping.SiteConfiguration?.SellerNameOnPageSelector,
-                    ImageSelector = mapping.SiteConfiguration?.ImageSelector
+                    ImageSelector = mapping.SiteConfiguration?.ImageSelector,
+                    // Specification scraping selectors
+                    SpecificationTableSelector = mapping.SiteConfiguration?.SpecificationTableSelector,
+                    SpecificationContainerSelector = mapping.SiteConfiguration?.SpecificationContainerSelector,
+                    SpecificationOptions = string.IsNullOrEmpty(mapping.SiteConfiguration?.SpecificationParsingOptions)
+                        ? null
+                        : JsonSerializer.Deserialize<SpecificationParsingOptions>(mapping.SiteConfiguration.SpecificationParsingOptions!)
                 },
                 ScrapingProfile = new ScrapingProfile
                 {
@@ -183,7 +198,9 @@ public class ScrapingOrchestrationService : IScrapingOrchestrationService
                 RequiresBrowserAutomation = mapping.SiteConfiguration?.RequiresBrowserAutomation ?? false,
                 BrowserAutomationProfile = string.IsNullOrEmpty(mapping.SiteConfiguration?.BrowserAutomationProfile)
                     ? null
-                    : JsonSerializer.Deserialize<BrowserAutomationProfile>(mapping.SiteConfiguration.BrowserAutomationProfile!)
+                    : JsonSerializer.Deserialize<BrowserAutomationProfile>(mapping.SiteConfiguration.BrowserAutomationProfile!),
+                // Enable specification scraping if configured
+                ScrapeSpecifications = mapping.SiteConfiguration?.EnableSpecificationScraping ?? false
             };
 
             await _messagePublisher.PublishAsync(

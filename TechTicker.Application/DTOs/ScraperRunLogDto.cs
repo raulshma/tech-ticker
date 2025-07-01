@@ -126,17 +126,7 @@ public class SellerPerformanceMetricDto
     public TimeSpan? AverageDuration { get; set; }
 }
 
-/// <summary>
-/// DTO for scraping selectors
-/// </summary>
-public class ScrapingSelectorsDto
-{
-    public string ProductNameSelector { get; set; } = null!;
-    public string PriceSelector { get; set; } = null!;
-    public string StockSelector { get; set; } = null!;
-    public string? SellerNameOnPageSelector { get; set; }
-    public string? ImageSelector { get; set; }
-}
+
 
 /// <summary>
 /// DTO for filtering scraper run logs

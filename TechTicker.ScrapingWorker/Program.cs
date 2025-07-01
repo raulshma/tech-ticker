@@ -6,6 +6,7 @@ using TechTicker.DataAccess.Repositories;
 using TechTicker.DataAccess.Repositories.Interfaces;
 using TechTicker.ScrapingWorker;
 using TechTicker.ScrapingWorker.Services;
+using TechTicker.Shared.Utilities.Html;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -58,6 +59,9 @@ builder.Services.AddScoped<IImageScrapingService, ImageScrapingService>();
 // Add scraping services
 builder.Services.AddScoped<WebScrapingService>();
 builder.Services.AddScoped<PriceDataProcessingService>();
+
+// Register specification parsing services
+builder.Services.AddSingleton<ITableParser, UniversalTableParser>();
 
 // Add the worker
 builder.Services.AddHostedService<Worker>();

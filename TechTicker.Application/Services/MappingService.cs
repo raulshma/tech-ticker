@@ -196,7 +196,12 @@ public class MappingService : IMappingService
             CreatedAt = config.CreatedAt,
             UpdatedAt = config.UpdatedAt,
             RequiresBrowserAutomation = config.RequiresBrowserAutomation,
-            BrowserAutomationProfile = config.BrowserAutomationProfile
+            BrowserAutomationProfile = config.BrowserAutomationProfile,
+            SpecificationTableSelector = config.SpecificationTableSelector,
+            SpecificationContainerSelector = config.SpecificationContainerSelector,
+            EnableSpecificationScraping = config.EnableSpecificationScraping,
+            SpecificationOptions = string.IsNullOrEmpty(config.SpecificationParsingOptions) ? null : 
+                JsonSerializer.Deserialize<SpecificationParsingOptions>(config.SpecificationParsingOptions)
         };
     }
 
@@ -217,7 +222,12 @@ public class MappingService : IMappingService
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow,
             RequiresBrowserAutomation = createDto.RequiresBrowserAutomation,
-            BrowserAutomationProfile = createDto.BrowserAutomationProfile
+            BrowserAutomationProfile = createDto.BrowserAutomationProfile,
+            SpecificationTableSelector = createDto.SpecificationTableSelector,
+            SpecificationContainerSelector = createDto.SpecificationContainerSelector,
+            EnableSpecificationScraping = createDto.EnableSpecificationScraping,
+            SpecificationParsingOptions = createDto.SpecificationOptions == null ? null : 
+                JsonSerializer.Serialize(createDto.SpecificationOptions)
         };
     }
 
@@ -250,11 +260,25 @@ public class MappingService : IMappingService
         if (updateDto.IsEnabled.HasValue)
             config.IsEnabled = updateDto.IsEnabled.Value;
 
-        config.UpdatedAt = DateTimeOffset.UtcNow;
         if (updateDto.RequiresBrowserAutomation.HasValue)
             config.RequiresBrowserAutomation = updateDto.RequiresBrowserAutomation.Value;
+
         if (updateDto.BrowserAutomationProfile != null)
             config.BrowserAutomationProfile = updateDto.BrowserAutomationProfile;
+
+        if (updateDto.SpecificationTableSelector != null)
+            config.SpecificationTableSelector = updateDto.SpecificationTableSelector;
+
+        if (updateDto.SpecificationContainerSelector != null)
+            config.SpecificationContainerSelector = updateDto.SpecificationContainerSelector;
+
+        if (updateDto.EnableSpecificationScraping.HasValue)
+            config.EnableSpecificationScraping = updateDto.EnableSpecificationScraping.Value;
+
+        if (updateDto.SpecificationOptions != null)
+            config.SpecificationParsingOptions = JsonSerializer.Serialize(updateDto.SpecificationOptions);
+
+        config.UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     public PriceHistoryDto MapToDto(PriceHistory priceHistory)
