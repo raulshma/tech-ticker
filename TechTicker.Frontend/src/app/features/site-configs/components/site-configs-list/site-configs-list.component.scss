@@ -176,6 +176,11 @@
       background: #FFF4E6;
       mat-icon { color: #E65100; }
     }
+
+    &.tertiary-surface {
+      background: var(--mat-sys-tertiary-container);
+      mat-icon { color: var(--mat-sys-tertiary); }
+    }
   }
 
   .stat-info {
@@ -372,6 +377,21 @@
       .selector-count-chip {
         background: var(--mat-sys-secondary-container);
         color: var(--mat-sys-secondary);
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 12px;
+        
+        mat-icon {
+          font-size: 14px;
+          width: 14px;
+          height: 14px;
+          margin-right: 4px;
+        }
+      }
+
+      .spec-chip {
+        background: var(--mat-sys-tertiary-container);
+        color: var(--mat-sys-tertiary);
         border-radius: 8px;
         font-weight: 500;
         font-size: 12px;

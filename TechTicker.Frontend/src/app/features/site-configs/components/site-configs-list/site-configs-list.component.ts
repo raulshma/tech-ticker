@@ -105,7 +105,9 @@ export class SiteConfigsListComponent implements OnInit {
     if (config.priceSelector) count++;
     if (config.stockSelector) count++;
     if (config.sellerNameOnPageSelector) count++;
-    if ((config as any).imageSelector) count++;
+    if (config.imageSelector) count++;
+    if (config.specificationTableSelector) count++;
+    if (config.specificationContainerSelector) count++;
     return count;
   }
 
@@ -116,8 +118,20 @@ export class SiteConfigsListComponent implements OnInit {
     if (config.stockSelector) selectors.push('Stock');
     if (config.sellerNameOnPageSelector) selectors.push('Seller');
     if ((config as any).imageSelector) selectors.push('Image');
+    if (config.specificationTableSelector) selectors.push('Spec Table');
+    if (config.specificationContainerSelector) selectors.push('Spec Container');
 
-    return selectors.length > 0 ? selectors.join(', ') : 'None configured';
+    const baseText = selectors.length > 0 ? selectors.join(', ') : 'None configured';
+    
+    if (config.enableSpecificationScraping) {
+      return `${baseText} + Specs`;
+    }
+    
+    return baseText;
+  }
+
+  isSpecificationScrapingEnabled(config: ScraperSiteConfigurationDto): boolean {
+    return config.enableSpecificationScraping === true;
   }
 
   getEnabledConfigsCount(): number {
@@ -130,5 +144,9 @@ export class SiteConfigsListComponent implements OnInit {
 
   getBrowserAutomationCount(): number {
     return this.dataSource.data.filter(config => (config as any).requiresBrowserAutomation).length;
+  }
+
+  getSpecificationScrapingCount(): number {
+    return this.dataSource.data.filter(config => config.enableSpecificationScraping).length;
   }
 }

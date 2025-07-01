@@ -91,6 +91,20 @@
           </div>
         </mat-card-content>
       </mat-card>
+
+      <mat-card class="stat-card" appearance="outlined" tabindex="0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon tertiary-surface">
+              <mat-icon aria-hidden="true">table_chart</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3 class="mat-headline-medium stat-number">{{getSpecificationScrapingCount()}}</h3>
+              <p class="mat-body-medium stat-label">Specification Scraping</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
   </section>
 
@@ -150,6 +164,10 @@
                       <mat-chip class="selector-count-chip">
                         <mat-icon>code</mat-icon>
                         {{getSelectorsCount(config)}} configured
+                      </mat-chip>
+                      <mat-chip *ngIf="isSpecificationScrapingEnabled(config)" class="spec-chip">
+                        <mat-icon>table_chart</mat-icon>
+                        Specs
                       </mat-chip>
                     </mat-chip-set>
                     <p class="mat-body-small selectors-list" matTooltip="{{getSelectorsText(config)}}">
