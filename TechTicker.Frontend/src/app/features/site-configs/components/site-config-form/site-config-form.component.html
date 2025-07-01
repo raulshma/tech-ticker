@@ -209,6 +209,75 @@
             </div>
           </mat-expansion-panel>
 
+          <!-- Product Specifications -->
+          <mat-expansion-panel class="modern-expansion-panel">
+            <mat-expansion-panel-header class="panel-header">
+              <mat-panel-title class="mat-title-large">
+                <mat-icon class="panel-icon">description</mat-icon>
+                Product Specifications
+              </mat-panel-title>
+              <mat-panel-description class="mat-body-medium">Configure specification table scraping</mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="panel-content">
+              <!-- Enable Specification Scraping -->
+              <div class="form-field-group full-width">
+                <div class="status-field-modern">
+                  <div class="status-header">
+                    <mat-icon class="status-icon">auto_awesome</mat-icon>
+                    <div class="status-text">
+                      <h4 class="mat-title-medium status-label">Specification Scraping</h4>
+                      <p class="mat-body-small status-description">Enable automatic extraction of product specifications</p>
+                    </div>
+                  </div>
+                  <mat-slide-toggle formControlName="enableSpecificationScraping" class="status-toggle-modern">
+                    {{ siteConfigForm.get('enableSpecificationScraping')?.value ? 'Enabled' : 'Disabled' }}
+                  </mat-slide-toggle>
+                </div>
+                <div class="status-hint-modern">
+                  <mat-icon class="hint-icon">{{ siteConfigForm.get('enableSpecificationScraping')?.value ? 'check_circle' : 'cancel' }}</mat-icon>
+                  <span class="mat-body-small">
+                    {{ siteConfigForm.get('enableSpecificationScraping')?.value ? 'Specification scraping is enabled for this site' : 'Specification scraping is disabled' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-grid" *ngIf="siteConfigForm.get('enableSpecificationScraping')?.value">
+                <!-- Specification Table Selector -->
+                <div class="form-field-group">
+                  <mat-form-field appearance="outline" class="modern-form-field">
+                    <mat-label>Specification Table Selector</mat-label>
+                    <input matInput
+                           formControlName="specificationTableSelector"
+                           placeholder="table.specs, .spec-table, .specifications"
+                           maxlength="500">
+                    <mat-icon matSuffix>table_chart</mat-icon>
+                    <mat-hint>CSS selector for specification tables</mat-hint>
+                    <mat-error *ngIf="siteConfigForm.get('specificationTableSelector')?.invalid && siteConfigForm.get('specificationTableSelector')?.touched">
+                      {{ getFieldErrorMessage('specificationTableSelector') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <!-- Specification Container Selector -->
+                <div class="form-field-group">
+                  <mat-form-field appearance="outline" class="modern-form-field">
+                    <mat-label>Specification Container Selector</mat-label>
+                    <input matInput
+                           formControlName="specificationContainerSelector"
+                           placeholder=".spec-container, #specifications"
+                           maxlength="500">
+                    <mat-icon matSuffix>crop_free</mat-icon>
+                    <mat-hint>Container selector (optional)</mat-hint>
+                    <mat-error *ngIf="siteConfigForm.get('specificationContainerSelector')?.invalid && siteConfigForm.get('specificationContainerSelector')?.touched">
+                      {{ getFieldErrorMessage('specificationContainerSelector') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+
           <!-- Additional Headers -->
           <mat-expansion-panel class="modern-expansion-panel">
             <mat-expansion-panel-header class="panel-header">

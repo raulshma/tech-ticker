@@ -65,8 +65,6 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
       });
   }
 
-
-
   goBack(): void {
     this.location.back();
   }
@@ -192,6 +190,47 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
               this.scraperLog?.imageScrapingError);
   }
 
+  hasSpecificationData(): boolean {
+    return !!(this.scraperLog?.specificationData || 
+              this.scraperLog?.specificationMetadata || 
+              this.scraperLog?.specificationCount ||
+              this.scraperLog?.specificationError);
+  }
+
+  getParsedSpecifications(): any {
+    if (!this.scraperLog?.specificationData) return null;
+    try {
+      return JSON.parse(this.scraperLog.specificationData);
+    } catch (error) {
+      console.error('Error parsing specification data:', error);
+      return null;
+    }
+  }
+
+  getParsedSpecificationMetadata(): any {
+    if (!this.scraperLog?.specificationMetadata) return null;
+    try {
+      return JSON.parse(this.scraperLog.specificationMetadata);
+    } catch (error) {
+      console.error('Error parsing specification metadata:', error);
+      return null;
+    }
+  }
+
+  getSpecificationQualityBadgeClass(): string {
+    if (!this.scraperLog?.specificationQualityScore) return 'badge-secondary';
+    
+    const score = this.scraperLog.specificationQualityScore;
+    if (score >= 0.9) return 'badge-success';
+    if (score >= 0.7) return 'badge-warning';
+    return 'badge-danger';
+  }
+
+  formatSpecificationParsingTime(): string {
+    if (!this.scraperLog?.specificationParsingTime) return '';
+    return `${this.scraperLog.specificationParsingTime}ms`;
+  }
+
   getProxyDisplayInfo(): { hasProxy: boolean; proxyInfo: string } {
     if (this.scraperLog?.proxyUsed) {
       return { hasProxy: true, proxyInfo: this.scraperLog.proxyUsed };
@@ -206,6 +245,4 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
     // Navigate to the retry attempt details
     this.router.navigate(['/scraper-logs', runId]);
   }
-
-
 }

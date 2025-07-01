@@ -452,6 +452,95 @@
         </mat-card-content>
       </mat-card>
 
+      <!-- Specification Parsing Results -->
+      <mat-card class="info-card specification-info" appearance="outlined" *ngIf="hasSpecificationData()">
+        <mat-card-header>
+          <mat-card-title class="mat-headline-small">
+            <mat-icon>description</mat-icon>
+            Specification Parsing Results
+          </mat-card-title>
+          <mat-card-subtitle>Product specification extraction details</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Specification Overview -->
+          <div class="specification-overview">
+            <div class="spec-metrics-grid">
+              <div class="spec-metric-item" *ngIf="scraperLog.specificationCount">
+                <mat-icon class="metric-icon">list_alt</mat-icon>
+                <div class="metric-content">
+                  <label class="metric-label">Specifications Found</label>
+                  <span class="metric-value">{{ scraperLog.specificationCount }}</span>
+                </div>
+              </div>
+
+              <div class="spec-metric-item" *ngIf="scraperLog.specificationParsingStrategy">
+                <mat-icon class="metric-icon">settings</mat-icon>
+                <div class="metric-content">
+                  <label class="metric-label">Parsing Strategy</label>
+                  <span class="metric-value">{{ scraperLog.specificationParsingStrategy }}</span>
+                </div>
+              </div>
+
+              <div class="spec-metric-item" *ngIf="scraperLog.specificationParsingTime">
+                <mat-icon class="metric-icon">schedule</mat-icon>
+                <div class="metric-content">
+                  <label class="metric-label">Parsing Time</label>
+                  <span class="metric-value">{{ formatSpecificationParsingTime() }}</span>
+                </div>
+              </div>
+
+              <div class="spec-metric-item" *ngIf="scraperLog.specificationQualityScore !== null && scraperLog.specificationQualityScore !== undefined">
+                <mat-icon class="metric-icon">star</mat-icon>
+                <div class="metric-content">
+                  <label class="metric-label">Quality Score</label>
+                  <span class="metric-value">
+                    <mat-chip [class]="getSpecificationQualityBadgeClass()">
+                      {{ (scraperLog.specificationQualityScore * 100) | number:'1.0-0' }}%
+                    </mat-chip>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Parsed Specifications -->
+          <div class="specification-data" *ngIf="getParsedSpecifications()">
+            <app-product-specifications 
+              [specifications]="getParsedSpecifications()"
+              [showMetadata]="true">
+            </app-product-specifications>
+          </div>
+
+          <!-- Specification Parsing Error -->
+          <div class="specification-error" *ngIf="scraperLog.specificationError">
+            <mat-icon class="error-icon">error</mat-icon>
+            <span class="error-text">{{ scraperLog.specificationError }}</span>
+          </div>
+
+          <!-- Specification Metadata (Technical Details) -->
+          <mat-accordion *ngIf="getParsedSpecificationMetadata()">
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon>info</mat-icon>
+                  Technical Metadata
+                </mat-panel-title>
+                <mat-panel-description>
+                  Detailed parsing metadata and quality metrics
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <div class="metadata-display">
+                <button matIconButton (click)="copyToClipboard(scraperLog.specificationMetadata!)" 
+                        matTooltip="Copy Metadata" class="copy-metadata-btn">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+                <pre class="metadata-content">{{ formatJson(getParsedSpecificationMetadata()) }}</pre>
+              </div>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </mat-card-content>
+      </mat-card>
+
       <!-- Enhanced Error Details -->
       <mat-card class="info-card error-info" appearance="outlined" 
                 *ngIf="scraperLog.errorMessage || scraperLog.errorCode || scraperLog.errorCategory || scraperLog.errorStackTrace">

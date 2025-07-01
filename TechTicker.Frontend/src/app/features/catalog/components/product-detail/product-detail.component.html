@@ -174,10 +174,22 @@
         <div class="tab-content">
           <div class="specifications-section">
             <h3>Product Specifications</h3>
-            <div class="specs-grid">
-              <div *ngFor="let spec of getSpecificationEntries()" class="spec-item">
-                <span class="spec-label">{{ spec[0] }}:</span>
-                <span class="spec-value">{{ spec[1] }}</span>
+            
+            <!-- Enhanced Specifications (from scraping) -->
+            <div *ngIf="hasEnhancedSpecifications()" class="enhanced-specs">
+              <app-product-specifications 
+                [specifications]="getEnhancedSpecifications()"
+                [showMetadata]="false">
+              </app-product-specifications>
+            </div>
+            
+            <!-- Basic Specifications (manual/simple format) -->
+            <div *ngIf="!hasEnhancedSpecifications()" class="basic-specs">
+              <div class="specs-grid">
+                <div *ngFor="let spec of getSpecificationEntries()" class="spec-item">
+                  <span class="spec-label">{{ spec[0] }}:</span>
+                  <span class="spec-value">{{ spec[1] }}</span>
+                </div>
               </div>
             </div>
           </div>

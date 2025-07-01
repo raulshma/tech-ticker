@@ -13507,9 +13507,10 @@ export interface IBrowserActionGenerationResponseDtoApiResponse {
 export class BrowserAutomationActionDto implements IBrowserAutomationActionDto {
     actionType?: string | undefined;
     selector?: string | undefined;
-    repeat?: number | undefined;
-    delayMs?: number | undefined;
     value?: string | undefined;
+    delayMs?: number | undefined;
+    repeat?: number | undefined;
+    options?: { [key: string]: any; } | undefined;
 
     constructor(data?: IBrowserAutomationActionDto) {
         if (data) {
@@ -13524,9 +13525,16 @@ export class BrowserAutomationActionDto implements IBrowserAutomationActionDto {
         if (_data) {
             this.actionType = _data["actionType"];
             this.selector = _data["selector"];
-            this.repeat = _data["repeat"];
-            this.delayMs = _data["delayMs"];
             this.value = _data["value"];
+            this.delayMs = _data["delayMs"];
+            this.repeat = _data["repeat"];
+            if (_data["options"]) {
+                this.options = {} as any;
+                for (let key in _data["options"]) {
+                    if (_data["options"].hasOwnProperty(key))
+                        (<any>this.options)![key] = _data["options"][key];
+                }
+            }
         }
     }
 
@@ -13541,9 +13549,16 @@ export class BrowserAutomationActionDto implements IBrowserAutomationActionDto {
         data = typeof data === 'object' ? data : {};
         data["actionType"] = this.actionType;
         data["selector"] = this.selector;
-        data["repeat"] = this.repeat;
-        data["delayMs"] = this.delayMs;
         data["value"] = this.value;
+        data["delayMs"] = this.delayMs;
+        data["repeat"] = this.repeat;
+        if (this.options) {
+            data["options"] = {};
+            for (let key in this.options) {
+                if (this.options.hasOwnProperty(key))
+                    (<any>data["options"])[key] = (<any>this.options)[key];
+            }
+        }
         return data;
     }
 }
@@ -13551,9 +13566,10 @@ export class BrowserAutomationActionDto implements IBrowserAutomationActionDto {
 export interface IBrowserAutomationActionDto {
     actionType?: string | undefined;
     selector?: string | undefined;
-    repeat?: number | undefined;
-    delayMs?: number | undefined;
     value?: string | undefined;
+    delayMs?: number | undefined;
+    repeat?: number | undefined;
+    options?: { [key: string]: any; } | undefined;
 }
 
 export class BrowserAutomationProfileDto implements IBrowserAutomationProfileDto {
@@ -15788,6 +15804,10 @@ export class CreateScraperSiteConfigurationDto implements ICreateScraperSiteConf
     isEnabled?: boolean;
     requiresBrowserAutomation?: boolean;
     browserAutomationProfile?: string | undefined;
+    specificationTableSelector?: string | undefined;
+    specificationContainerSelector?: string | undefined;
+    enableSpecificationScraping?: boolean;
+    specificationOptions?: SpecificationParsingOptions;
 
     constructor(data?: ICreateScraperSiteConfigurationDto) {
         if (data) {
@@ -15817,6 +15837,10 @@ export class CreateScraperSiteConfigurationDto implements ICreateScraperSiteConf
             this.isEnabled = _data["isEnabled"];
             this.requiresBrowserAutomation = _data["requiresBrowserAutomation"];
             this.browserAutomationProfile = _data["browserAutomationProfile"];
+            this.specificationTableSelector = _data["specificationTableSelector"];
+            this.specificationContainerSelector = _data["specificationContainerSelector"];
+            this.enableSpecificationScraping = _data["enableSpecificationScraping"];
+            this.specificationOptions = _data["specificationOptions"] ? SpecificationParsingOptions.fromJS(_data["specificationOptions"]) : <any>undefined;
         }
     }
 
@@ -15846,6 +15870,10 @@ export class CreateScraperSiteConfigurationDto implements ICreateScraperSiteConf
         data["isEnabled"] = this.isEnabled;
         data["requiresBrowserAutomation"] = this.requiresBrowserAutomation;
         data["browserAutomationProfile"] = this.browserAutomationProfile;
+        data["specificationTableSelector"] = this.specificationTableSelector;
+        data["specificationContainerSelector"] = this.specificationContainerSelector;
+        data["enableSpecificationScraping"] = this.enableSpecificationScraping;
+        data["specificationOptions"] = this.specificationOptions ? this.specificationOptions.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -15862,6 +15890,10 @@ export interface ICreateScraperSiteConfigurationDto {
     isEnabled?: boolean;
     requiresBrowserAutomation?: boolean;
     browserAutomationProfile?: string | undefined;
+    specificationTableSelector?: string | undefined;
+    specificationContainerSelector?: string | undefined;
+    enableSpecificationScraping?: boolean;
+    specificationOptions?: SpecificationParsingOptions;
 }
 
 export class CreateUserDto implements ICreateUserDto {
@@ -21436,6 +21468,13 @@ export class ScraperRunLogDto implements IScraperRunLogDto {
     imageProcessingCount?: number | undefined;
     imageUploadCount?: number | undefined;
     imageScrapingError?: string | undefined;
+    specificationData?: string | undefined;
+    specificationMetadata?: string | undefined;
+    specificationCount?: number | undefined;
+    specificationParsingStrategy?: string | undefined;
+    specificationQualityScore?: number | undefined;
+    specificationParsingTime?: number | undefined;
+    specificationError?: string | undefined;
     errorMessage?: string | undefined;
     errorCode?: string | undefined;
     errorStackTrace?: string | undefined;
@@ -21503,6 +21542,13 @@ export class ScraperRunLogDto implements IScraperRunLogDto {
             this.imageProcessingCount = _data["imageProcessingCount"];
             this.imageUploadCount = _data["imageUploadCount"];
             this.imageScrapingError = _data["imageScrapingError"];
+            this.specificationData = _data["specificationData"];
+            this.specificationMetadata = _data["specificationMetadata"];
+            this.specificationCount = _data["specificationCount"];
+            this.specificationParsingStrategy = _data["specificationParsingStrategy"];
+            this.specificationQualityScore = _data["specificationQualityScore"];
+            this.specificationParsingTime = _data["specificationParsingTime"];
+            this.specificationError = _data["specificationError"];
             this.errorMessage = _data["errorMessage"];
             this.errorCode = _data["errorCode"];
             this.errorStackTrace = _data["errorStackTrace"];
@@ -21574,6 +21620,13 @@ export class ScraperRunLogDto implements IScraperRunLogDto {
         data["imageProcessingCount"] = this.imageProcessingCount;
         data["imageUploadCount"] = this.imageUploadCount;
         data["imageScrapingError"] = this.imageScrapingError;
+        data["specificationData"] = this.specificationData;
+        data["specificationMetadata"] = this.specificationMetadata;
+        data["specificationCount"] = this.specificationCount;
+        data["specificationParsingStrategy"] = this.specificationParsingStrategy;
+        data["specificationQualityScore"] = this.specificationQualityScore;
+        data["specificationParsingTime"] = this.specificationParsingTime;
+        data["specificationError"] = this.specificationError;
         data["errorMessage"] = this.errorMessage;
         data["errorCode"] = this.errorCode;
         data["errorStackTrace"] = this.errorStackTrace;
@@ -21624,6 +21677,13 @@ export interface IScraperRunLogDto {
     imageProcessingCount?: number | undefined;
     imageUploadCount?: number | undefined;
     imageScrapingError?: string | undefined;
+    specificationData?: string | undefined;
+    specificationMetadata?: string | undefined;
+    specificationCount?: number | undefined;
+    specificationParsingStrategy?: string | undefined;
+    specificationQualityScore?: number | undefined;
+    specificationParsingTime?: number | undefined;
+    specificationError?: string | undefined;
     errorMessage?: string | undefined;
     errorCode?: string | undefined;
     errorStackTrace?: string | undefined;
@@ -22360,6 +22420,10 @@ export class ScraperSiteConfigurationDto implements IScraperSiteConfigurationDto
     updatedAt?: Date;
     requiresBrowserAutomation?: boolean;
     browserAutomationProfile?: string | undefined;
+    specificationTableSelector?: string | undefined;
+    specificationContainerSelector?: string | undefined;
+    enableSpecificationScraping?: boolean;
+    specificationOptions?: SpecificationParsingOptions;
 
     constructor(data?: IScraperSiteConfigurationDto) {
         if (data) {
@@ -22392,6 +22456,10 @@ export class ScraperSiteConfigurationDto implements IScraperSiteConfigurationDto
             this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
             this.requiresBrowserAutomation = _data["requiresBrowserAutomation"];
             this.browserAutomationProfile = _data["browserAutomationProfile"];
+            this.specificationTableSelector = _data["specificationTableSelector"];
+            this.specificationContainerSelector = _data["specificationContainerSelector"];
+            this.enableSpecificationScraping = _data["enableSpecificationScraping"];
+            this.specificationOptions = _data["specificationOptions"] ? SpecificationParsingOptions.fromJS(_data["specificationOptions"]) : <any>undefined;
         }
     }
 
@@ -22424,6 +22492,10 @@ export class ScraperSiteConfigurationDto implements IScraperSiteConfigurationDto
         data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
         data["requiresBrowserAutomation"] = this.requiresBrowserAutomation;
         data["browserAutomationProfile"] = this.browserAutomationProfile;
+        data["specificationTableSelector"] = this.specificationTableSelector;
+        data["specificationContainerSelector"] = this.specificationContainerSelector;
+        data["enableSpecificationScraping"] = this.enableSpecificationScraping;
+        data["specificationOptions"] = this.specificationOptions ? this.specificationOptions.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -22443,6 +22515,10 @@ export interface IScraperSiteConfigurationDto {
     updatedAt?: Date;
     requiresBrowserAutomation?: boolean;
     browserAutomationProfile?: string | undefined;
+    specificationTableSelector?: string | undefined;
+    specificationContainerSelector?: string | undefined;
+    enableSpecificationScraping?: boolean;
+    specificationOptions?: SpecificationParsingOptions;
 }
 
 export class ScraperSiteConfigurationDtoApiResponse implements IScraperSiteConfigurationDtoApiResponse {
@@ -22627,6 +22703,9 @@ export class ScrapingSelectorsDto implements IScrapingSelectorsDto {
     stockSelector?: string | undefined;
     sellerNameOnPageSelector?: string | undefined;
     imageSelector?: string | undefined;
+    specificationTableSelector?: string | undefined;
+    specificationContainerSelector?: string | undefined;
+    specificationOptions?: SpecificationParsingOptions;
 
     constructor(data?: IScrapingSelectorsDto) {
         if (data) {
@@ -22644,6 +22723,9 @@ export class ScrapingSelectorsDto implements IScrapingSelectorsDto {
             this.stockSelector = _data["stockSelector"];
             this.sellerNameOnPageSelector = _data["sellerNameOnPageSelector"];
             this.imageSelector = _data["imageSelector"];
+            this.specificationTableSelector = _data["specificationTableSelector"];
+            this.specificationContainerSelector = _data["specificationContainerSelector"];
+            this.specificationOptions = _data["specificationOptions"] ? SpecificationParsingOptions.fromJS(_data["specificationOptions"]) : <any>undefined;
         }
     }
 
@@ -22661,6 +22743,9 @@ export class ScrapingSelectorsDto implements IScrapingSelectorsDto {
         data["stockSelector"] = this.stockSelector;
         data["sellerNameOnPageSelector"] = this.sellerNameOnPageSelector;
         data["imageSelector"] = this.imageSelector;
+        data["specificationTableSelector"] = this.specificationTableSelector;
+        data["specificationContainerSelector"] = this.specificationContainerSelector;
+        data["specificationOptions"] = this.specificationOptions ? this.specificationOptions.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -22671,6 +22756,9 @@ export interface IScrapingSelectorsDto {
     stockSelector?: string | undefined;
     sellerNameOnPageSelector?: string | undefined;
     imageSelector?: string | undefined;
+    specificationTableSelector?: string | undefined;
+    specificationContainerSelector?: string | undefined;
+    specificationOptions?: SpecificationParsingOptions;
 }
 
 export class ScreenshotCaptureDto implements IScreenshotCaptureDto {
@@ -22871,6 +22959,58 @@ export interface ISellerPerformanceMetricDtoIEnumerableApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class SpecificationParsingOptions implements ISpecificationParsingOptions {
+    enableCaching?: boolean;
+    throwOnError?: boolean;
+    maxCacheEntries?: number;
+    cacheExpiry?: string;
+    preferredVendor?: string | undefined;
+
+    constructor(data?: ISpecificationParsingOptions) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.enableCaching = _data["enableCaching"];
+            this.throwOnError = _data["throwOnError"];
+            this.maxCacheEntries = _data["maxCacheEntries"];
+            this.cacheExpiry = _data["cacheExpiry"];
+            this.preferredVendor = _data["preferredVendor"];
+        }
+    }
+
+    static fromJS(data: any): SpecificationParsingOptions {
+        data = typeof data === 'object' ? data : {};
+        let result = new SpecificationParsingOptions();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["enableCaching"] = this.enableCaching;
+        data["throwOnError"] = this.throwOnError;
+        data["maxCacheEntries"] = this.maxCacheEntries;
+        data["cacheExpiry"] = this.cacheExpiry;
+        data["preferredVendor"] = this.preferredVendor;
+        return data;
+    }
+}
+
+export interface ISpecificationParsingOptions {
+    enableCaching?: boolean;
+    throwOnError?: boolean;
+    maxCacheEntries?: number;
+    cacheExpiry?: string;
+    preferredVendor?: string | undefined;
 }
 
 export class StringApiResponse implements IStringApiResponse {
@@ -25217,6 +25357,10 @@ export class UpdateScraperSiteConfigurationDto implements IUpdateScraperSiteConf
     isEnabled?: boolean | undefined;
     requiresBrowserAutomation?: boolean | undefined;
     browserAutomationProfile?: string | undefined;
+    specificationTableSelector?: string | undefined;
+    specificationContainerSelector?: string | undefined;
+    enableSpecificationScraping?: boolean | undefined;
+    specificationOptions?: SpecificationParsingOptions;
 
     constructor(data?: IUpdateScraperSiteConfigurationDto) {
         if (data) {
@@ -25246,6 +25390,10 @@ export class UpdateScraperSiteConfigurationDto implements IUpdateScraperSiteConf
             this.isEnabled = _data["isEnabled"];
             this.requiresBrowserAutomation = _data["requiresBrowserAutomation"];
             this.browserAutomationProfile = _data["browserAutomationProfile"];
+            this.specificationTableSelector = _data["specificationTableSelector"];
+            this.specificationContainerSelector = _data["specificationContainerSelector"];
+            this.enableSpecificationScraping = _data["enableSpecificationScraping"];
+            this.specificationOptions = _data["specificationOptions"] ? SpecificationParsingOptions.fromJS(_data["specificationOptions"]) : <any>undefined;
         }
     }
 
@@ -25275,6 +25423,10 @@ export class UpdateScraperSiteConfigurationDto implements IUpdateScraperSiteConf
         data["isEnabled"] = this.isEnabled;
         data["requiresBrowserAutomation"] = this.requiresBrowserAutomation;
         data["browserAutomationProfile"] = this.browserAutomationProfile;
+        data["specificationTableSelector"] = this.specificationTableSelector;
+        data["specificationContainerSelector"] = this.specificationContainerSelector;
+        data["enableSpecificationScraping"] = this.enableSpecificationScraping;
+        data["specificationOptions"] = this.specificationOptions ? this.specificationOptions.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -25291,6 +25443,10 @@ export interface IUpdateScraperSiteConfigurationDto {
     isEnabled?: boolean | undefined;
     requiresBrowserAutomation?: boolean | undefined;
     browserAutomationProfile?: string | undefined;
+    specificationTableSelector?: string | undefined;
+    specificationContainerSelector?: string | undefined;
+    enableSpecificationScraping?: boolean | undefined;
+    specificationOptions?: SpecificationParsingOptions;
 }
 
 export class UpdateUserDto implements IUpdateUserDto {

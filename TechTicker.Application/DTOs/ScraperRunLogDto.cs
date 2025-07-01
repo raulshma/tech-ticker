@@ -42,6 +42,15 @@ public class ScraperRunLogDto
     public int? ImageUploadCount { get; set; }
     public string? ImageScrapingError { get; set; }
 
+    // Specification parsing results
+    public string? SpecificationData { get; set; }
+    public string? SpecificationMetadata { get; set; }
+    public int? SpecificationCount { get; set; }
+    public string? SpecificationParsingStrategy { get; set; }
+    public double? SpecificationQualityScore { get; set; }
+    public long? SpecificationParsingTime { get; set; }
+    public string? SpecificationError { get; set; }
+
     // Error details
     public string? ErrorMessage { get; set; }
     public string? ErrorCode { get; set; }
@@ -125,8 +134,6 @@ public class SellerPerformanceMetricDto
     public TimeSpan? AverageResponseTime { get; set; }
     public TimeSpan? AverageDuration { get; set; }
 }
-
-
 
 /// <summary>
 /// DTO for filtering scraper run logs

@@ -26,7 +26,7 @@ export class SiteConfigFormComponent implements OnInit {
   siteConfigForm: FormGroup;
   isLoading = false;
   isEditMode = false;
-  siteConfigId: string | null = null;
+  siteConfigId?: string;
   showExamples = false;
   error: string | null = null;
 
@@ -140,18 +140,21 @@ export class SiteConfigFormComponent implements OnInit {
       stockSelector: ['', [Validators.maxLength(500)]],
       sellerNameOnPageSelector: ['', [Validators.maxLength(500)]],
       imageSelector: ['', [Validators.maxLength(500)]],
-      defaultUserAgent: ['', [Validators.maxLength(1000)]],
+      defaultUserAgent: ['', [Validators.maxLength(500)]],
       additionalHeaders: this.formBuilder.array([]),
       isEnabled: [true],
       requiresBrowserAutomation: [false],
       browserAutomationProfile: [''],
+      enableSpecificationScraping: [false],
+      specificationTableSelector: [''],
+      specificationContainerSelector: ['']
     });
 
     // Note: Browser automation profile handles its own object/string conversion
   }
 
   ngOnInit(): void {
-    this.siteConfigId = this.route.snapshot.paramMap.get('id');
+    this.siteConfigId = this.route.snapshot.paramMap.get('id') || undefined;
     this.isEditMode = !!this.siteConfigId;
 
     if (this.isEditMode && this.siteConfigId) {
@@ -173,18 +176,20 @@ export class SiteConfigFormComponent implements OnInit {
     this.error = null;
     this.siteConfigsService.getSiteConfig(id).subscribe({
       next: (config) => {
-        const configAny = config as any;
         this.siteConfigForm.patchValue({
           siteDomain: config.siteDomain,
           productNameSelector: config.productNameSelector,
           priceSelector: config.priceSelector,
           stockSelector: config.stockSelector,
           sellerNameOnPageSelector: config.sellerNameOnPageSelector,
-          imageSelector: configAny.imageSelector,
+          imageSelector: config.imageSelector,
           defaultUserAgent: config.defaultUserAgent,
           isEnabled: config.isEnabled,
-          requiresBrowserAutomation: configAny.requiresBrowserAutomation ?? false,
-          browserAutomationProfile: configAny.browserAutomationProfile ?? ''
+          requiresBrowserAutomation: config.requiresBrowserAutomation ?? false,
+          browserAutomationProfile: config.browserAutomationProfile ?? '',
+          enableSpecificationScraping: config.enableSpecificationScraping ?? false,
+          specificationTableSelector: config.specificationTableSelector ?? '',
+          specificationContainerSelector: config.specificationContainerSelector ?? ''
         });
 
         // Load additional headers
@@ -242,15 +247,16 @@ export class SiteConfigFormComponent implements OnInit {
           priceSelector: formValue.priceSelector || undefined,
           stockSelector: formValue.stockSelector || undefined,
           sellerNameOnPageSelector: formValue.sellerNameOnPageSelector || undefined,
+          imageSelector: formValue.imageSelector || undefined,
           defaultUserAgent: formValue.defaultUserAgent || undefined,
           additionalHeaders: Object.keys(headersObject).length > 0 ? headersObject : undefined,
           isEnabled: formValue.isEnabled,
           requiresBrowserAutomation: formValue.requiresBrowserAutomation,
-          browserAutomationProfile: formValue.browserAutomationProfile || undefined
+          browserAutomationProfile: formValue.browserAutomationProfile || undefined,
+          enableSpecificationScraping: formValue.enableSpecificationScraping,
+          specificationTableSelector: formValue.specificationTableSelector || undefined,
+          specificationContainerSelector: formValue.specificationContainerSelector || undefined
         });
-
-        // Add image selector using type assertion until API client is regenerated
-        (updateDto as any).imageSelector = formValue.imageSelector || undefined;
 
         this.siteConfigsService.updateSiteConfig(this.siteConfigId, updateDto).subscribe({
           next: () => {
@@ -270,15 +276,16 @@ export class SiteConfigFormComponent implements OnInit {
           priceSelector: formValue.priceSelector || undefined,
           stockSelector: formValue.stockSelector || undefined,
           sellerNameOnPageSelector: formValue.sellerNameOnPageSelector || undefined,
+          imageSelector: formValue.imageSelector || undefined,
           defaultUserAgent: formValue.defaultUserAgent || undefined,
           additionalHeaders: Object.keys(headersObject).length > 0 ? headersObject : undefined,
           isEnabled: formValue.isEnabled,
           requiresBrowserAutomation: formValue.requiresBrowserAutomation,
-          browserAutomationProfile: formValue.browserAutomationProfile || undefined
+          browserAutomationProfile: formValue.browserAutomationProfile || undefined,
+          enableSpecificationScraping: formValue.enableSpecificationScraping,
+          specificationTableSelector: formValue.specificationTableSelector || undefined,
+          specificationContainerSelector: formValue.specificationContainerSelector || undefined
         });
-
-        // Add image selector using type assertion until API client is regenerated
-        (createDto as any).imageSelector = formValue.imageSelector || undefined;
 
         this.siteConfigsService.createSiteConfig(createDto).subscribe({
           next: () => {

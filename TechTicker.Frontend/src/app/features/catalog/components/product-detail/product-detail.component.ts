@@ -234,6 +234,54 @@ export class ProductDetailComponent implements OnInit {
     return this.getSpecificationEntries().length > 0;
   }
 
+  hasEnhancedSpecifications(): boolean {
+    // Check if specifications are in the enhanced format from scraping
+    if (!this.product?.specifications) return false;
+    
+    // Enhanced specifications should have structured metadata
+    return !!(this.product.specifications['_metadata'] || 
+              this.product.specifications['_quality'] ||
+              this.product.specifications['_typed'] ||
+              this.product.specifications['_categorized']);
+  }
+
+  getEnhancedSpecifications(): any {
+    if (!this.hasEnhancedSpecifications()) return null;
+    
+    // Convert the enhanced specification format to what ProductSpecificationsComponent expects
+    const specs = this.product?.specifications;
+    if (!specs) return null;
+    
+    // If it's already in the right format, return it
+    if (specs['isSuccess'] !== undefined) {
+      return specs;
+    }
+    
+    // Otherwise, construct the format
+    const metadata = specs['_metadata'] || {};
+    const quality = specs['_quality'] || { overallScore: 0.8 };
+    const typed = specs['_typed'] || {};
+    const categorized = specs['_categorized'] || {};
+    
+    // Filter out metadata keys to get actual specifications
+    const actualSpecs: { [key: string]: any } = {};
+    Object.keys(specs).forEach(key => {
+      if (!key.startsWith('_')) {
+        actualSpecs[key] = specs[key];
+      }
+    });
+    
+    return {
+      isSuccess: true,
+      specifications: actualSpecs,
+      typedSpecifications: typed,
+      categorizedSpecs: categorized,
+      metadata: metadata,
+      quality: quality,
+      parsingTimeMs: metadata.processingTimeMs || 0
+    };
+  }
+
   hasProductImages(): boolean {
     const productAny = this.product as any;
     return !!(productAny?.primaryImageUrl || (productAny?.additionalImageUrls && productAny.additionalImageUrls.length > 0));

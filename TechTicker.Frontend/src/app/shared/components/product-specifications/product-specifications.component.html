@@ -1,0 +1,128 @@
+<div class="product-specifications" *ngIf="specifications">
+  <!-- Error State -->
+  <div *ngIf="!specifications.isSuccess" class="alert alert-warning">
+    <mat-icon>warning</mat-icon>
+    <strong>Specification Parsing Failed:</strong>
+    {{ specifications.errorMessage }}
+  </div>
+
+  <!-- Success State -->
+  <div *ngIf="hasSpecifications">
+    <div class="spec-header d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">
+        <mat-icon class="me-2">description</mat-icon>
+        Product Specifications
+      </h5>
+      <div class="spec-quality">
+        <span class="badge" [ngClass]="'bg-' + getConfidenceColor(specifications.quality.overallScore)">
+          Quality: {{ (specifications.quality.overallScore * 100) | number:'1.0-0' }}%
+        </span>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <mat-tab-group [selectedIndex]="activeTabIndex">
+      <mat-tab label="By Category">
+        <ng-template matTabContent>
+          <div class="categorized-specs mt-3">
+            <div *ngFor="let entry of categoryEntries" class="category-group mb-4">
+              <div class="category-header">
+                <h6 class="category-title">
+                  {{ entry[1].name }}
+                  <span class="badge bg-secondary ms-2">{{ entry[1].itemCount }}</span>
+                  <span *ngIf="entry[1].multiValueCount > 0" class="badge bg-info ms-1">
+                    {{ entry[1].multiValueCount }} multi-value
+                  </span>
+                </h6>
+              </div>
+              <div class="category-specs">
+                <div class="row">
+                  <div *ngFor="let specEntry of objectEntries(entry[1].specifications)" 
+                       class="col-md-6 col-lg-4 mb-2">
+                    <div class="spec-item">
+                      <div class="spec-key">
+                        <mat-icon class="spec-icon">{{ getTypeIcon(specEntry[1].type) }}</mat-icon>
+                        {{ specEntry[0] }}
+                        <span *ngIf="specEntry[1].unit" class="spec-unit">({{ specEntry[1].unit }})</span>
+                      </div>
+                      <div class="spec-value">{{ formatValue(specEntry[1]) }}</div>
+                      <div *ngIf="specEntry[1].confidence < 0.8" class="spec-confidence">
+                        <small class="text-muted">
+                          Confidence: {{ (specEntry[1].confidence * 100) | number:'1.0-0' }}%
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="All Specifications">
+        <ng-template matTabContent>
+          <div class="flat-specs mt-3">
+            <div class="row">
+              <div *ngFor="let specEntry of flatSpecifications" class="col-md-6 col-lg-4 mb-3">
+                <div class="spec-card">
+                  <div class="spec-header">
+                    <mat-icon class="spec-icon">{{ getTypeIcon(specEntry[1].type) }}</mat-icon>
+                    <span class="spec-key">{{ specEntry[0] }}</span>
+                    <span *ngIf="specEntry[1].unit" class="spec-unit">({{ specEntry[1].unit }})</span>
+                  </div>
+                  <div class="spec-value">{{ formatValue(specEntry[1]) }}</div>
+                  <div class="spec-meta">
+                    <small class="text-muted">
+                      Type: {{ specEntry[1].type }} | 
+                      Confidence: {{ (specEntry[1].confidence * 100) | number:'1.0-0' }}%
+                      <span *ngIf="specEntry[1].hasMultipleValues"> | Multi-value ({{ specEntry[1].valueCount }})</span>
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="Metadata" *ngIf="showMetadata">
+        <ng-template matTabContent>
+          <div class="metadata-view mt-3">
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Parsing Information</h6>
+                <ul class="list-unstyled">
+                  <li><strong>Structure:</strong> {{ specifications.metadata.structure }}</li>
+                  <li><strong>Processing Time:</strong> {{ specifications.parsingTimeMs }}ms</li>
+                  <li><strong>Total Rows:</strong> {{ specifications.metadata.totalRows }}</li>
+                  <li><strong>Data Rows:</strong> {{ specifications.metadata.dataRows }}</li>
+                  <li><strong>Multi-value Specs:</strong> {{ specifications.metadata.multiValueSpecs }}</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6>Quality Metrics</h6>
+                <ul class="list-unstyled">
+                  <li><strong>Overall Score:</strong> 
+                    <span class="badge" [ngClass]="'bg-' + getConfidenceColor(specifications.quality.overallScore)">
+                      {{ (specifications.quality.overallScore * 100) | number:'1.0-0' }}%
+                    </span>
+                  </li>
+                  <li><strong>Structure Confidence:</strong> {{ (specifications.quality.structureConfidence * 100) | number:'1.0-0' }}%</li>
+                  <li><strong>Type Detection:</strong> {{ (specifications.quality.typeDetectionAccuracy * 100) | number:'1.0-0' }}%</li>
+                  <li><strong>Completeness:</strong> {{ (specifications.quality.completenessScore * 100) | number:'1.0-0' }}%</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="specifications.isSuccess && !hasSpecifications" class="alert alert-info">
+    <mat-icon>info</mat-icon>
+    No specifications found on this page.
+  </div>
+</div> 

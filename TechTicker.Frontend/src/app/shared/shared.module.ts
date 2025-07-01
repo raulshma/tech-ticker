@@ -9,10 +9,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatCardModule } from '@angular/material/card';
+import { MatBadgeModule } from '@angular/material/badge';
 
 import { AppLayoutComponent } from './components/layout/app-layout.component';
 import { ImageGalleryComponent } from './components/image-gallery/image-gallery.component';
 import { AiAssistantComponent } from './components/ai-assistant/ai-assistant.component';
+import { ProductSpecificationsComponent } from './components/product-specifications/product-specifications.component';
 import { RbacModule } from './modules/rbac.module';
 
 @NgModule({
@@ -31,12 +35,17 @@ import { RbacModule } from './modules/rbac.module';
     MatMenuModule,
     MatDividerModule,
     MatTooltipModule,
+    MatTabsModule,
+    MatCardModule,
+    MatBadgeModule,
     RbacModule,
-    AiAssistantComponent
+    AiAssistantComponent,
+    ProductSpecificationsComponent
   ],
   exports: [
     AppLayoutComponent,
     ImageGalleryComponent,
+    ProductSpecificationsComponent,
     AiAssistantComponent,
     RbacModule,
   ]
