@@ -22,7 +22,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatBadgeModule } from '@angular/material/badge';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TechTickerApiClient, BrowserAutomationTestRequestDto, SaveTestResultsRequestDto, BrowserAutomationProfileDto, BrowserTestOptionsDto, BrowserAutomationActionDto } from '../../shared/api/api-client';
+import { TechTickerApiClient, BrowserAutomationTestRequestDto, SaveTestResultRequestDto, BrowserAutomationProfileDto, BrowserTestOptionsDto, BrowserAutomationActionDto } from '../../shared/api/api-client';
 import { BrowserAutomationTestHubService } from './services/browser-automation-test-hub.service';
 import { AdvancedTestConfigDialogComponent } from './components/advanced-test-config-dialog.component';
 import { TestResultsHistoryComponent } from './components/test-results-history.component';
@@ -509,7 +509,7 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
     if (!this.currentSessionId || !this.testResults) return;
 
     try {
-      const request = new SaveTestResultsRequestDto({
+      const request = new SaveTestResultRequestDto({
         name: `Test Session ${new Date().toISOString()}`,
         description: `Browser automation test for ${this.testerForm.value.testUrl}`,
         tags: ['browser-automation', 'test']

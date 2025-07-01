@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
@@ -19,10 +20,14 @@ namespace TechTicker.ApiService.Controllers;
 public class AlertTestingController : BaseApiController
 {
     private readonly IAlertTestingService _alertTestingService;
+    private readonly ILogger<AlertTestingController> _logger;
 
-    public AlertTestingController(IAlertTestingService alertTestingService)
+    public AlertTestingController(
+        IAlertTestingService alertTestingService,
+        ILogger<AlertTestingController> logger)
     {
         _alertTestingService = alertTestingService;
+        _logger = logger;
     }
 
     /// <summary>
@@ -137,23 +142,19 @@ public class AlertTestingController : BaseApiController
     /// <returns>Testing statistics</returns>
     [HttpGet("admin/statistics")]
     [RequirePermission(Permissions.AlertRulesManage)]
-    public Task<ActionResult<ApiResponse<AlertTestingStatsDto>>> GetAlertTestingStatistics(
+    public async Task<ActionResult<ApiResponse<AlertTestingStatsDto>>> GetAlertTestingStatistics(
         [FromQuery] DateTimeOffset? startDate = null,
         [FromQuery] DateTimeOffset? endDate = null)
     {
         try
         {
-            // This would require additional service method - placeholder for now
-            var response = ApiResponse<AlertTestingStatsDto>.FailureResult(
-                "Feature not yet implemented", 501);
-            return Task.FromResult<ActionResult<ApiResponse<AlertTestingStatsDto>>>(StatusCode(501, response));
+            var result = await _alertTestingService.GetAlertTestingStatisticsAsync(startDate, endDate);
+            return HandleResult(result);
         }
         catch (Exception ex)
         {
-            var errorResponse = ApiResponse<AlertTestingStatsDto>.FailureResult(
-                $"Failed to get testing statistics: {ex.Message}", 500);
-            errorResponse.CorrelationId = CorrelationId;
-            return Task.FromResult<ActionResult<ApiResponse<AlertTestingStatsDto>>>(StatusCode(500, errorResponse));
+            _logger.LogError(ex, "Error getting alert testing statistics");
+            return StatusCode(500, ApiResponse<AlertTestingStatsDto>.FailureResult("Internal server error", 500));
         }
     }
 
@@ -168,15 +169,4 @@ public class AlertTestingController : BaseApiController
     }
 }
 
-/// <summary>
-/// DTO for alert testing statistics (placeholder)
-/// </summary>
-public class AlertTestingStatsDto
-{
-    public int TotalTestsRun { get; set; }
-    public int TotalSimulationsRun { get; set; }
-    public int TotalValidationsRun { get; set; }
-    public Dictionary<string, int> TestsByConditionType { get; set; } = new();
-    public Dictionary<string, int> TestsByUser { get; set; } = new();
-    public DateTimeOffset? LastTestRun { get; set; }
-}
+

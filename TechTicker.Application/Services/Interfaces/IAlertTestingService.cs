@@ -35,6 +35,13 @@ public interface IAlertTestingService
     /// Validate an alert rule configuration
     /// </summary>
     Task<Result<AlertRuleValidationResultDto>> ValidateAlertRuleAsync(TestAlertRuleDto alertRule);
+
+    /// <summary>
+    /// Get alert testing statistics for administrative purposes
+    /// </summary>
+    Task<Result<AlertTestingStatsDto>> GetAlertTestingStatisticsAsync(
+        DateTimeOffset? startDate = null, 
+        DateTimeOffset? endDate = null);
 }
 
 /// <summary>

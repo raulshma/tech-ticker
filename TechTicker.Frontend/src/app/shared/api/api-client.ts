@@ -3425,65 +3425,6 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    saveTestResults(sessionId: string, body: SaveTestResultsRequestDto | undefined): Observable<StringApiResponse> {
-        let url_ = this.baseUrl + "/api/browser-automation/test/{sessionId}/save";
-        if (sessionId === undefined || sessionId === null)
-            throw new Error("The parameter 'sessionId' must be defined.");
-        url_ = url_.replace("{sessionId}", encodeURIComponent("" + sessionId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSaveTestResults(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processSaveTestResults(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<StringApiResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<StringApiResponse>;
-        }));
-    }
-
-    protected processSaveTestResults(response: HttpResponseBase): Observable<StringApiResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = StringApiResponse.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return OK
-     */
     validateProfile(body: ProfileValidationRequestDto | undefined): Observable<ProfileValidationResultDtoApiResponse> {
         let url_ = this.baseUrl + "/api/browser-automation/test/validate";
         url_ = url_.replace(/[?&]$/, "");
@@ -8978,7 +8919,7 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
-    saveTestResults2(sessionId: string, body: SaveTestResultRequestDto | undefined): Observable<StringApiResponse> {
+    saveTestResults(sessionId: string, body: SaveTestResultRequestDto | undefined): Observable<StringApiResponse> {
         let url_ = this.baseUrl + "/api/test-results/sessions/{sessionId}/save";
         if (sessionId === undefined || sessionId === null)
             throw new Error("The parameter 'sessionId' must be defined.");
@@ -8998,11 +8939,11 @@ export class TechTickerApiClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSaveTestResults2(response_);
+            return this.processSaveTestResults(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSaveTestResults2(response_ as any);
+                    return this.processSaveTestResults(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<StringApiResponse>;
                 }
@@ -9011,7 +8952,7 @@ export class TechTickerApiClient {
         }));
     }
 
-    protected processSaveTestResults2(response: HttpResponseBase): Observable<StringApiResponse> {
+    protected processSaveTestResults(response: HttpResponseBase): Observable<StringApiResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -12973,7 +12914,16 @@ export class AlertTestingStatsDto implements IAlertTestingStatsDto {
     totalValidationsRun?: number;
     testsByConditionType?: { [key: string]: number; } | undefined;
     testsByUser?: { [key: string]: number; } | undefined;
+    testsByProduct?: { [key: string]: number; } | undefined;
+    testsByResult?: { [key: string]: number; } | undefined;
     lastTestRun?: Date | undefined;
+    firstTestRun?: Date | undefined;
+    averageExecutionTimeMs?: number;
+    uniqueAlertRulesTested?: number;
+    uniqueProductsTested?: number;
+    dailyTestCounts?: { [key: string]: number; } | undefined;
+    periodStart?: Date | undefined;
+    periodEnd?: Date | undefined;
 
     constructor(data?: IAlertTestingStatsDto) {
         if (data) {
@@ -13003,7 +12953,34 @@ export class AlertTestingStatsDto implements IAlertTestingStatsDto {
                         (<any>this.testsByUser)![key] = _data["testsByUser"][key];
                 }
             }
+            if (_data["testsByProduct"]) {
+                this.testsByProduct = {} as any;
+                for (let key in _data["testsByProduct"]) {
+                    if (_data["testsByProduct"].hasOwnProperty(key))
+                        (<any>this.testsByProduct)![key] = _data["testsByProduct"][key];
+                }
+            }
+            if (_data["testsByResult"]) {
+                this.testsByResult = {} as any;
+                for (let key in _data["testsByResult"]) {
+                    if (_data["testsByResult"].hasOwnProperty(key))
+                        (<any>this.testsByResult)![key] = _data["testsByResult"][key];
+                }
+            }
             this.lastTestRun = _data["lastTestRun"] ? new Date(_data["lastTestRun"].toString()) : <any>undefined;
+            this.firstTestRun = _data["firstTestRun"] ? new Date(_data["firstTestRun"].toString()) : <any>undefined;
+            this.averageExecutionTimeMs = _data["averageExecutionTimeMs"];
+            this.uniqueAlertRulesTested = _data["uniqueAlertRulesTested"];
+            this.uniqueProductsTested = _data["uniqueProductsTested"];
+            if (_data["dailyTestCounts"]) {
+                this.dailyTestCounts = {} as any;
+                for (let key in _data["dailyTestCounts"]) {
+                    if (_data["dailyTestCounts"].hasOwnProperty(key))
+                        (<any>this.dailyTestCounts)![key] = _data["dailyTestCounts"][key];
+                }
+            }
+            this.periodStart = _data["periodStart"] ? new Date(_data["periodStart"].toString()) : <any>undefined;
+            this.periodEnd = _data["periodEnd"] ? new Date(_data["periodEnd"].toString()) : <any>undefined;
         }
     }
 
@@ -13033,7 +13010,34 @@ export class AlertTestingStatsDto implements IAlertTestingStatsDto {
                     (<any>data["testsByUser"])[key] = (<any>this.testsByUser)[key];
             }
         }
+        if (this.testsByProduct) {
+            data["testsByProduct"] = {};
+            for (let key in this.testsByProduct) {
+                if (this.testsByProduct.hasOwnProperty(key))
+                    (<any>data["testsByProduct"])[key] = (<any>this.testsByProduct)[key];
+            }
+        }
+        if (this.testsByResult) {
+            data["testsByResult"] = {};
+            for (let key in this.testsByResult) {
+                if (this.testsByResult.hasOwnProperty(key))
+                    (<any>data["testsByResult"])[key] = (<any>this.testsByResult)[key];
+            }
+        }
         data["lastTestRun"] = this.lastTestRun ? this.lastTestRun.toISOString() : <any>undefined;
+        data["firstTestRun"] = this.firstTestRun ? this.firstTestRun.toISOString() : <any>undefined;
+        data["averageExecutionTimeMs"] = this.averageExecutionTimeMs;
+        data["uniqueAlertRulesTested"] = this.uniqueAlertRulesTested;
+        data["uniqueProductsTested"] = this.uniqueProductsTested;
+        if (this.dailyTestCounts) {
+            data["dailyTestCounts"] = {};
+            for (let key in this.dailyTestCounts) {
+                if (this.dailyTestCounts.hasOwnProperty(key))
+                    (<any>data["dailyTestCounts"])[key] = (<any>this.dailyTestCounts)[key];
+            }
+        }
+        data["periodStart"] = this.periodStart ? this.periodStart.toISOString() : <any>undefined;
+        data["periodEnd"] = this.periodEnd ? this.periodEnd.toISOString() : <any>undefined;
         return data;
     }
 }
@@ -13044,7 +13048,16 @@ export interface IAlertTestingStatsDto {
     totalValidationsRun?: number;
     testsByConditionType?: { [key: string]: number; } | undefined;
     testsByUser?: { [key: string]: number; } | undefined;
+    testsByProduct?: { [key: string]: number; } | undefined;
+    testsByResult?: { [key: string]: number; } | undefined;
     lastTestRun?: Date | undefined;
+    firstTestRun?: Date | undefined;
+    averageExecutionTimeMs?: number;
+    uniqueAlertRulesTested?: number;
+    uniqueProductsTested?: number;
+    dailyTestCounts?: { [key: string]: number; } | undefined;
+    periodStart?: Date | undefined;
+    periodEnd?: Date | undefined;
 }
 
 export class AlertTestingStatsDtoApiResponse implements IAlertTestingStatsDtoApiResponse {
@@ -20983,58 +20996,6 @@ export class SaveTestResultRequestDto implements ISaveTestResultRequestDto {
 }
 
 export interface ISaveTestResultRequestDto {
-    name?: string | undefined;
-    description?: string | undefined;
-    tags?: string[] | undefined;
-}
-
-export class SaveTestResultsRequestDto implements ISaveTestResultsRequestDto {
-    name?: string | undefined;
-    description?: string | undefined;
-    tags?: string[] | undefined;
-
-    constructor(data?: ISaveTestResultsRequestDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.name = _data["name"];
-            this.description = _data["description"];
-            if (Array.isArray(_data["tags"])) {
-                this.tags = [] as any;
-                for (let item of _data["tags"])
-                    this.tags!.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): SaveTestResultsRequestDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new SaveTestResultsRequestDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["description"] = this.description;
-        if (Array.isArray(this.tags)) {
-            data["tags"] = [];
-            for (let item of this.tags)
-                data["tags"].push(item);
-        }
-        return data;
-    }
-}
-
-export interface ISaveTestResultsRequestDto {
     name?: string | undefined;
     description?: string | undefined;
     tags?: string[] | undefined;
