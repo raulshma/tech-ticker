@@ -81,7 +81,7 @@ public partial class WebScrapingService
                     SellerNameOnPageSelector = command.Selectors.SellerNameOnPageSelector,
                     ImageSelector = command.Selectors.ImageSelector
                 },
-                AttemptNumber = 1, // TODO: Handle retry logic
+                AttemptNumber = 1,
                 DebugNotes = "Starting scraping operation"
             };
 
@@ -128,7 +128,7 @@ public partial class WebScrapingService
             var htmlContent = proxyResponse.Content!;
 
             // Parse HTML with AngleSharp
-            var config = Configuration.Default;
+            var config = AngleSharp.Configuration.Default;
             var context = BrowsingContext.New(config);
             var document = await context.OpenAsync(req => req.Content(htmlContent));
 
@@ -727,7 +727,7 @@ public partial class WebScrapingService
                     SpecificationTableSelector = command.Selectors.SpecificationTableSelector,
                     SpecificationContainerSelector = command.Selectors.SpecificationContainerSelector
                 },
-                AttemptNumber = 1, // TODO: Handle retry logic
+                AttemptNumber = 1,
                 DebugNotes = "Starting browser automation scraping operation"
             };
 
@@ -898,7 +898,7 @@ public partial class WebScrapingService
                 {
                     // Get page content for specification parsing
                     var pageContent = await page.ContentAsync();
-                    var config = Configuration.Default;
+                    var config = AngleSharp.Configuration.Default;
                     var angleSharpContext = BrowsingContext.New(config);
                     var document = await angleSharpContext.OpenAsync(req => req.Content(pageContent));
 

@@ -7,6 +7,7 @@ using TechTicker.Application.Configuration;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.Domain.Entities;
 using TechTicker.Shared.Utilities;
+using TechTicker.ScrapingWorker.Services.Interfaces;
 
 namespace TechTicker.ScrapingWorker.Services;
 
@@ -20,6 +21,7 @@ public class ProxyAwareHttpClientService
     private readonly ILogger<ProxyAwareHttpClientService> _logger;
     private readonly ProxyPoolConfiguration _config;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IRetryPolicyService _retryPolicyService;
     private readonly string _encryptionKey;
 
     // Supported proxy types
@@ -30,12 +32,14 @@ public class ProxyAwareHttpClientService
         ILogger<ProxyAwareHttpClientService> logger,
         IOptions<ProxyPoolConfiguration> config,
         IHttpClientFactory httpClientFactory,
+        IRetryPolicyService retryPolicyService,
         IConfiguration configuration)
     {
         _proxyPoolService = proxyPoolService;
         _logger = logger;
         _config = config.Value;
         _httpClientFactory = httpClientFactory;
+        _retryPolicyService = retryPolicyService;
         _encryptionKey = configuration["AiConfiguration:EncryptionKey"] ?? throw new InvalidOperationException("Encryption key not found in configuration");
     }
 
@@ -114,157 +118,146 @@ public class ProxyAwareHttpClientService
             RequestStartTime = DateTimeOffset.UtcNow
         };
 
-        var stopwatch = Stopwatch.StartNew();
-        var retryCount = 0;
-        var maxRetries = _config.MaxRetries;
+        var overallStopwatch = Stopwatch.StartNew();
+        ProxyConfiguration? proxy = null;
+        HttpClient? httpClient = null;
 
-        while (retryCount <= maxRetries)
+        try
         {
-            ProxyConfiguration? proxy = null;
-            HttpClient? httpClient = null;
-
-            try
+            // Get proxy if pool is enabled
+            if (_proxyPoolService.IsProxyPoolEnabled)
             {
-                // Get proxy if pool is enabled
-                if (_proxyPoolService.IsProxyPoolEnabled)
-                {
-                    proxy = await _proxyPoolService.GetNextProxyAsync();
-                    if (proxy != null)
-                    {
-                        response.ProxyUsed = $"{proxy.Host}:{proxy.Port}";
-                        response.ProxyId = proxy.ProxyConfigurationId;
-                        _logger.LogDebug("Using proxy {ProxyHost}:{ProxyPort} for request to {Url}", 
-                            proxy.Host, proxy.Port, url);
-                    }
-                    else
-                    {
-                        _logger.LogInformation("No active proxies available in pool, making direct request to {Url}", url);
-                    }
-                }
-                else
-                {
-                    _logger.LogDebug("Proxy pool is disabled, making direct request to {Url}", url);
-                }
-
-                // Create HTTP client with or without proxy
-                httpClient = CreateHttpClient(proxy, userAgent);
-
-                // Add custom headers
-                if (headers != null)
-                {
-                    foreach (var header in headers)
-                    {
-                        httpClient.DefaultRequestHeaders.Remove(header.Key);
-                        httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
-                    }
-                }
-
-                // Make the request
-                var httpResponse = await httpClient.GetAsync(url);
-                stopwatch.Stop();
-
-                response.IsSuccess = httpResponse.IsSuccessStatusCode;
-                response.StatusCode = (int)httpResponse.StatusCode;
-
-                if (isBinary)
-                {
-                    response.BinaryContent = await httpResponse.Content.ReadAsByteArrayAsync();
-                }
-                else
-                {
-                    response.Content = await httpResponse.Content.ReadAsStringAsync();
-                }
-
-                response.ResponseTime = stopwatch.Elapsed;
-                response.Headers = httpResponse.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value));
-
-                // Add content headers
-                foreach (var header in httpResponse.Content.Headers)
-                {
-                    response.Headers[header.Key] = string.Join(", ", header.Value);
-                }
-
-                // Record proxy success if used
+                proxy = await _proxyPoolService.GetNextProxyAsync();
                 if (proxy != null)
                 {
-                    await _proxyPoolService.RecordProxySuccessAsync(proxy.ProxyConfigurationId, (int)stopwatch.ElapsedMilliseconds);
-                }
-
-                if (response.IsSuccess)
-                {
-                    var connectionType = proxy != null ? $"proxy {proxy.Host}:{proxy.Port}" : "direct connection";
-                    _logger.LogDebug("Successfully fetched {Url} in {ElapsedMs}ms using {ConnectionType}", 
-                        url, stopwatch.ElapsedMilliseconds, connectionType);
-                    return response;
+                    response.ProxyUsed = $"{proxy.Host}:{proxy.Port}";
+                    response.ProxyId = proxy.ProxyConfigurationId;
+                    _logger.LogDebug("Using proxy {ProxyHost}:{ProxyPort} for request to {Url}", 
+                        proxy.Host, proxy.Port, url);
                 }
                 else
                 {
-                    _logger.LogWarning("HTTP request failed with status {StatusCode} for {Url}", 
-                        httpResponse.StatusCode, url);
-                    
-                    // Record proxy failure if used
-                    if (proxy != null)
-                    {
-                        await _proxyPoolService.RecordProxyFailureAsync(
-                            proxy.ProxyConfigurationId, 
-                            $"HTTP {(int)httpResponse.StatusCode} {httpResponse.ReasonPhrase}", 
-                            "HTTP_ERROR");
-                    }
+                    _logger.LogInformation("No active proxies available in pool, making direct request to {Url}", url);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                stopwatch.Stop();
-                response.ErrorMessage = ex.Message;
-                response.ResponseTime = stopwatch.Elapsed;
+                _logger.LogDebug("Proxy pool is disabled, making direct request to {Url}", url);
+            }
 
-                // Enhanced error logging for proxy issues
-                if (proxy != null)
-                {
-                    _logger.LogError(ex, "Error making HTTP request to {Url} via proxy {ProxyHost}:{ProxyPort} (attempt {Attempt}/{MaxRetries}). Error: {ErrorMessage}", 
-                        url, proxy.Host, proxy.Port, retryCount + 1, maxRetries + 1, ex.Message);
-                    
-                    // Log specific proxy tunnel errors
-                    if (ex.Message.Contains("proxy tunnel") || ex.Message.Contains("400"))
-                    {
-                        _logger.LogWarning("Proxy tunnel error detected for {ProxyHost}:{ProxyPort}. This may indicate proxy configuration issues or proxy server problems.", 
-                            proxy.Host, proxy.Port);
-                    }
-                }
-                else
-                {
-                    _logger.LogError(ex, "Error making HTTP request to {Url} via direct connection (attempt {Attempt}/{MaxRetries})", 
-                        url, retryCount + 1, maxRetries + 1);
-                }
+            // Create HTTP client with or without proxy
+            httpClient = CreateHttpClient(proxy, userAgent);
 
+            // Add custom headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    httpClient.DefaultRequestHeaders.Remove(header.Key);
+                    httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
+                }
+            }
+
+            // Create and execute HTTP request with Polly retry policy
+            var retryPolicy = _retryPolicyService.GetHttpRetryPolicy();
+            
+            var httpResponse = await retryPolicy.ExecuteAsync(async () =>
+            {
+                _logger.LogDebug("Executing HTTP request to {Url}", url);
+                return await httpClient.GetAsync(url);
+            });
+
+            overallStopwatch.Stop();
+
+            response.IsSuccess = httpResponse.IsSuccessStatusCode;
+            response.StatusCode = (int)httpResponse.StatusCode;
+
+            if (isBinary)
+            {
+                response.BinaryContent = await httpResponse.Content.ReadAsByteArrayAsync();
+            }
+            else
+            {
+                response.Content = await httpResponse.Content.ReadAsStringAsync();
+            }
+
+            response.ResponseTime = overallStopwatch.Elapsed;
+            response.Headers = httpResponse.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value));
+
+            // Add content headers
+            foreach (var header in httpResponse.Content.Headers)
+            {
+                response.Headers[header.Key] = string.Join(", ", header.Value);
+            }
+
+            // Record proxy success if used
+            if (proxy != null)
+            {
+                await _proxyPoolService.RecordProxySuccessAsync(proxy.ProxyConfigurationId, (int)overallStopwatch.ElapsedMilliseconds);
+            }
+
+            if (response.IsSuccess)
+            {
+                var connectionType = proxy != null ? $"proxy {proxy.Host}:{proxy.Port}" : "direct connection";
+                _logger.LogDebug("Successfully fetched {Url} in {ElapsedMs}ms using {ConnectionType}", 
+                    url, overallStopwatch.ElapsedMilliseconds, connectionType);
+                return response;
+            }
+            else
+            {
+                _logger.LogWarning("HTTP request failed with status {StatusCode} for {Url}", 
+                    httpResponse.StatusCode, url);
+                
                 // Record proxy failure if used
                 if (proxy != null)
                 {
                     await _proxyPoolService.RecordProxyFailureAsync(
                         proxy.ProxyConfigurationId, 
-                        ex.Message, 
-                        ex.GetType().Name);
+                        $"HTTP {(int)httpResponse.StatusCode} {httpResponse.ReasonPhrase}", 
+                        "HTTP_ERROR");
                 }
-            }
-            finally
-            {
-                httpClient?.Dispose();
-            }
 
-            retryCount++;
-            if (retryCount <= maxRetries)
-            {
-                var delay = _config.RetryDelayMs * retryCount; // Exponential backoff
-                _logger.LogDebug("Retrying request to {Url} in {Delay}ms (attempt {Attempt}/{MaxRetries})", 
-                    url, delay, retryCount + 1, maxRetries + 1);
-                await Task.Delay(delay);
-                stopwatch.Restart();
+                response.ErrorMessage = $"HTTP {(int)httpResponse.StatusCode} {httpResponse.ReasonPhrase}";
+                return response;
             }
         }
+        catch (Exception ex)
+        {
+            overallStopwatch.Stop();
+            response.IsSuccess = false;
+            response.ErrorMessage = ex.Message;
+            response.ResponseTime = overallStopwatch.Elapsed;
 
-        response.IsSuccess = false;
-        response.ErrorMessage = response.ErrorMessage ?? "Max retries exceeded";
-        return response;
+            // Enhanced error logging for proxy issues
+            if (proxy != null)
+            {
+                _logger.LogError(ex, "Error making HTTP request to {Url} via proxy {ProxyHost}:{ProxyPort}. Error: {ErrorMessage}", 
+                    url, proxy.Host, proxy.Port, ex.Message);
+                
+                // Log specific proxy tunnel errors
+                if (ex.Message.Contains("proxy tunnel") || ex.Message.Contains("400"))
+                {
+                    _logger.LogWarning("Proxy tunnel error detected for {ProxyHost}:{ProxyPort}. This may indicate proxy configuration issues or proxy server problems.", 
+                        proxy.Host, proxy.Port);
+                }
+
+                // Record proxy failure
+                await _proxyPoolService.RecordProxyFailureAsync(
+                    proxy.ProxyConfigurationId, 
+                    ex.Message, 
+                    ex.GetType().Name);
+            }
+            else
+            {
+                _logger.LogError(ex, "Error making HTTP request to {Url} via direct connection", url);
+            }
+
+            return response;
+        }
+        finally
+        {
+            httpClient?.Dispose();
+        }
     }
 
     private HttpClient CreateHttpClient(ProxyConfiguration? proxy, string? userAgent)

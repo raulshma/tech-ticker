@@ -5,7 +5,9 @@ using TechTicker.DataAccess;
 using TechTicker.DataAccess.Repositories;
 using TechTicker.DataAccess.Repositories.Interfaces;
 using TechTicker.ScrapingWorker;
+using TechTicker.ScrapingWorker.Configuration;
 using TechTicker.ScrapingWorker.Services;
+using TechTicker.ScrapingWorker.Services.Interfaces;
 using TechTicker.Shared.Utilities.Html;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -27,6 +29,10 @@ builder.Services.Configure<MessagingConfiguration>(
 builder.Services.Configure<ProxyPoolConfiguration>(
     builder.Configuration.GetSection(ProxyPoolConfiguration.SectionName));
 
+// Configure retry policies
+builder.Services.Configure<RetryConfiguration>(
+    builder.Configuration.GetSection("RetryConfiguration"));
+
 // Add repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IMappingService, MappingService>();
@@ -40,6 +46,7 @@ builder.Services.AddSingleton<IMessageConsumer, RabbitMQConsumer>();
 
 // Add proxy services
 builder.Services.AddScoped<IProxyPoolService, ProxyPoolService>();
+builder.Services.AddScoped<IRetryPolicyService, RetryPolicyService>();
 builder.Services.AddScoped<ProxyAwareHttpClientService>();
 builder.Services.AddMemoryCache();
 
