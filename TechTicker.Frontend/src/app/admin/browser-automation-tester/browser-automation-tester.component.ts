@@ -164,7 +164,7 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
     private dialog: MatDialog
   ) {
     this.testerForm = this.fb.group({
-      testUrl: ['https://example.com', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]],
+      testUrl: ['', [Validators.required, Validators.pattern(/^https?:\/\/.{3,}$/)]],
       sessionName: [''],
       saveResults: [false]
     });
@@ -516,23 +516,44 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
       this.testResults = null;
       this.currentScreenshot = null;
 
+      const testUrl = this.testerForm.value.testUrl;
+
       // Create profile with current actions or basic navigation
       let actions: BrowserAutomationActionDto[] = [];
       
       if (this.currentActions.length > 0) {
-        // Convert current actions to DTOs
-        actions = this.currentActions.map(action => new BrowserAutomationActionDto({
-          actionType: action.actionType,
-          selector: action.selector,
-          repeat: action.repeat,
-          delayMs: action.delayMs,
-          value: action.value
-        }));
+        // Convert current actions to DTOs and ensure navigate actions use the correct URL
+        actions = this.currentActions.map(action => {
+          const actionDto = new BrowserAutomationActionDto({
+            actionType: action.actionType,
+            selector: action.selector,
+            repeat: action.repeat,
+            delayMs: action.delayMs,
+            value: action.value
+          });
+
+          // If this is a navigate action and no specific URL is set, use the test URL
+          if (action.actionType === 'navigate' && (!action.value || action.value === 'https://example.com' || action.value.trim() === '')) {
+            actionDto.value = testUrl;
+          }
+
+          return actionDto;
+        });
+
+        // If no navigate action exists at the beginning, prepend one
+        const hasNavigateAction = actions.some(action => action.actionType === 'navigate');
+        if (!hasNavigateAction) {
+          actions.unshift(new BrowserAutomationActionDto({
+            actionType: 'navigate',
+            value: testUrl,
+            delayMs: 2000
+          }));
+        }
       } else {
-        // Fallback to basic navigation action
+        // Fallback to basic navigation action when no current actions exist
         actions = [new BrowserAutomationActionDto({
           actionType: 'navigate',
-          value: this.testerForm.value.testUrl,
+          value: testUrl,
           delayMs: 2000
         })];
       }
@@ -669,11 +690,86 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
 
   getActionIcon(actionType: string): string {
     switch (actionType?.toLowerCase()) {
+      // Navigation Actions
+      case 'navigate':
+      case 'goto':
+      case 'url': return 'navigation';
+      case 'reload':
+      case 'refresh': return 'refresh';
+      case 'goback': return 'arrow_back';
+      case 'goforward': return 'arrow_forward';
+      
+      // Clicking Actions
       case 'click': return 'touch_app';
+      case 'doubleclick':
+      case 'rightclick': return 'mouse';
+      
+      // Input Actions
       case 'type': return 'keyboard';
-      case 'navigate': return 'navigation';
-      case 'wait': return 'schedule';
+      case 'clear': return 'clear';
+      case 'setvalue': return 'input';
+      case 'press': return 'keyboard';
+      case 'upload': return 'upload_file';
+      
+      // Focus Actions
+      case 'focus': return 'center_focus_strong';
+      case 'blur': return 'blur_on';
+      case 'hover': return 'mouse';
+      
+      // Wait Actions
+      case 'wait':
+      case 'waitfortimeout': return 'timer';
+      case 'waitforselector': return 'schedule';
+      case 'waitfornavigation': return 'hourglass_empty';
+      case 'waitforloadstate': return 'hourglass_full';
+      
+      // Scroll Actions
       case 'scroll': return 'unfold_more';
+      
+      // Selection Actions
+      case 'selectoption': return 'arrow_drop_down';
+      
+      // Media Actions
+      case 'screenshot': return 'camera_alt';
+      
+      // JavaScript Actions
+      case 'evaluate': return 'code';
+      
+      // Drag & Drop Actions
+      case 'drag': return 'drag_indicator';
+      
+      // Window Management
+      case 'maximize': return 'fullscreen';
+      case 'minimize': return 'fullscreen_exit';
+      case 'fullscreen': return 'fullscreen';
+      case 'newtab':
+      case 'newpage': return 'tab';
+      case 'closetab':
+      case 'closepage': return 'close';
+      case 'switchwindow':
+      case 'switchtab': return 'swap_horiz';
+      
+      // Frame Actions
+      case 'switchframe':
+      case 'switchiframe': return 'web_asset';
+      
+      // Alert Actions
+      case 'alert': return 'warning';
+      case 'acceptalert': return 'check_circle';
+      case 'dismissalert': return 'cancel';
+      
+      // Cookie Actions
+      case 'getcookies':
+      case 'setcookies': return 'cookie';
+      case 'deletecookies': return 'delete_sweep';
+      
+      // Style & Script Injection
+      case 'addstylesheet': return 'style';
+      case 'addscript': return 'code';
+      
+      // Device Emulation
+      case 'emulatedevice': return 'smartphone';
+      
       default: return 'play_arrow';
     }
   }
@@ -777,11 +873,12 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
       {
         id: 'basic-navigation',
         name: 'Basic Navigation',
-        description: 'Simple navigation to a URL with wait',
+        description: 'Simple navigation to a URL with wait (uses current test URL)',
         category: 'navigation',
         actions: [
-          { actionType: 'navigate', value: 'https://example.com', delayMs: 2000 },
-          { actionType: 'wait', value: '3000' }
+          { actionType: 'navigate', value: '', delayMs: 2000 }, // Empty value will use test URL
+          { actionType: 'waitForLoadState', value: 'networkidle', delayMs: 1000 },
+          { actionType: 'screenshot', delayMs: 500 }
         ],
         createdAt: new Date(),
         usageCount: 0
@@ -789,10 +886,12 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
       {
         id: 'form-filling',
         name: 'Form Filling',
-        description: 'Fill out a form with text input',
+        description: 'Fill out a form with text input and clear/focus actions',
         category: 'form-filling',
         actions: [
           { actionType: 'waitForSelector', selector: 'input[name="username"]', delayMs: 1000 },
+          { actionType: 'focus', selector: 'input[name="username"]', delayMs: 300 },
+          { actionType: 'clear', selector: 'input[name="username"]', delayMs: 300 },
           { actionType: 'type', selector: 'input[name="username"]', value: 'testuser', delayMs: 500 },
           { actionType: 'type', selector: 'input[name="password"]', value: 'testpass', delayMs: 500 },
           { actionType: 'click', selector: 'button[type="submit"]', delayMs: 1000 }
@@ -803,10 +902,13 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
       {
         id: 'screenshot-sequence',
         name: 'Screenshot Sequence',
-        description: 'Navigate and take screenshots',
+        description: 'Navigate and take screenshots with scrolling (uses current test URL)',
         category: 'screenshots',
         actions: [
-          { actionType: 'navigate', value: 'https://example.com', delayMs: 2000 },
+          { actionType: 'navigate', value: '', delayMs: 2000 }, // Empty value will use test URL
+          { actionType: 'waitForLoadState', value: 'networkidle', delayMs: 1000 },
+          { actionType: 'screenshot', delayMs: 1000 },
+          { actionType: 'scroll', delayMs: 1000 },
           { actionType: 'screenshot', delayMs: 1000 },
           { actionType: 'scroll', delayMs: 1000 },
           { actionType: 'screenshot', delayMs: 1000 }
@@ -817,13 +919,49 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
       {
         id: 'ecommerce-browse',
         name: 'E-commerce Browse',
-        description: 'Browse an e-commerce site',
+        description: 'Browse an e-commerce site with hover and double-click (uses current test URL)',
         category: 'ecommerce',
         actions: [
-          { actionType: 'navigate', value: 'https://example.com', delayMs: 2000 },
+          { actionType: 'navigate', value: '', delayMs: 2000 }, // Empty value will use test URL
           { actionType: 'waitForSelector', selector: '.product-grid', delayMs: 1000 },
+          { actionType: 'hover', selector: '.product-item:first-child', delayMs: 800 },
           { actionType: 'click', selector: '.product-item:first-child', delayMs: 1000 },
+          { actionType: 'waitForNavigation', delayMs: 2000 },
           { actionType: 'waitForSelector', selector: '.product-details', delayMs: 1000 },
+          { actionType: 'screenshot', delayMs: 1000 }
+        ],
+        createdAt: new Date(),
+        usageCount: 0
+      },
+      {
+        id: 'advanced-interactions',
+        name: 'Advanced Interactions',
+        description: 'Demonstrate keyboard, alerts, and window management actions',
+        category: 'testing',
+        actions: [
+          { actionType: 'navigate', value: '', delayMs: 2000 }, // Empty value will use test URL
+          { actionType: 'press', value: 'F11', delayMs: 1000 }, // Fullscreen
+          { actionType: 'wait', value: '2000', delayMs: 0 },
+          { actionType: 'press', value: 'Escape', delayMs: 1000 }, // Exit fullscreen
+          { actionType: 'rightclick', selector: 'body', delayMs: 1000 },
+          { actionType: 'press', value: 'Escape', delayMs: 500 }, // Close context menu
+          { actionType: 'screenshot', delayMs: 1000 }
+        ],
+        createdAt: new Date(),
+        usageCount: 0
+      },
+      {
+        id: 'multi-tab-workflow',
+        name: 'Multi-Tab Workflow',
+        description: 'Demonstrate tab management and switching',
+        category: 'navigation',
+        actions: [
+          { actionType: 'navigate', value: '', delayMs: 2000 }, // Empty value will use test URL
+          { actionType: 'screenshot', delayMs: 1000 },
+          { actionType: 'newtab', value: 'https://github.com', delayMs: 2000 },
+          { actionType: 'waitForLoadState', value: 'networkidle', delayMs: 2000 },
+          { actionType: 'screenshot', delayMs: 1000 },
+          { actionType: 'switchtab', value: '0', delayMs: 1000 }, // Switch back to first tab
           { actionType: 'screenshot', delayMs: 1000 }
         ],
         createdAt: new Date(),
@@ -841,12 +979,24 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
       maxWidth: '1200px',
       height: '80vh',
       maxHeight: '800px',
-      data: { currentActions: this.currentActions }
+      data: { 
+        currentActions: this.currentActions,
+        testUrl: this.testerForm.value.testUrl 
+      }
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result?.action === 'use' && result.actions) {
-        this.currentActions = result.actions;
+        // Process actions to replace empty navigate URLs with current test URL
+        const testUrl = this.testerForm.value.testUrl;
+        const processedActions = result.actions.map((action: BrowserAutomationAction) => {
+          if (action.actionType === 'navigate' && (!action.value || action.value.trim() === '')) {
+            return { ...action, value: testUrl || 'https://example.com' };
+          }
+          return action;
+        });
+        
+        this.currentActions = processedActions;
         this.showSuccessMessage(`Applied template "${result.template.name}" with ${result.actions.length} actions`);
         this.loadActionTemplatesCount(); // Refresh count
       }
@@ -888,12 +1038,41 @@ export class BrowserAutomationTesterComponent implements OnInit, OnDestroy {
 
   addQuickAction(): void {
     // Add a simple navigation action as a quick example
+    const testUrl = this.testerForm.value.testUrl;
     const quickAction: BrowserAutomationAction = {
       actionType: 'navigate',
-      value: this.testerForm.value.testUrl || 'https://example.com',
+      value: testUrl || 'https://example.com',
       delayMs: 2000
     };
     this.addAction(quickAction);
-    this.showSuccessMessage('Quick action added! You can edit it in the action list.');
+    this.showSuccessMessage('Quick navigation action added! You can edit it in the action list.');
+  }
+
+  addQuickScreenshot(): void {
+    const screenshotAction: BrowserAutomationAction = {
+      actionType: 'screenshot',
+      delayMs: 1000
+    };
+    this.addAction(screenshotAction);
+    this.showSuccessMessage('Screenshot action added!');
+  }
+
+  addQuickWait(): void {
+    const waitAction: BrowserAutomationAction = {
+      actionType: 'wait',
+      value: '3000',
+      delayMs: 0
+    };
+    this.addAction(waitAction);
+    this.showSuccessMessage('Wait action added (3 seconds)!');
+  }
+
+  addQuickScroll(): void {
+    const scrollAction: BrowserAutomationAction = {
+      actionType: 'scroll',
+      delayMs: 1000
+    };
+    this.addAction(scrollAction);
+    this.showSuccessMessage('Scroll action added!');
   }
 } 

@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ProductDto } from '../../../../shared/api/api-client';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-product-selector',
@@ -39,14 +40,41 @@ export class ProductSelectorComponent implements OnInit, OnDestroy {
     return `${product.manufacturer || ''} ${product.name || ''}`.trim();
   }
 
+  hasProductImages(product: ProductDto): boolean {
+    return !!(product.primaryImageUrl || (product.additionalImageUrls && product.additionalImageUrls.length > 0));
+  }
+
+  getPrimaryImageUrl(product: ProductDto): string | null {
+    return product.primaryImageUrl || null;
+  }
+
+  getAdditionalImageUrls(product: ProductDto): string[] {
+    return product.additionalImageUrls || [];
+  }
+
   getProductImage(product: ProductDto): string {
     if (product.primaryImageUrl) {
-      return product.primaryImageUrl;
+      return this.getImageUrl(product.primaryImageUrl);
     }
     if (product.additionalImageUrls && product.additionalImageUrls.length > 0) {
-      return product.additionalImageUrls[0];
+      return this.getImageUrl(product.additionalImageUrls[0]);
     }
     return '/assets/images/product-placeholder.png';
+  }
+
+  private getImageUrl(imageUrl: string): string {
+    // Convert relative paths to absolute URLs
+    if (imageUrl && !imageUrl.startsWith('http')) {
+      // Use the API base URL from environment
+      const baseUrl = this.getApiBaseUrl();
+      return `${baseUrl}/${imageUrl}`;
+    }
+    return imageUrl;
+  }
+
+  private getApiBaseUrl(): string {
+    // Get the API base URL from environment, fallback to current location
+    return environment.apiUrl || window.location.origin;
   }
 
   onImageError(event: Event): void {

@@ -28,10 +28,20 @@
 
         <div class="product-option-content">
           <div class="product-image">
-            <img
-              [src]="getProductImage(product)"
-              [alt]="product.name"
-              (error)="onImageError($event)">
+            <app-image-gallery
+              *ngIf="hasProductImages(product)"
+              [primaryImageUrl]="getPrimaryImageUrl(product)"
+              [additionalImageUrls]="getAdditionalImageUrls(product)"
+              [altText]="product.name || 'Product image'"
+              [maxHeight]="'60px'"
+              [maxWidth]="'60px'"
+              [showThumbnails]="false">
+            </app-image-gallery>
+
+            <div *ngIf="!hasProductImages(product)"
+                 class="no-image-placeholder">
+              <mat-icon>image_not_supported</mat-icon>
+            </div>
           </div>
 
           <div class="product-info">
@@ -71,10 +81,20 @@
     <mat-card class="product-card">
       <div class="product-card-content">
         <div class="product-image-large">
-          <img
-            [src]="getProductImage(selectedProduct)"
-            [alt]="selectedProduct.name"
-            (error)="onImageError($event)">
+          <app-image-gallery
+            *ngIf="hasProductImages(selectedProduct)"
+            [primaryImageUrl]="getPrimaryImageUrl(selectedProduct)"
+            [additionalImageUrls]="getAdditionalImageUrls(selectedProduct)"
+            [altText]="selectedProduct.name || 'Product image'"
+            [maxHeight]="'200px'"
+            [showThumbnails]="false">
+          </app-image-gallery>
+
+          <div *ngIf="!hasProductImages(selectedProduct)"
+               class="no-image-placeholder-large">
+            <mat-icon>image_not_supported</mat-icon>
+            <span>No image available</span>
+          </div>
         </div>
 
         <div class="product-details">

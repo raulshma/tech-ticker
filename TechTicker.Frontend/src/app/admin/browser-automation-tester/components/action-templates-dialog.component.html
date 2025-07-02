@@ -239,9 +239,10 @@
                     <mat-form-field appearance="outline" 
                                    class="value-field"
                                    *ngIf="actionNeedsValue(action.value?.actionType)">
-                      <mat-label>Value</mat-label>
+                      <mat-label>{{getValueLabel(action.value?.actionType)}}</mat-label>
                       <input matInput formControlName="value" 
-                             [placeholder]="action.value?.actionType === 'wait' || action.value?.actionType === 'waitForTimeout' ? 'Milliseconds' : 'Enter value'">
+                             [placeholder]="getValuePlaceholder(action.value?.actionType)">
+                      <mat-hint *ngIf="getValueHint(action.value?.actionType)">{{getValueHint(action.value?.actionType)}}</mat-hint>
                     </mat-form-field>
 
                     <div class="action-options">

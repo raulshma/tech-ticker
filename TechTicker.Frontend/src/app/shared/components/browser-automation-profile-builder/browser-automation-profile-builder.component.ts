@@ -88,19 +88,87 @@ export class BrowserAutomationProfileBuilderComponent implements ControlValueAcc
     { value: 'webkit', label: 'WebKit (Safari)' }
   ];
   
-  // Updated action types to match backend implementation
+  // Complete list of action types to match backend implementation
   actionTypes = [
-    { value: 'scroll', label: 'Scroll Down', description: 'Scroll down by one viewport' },
+    // Navigation Actions
+    { value: 'navigate', label: 'Navigate to URL', description: 'Navigate to a URL' },
+    { value: 'goto', label: 'Go to URL', description: 'Go to a URL (alias for navigate)' },
+    { value: 'url', label: 'Open URL', description: 'Open a URL (alias for navigate)' },
+    { value: 'reload', label: 'Reload Page', description: 'Reload the current page' },
+    { value: 'refresh', label: 'Refresh Page', description: 'Refresh the current page' },
+    { value: 'goback', label: 'Go Back', description: 'Navigate back in browser history' },
+    { value: 'goforward', label: 'Go Forward', description: 'Navigate forward in browser history' },
+    
+    // Clicking Actions
     { value: 'click', label: 'Click Element', description: 'Click on an element by CSS selector' },
-    { value: 'waitForSelector', label: 'Wait for Selector', description: 'Wait for an element to appear' },
+    { value: 'doubleclick', label: 'Double Click', description: 'Double-click on an element' },
+    { value: 'rightclick', label: 'Right Click', description: 'Right-click on an element' },
+    
+    // Input Actions
     { value: 'type', label: 'Type Text', description: 'Type text into an input field' },
+    { value: 'clear', label: 'Clear Input', description: 'Clear an input field' },
+    { value: 'setValue', label: 'Set Value (JS)', description: 'Set input value using JavaScript' },
+    { value: 'press', label: 'Press Key', description: 'Press a keyboard key' },
+    { value: 'upload', label: 'Upload File', description: 'Upload a file to a file input' },
+    
+    // Focus Actions
+    { value: 'focus', label: 'Focus Element', description: 'Focus on an element' },
+    { value: 'blur', label: 'Blur Element', description: 'Remove focus from an element' },
+    { value: 'hover', label: 'Hover Element', description: 'Hover over an element' },
+    
+    // Wait Actions
     { value: 'wait', label: 'Wait (Timeout)', description: 'Wait for a specified time' },
     { value: 'waitForTimeout', label: 'Wait for Timeout', description: 'Wait for a specified time (alternative)' },
-    { value: 'screenshot', label: 'Take Screenshot', description: 'Capture a screenshot of the page' },
-    { value: 'evaluate', label: 'Execute JavaScript', description: 'Run custom JavaScript code' },
-    { value: 'hover', label: 'Hover Element', description: 'Hover over an element' },
+    { value: 'waitForSelector', label: 'Wait for Selector', description: 'Wait for an element to appear' },
+    { value: 'waitForNavigation', label: 'Wait for Navigation', description: 'Wait for page navigation to complete' },
+    { value: 'waitForLoadState', label: 'Wait for Load State', description: 'Wait for specific page load state' },
+    
+    // Scroll Actions
+    { value: 'scroll', label: 'Scroll Down', description: 'Scroll down by one viewport' },
+    
+    // Selection Actions
     { value: 'selectOption', label: 'Select Option', description: 'Select an option from a dropdown' },
-    { value: 'setValue', label: 'Set Value (JS)', description: 'Set input value using JavaScript' }
+    
+    // Media Actions
+    { value: 'screenshot', label: 'Take Screenshot', description: 'Capture a screenshot of the page' },
+    
+    // JavaScript Actions
+    { value: 'evaluate', label: 'Execute JavaScript', description: 'Run custom JavaScript code' },
+    
+    // Drag & Drop Actions
+    { value: 'drag', label: 'Drag and Drop', description: 'Drag and drop elements' },
+    
+    // Window Management
+    { value: 'maximize', label: 'Maximize Window', description: 'Maximize browser window' },
+    { value: 'minimize', label: 'Minimize Window', description: 'Minimize browser window' },
+    { value: 'fullscreen', label: 'Enter Fullscreen', description: 'Enter fullscreen mode' },
+    { value: 'newtab', label: 'New Tab', description: 'Open new tab' },
+    { value: 'newpage', label: 'New Page', description: 'Open new page' },
+    { value: 'closetab', label: 'Close Tab', description: 'Close current tab' },
+    { value: 'closepage', label: 'Close Page', description: 'Close current page' },
+    { value: 'switchwindow', label: 'Switch Window', description: 'Switch between windows' },
+    { value: 'switchtab', label: 'Switch Tab', description: 'Switch between tabs' },
+    
+    // Frame Actions
+    { value: 'switchframe', label: 'Switch Frame', description: 'Switch to a frame' },
+    { value: 'switchiframe', label: 'Switch iFrame', description: 'Switch to an iframe' },
+    
+    // Alert Actions
+    { value: 'alert', label: 'Handle Alert', description: 'Handle alert dialogs' },
+    { value: 'acceptalert', label: 'Accept Alert', description: 'Accept an alert dialog' },
+    { value: 'dismissalert', label: 'Dismiss Alert', description: 'Dismiss an alert dialog' },
+    
+    // Cookie Actions
+    { value: 'getcookies', label: 'Get Cookies', description: 'Retrieve cookies' },
+    { value: 'setcookies', label: 'Set Cookies', description: 'Set cookies' },
+    { value: 'deletecookies', label: 'Delete Cookies', description: 'Delete cookies' },
+    
+    // Style & Script Injection
+    { value: 'addstylesheet', label: 'Add Stylesheet', description: 'Add CSS stylesheet to page' },
+    { value: 'addscript', label: 'Add Script', description: 'Add JavaScript to page' },
+    
+    // Device Emulation
+    { value: 'emulatedevice', label: 'Emulate Device', description: 'Emulate specific device settings' }
   ];
   
   validationError: string | null = null;

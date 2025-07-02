@@ -54,6 +54,24 @@
             border-radius: 8px;
             border: 1px solid var(--mdc-theme-outline);
           }
+
+          .no-image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--mdc-theme-surface-variant);
+            border: 1px solid var(--mdc-theme-outline-variant);
+            border-radius: 8px;
+            color: var(--mdc-theme-text-secondary-on-background);
+
+            mat-icon {
+              font-size: 24px;
+              width: 24px;
+              height: 24px;
+            }
+          }
         }
 
         .product-info {

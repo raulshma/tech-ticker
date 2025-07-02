@@ -18,10 +18,20 @@
       <div class="winner-display">
         <div class="product-winner">
           <div class="product-image">
-            <img
-              [src]="getProductImage(getWinnerProduct() || undefined)"
-              [alt]="getProductName(getWinnerProduct() || undefined)"
-              (error)="onImageError($event)">
+            <app-image-gallery
+              *ngIf="hasProductImages(getWinnerProduct() || undefined)"
+              [primaryImageUrl]="getPrimaryImageUrl(getWinnerProduct() || undefined)"
+              [additionalImageUrls]="getAdditionalImageUrls(getWinnerProduct() || undefined)"
+              [altText]="getProductName(getWinnerProduct() || undefined)"
+              [maxHeight]="'100px'"
+              [maxWidth]="'100px'"
+              [showThumbnails]="false">
+            </app-image-gallery>
+
+            <div *ngIf="!hasProductImages(getWinnerProduct() || undefined)"
+                 class="no-image-placeholder">
+              <mat-icon>image_not_supported</mat-icon>
+            </div>
           </div>
           <div class="product-info">
             <h3>{{ getProductName(getWinnerProduct() || undefined) }}</h3>

@@ -13,10 +13,21 @@
       <div class="recommendation-summary">
         <div class="recommended-product">
           <div class="product-display">
-            <div class="product-image">            <img
-              [src]="getProductImage(getRecommendedProduct() || undefined)"
-              [alt]="getProductName(getRecommendedProduct() || undefined)"
-              (error)="onImageError($event)">
+            <div class="product-image">
+              <app-image-gallery
+                *ngIf="hasProductImages(getRecommendedProduct() || undefined)"
+                [primaryImageUrl]="getPrimaryImageUrl(getRecommendedProduct() || undefined)"
+                [additionalImageUrls]="getAdditionalImageUrls(getRecommendedProduct() || undefined)"
+                [altText]="getProductName(getRecommendedProduct() || undefined)"
+                [maxHeight]="'120px'"
+                [maxWidth]="'120px'"
+                [showThumbnails]="false">
+              </app-image-gallery>
+
+              <div *ngIf="!hasProductImages(getRecommendedProduct() || undefined)"
+                   class="no-image-placeholder">
+                <mat-icon>image_not_supported</mat-icon>
+              </div>
             </div>
             <div class="product-info">
               <h3>{{ getProductName(getRecommendedProduct() || undefined) }}</h3>

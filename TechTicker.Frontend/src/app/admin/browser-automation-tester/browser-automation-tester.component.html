@@ -1,3 +1,4 @@
+<form [formGroup]="testerForm">
 <div class="browser-automation-container">
   <!-- Modern Welcome Header Section -->
   <header class="welcome-section">
@@ -12,7 +13,7 @@
             <mat-label>Test URL</mat-label>
             <input matInput 
                    formControlName="testUrl"
-                   placeholder="https://example.com/product">
+                   placeholder="Enter URL to test (e.g., https://example.com/product)">
             <mat-icon matSuffix>link</mat-icon>
           </mat-form-field>
           <div class="action-buttons">
@@ -487,14 +488,14 @@
                                 <mat-icon>{{getActionIcon(action.actionType)}}</mat-icon>
                                 <span class="action-type-label">{{action.actionType}}</span>
                               </div>
-                              <div class="action-details" *ngIf="action.selector || action.value">
+                              <div class="action-details" *ngIf="action.selector || action.value || action.actionType === 'navigate'">
                                 <div class="detail-item" *ngIf="action.selector">
                                   <span class="detail-label">Selector:</span>
                                   <span class="detail-value">{{action.selector}}</span>
                                 </div>
-                                <div class="detail-item" *ngIf="action.value">
-                                  <span class="detail-label">Value:</span>
-                                  <span class="detail-value">{{action.value}}</span>
+                                <div class="detail-item" *ngIf="action.value || action.actionType === 'navigate'">
+                                  <span class="detail-label">{{action.actionType === 'navigate' ? 'URL' : 'Value'}}:</span>
+                                  <span class="detail-value">{{action.value || (action.actionType === 'navigate' ? 'Will use test URL' : '')}}</span>
                                 </div>
                               </div>
                               <div class="action-options" *ngIf="action.repeat || action.delayMs">
@@ -516,20 +517,40 @@
                     <div class="no-actions" *ngIf="currentActions.length === 0">
                       <mat-icon class="empty-icon">playlist_add</mat-icon>
                       <h4 class="mat-headline-medium">No actions defined</h4>
-                      <p class="mat-body-large">Add actions to create an automation sequence, or load a template to get started.</p>
-                                           <div class="action-buttons">
-                       <button matButton="elevated" 
-                               color="primary" 
-                               (click)="openActionTemplates()">
-                         <mat-icon>template</mat-icon>
-                         Load Template
-                       </button>
-                       <button matButton="elevated" 
-                               (click)="addQuickAction()">
-                         <mat-icon>add</mat-icon>
-                         Quick Add Action
-                       </button>
-                     </div>
+                      <p class="mat-body-large">Add actions to create an automation sequence, or load a template to get started. When no actions are defined, a basic navigation to your test URL will be performed.</p>
+                      <div class="action-buttons">
+                        <button matButton="elevated" 
+                                color="primary" 
+                                (click)="openActionTemplates()">
+                          <mat-icon>template</mat-icon>
+                          Load Template
+                        </button>
+                        <button matButton="elevated" 
+                                [matMenuTriggerFor]="quickActionsMenu">
+                          <mat-icon>add</mat-icon>
+                          Quick Add Actions
+                        </button>
+                        <mat-menu #quickActionsMenu="matMenu">
+                          <button mat-menu-item 
+                                  (click)="addQuickAction()"
+                                  [disabled]="!testerForm.value.testUrl">
+                            <mat-icon>navigation</mat-icon>
+                            <span>Navigate to URL</span>
+                          </button>
+                          <button mat-menu-item (click)="addQuickScreenshot()">
+                            <mat-icon>camera_alt</mat-icon>
+                            <span>Take Screenshot</span>
+                          </button>
+                          <button mat-menu-item (click)="addQuickWait()">
+                            <mat-icon>schedule</mat-icon>
+                            <span>Wait (3 seconds)</span>
+                          </button>
+                          <button mat-menu-item (click)="addQuickScroll()">
+                            <mat-icon>unfold_more</mat-icon>
+                            <span>Scroll Down</span>
+                          </button>
+                        </mat-menu>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -625,3 +646,4 @@
     </mat-form-field>
   </div>
 </mat-menu> 
+</form>

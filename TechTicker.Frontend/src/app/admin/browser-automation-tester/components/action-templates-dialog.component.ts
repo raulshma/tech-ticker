@@ -88,26 +88,94 @@ export class ActionTemplatesDialogComponent implements OnInit {
     { value: 'testing', label: 'Testing', icon: 'bug_report' }
   ];
 
-  // Action types for reference
+  // Action types for reference - Complete list from backend
   actionTypes = [
-    { value: 'scroll', label: 'Scroll Down', icon: 'unfold_more' },
+    // Navigation Actions
+    { value: 'navigate', label: 'Navigate to URL', icon: 'navigation' },
+    { value: 'goto', label: 'Go to URL', icon: 'navigation' },
+    { value: 'url', label: 'Open URL', icon: 'navigation' },
+    { value: 'reload', label: 'Reload Page', icon: 'refresh' },
+    { value: 'refresh', label: 'Refresh Page', icon: 'refresh' },
+    { value: 'goback', label: 'Go Back', icon: 'arrow_back' },
+    { value: 'goforward', label: 'Go Forward', icon: 'arrow_forward' },
+    
+    // Clicking Actions
     { value: 'click', label: 'Click Element', icon: 'touch_app' },
-    { value: 'waitForSelector', label: 'Wait for Selector', icon: 'schedule' },
+    { value: 'doubleclick', label: 'Double Click', icon: 'mouse' },
+    { value: 'rightclick', label: 'Right Click', icon: 'mouse' },
+    
+    // Input Actions
     { value: 'type', label: 'Type Text', icon: 'keyboard' },
+    { value: 'clear', label: 'Clear Input', icon: 'clear' },
+    { value: 'setValue', label: 'Set Value (JS)', icon: 'input' },
+    { value: 'press', label: 'Press Key', icon: 'keyboard' },
+    { value: 'upload', label: 'Upload File', icon: 'upload_file' },
+    
+    // Focus Actions
+    { value: 'focus', label: 'Focus Element', icon: 'center_focus_strong' },
+    { value: 'blur', label: 'Blur Element', icon: 'blur_on' },
+    { value: 'hover', label: 'Hover Element', icon: 'mouse' },
+    
+    // Wait Actions
     { value: 'wait', label: 'Wait (Timeout)', icon: 'timer' },
     { value: 'waitForTimeout', label: 'Wait for Timeout', icon: 'timer' },
-    { value: 'screenshot', label: 'Take Screenshot', icon: 'camera_alt' },
-    { value: 'evaluate', label: 'Execute JavaScript', icon: 'code' },
-    { value: 'hover', label: 'Hover Element', icon: 'mouse' },
+    { value: 'waitForSelector', label: 'Wait for Selector', icon: 'schedule' },
+    { value: 'waitForNavigation', label: 'Wait for Navigation', icon: 'hourglass_empty' },
+    { value: 'waitForLoadState', label: 'Wait for Load State', icon: 'hourglass_full' },
+    
+    // Scroll Actions
+    { value: 'scroll', label: 'Scroll Down', icon: 'unfold_more' },
+    
+    // Selection Actions
     { value: 'selectOption', label: 'Select Option', icon: 'arrow_drop_down' },
-    { value: 'setValue', label: 'Set Value (JS)', icon: 'input' }
+    
+    // Media Actions
+    { value: 'screenshot', label: 'Take Screenshot', icon: 'camera_alt' },
+    
+    // JavaScript Actions
+    { value: 'evaluate', label: 'Execute JavaScript', icon: 'code' },
+    
+    // Drag & Drop Actions
+    { value: 'drag', label: 'Drag and Drop', icon: 'drag_indicator' },
+    
+    // Window Management
+    { value: 'maximize', label: 'Maximize Window', icon: 'fullscreen' },
+    { value: 'minimize', label: 'Minimize Window', icon: 'fullscreen_exit' },
+    { value: 'fullscreen', label: 'Enter Fullscreen', icon: 'fullscreen' },
+    { value: 'newtab', label: 'New Tab', icon: 'tab' },
+    { value: 'newpage', label: 'New Page', icon: 'tab' },
+    { value: 'closetab', label: 'Close Tab', icon: 'close' },
+    { value: 'closepage', label: 'Close Page', icon: 'close' },
+    { value: 'switchwindow', label: 'Switch Window', icon: 'swap_horiz' },
+    { value: 'switchtab', label: 'Switch Tab', icon: 'swap_horiz' },
+    
+    // Frame Actions
+    { value: 'switchframe', label: 'Switch Frame', icon: 'web_asset' },
+    { value: 'switchiframe', label: 'Switch iFrame', icon: 'web_asset' },
+    
+    // Alert Actions
+    { value: 'alert', label: 'Handle Alert', icon: 'warning' },
+    { value: 'acceptalert', label: 'Accept Alert', icon: 'check_circle' },
+    { value: 'dismissalert', label: 'Dismiss Alert', icon: 'cancel' },
+    
+    // Cookie Actions
+    { value: 'getcookies', label: 'Get Cookies', icon: 'cookie' },
+    { value: 'setcookies', label: 'Set Cookies', icon: 'cookie' },
+    { value: 'deletecookies', label: 'Delete Cookies', icon: 'delete_sweep' },
+    
+    // Style & Script Injection
+    { value: 'addstylesheet', label: 'Add Stylesheet', icon: 'style' },
+    { value: 'addscript', label: 'Add Script', icon: 'code' },
+    
+    // Device Emulation
+    { value: 'emulatedevice', label: 'Emulate Device', icon: 'smartphone' }
   ];
 
   constructor(
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ActionTemplatesDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { currentActions?: BrowserAutomationAction[] }
+    @Inject(MAT_DIALOG_DATA) public data: { currentActions?: BrowserAutomationAction[], testUrl?: string }
   ) {
     this.templateForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -274,11 +342,20 @@ export class ActionTemplatesDialogComponent implements OnInit {
     template.usageCount++;
     this.saveTemplates();
     
+    // Process template actions to handle empty navigate URLs
+    const processedActions = template.actions.map(action => {
+      if (action.actionType === 'navigate' && !action.value) {
+        // Empty navigate action will be handled by the parent component to use the current test URL
+        return { ...action, value: '' };
+      }
+      return action;
+    });
+    
     // Return the template actions to the parent component
     this.dialogRef.close({
       action: 'use',
       template: template,
-      actions: template.actions
+      actions: processedActions
     });
   }
 
@@ -340,11 +417,89 @@ export class ActionTemplatesDialogComponent implements OnInit {
   }
 
   actionNeedsSelector(actionType: string): boolean {
-    return ['click', 'waitForSelector', 'type', 'hover', 'selectOption', 'setValue'].includes(actionType);
+    return [
+      'click', 'doubleclick', 'rightclick', 'type', 'clear', 'setValue', 
+      'focus', 'blur', 'hover', 'waitForSelector', 'selectOption', 'upload',
+      'drag', 'switchframe', 'switchiframe'
+    ].includes(actionType);
   }
 
   actionNeedsValue(actionType: string): boolean {
-    return ['type', 'wait', 'waitForTimeout', 'evaluate', 'setValue'].includes(actionType);
+    return [
+      'navigate', 'goto', 'url', 'type', 'setValue', 'press', 'upload', 
+      'wait', 'waitForTimeout', 'evaluate', 'selectOption', 'drag',
+      'waitForLoadState', 'newtab', 'newpage', 'switchwindow', 'switchtab',
+      'setcookies', 'addstylesheet', 'addscript', 'emulatedevice'
+    ].includes(actionType);
+  }
+
+  getValueLabel(actionType: string): string {
+    switch (actionType?.toLowerCase()) {
+      case 'navigate':
+      case 'goto':
+      case 'url':
+      case 'newtab':
+      case 'newpage': return 'URL';
+      case 'type':
+      case 'setvalue': return 'Text';
+      case 'wait':
+      case 'waitfortimeout': return 'Duration (ms)';
+      case 'press': return 'Key';
+      case 'upload': return 'File Path';
+      case 'evaluate':
+      case 'addscript': return 'JavaScript Code';
+      case 'selectoption': return 'Option Value';
+      case 'drag': return 'Target Selector';
+      case 'waitforloadstate': return 'Load State';
+      case 'switchwindow':
+      case 'switchtab': return 'Tab Index';
+      case 'setcookies': return 'Cookie Data (JSON)';
+      case 'addstylesheet': return 'CSS Code';
+      case 'emulatedevice': return 'Device Settings (JSON)';
+      default: return 'Value';
+    }
+  }
+
+  getValuePlaceholder(actionType: string): string {
+    switch (actionType?.toLowerCase()) {
+      case 'navigate':
+      case 'goto':
+      case 'url':
+      case 'newtab':
+      case 'newpage': return 'https://example.com';
+      case 'type':
+      case 'setvalue': return 'Enter text to type';
+      case 'wait':
+      case 'waitfortimeout': return '3000';
+      case 'press': return 'Enter, Space, ArrowDown, etc.';
+      case 'upload': return '/path/to/file.pdf';
+      case 'evaluate':
+      case 'addscript': return 'console.log("Hello World");';
+      case 'selectoption': return 'option1';
+      case 'drag': return '#target-element';
+      case 'waitforloadstate': return 'networkidle, domcontentloaded, load';
+      case 'switchwindow':
+      case 'switchtab': return '0, 1, 2...';
+      case 'setcookies': return '{"name": "value", "domain": ".example.com"}';
+      case 'addstylesheet': return '.my-class { color: red; }';
+      case 'emulatedevice': return '{"width": 375, "height": 667}';
+      default: return 'Enter value';
+    }
+  }
+
+  getValueHint(actionType: string): string {
+    switch (actionType?.toLowerCase()) {
+      case 'wait':
+      case 'waitfortimeout': return 'Time to wait in milliseconds';
+      case 'press': return 'Valid key names from Playwright documentation';
+      case 'waitforloadstate': return 'Valid states: load, domcontentloaded, networkidle';
+      case 'switchwindow':
+      case 'switchtab': return 'Zero-based tab index (0 = first tab)';
+      case 'setcookies': return 'JSON object with cookie properties';
+      case 'emulatedevice': return 'JSON with device viewport and user agent settings';
+      case 'drag': return 'CSS selector of the drop target element';
+      default: return '';
+    }
   }
 
   private generateId(): string {

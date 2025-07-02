@@ -3,6 +3,7 @@ import {
   ProductComparisonSummaryDto,
   ProductWithCurrentPricesDto
 } from '../../services/product-comparison.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-product-comparison-summary',
@@ -25,15 +26,45 @@ export class ProductComparisonSummaryComponent {
     return this.summary.recommendedProductId === this.product1.productId ? this.product2 : this.product1;
   }
 
+  hasProductImages(product?: ProductWithCurrentPricesDto): boolean {
+    if (!product) return false;
+    return !!(product.primaryImageUrl || (product.additionalImageUrls && product.additionalImageUrls.length > 0));
+  }
+
+  getPrimaryImageUrl(product?: ProductWithCurrentPricesDto): string | null {
+    if (!product) return null;
+    return product.primaryImageUrl || null;
+  }
+
+  getAdditionalImageUrls(product?: ProductWithCurrentPricesDto): string[] {
+    if (!product) return [];
+    return product.additionalImageUrls || [];
+  }
+
   getProductImage(product?: ProductWithCurrentPricesDto): string {
     if (!product) return '/assets/images/product-placeholder.png';
     if (product.primaryImageUrl) {
-      return product.primaryImageUrl;
+      return this.getImageUrl(product.primaryImageUrl);
     }
     if (product.additionalImageUrls && product.additionalImageUrls.length > 0) {
-      return product.additionalImageUrls[0];
+      return this.getImageUrl(product.additionalImageUrls[0]);
     }
     return '/assets/images/product-placeholder.png';
+  }
+
+  private getImageUrl(imageUrl: string): string {
+    // Convert relative paths to absolute URLs
+    if (imageUrl && !imageUrl.startsWith('http')) {
+      // Use the API base URL from environment
+      const baseUrl = this.getApiBaseUrl();
+      return `${baseUrl}/${imageUrl}`;
+    }
+    return imageUrl;
+  }
+
+  private getApiBaseUrl(): string {
+    // Get the API base URL from environment, fallback to current location
+    return environment.apiUrl || window.location.origin;
   }
 
   onImageError(event: Event): void {
