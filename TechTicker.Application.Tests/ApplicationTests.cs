@@ -108,6 +108,8 @@ public class AlertProcessingServiceTests
         _mockUnitOfWork.Setup(x => x.AlertHistories.AddAsync(It.IsAny<AlertHistory>()))
             .ReturnsAsync((AlertHistory ah) => ah);
         _mockUnitOfWork.Setup(x => x.AlertRules.Update(It.IsAny<AlertRule>()));
+        _mockUnitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
         _mockMessagePublisher
             .Setup(x => x.PublishAsync(
                 It.IsAny<AlertTriggeredEvent>(),
@@ -126,11 +128,11 @@ public class AlertProcessingServiceTests
 
         // Assert
         _mockMessagePublisher.Verify(x => x.PublishAsync(
-            It.Is<AlertTriggeredEvent>(e => e.AlertRuleId == alertRule.AlertRuleId),
-            _messagingConfig.AlertsExchange,
-            _messagingConfig.AlertTriggeredRoutingKey), Times.AtLeastOnce);
+            It.Is<AlertTriggeredEvent>(e => e.AlertRuleId == alertRule.AlertRuleId && e.TriggeringPrice == 250.00m),
+            "alerts",
+            "alert.triggered"), Times.Once);
 
-        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(default), Times.AtLeastOnce);
+        _mockUnitOfWork.Verify(x => x.SaveChangesAsync(default), Times.Once);
     }
 
     [Fact]
@@ -217,6 +219,8 @@ public class AlertProcessingServiceTests
         _mockUnitOfWork.Setup(x => x.AlertHistories.AddAsync(It.IsAny<AlertHistory>()))
             .ReturnsAsync((AlertHistory ah) => ah);
         _mockUnitOfWork.Setup(x => x.AlertRules.Update(It.IsAny<AlertRule>()));
+        _mockUnitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
         _mockMessagePublisher
             .Setup(x => x.PublishAsync(
                 It.IsAny<AlertTriggeredEvent>(),
@@ -235,8 +239,8 @@ public class AlertProcessingServiceTests
         // Assert
         _mockMessagePublisher.Verify(x => x.PublishAsync(
             It.Is<AlertTriggeredEvent>(e => e.AlertRuleId == alertRule.AlertRuleId),
-            _messagingConfig.AlertsExchange,
-            _messagingConfig.AlertTriggeredRoutingKey), Times.AtLeastOnce);
+            "alerts",
+            "alert.triggered"), Times.Once);
     }
 
     [Fact]
@@ -282,6 +286,8 @@ public class AlertProcessingServiceTests
         _mockUnitOfWork.Setup(x => x.AlertHistories.AddAsync(It.IsAny<AlertHistory>()))
             .ReturnsAsync((AlertHistory ah) => ah);
         _mockUnitOfWork.Setup(x => x.AlertRules.Update(It.IsAny<AlertRule>()));
+        _mockUnitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
         _mockMessagePublisher
             .Setup(x => x.PublishAsync(
                 It.IsAny<AlertTriggeredEvent>(),
@@ -299,9 +305,9 @@ public class AlertProcessingServiceTests
 
         // Assert
         _mockMessagePublisher.Verify(x => x.PublishAsync(
-            It.Is<AlertTriggeredEvent>(e => e.AlertRuleId == alertRule.AlertRuleId),
-            _messagingConfig.AlertsExchange,
-            _messagingConfig.AlertTriggeredRoutingKey), Times.AtLeastOnce);
+            It.Is<AlertTriggeredEvent>(e => e.AlertRuleId == alertRule.AlertRuleId && e.TriggeringStockStatus == "IN_STOCK"),
+            "alerts",
+            "alert.triggered"), Times.Once);
     }
 
     [Fact]

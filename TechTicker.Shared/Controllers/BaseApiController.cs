@@ -205,7 +205,7 @@ namespace TechTicker.Shared.Controllers
         {
             var response = ApiResponse<T>.FailureResult(message, 400);
             response.CorrelationId = CorrelationId;
-            return StatusCode(400, response);
+            return base.BadRequest(response);
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace TechTicker.Shared.Controllers
         {
             var response = ApiResponse<T>.FailureResult(message, 404);
             response.CorrelationId = CorrelationId;
-            return StatusCode(404, response);
+            return base.NotFound(response);
         }
 
         /// <summary>
@@ -236,7 +236,9 @@ namespace TechTicker.Shared.Controllers
             var response = ApiResponse<T>.FailureResult(message, 422);
             response.CorrelationId = CorrelationId;
             return StatusCode(422, response);
-        }        /// <summary>
+        }
+
+        /// <summary>
         /// Returns a PagedResponse directly without double wrapping
         /// </summary>
         protected ActionResult<PagedResponse<T>> OkPaged<T>(IEnumerable<T> data, int pageNumber, int pageSize, long totalCount, string? message = null)
@@ -267,11 +269,11 @@ namespace TechTicker.Shared.Controllers
 
             return result.ErrorCode switch
             {
-                "RESOURCE_NOT_FOUND" => NotFoundGeneric<T>(result.ErrorMessage!),
-                "VALIDATION_FAILED" => BadRequestGeneric<T>(result.ErrorMessage!),
-                "CONFLICT" => ConflictGeneric<T>(result.ErrorMessage!),
-                "BUSINESS_RULE_VIOLATION" => UnprocessableEntityGeneric<T>(result.ErrorMessage!),
-                _ => BadRequestGeneric<T>(result.ErrorMessage!)
+                "RESOURCE_NOT_FOUND" => base.NotFound(ApiResponse<T>.FailureResult(result.ErrorMessage!, 404)),
+                "VALIDATION_FAILED" => base.BadRequest(ApiResponse<T>.FailureResult(result.ErrorMessage!, 400)),
+                "CONFLICT" => StatusCode(409, ApiResponse<T>.FailureResult(result.ErrorMessage!, 409)),
+                "BUSINESS_RULE_VIOLATION" => StatusCode(422, ApiResponse<T>.FailureResult(result.ErrorMessage!, 422)),
+                _ => base.BadRequest(ApiResponse<T>.FailureResult(result.ErrorMessage!, 400))
             };
         }
 
@@ -303,7 +305,7 @@ namespace TechTicker.Shared.Controllers
             if (result.IsSuccess)
             {
                 result.Data!.CorrelationId = CorrelationId;
-                return StatusCode(200, result.Data);
+                return base.Ok(result.Data);
             }
 
             var errorResponse = PagedResponse<T>.FailureResult(result.ErrorMessage!, result.ErrorCode switch
@@ -315,7 +317,14 @@ namespace TechTicker.Shared.Controllers
                 _ => 400
             });
             errorResponse.CorrelationId = CorrelationId;
-            return StatusCode(errorResponse.StatusCode, errorResponse);
+            return errorResponse.StatusCode switch
+            {
+                400 => base.BadRequest(errorResponse),
+                404 => base.NotFound(errorResponse),
+                409 => StatusCode(409, errorResponse),
+                422 => StatusCode(422, errorResponse),
+                _ => base.BadRequest(errorResponse)
+            };
         }
     }
 }

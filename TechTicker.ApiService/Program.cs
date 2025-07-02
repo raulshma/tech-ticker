@@ -224,6 +224,12 @@ builder.Services.AddCors(options =>
 // Add Alert Processing Service
 builder.Services.AddScoped<IAlertProcessingService, AlertProcessingService>();
 
+// Add Product Comparison Services
+builder.Services.AddScoped<IProductComparisonService, ProductComparisonService>();
+builder.Services.AddScoped<ISpecificationAnalysisEngine, SpecificationAnalysisEngine>();
+builder.Services.AddScoped<IPriceAnalysisService, PriceAnalysisService>();
+builder.Services.AddScoped<IRecommendationGenerationService, RecommendationGenerationService>();
+
 // Add Browser Automation Test Services
 builder.Services.AddScoped<IBrowserAutomationWebSocketService, BrowserAutomationWebSocketService>();
 
