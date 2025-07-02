@@ -26,6 +26,7 @@ import { CatalogRoutingModule } from './catalog-routing.module';
 
 // Shared
 import { SharedModule } from '../../shared/shared.module';
+import { ProductSpecificationsComponent } from '../../shared/components/product-specifications/product-specifications.component';
 
 // Components
 import { CatalogComponent } from './components/catalog/catalog.component';
@@ -59,7 +60,8 @@ import { CategoryFilterComponent } from './components/category-filter/category-f
     MatTabsModule,
     MatTooltipModule,
     MatSnackBarModule,
-    BaseChartDirective
+    BaseChartDirective,
+    ProductSpecificationsComponent
   ]
 })
 export class CatalogModule { }

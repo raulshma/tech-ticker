@@ -192,6 +192,26 @@
   .tab-content {
     padding: 24px 0;
   }
+
+  ::ng-deep .mat-mdc-tab-labels .mdc-tab {
+    .mat-icon {
+      margin-right: 8px;
+    }
+  }
+
+  .spec-badge {
+    display: inline-block;
+    background-color: var(--mat-sys-color-primary);
+    color: white;
+    border-radius: 50%;
+    min-width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    font-size: 0.75rem;
+    margin-left: 8px;
+    padding: 0 4px;
+  }
 }
 
 .prices-section {
@@ -298,7 +318,7 @@
   }
 }
 
-.no-prices, .no-history {
+.no-prices, .no-history, .no-specs {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -306,7 +326,7 @@
   padding: 64px 32px;
   text-align: center;
 
-  .no-prices-icon, .no-history-icon {
+  .no-prices-icon, .no-history-icon, .no-specs-icon {
     font-size: 64px;
     width: 64px;
     height: 64px;
@@ -323,6 +343,15 @@
     margin: 0;
     color: var(--mat-sys-color-on-surface);
     max-width: 400px;
+  }
+}
+
+.specs-card {
+  background-color: var(--mat-sys-color-surface-variant);
+  border-radius: 8px;
+
+  .mat-mdc-card-content {
+    padding: 32px 16px;
   }
 }
 
@@ -380,6 +409,12 @@
       padding: 12px 16px;
       background: var(--mat-sys-color-surface-variant, var(--mat-sys-color-surface));
       border-radius: 6px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
 
       .spec-label {
         font-weight: 500;
@@ -389,6 +424,27 @@
       .spec-value {
         color: var(--mat-sys-color-on-surface);
         text-align: right;
+        max-width: 60%;
+        overflow-wrap: break-word;
+      }
+    }
+  }
+
+  .enhanced-specs {
+    padding: 8px;
+    border-radius: 8px;
+
+    // Add animation for enhanced specs
+    animation: fadeIn 0.3s ease-in-out;
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
   }
@@ -448,3 +504,6 @@
     grid-template-columns: 1fr;
   }
 }
+
+// Utility classes
+.my-3 { margin-top: 1rem !important; margin-bottom: 1rem !important; }

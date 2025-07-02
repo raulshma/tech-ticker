@@ -148,8 +148,8 @@ export class ProductDetailComponent implements OnInit {
   }
 
   onTabChange(index: number): void {
-    // Load price history when price history tab is selected
-    if (index === 1 && this.priceHistory.length === 0) {
+    // Load price history when price history tab is selected (now at index 2)
+    if (index === 2 && this.priceHistory.length === 0) {
       this.loadPriceHistory();
     }
   }
@@ -237,9 +237,9 @@ export class ProductDetailComponent implements OnInit {
   hasEnhancedSpecifications(): boolean {
     // Check if specifications are in the enhanced format from scraping
     if (!this.product?.specifications) return false;
-    
+
     // Enhanced specifications should have structured metadata
-    return !!(this.product.specifications['_metadata'] || 
+    return !!(this.product.specifications['_metadata'] ||
               this.product.specifications['_quality'] ||
               this.product.specifications['_typed'] ||
               this.product.specifications['_categorized']);
@@ -247,22 +247,22 @@ export class ProductDetailComponent implements OnInit {
 
   getEnhancedSpecifications(): any {
     if (!this.hasEnhancedSpecifications()) return null;
-    
+
     // Convert the enhanced specification format to what ProductSpecificationsComponent expects
     const specs = this.product?.specifications;
     if (!specs) return null;
-    
+
     // If it's already in the right format, return it
     if (specs['isSuccess'] !== undefined) {
       return specs;
     }
-    
+
     // Otherwise, construct the format
     const metadata = specs['_metadata'] || {};
     const quality = specs['_quality'] || { overallScore: 0.8 };
     const typed = specs['_typed'] || {};
     const categorized = specs['_categorized'] || {};
-    
+
     // Filter out metadata keys to get actual specifications
     const actualSpecs: { [key: string]: any } = {};
     Object.keys(specs).forEach(key => {
@@ -270,7 +270,7 @@ export class ProductDetailComponent implements OnInit {
         actualSpecs[key] = specs[key];
       }
     });
-    
+
     return {
       isSuccess: true,
       specifications: actualSpecs,

@@ -87,10 +87,57 @@
       </div>
     </div>
 
+    <!-- Specifications Card (When no tabs available) -->
+    <mat-card class="specs-card my-3" *ngIf="!hasSpecifications() && product">
+      <mat-card-content class="no-specs">
+        <mat-icon class="no-specs-icon">info</mat-icon>
+        <h4>No Product Specifications Available</h4>
+        <p>Technical specifications for this product are not currently available.</p>
+      </mat-card-content>
+    </mat-card>
+
     <!-- Tabs Section -->
     <mat-tab-group (selectedTabChange)="onTabChange($event.index)" class="detail-tabs">
+      <!-- Specifications Tab (Moved to first position for better visibility) -->
+      <mat-tab *ngIf="hasSpecifications()">
+        <ng-template mat-tab-label>
+          <mat-icon class="me-2">description</mat-icon>
+          Specifications
+          <span class="spec-badge" *ngIf="getSpecificationEntries().length > 0">
+            {{ getSpecificationEntries().length }}
+          </span>
+        </ng-template>
+        <div class="tab-content">
+          <div class="specifications-section">
+            <h3>Product Specifications</h3>
+
+            <!-- Enhanced Specifications (from scraping) -->
+            <div *ngIf="hasEnhancedSpecifications()" class="enhanced-specs">
+              <app-product-specifications
+                [specifications]="getEnhancedSpecifications()"
+                [showMetadata]="false">
+              </app-product-specifications>
+            </div>
+
+            <!-- Basic Specifications (manual/simple format) -->
+            <div *ngIf="!hasEnhancedSpecifications()" class="basic-specs">
+              <div class="specs-grid">
+                <div *ngFor="let spec of getSpecificationEntries()" class="spec-item">
+                  <span class="spec-label">{{ spec[0] }}:</span>
+                  <span class="spec-value">{{ spec[1] }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
       <!-- Current Prices Tab -->
-      <mat-tab label="Current Prices">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="me-2">attach_money</mat-icon>
+          Current Prices
+        </ng-template>
         <div class="tab-content">
           <div class="prices-section" *ngIf="product.currentPrices && product.currentPrices.length > 0">
             <h3>Compare Prices</h3>
@@ -137,7 +184,11 @@
       </mat-tab>
 
       <!-- Price History Tab -->
-      <mat-tab label="Price History">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="me-2">timeline</mat-icon>
+          Price History
+        </ng-template>
         <div class="tab-content">
           <div class="price-history-section">
             <h3>Price History</h3>
@@ -164,33 +215,6 @@
               <mat-icon class="no-history-icon">timeline</mat-icon>
               <h4>No Price History Available</h4>
               <p>Price history data is not available for this product yet.</p>
-            </div>
-          </div>
-        </div>
-      </mat-tab>
-
-      <!-- Specifications Tab -->
-      <mat-tab label="Specifications" *ngIf="hasSpecifications()">
-        <div class="tab-content">
-          <div class="specifications-section">
-            <h3>Product Specifications</h3>
-            
-            <!-- Enhanced Specifications (from scraping) -->
-            <div *ngIf="hasEnhancedSpecifications()" class="enhanced-specs">
-              <app-product-specifications 
-                [specifications]="getEnhancedSpecifications()"
-                [showMetadata]="false">
-              </app-product-specifications>
-            </div>
-            
-            <!-- Basic Specifications (manual/simple format) -->
-            <div *ngIf="!hasEnhancedSpecifications()" class="basic-specs">
-              <div class="specs-grid">
-                <div *ngFor="let spec of getSpecificationEntries()" class="spec-item">
-                  <span class="spec-label">{{ spec[0] }}:</span>
-                  <span class="spec-value">{{ spec[1] }}</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>
