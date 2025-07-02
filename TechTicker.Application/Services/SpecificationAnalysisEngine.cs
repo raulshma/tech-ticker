@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services.Interfaces;
+using TechTicker.DataAccess.Repositories.Interfaces;
 using System.Text.Json;
 
 namespace TechTicker.Application.Services;
@@ -11,6 +12,7 @@ namespace TechTicker.Application.Services;
 public class SpecificationAnalysisEngine : ISpecificationAnalysisEngine
 {
     private readonly ILogger<SpecificationAnalysisEngine> _logger;
+    private readonly IUnitOfWork _unitOfWork;
 
     // Default weights for common specification categories
     private readonly Dictionary<string, decimal> _defaultCategoryWeights = new()
@@ -23,9 +25,12 @@ public class SpecificationAnalysisEngine : ISpecificationAnalysisEngine
         { "general", 0.05m }
     };
 
-    public SpecificationAnalysisEngine(ILogger<SpecificationAnalysisEngine> logger)
+    public SpecificationAnalysisEngine(
+        ILogger<SpecificationAnalysisEngine> logger,
+        IUnitOfWork unitOfWork)
     {
         _logger = logger;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -47,6 +52,27 @@ public class SpecificationAnalysisEngine : ISpecificationAnalysisEngine
 
             var spec1 = product1.Specifications ?? new Dictionary<string, object>();
             var spec2 = product2.Specifications ?? new Dictionary<string, object>();
+            
+            // If product specifications are empty, try to get them from ProductSellerMapping
+            if (spec1.Count == 0)
+            {
+                var mappingSpecs1 = await GetSpecificationsFromMappingAsync(product1.ProductId);
+                if (mappingSpecs1 != null && mappingSpecs1.Count > 0)
+                {
+                    _logger.LogInformation("Using specifications from ProductSellerMapping for product {ProductId}", product1.ProductId);
+                    spec1 = mappingSpecs1;
+                }
+            }
+            
+            if (spec2.Count == 0)
+            {
+                var mappingSpecs2 = await GetSpecificationsFromMappingAsync(product2.ProductId);
+                if (mappingSpecs2 != null && mappingSpecs2.Count > 0)
+                {
+                    _logger.LogInformation("Using specifications from ProductSellerMapping for product {ProductId}", product2.ProductId);
+                    spec2 = mappingSpecs2;
+                }
+            }
 
             var differences = new List<SpecificationDifferenceDto>();
             var matches = new List<SpecificationMatchDto>();
@@ -550,5 +576,42 @@ public class SpecificationAnalysisEngine : ISpecificationAnalysisEngine
 
         return $"Category analysis: {matchCount} matching specifications, {diffCount} differences. " +
                $"Product 1 advantages: {product1Advantages}, Product 2 advantages: {product2Advantages}.";
+    }
+    
+    /// <summary>
+    /// Get specifications from ProductSellerMapping if the product itself doesn't have them
+    /// </summary>
+    /// <param name="productId">The ID of the product to get specifications for</param>
+    /// <returns>Dictionary of specifications or null if none found</returns>
+    private async Task<Dictionary<string, object>?> GetSpecificationsFromMappingAsync(Guid productId)
+    {
+        try
+        {
+            // Get ProductSellerMapping entries for this product with specifications
+            var mappings = await _unitOfWork.ProductSellerMappings.FindAsync(
+                m => m.CanonicalProductId == productId && 
+                     m.LatestSpecifications != null && 
+                     m.LatestSpecifications != "");
+                
+            // Order by quality score and recency
+            var bestMapping = mappings
+                .OrderByDescending(m => m.SpecificationsQualityScore)
+                .ThenByDescending(m => m.SpecificationsLastUpdated)
+                .FirstOrDefault();
+                
+            if (bestMapping == null || string.IsNullOrEmpty(bestMapping.LatestSpecifications))
+            {
+                return null;
+            }
+            
+            // Parse JSON string to dictionary
+            var specifications = JsonSerializer.Deserialize<Dictionary<string, object>>(bestMapping.LatestSpecifications);
+            return specifications;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error getting specifications from ProductSellerMapping for product {ProductId}", productId);
+            return null;
+        }
     }
 }

@@ -3,6 +3,9 @@ using Moq;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services;
 using TechTicker.Application.Services.Interfaces;
+using TechTicker.DataAccess.Repositories.Interfaces;
+using TechTicker.Domain.Entities;
+using System.Text.Json;
 using Xunit;
 
 namespace TechTicker.Application.Tests.Services;
@@ -14,12 +17,20 @@ namespace TechTicker.Application.Tests.Services;
 public class SpecificationAnalysisEngineTests
 {
     private readonly Mock<ILogger<SpecificationAnalysisEngine>> _loggerMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly Mock<IProductSellerMappingRepository> _productSellerMappingRepositoryMock;
     private readonly SpecificationAnalysisEngine _engine;
 
     public SpecificationAnalysisEngineTests()
     {
         _loggerMock = new Mock<ILogger<SpecificationAnalysisEngine>>();
-        _engine = new SpecificationAnalysisEngine(_loggerMock.Object);
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _productSellerMappingRepositoryMock = new Mock<IProductSellerMappingRepository>();
+        
+        // Setup unit of work with repository mock
+        _unitOfWorkMock.Setup(u => u.ProductSellerMappings).Returns(_productSellerMappingRepositoryMock.Object);
+        
+        _engine = new SpecificationAnalysisEngine(_loggerMock.Object, _unitOfWorkMock.Object);
     }
 
     #region AnalyzeSpecificationsAsync Tests
@@ -185,6 +196,11 @@ public class SpecificationAnalysisEngineTests
         // Arrange
         var product1 = CreateTestProduct("Product 1", new Dictionary<string, object>());
         var product2 = CreateTestProduct("Product 2", new Dictionary<string, object>());
+        
+        // Setup to return no mappings
+        _productSellerMappingRepositoryMock
+            .Setup(r => r.FindAsync(It.IsAny<System.Linq.Expressions.Expression<Func<ProductSellerMapping, bool>>>()))
+            .ReturnsAsync(new List<ProductSellerMapping>());
 
         // Act
         var result = await _engine.AnalyzeSpecificationsAsync(product1, product2);
@@ -194,6 +210,74 @@ public class SpecificationAnalysisEngineTests
         Assert.Empty(result.Differences);
         Assert.Empty(result.Matches);
         Assert.Empty(result.CategoryScores);
+    }
+    
+    [Fact]
+    public async Task AnalyzeSpecificationsAsync_ShouldFallbackToMappingSpecifications_WhenProductSpecificationsEmpty()
+    {
+        // Arrange
+        var productId1 = Guid.NewGuid();
+        var productId2 = Guid.NewGuid();
+        
+        var product1 = CreateTestProduct("Product 1", new Dictionary<string, object>());
+        var product2 = CreateTestProduct("Product 2", new Dictionary<string, object>());
+        product1.ProductId = productId1;
+        product2.ProductId = productId2;
+        
+        var mappingSpecs1 = new Dictionary<string, object>
+        {
+            { "RAM", "8GB" },
+            { "Storage", "256GB SSD" }
+        };
+        
+        var mappingSpecs2 = new Dictionary<string, object>
+        {
+            { "RAM", "16GB" },
+            { "Storage", "512GB SSD" }
+        };
+        
+        // Mock ProductSellerMapping repository to return mappings with specifications
+        var mapping1 = new ProductSellerMapping 
+        { 
+            MappingId = Guid.NewGuid(),
+            CanonicalProductId = productId1,
+            LatestSpecifications = JsonSerializer.Serialize(mappingSpecs1),
+            SpecificationsQualityScore = 0.8,
+            SpecificationsLastUpdated = DateTime.UtcNow
+        };
+        
+        var mapping2 = new ProductSellerMapping 
+        { 
+            MappingId = Guid.NewGuid(),
+            CanonicalProductId = productId2,
+            LatestSpecifications = JsonSerializer.Serialize(mappingSpecs2),
+            SpecificationsQualityScore = 0.9,
+            SpecificationsLastUpdated = DateTime.UtcNow
+        };
+        
+        _productSellerMappingRepositoryMock
+            .Setup(r => r.FindAsync(It.Is<System.Linq.Expressions.Expression<Func<ProductSellerMapping, bool>>>(
+                expr => expr.Compile().Invoke(mapping1))))
+            .ReturnsAsync(new List<ProductSellerMapping> { mapping1 });
+            
+        _productSellerMappingRepositoryMock
+            .Setup(r => r.FindAsync(It.Is<System.Linq.Expressions.Expression<Func<ProductSellerMapping, bool>>>(
+                expr => expr.Compile().Invoke(mapping2))))
+            .ReturnsAsync(new List<ProductSellerMapping> { mapping2 });
+
+        // Act
+        var result = await _engine.AnalyzeSpecificationsAsync(product1, product2);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotEmpty(result.Differences);
+        Assert.Contains(result.Differences, d => d.SpecificationKey == "RAM");
+        Assert.Contains(result.Differences, d => d.SpecificationKey == "Storage");
+        
+        // Verify both repositories were queried
+        _productSellerMappingRepositoryMock.Verify(
+            r => r.FindAsync(It.IsAny<System.Linq.Expressions.Expression<Func<ProductSellerMapping, bool>>>()), 
+            Times.Exactly(2));
     }
 
     [Fact]
