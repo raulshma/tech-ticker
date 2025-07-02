@@ -37,6 +37,12 @@ const routes: Routes = [
         data: { roles: ['Admin', 'Moderator'] }
       },
       {
+        path: 'product-comparison',
+        loadChildren: () => import('./features/product-comparison/product-comparison.module').then(m => m.ProductComparisonModule),
+        canActivate: [RoleGuard],
+        data: { roles: ['User', 'Admin', 'Moderator'] } // Accessible to Users, Admins, and Moderators
+      },
+      {
         path: 'mappings',
         loadChildren: () => import('./features/mappings/mappings.module').then(m => m.MappingsModule),
         canActivate: [RoleGuard],

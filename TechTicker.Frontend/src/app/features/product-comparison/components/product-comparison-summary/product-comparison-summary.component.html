@@ -1,0 +1,143 @@
+<mat-card class="comparison-summary">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>analytics</mat-icon>
+      Comparison Summary
+    </mat-card-title>
+    <mat-card-subtitle>{{ summary?.categoryName || 'Product' }} Products</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Winner Display -->
+    <div class="winner-section">
+      <div class="winner-badge">
+        <mat-icon>emoji_events</mat-icon>
+        <span>Recommended Choice</span>
+      </div>
+
+      <div class="winner-display">
+        <div class="product-winner">
+          <div class="product-image">
+            <img
+              [src]="getProductImage(getWinnerProduct() || undefined)"
+              [alt]="getProductName(getWinnerProduct() || undefined)"
+              (error)="onImageError($event)">
+          </div>
+          <div class="product-info">
+            <h3>{{ getProductName(getWinnerProduct() || undefined) }}</h3>
+            <p class="recommendation-reason">{{ summary?.recommendationReason || 'No reason provided' }}</p>
+          </div>
+          <div class="score-display">
+            <div class="score-circle">
+              <span class="score-value">{{ getScorePercentage(
+                (summary?.recommendedProductId === product1?.productId) ?
+                summary?.product1OverallScore :
+                summary?.product2OverallScore
+              ) }}%</span>
+              <span class="score-label">Score</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Detailed Comparison Stats -->
+    <div class="comparison-stats">
+      <div class="stats-grid">
+        <!-- Overall Scores -->
+        <div class="stat-card">
+          <h4>Overall Scores</h4>
+          <div class="score-comparison">
+            <div class="product-score">
+              <span class="product-label">{{ getProductName(product1) }}</span>
+              <div class="score-bar">
+                <div
+                  class="score-fill"
+                  [style.width.%]="getScorePercentage(summary?.product1OverallScore)"
+                  [class.winner]="summary?.recommendedProductId === product1?.productId">
+                </div>
+                <span class="score-text">{{ getScorePercentage(summary?.product1OverallScore) }}%</span>
+              </div>
+            </div>
+            <div class="product-score">
+              <span class="product-label">{{ getProductName(product2) }}</span>
+              <div class="score-bar">
+                <div
+                  class="score-fill"
+                  [style.width.%]="getScorePercentage(summary?.product2OverallScore)"
+                  [class.winner]="summary?.recommendedProductId === product2?.productId">
+                </div>
+                <span class="score-text">{{ getScorePercentage(summary?.product2OverallScore) }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Specification Statistics -->
+        <div class="stat-card">
+          <h4>Specification Analysis</h4>
+          <div class="spec-stats">
+            <div class="stat-item">
+              <mat-icon>check_circle</mat-icon>
+              <div class="stat-content">
+                <span class="stat-number">{{ summary?.matchingSpecifications || 0 }}</span>
+                <span class="stat-label">Matching Specs</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <mat-icon>compare_arrows</mat-icon>
+              <div class="stat-content">
+                <span class="stat-number">{{ summary?.differentSpecifications || 0 }}</span>
+                <span class="stat-label">Different Specs</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <mat-icon>assessment</mat-icon>
+              <div class="stat-content">
+                <span class="stat-number">{{ summary?.totalSpecifications || 0 }}</span>
+                <span class="stat-label">Total Specs</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="compatibility-meter">
+            <div class="meter-label">
+              <span>Compatibility</span>
+              <span class="percentage">{{ getMatchingPercentage() }}%</span>
+            </div>
+            <div class="meter-bar">
+              <div
+                class="meter-fill"
+                [style.width.%]="getMatchingPercentage()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Differences -->
+        <div class="stat-card highlight-card">
+          <h4>
+            <mat-icon>insights</mat-icon>
+            Key Insights
+          </h4>
+          <div class="insights-list">
+            <div class="insight-item">
+              <strong>Score Difference:</strong>
+              {{ getScoreDifference() * 100 | number:'1.1-1' }}% advantage to {{ getProductName(getWinnerProduct() || undefined) }}
+            </div>
+            <div class="insight-item">
+              <strong>Compatibility:</strong>
+              {{ getMatchingPercentage() }}% of specifications match
+            </div>
+            <div class="insight-item">
+              <strong>Category:</strong>
+              Both products are {{ summary?.categoryName || 'unknown' }} devices
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

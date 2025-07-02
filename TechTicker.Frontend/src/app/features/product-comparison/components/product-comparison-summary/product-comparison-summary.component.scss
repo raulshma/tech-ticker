@@ -1,0 +1,279 @@
+.comparison-summary {
+  margin-bottom: 2rem;
+
+  mat-card-header {
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  .winner-section {
+    margin-bottom: 2rem;
+
+    .winner-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--mdc-theme-primary), var(--mdc-theme-secondary));
+      color: white;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+
+      mat-icon {
+        font-size: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+
+    .winner-display {
+      .product-winner {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        background-color: var(--mdc-theme-surface-variant);
+        border-radius: 12px;
+        border: 2px solid var(--mdc-theme-primary);
+
+        .product-image {
+          width: 80px;
+          height: 80px;
+          flex-shrink: 0;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--mdc-theme-outline);
+          }
+        }
+
+        .product-info {
+          flex: 1;
+
+          h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--mdc-theme-text-primary-on-background);
+          }
+
+          .recommendation-reason {
+            margin: 0;
+            color: var(--mdc-theme-text-secondary-on-background);
+            line-height: 1.4;
+            font-style: italic;
+          }
+        }
+
+        .score-display {
+          .score-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--mdc-theme-primary), var(--mdc-theme-secondary));
+            color: white;
+
+            .score-value {
+              font-size: 1.2rem;
+              font-weight: bold;
+            }
+
+            .score-label {
+              font-size: 0.75rem;
+              opacity: 0.9;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .comparison-stats {
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+
+      .stat-card {
+        padding: 1.5rem;
+        border: 1px solid var(--mdc-theme-outline-variant);
+        border-radius: 8px;
+        background-color: var(--mdc-theme-surface);
+
+        &.highlight-card {
+          background: linear-gradient(135deg, var(--mdc-theme-primary-container), var(--mdc-theme-secondary-container));
+        }
+
+        h4 {
+          margin: 0 0 1rem 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .score-comparison {
+          .product-score {
+            margin-bottom: 1rem;
+
+            .product-label {
+              display: block;
+              font-size: 0.9rem;
+              font-weight: 500;
+              margin-bottom: 0.5rem;
+              color: var(--mdc-theme-text-secondary-on-background);
+            }
+
+            .score-bar {
+              position: relative;
+              height: 24px;
+              background-color: var(--mdc-theme-surface-variant);
+              border-radius: 12px;
+              overflow: hidden;
+
+              .score-fill {
+                height: 100%;
+                background-color: var(--mdc-theme-primary);
+                transition: width 0.3s ease;
+                border-radius: 12px;
+
+                &.winner {
+                  background: linear-gradient(90deg, var(--mdc-theme-primary), var(--mdc-theme-secondary));
+                }
+              }
+
+              .score-text {
+                position: absolute;
+                right: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: var(--mdc-theme-text-primary-on-background);
+              }
+            }
+          }
+        }
+
+        .spec-stats {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+
+          .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+
+            mat-icon {
+              color: var(--mdc-theme-primary);
+            }
+
+            .stat-content {
+              display: flex;
+              flex-direction: column;
+
+              .stat-number {
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: var(--mdc-theme-text-primary-on-background);
+              }
+
+              .stat-label {
+                font-size: 0.85rem;
+                color: var(--mdc-theme-text-secondary-on-background);
+              }
+            }
+          }
+        }
+
+        .compatibility-meter {
+          .meter-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+
+            .percentage {
+              color: var(--mdc-theme-primary);
+              font-weight: bold;
+            }
+          }
+
+          .meter-bar {
+            height: 8px;
+            background-color: var(--mdc-theme-surface-variant);
+            border-radius: 4px;
+            overflow: hidden;
+
+            .meter-fill {
+              height: 100%;
+              background: linear-gradient(90deg, var(--mdc-theme-primary), var(--mdc-theme-secondary));
+              transition: width 0.3s ease;
+            }
+          }
+        }
+
+        .insights-list {
+          .insight-item {
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            strong {
+              color: var(--mdc-theme-primary);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .comparison-summary {
+    .winner-section {
+      .winner-display {
+        .product-winner {
+          flex-direction: column;
+          text-align: center;
+          gap: 1rem;
+
+          .product-info {
+            h3 {
+              font-size: 1.1rem;
+            }
+          }
+        }
+      }
+    }
+
+    .comparison-stats {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}

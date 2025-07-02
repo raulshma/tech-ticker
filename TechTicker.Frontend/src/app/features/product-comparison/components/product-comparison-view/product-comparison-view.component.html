@@ -1,0 +1,191 @@
+<div class="product-comparison-container">
+  <!-- Header Section -->
+  <div class="comparison-header">
+    <div class="header-content">
+      <h1>
+        <mat-icon>compare</mat-icon>
+        Product Comparison
+      </h1>
+      <p class="subtitle">Compare specifications, prices, and get AI-powered recommendations</p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        mat-raised-button
+        color="accent"
+        (click)="resetComparison()"
+        [disabled]="isComparing">
+        <mat-icon>refresh</mat-icon>
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Product Selection Section -->
+  <mat-card class="selection-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>search</mat-icon>
+        Select Products to Compare
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="comparisonForm" class="comparison-form">
+        <div class="product-selectors">
+          <!-- Product 1 Selector -->
+          <div class="product-selector">
+            <app-product-selector
+              label="First Product"
+              [searchControl]="product1SearchControl"
+              [options]="product1Options"
+              [selectedProduct]="comparisonForm.get('product1')?.value ?? null"
+              (productSelected)="onProduct1Selected($event)"
+              placeholder="Search for first product..."
+              [required]="true">
+            </app-product-selector>
+          </div>
+
+          <!-- VS Divider -->
+          <div class="vs-divider">
+            <mat-icon class="vs-icon">compare_arrows</mat-icon>
+            <span class="vs-text">VS</span>
+          </div>
+
+          <!-- Product 2 Selector -->
+          <div class="product-selector">
+            <app-product-selector
+              label="Second Product"
+              [searchControl]="product2SearchControl"
+              [options]="product2Options"
+              [selectedProduct]="comparisonForm.get('product2')?.value ?? null"
+              (productSelected)="onProduct2Selected($event)"
+              placeholder="Search for second product..."
+              [required]="true">
+            </app-product-selector>
+          </div>
+        </div>
+
+        <!-- Comparison Options -->
+        <div class="comparison-options">
+          <h3>Comparison Options</h3>
+          <div class="options-grid">
+            <mat-slide-toggle formControlName="includePriceAnalysis">
+              <span class="option-label">
+                <mat-icon>attach_money</mat-icon>
+                Include Price Analysis
+              </span>
+            </mat-slide-toggle>
+
+            <mat-slide-toggle formControlName="generateRecommendations">
+              <span class="option-label">
+                <mat-icon>psychology</mat-icon>
+                Generate AI Recommendations
+              </span>
+            </mat-slide-toggle>
+          </div>
+        </div>
+
+        <!-- Compare Button -->
+        <div class="compare-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="performComparison()"
+            [disabled]="!canCompare() || isComparing"
+            class="compare-button">
+            <mat-icon>analytics</mat-icon>
+            <span *ngIf="!isComparing">Compare Products</span>
+            <span *ngIf="isComparing">Comparing...</span>
+            <mat-spinner *ngIf="isComparing" diameter="20" class="inline-spinner"></mat-spinner>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading products...</p>
+  </div>
+
+  <!-- Error State -->
+  <mat-card *ngIf="error && !isComparing && !isLoading" class="error-card">
+    <mat-card-content>
+      <div class="error-content">
+        <mat-icon color="warn">error</mat-icon>
+        <span>{{ error }}</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Comparison Results -->
+  <div *ngIf="comparisonResult && !isComparing" class="comparison-results">
+    <!-- Summary -->
+    <app-product-comparison-summary
+      *ngIf="comparisonResult?.summary && comparisonResult?.product1 && comparisonResult?.product2"
+      [summary]="comparisonResult.summary"
+      [product1]="comparisonResult.product1"
+      [product2]="comparisonResult.product2">
+    </app-product-comparison-summary>
+
+    <!-- Main Comparison Tabs -->
+    <mat-card class="results-card">
+      <mat-tab-group>
+        <!-- Specifications Tab -->
+        <mat-tab label="Specifications">
+          <ng-template matTabContent>
+            <app-specification-comparison
+              *ngIf="comparisonResult?.specificationComparison && comparisonResult?.product1 && comparisonResult?.product2"
+              [comparison]="comparisonResult.specificationComparison!"
+              [product1]="comparisonResult.product1!"
+              [product2]="comparisonResult.product2!">
+            </app-specification-comparison>
+          </ng-template>
+        </mat-tab>
+
+        <!-- Price Analysis Tab -->
+        <mat-tab
+          label="Price Analysis"
+          *ngIf="comparisonResult?.priceAnalysis">
+          <ng-template matTabContent>
+            <app-price-analysis
+              *ngIf="comparisonResult?.priceAnalysis && comparisonResult?.product1 && comparisonResult?.product2"
+              [analysis]="comparisonResult.priceAnalysis!"
+              [product1]="comparisonResult.product1!"
+              [product2]="comparisonResult.product2!">
+            </app-price-analysis>
+          </ng-template>
+        </mat-tab>
+
+        <!-- Recommendations Tab -->
+        <mat-tab
+          label="AI Recommendations"
+          *ngIf="comparisonResult?.recommendationAnalysis">
+          <ng-template matTabContent>
+            <app-recommendation-display
+              *ngIf="comparisonResult?.recommendationAnalysis && comparisonResult?.product1 && comparisonResult?.product2"
+              [recommendation]="comparisonResult.recommendationAnalysis!"
+              [product1]="comparisonResult.product1!"
+              [product2]="comparisonResult.product2!">
+            </app-recommendation-display>
+          </ng-template>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!comparisonResult && !isLoading && !error" class="empty-state">
+    <mat-card class="empty-card">
+      <mat-card-content>
+        <div class="empty-content">
+          <mat-icon class="empty-icon">compare</mat-icon>
+          <h2>Ready to Compare Products</h2>
+          <p>Select two products from the same category to see a detailed comparison with specifications, pricing, and AI-powered recommendations.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

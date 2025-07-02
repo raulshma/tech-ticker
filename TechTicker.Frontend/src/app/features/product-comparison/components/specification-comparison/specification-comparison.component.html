@@ -1,0 +1,229 @@
+<div class="specification-comparison">
+  <!-- Category Filter and Summary -->
+  <div class="comparison-header">
+    <div class="filter-section">
+      <mat-form-field appearance="outline" class="category-filter">
+        <mat-label>Filter by Category</mat-label>
+        <mat-select [(value)]="selectedCategory">
+          <mat-option value="all">All Categories</mat-option>
+          <mat-option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="summary-stats">
+      <div class="stat-chip">
+        <mat-icon>check_circle</mat-icon>
+        <span>{{ getMatchesCount() }} Matches</span>
+      </div>
+      <div class="stat-chip">
+        <mat-icon>compare_arrows</mat-icon>
+        <span>{{ getDifferencesCount() }} Differences</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Scores (when category is selected) -->
+  <div *ngIf="selectedCategory !== 'all' && getCategoryScore(selectedCategory)" class="category-score-card">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{ selectedCategory }} Category Analysis</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="score-comparison">
+          <div class="product-score">
+            <span class="product-name">{{ getProductName(product1) }}</span>
+            <div class="score-display">
+              <div class="score-bar">
+                <div
+                  class="score-fill product1"
+                  [style.width.%]="((getCategoryScore(selectedCategory)?.product1Score || 0) * 100)">
+                </div>
+              </div>
+              <span class="score-value">{{ ((getCategoryScore(selectedCategory)?.product1Score || 0) * 100) | number:'1.0-0' }}%</span>
+            </div>
+          </div>
+          <div class="product-score">
+            <span class="product-name">{{ getProductName(product2) }}</span>
+            <div class="score-display">
+              <div class="score-bar">
+                <div
+                  class="score-fill product2"
+                  [style.width.%]="((getCategoryScore(selectedCategory)?.product2Score || 0) * 100)">
+                </div>
+              </div>
+              <span class="score-value">{{ ((getCategoryScore(selectedCategory)?.product2Score || 0) * 100) | number:'1.0-0' }}%</span>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="getCategoryScore(selectedCategory)?.analysis" class="category-analysis">
+          <p>{{ getCategoryScore(selectedCategory)?.analysis }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Specifications Table -->
+  <mat-card class="specifications-table-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>list</mat-icon>
+        Detailed Specification Comparison
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="getFilteredData()" class="specifications-table">
+          <!-- Specification Column -->
+          <ng-container matColumnDef="specification">
+            <th mat-header-cell *matHeaderCellDef>
+              <div class="header-content">
+                <mat-icon>settings</mat-icon>
+                <span>Specification</span>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let spec">
+              <div class="spec-info">
+                <div class="spec-name">{{ spec.displayName }}</div>
+                <div class="spec-category">{{ spec.category }}</div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Product 1 Column -->
+          <ng-container matColumnDef="product1">
+            <th mat-header-cell *matHeaderCellDef>
+              <div class="header-content product-header">
+                <div class="product-info">
+                  <span class="product-name">{{ getProductName(product1) }}</span>
+                </div>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let spec"
+                [class]="'value-cell ' + getComparisonClass(spec.comparisonResult)">
+              <div class="spec-value">
+                {{ spec.product1Value }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Product 2 Column -->
+          <ng-container matColumnDef="product2">
+            <th mat-header-cell *matHeaderCellDef>
+              <div class="header-content product-header">
+                <div class="product-info">
+                  <span class="product-name">{{ getProductName(product2) }}</span>
+                </div>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let spec"
+                [class]="'value-cell ' + getComparisonClass(spec.comparisonResult)">
+              <div class="spec-value">
+                {{ spec.product2Value }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Comparison Column -->
+          <ng-container matColumnDef="comparison">
+            <th mat-header-cell *matHeaderCellDef>
+              <div class="header-content">
+                <mat-icon>compare</mat-icon>
+                <span>Result</span>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let spec">
+              <div class="comparison-result"
+                   [class]="getComparisonClass(spec.comparisonResult)"
+                   [matTooltip]="getComparisonTooltip(spec.comparisonResult)">
+                <mat-icon>{{ getComparisonIcon(spec.comparisonResult) }}</mat-icon>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Impact Column -->
+          <ng-container matColumnDef="impact">
+            <th mat-header-cell *matHeaderCellDef>
+              <div class="header-content">
+                <mat-icon>trending_up</mat-icon>
+                <span>Impact</span>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let spec">
+              <div class="impact-display" *ngIf="spec.impactScore !== undefined">
+                <mat-chip
+                  [class]="'impact-chip ' + getImpactLevel(spec.impactScore)"
+                  selected>
+                  {{ getImpactLevel(spec.impactScore) | titlecase }}
+                </mat-chip>
+              </div>
+              <div *ngIf="spec.isMatch" class="match-indicator">
+                <mat-chip color="primary" selected>Match</mat-chip>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="getFilteredData().length === 0" class="empty-state">
+        <mat-icon>search_off</mat-icon>
+        <p>No specifications found for the selected category.</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Category Breakdown (when showing all categories) -->
+  <div *ngIf="selectedCategory === 'all'" class="category-breakdown">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>category</mat-icon>
+          Category Breakdown
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="categories-grid">
+          <div *ngFor="let category of categories" class="category-card">
+            <div class="category-header">
+              <h4>{{ category }}</h4>
+              <mat-chip>{{ getSpecificationsByCategory()[category].length || 0 }} specs</mat-chip>
+            </div>
+
+            <div *ngIf="getCategoryScore(category)" class="category-scores">
+              <div class="mini-score-comparison">
+                <div class="mini-score">
+                  <span class="label">{{ getProductName(product1) }}</span>
+                  <div class="mini-bar">
+                    <div
+                      class="mini-fill product1"
+                      [style.width.%]="((getCategoryScore(category)?.product1Score || 0) * 100)">
+                    </div>
+                  </div>
+                  <span class="value">{{ ((getCategoryScore(category)?.product1Score || 0) * 100) | number:'1.0-0' }}%</span>
+                </div>
+                <div class="mini-score">
+                  <span class="label">{{ getProductName(product2) }}</span>
+                  <div class="mini-bar">
+                    <div
+                      class="mini-fill product2"
+                      [style.width.%]="((getCategoryScore(category)?.product2Score || 0) * 100)">
+                    </div>
+                  </div>
+                  <span class="value">{{ ((getCategoryScore(category)?.product2Score || 0) * 100) | number:'1.0-0' }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

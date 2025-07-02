@@ -1,0 +1,182 @@
+<div class="recommendation-display">
+  <!-- AI Recommendation Header -->
+  <mat-card class="recommendation-header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>psychology</mat-icon>
+        AI Recommendation
+      </mat-card-title>
+      <mat-card-subtitle>Powered by intelligent analysis</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="recommendation-summary">
+        <div class="recommended-product">
+          <div class="product-display">
+            <div class="product-image">            <img
+              [src]="getProductImage(getRecommendedProduct() || undefined)"
+              [alt]="getProductName(getRecommendedProduct() || undefined)"
+              (error)="onImageError($event)">
+            </div>
+            <div class="product-info">
+              <h3>{{ getProductName(getRecommendedProduct() || undefined) }}</h3>
+              <p class="primary-reason">{{ recommendation?.primaryReason || 'No reason provided' }}</p>
+            </div>
+          </div>
+
+          <div class="confidence-display">
+            <div class="confidence-circle" [class]="getConfidenceClass()">
+              <span class="confidence-value">{{ ((recommendation?.confidenceScore || 0) * 100) | number:'1.0-0' }}%</span>
+              <span class="confidence-label">Confidence</span>
+            </div>
+            <div class="confidence-level">{{ getConfidenceLevel() }} Confidence</div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Decision Factors -->
+  <mat-card class="factors-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>analytics</mat-icon>
+        Decision Factors
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="factors-list">
+        <div *ngFor="let factor of recommendation?.factors || []" class="factor-item">
+          <div class="factor-header">
+            <span class="factor-name">{{ factor.factor }}</span>
+            <mat-chip
+              [class]="'impact-chip ' + getFactorImpactClass(factor?.impact)"
+              selected>
+              {{ factor?.impact || 'Unknown' }} Impact
+            </mat-chip>
+          </div>
+
+          <div class="factor-scores">
+            <div class="score-comparison">
+              <div class="score-item">
+                <span class="product-label">{{ getProductName(product1) }}</span>
+                <div class="score-bar">
+                  <div
+                    class="score-fill product1"
+                    [style.width.%]="((factor?.product1Score || 0) * 100)">
+                  </div>
+                </div>
+                <span class="score-value">{{ ((factor?.product1Score || 0) * 100) | number:'1.0-0' }}%</span>
+              </div>
+
+              <div class="score-item">
+                <span class="product-label">{{ getProductName(product2) }}</span>
+                <div class="score-bar">
+                  <div
+                    class="score-fill product2"
+                    [style.width.%]="((factor?.product2Score || 0) * 100)">
+                  </div>
+                </div>
+                <span class="score-value">{{ ((factor?.product2Score || 0) * 100) | number:'1.0-0' }}%</span>
+              </div>
+            </div>
+
+            <div class="weight-indicator">
+              <span class="weight-label">Weight:</span>
+              <div class="weight-bar">
+                <div
+                  class="weight-fill"
+                  [style.width.%]="((factor?.weight || 0) * 100)">
+                </div>
+              </div>
+              <span class="weight-value">{{ ((factor?.weight || 0) * 100) | number:'1.0-0' }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Pros and Cons -->
+  <div class="pros-cons-section">
+    <div class="pros-cons-grid">
+      <!-- Pros -->
+      <mat-card class="pros-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon color="primary">thumb_up</mat-icon>
+            Advantages
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="pros-list">
+            <div *ngFor="let pro of recommendation?.pros || []" class="pro-item">
+              <mat-icon>check_circle</mat-icon>
+              <span>{{ pro }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="(recommendation?.pros?.length || 0) === 0" class="empty-state">
+            <mat-icon>info</mat-icon>
+            <span>No specific advantages identified</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Cons -->
+      <mat-card class="cons-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon color="warn">thumb_down</mat-icon>
+            Considerations
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="cons-list">
+            <div *ngFor="let con of recommendation?.cons || []" class="con-item">
+              <mat-icon>warning</mat-icon>
+              <span>{{ con }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="(recommendation?.cons?.length || 0) === 0" class="empty-state">
+            <mat-icon>info</mat-icon>
+            <span>No specific concerns identified</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Use Case and Alternative -->
+  <div *ngIf="recommendation?.useCase || recommendation?.alternativeRecommendation" class="additional-info">
+    <mat-card *ngIf="recommendation?.useCase" class="use-case-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>lightbulb</mat-icon>
+          Best Use Case
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p class="use-case-text">{{ recommendation?.useCase }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card *ngIf="recommendation?.alternativeRecommendation" class="alternative-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>alt_route</mat-icon>
+          Alternative Consideration
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p class="alternative-text">{{ recommendation?.alternativeRecommendation }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

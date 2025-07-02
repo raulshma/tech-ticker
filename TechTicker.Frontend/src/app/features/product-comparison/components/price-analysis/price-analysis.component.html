@@ -1,0 +1,150 @@
+<div class="price-analysis">
+  <!-- Price Summary -->
+  <mat-card class="price-summary-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>attach_money</mat-icon>
+        Price Comparison Summary
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="price-comparison-grid">
+        <div class="price-item">
+          <h4>{{ getProductName(product1) }}</h4>
+          <div class="price-display">
+            <span class="price">{{ formatPrice(analysis?.summary?.product1LowestPrice || 0) }}</span>
+            <span class="seller-count">from {{ analysis?.summary?.product1SellerCount || 0 }} sellers</span>
+          </div>
+        </div>
+
+        <div class="vs-section">
+          <mat-icon>compare_arrows</mat-icon>
+          <div class="price-difference">
+            <span class="difference-amount">{{ formatPrice(Math.abs(analysis?.summary?.priceDifference || 0)) }}</span>
+            <span class="difference-percentage">{{ formatPercentage(analysis?.summary?.priceDifferencePercentage) }}</span>
+            <span class="difference-label">difference</span>
+          </div>
+        </div>
+
+        <div class="price-item">
+          <h4>{{ getProductName(product2) }}</h4>
+          <div class="price-display">
+            <span class="price">{{ formatPrice(analysis?.summary?.product2LowestPrice || 0) }}</span>
+            <span class="seller-count">from {{ analysis?.summary?.product2SellerCount || 0 }} sellers</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="winner-display">
+        <mat-chip color="primary" selected>
+          <mat-icon>star</mat-icon>
+          Lower Price: {{ analysis?.summary?.lowerPricedProduct || 'N/A' }}
+        </mat-chip>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Value Analysis -->
+  <mat-card class="value-analysis-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>assessment</mat-icon>
+        Value Analysis
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="value-scores">
+        <div class="value-item">
+          <h4>{{ getProductName(product1) }}</h4>
+          <div class="value-score">
+            <div class="score-circle">
+              <span>{{ ((analysis?.valueAnalysis?.product1ValueScore || 0) * 100) | number:'1.0-0' }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="value-item">
+          <h4>{{ getProductName(product2) }}</h4>
+          <div class="value-score">
+            <div class="score-circle">
+              <span>{{ ((analysis?.valueAnalysis?.product2ValueScore || 0) * 100) | number:'1.0-0' }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="value-recommendation">
+        <mat-chip color="accent" selected>
+          <mat-icon>thumb_up</mat-icon>
+          Better Value: {{ analysis?.valueAnalysis?.betterValueProduct || 'N/A' }}
+        </mat-chip>
+        <p class="value-reason">{{ analysis?.valueAnalysis?.valueAnalysisReason || 'No analysis available' }}</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Seller Comparison -->
+  <mat-card class="seller-comparison-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>store</mat-icon>
+        Price by Seller
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="sellers-table-container">
+        <table mat-table [dataSource]="analysis?.sellerComparisons || []" class="sellers-table">
+          <ng-container matColumnDef="seller">
+            <th mat-header-cell *matHeaderCellDef>Seller</th>
+            <td mat-cell *matCellDef="let seller">{{ seller.sellerName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="product1Price">
+            <th mat-header-cell *matHeaderCellDef>{{ getProductName(product1) }}</th>
+            <td mat-cell *matCellDef="let seller">
+              <span *ngIf="seller.product1Price; else notAvailable">
+                {{ formatPrice(seller.product1Price) }}
+                <small>({{ seller.product1StockStatus }})</small>
+              </span>
+              <ng-template #notAvailable>
+                <span class="not-available">N/A</span>
+              </ng-template>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="product2Price">
+            <th mat-header-cell *matHeaderCellDef>{{ getProductName(product2) }}</th>
+            <td mat-cell *matCellDef="let seller">
+              <span *ngIf="seller.product2Price; else notAvailable2">
+                {{ formatPrice(seller.product2Price) }}
+                <small>({{ seller.product2StockStatus }})</small>
+              </span>
+              <ng-template #notAvailable2>
+                <span class="not-available">N/A</span>
+              </ng-template>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="difference">
+            <th mat-header-cell *matHeaderCellDef>Difference</th>
+            <td mat-cell *matCellDef="let seller">
+              <span *ngIf="seller.priceDifference !== null && seller.priceDifference !== undefined"
+                    [class]="seller.priceDifference > 0 ? 'positive-diff' : 'negative-diff'">
+                {{ formatPrice(Math.abs(seller.priceDifference)) }}
+              </span>
+              <span *ngIf="seller.availabilityAdvantage" class="availability-note">
+                {{ seller.availabilityAdvantage }}
+              </span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['seller', 'product1Price', 'product2Price', 'difference']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['seller', 'product1Price', 'product2Price', 'difference'];"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
