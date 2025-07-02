@@ -5739,6 +5739,239 @@ export class TechTickerApiClient {
      * @param body (optional) 
      * @return OK
      */
+    compareProducts(body: CompareProductsRequestDto | undefined): Observable<ProductComparisonResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/product-comparison/compare";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCompareProducts(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCompareProducts(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProductComparisonResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProductComparisonResultDtoApiResponse>;
+        }));
+    }
+
+    protected processCompareProducts(response: HttpResponseBase): Observable<ProductComparisonResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductComparisonResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status === 422) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result422: any = null;
+            let resultData422 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result422 = ApiResponse.fromJS(resultData422);
+            return throwException("Unprocessable Content", status, _responseText, _headers, result422);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    validateProductsForComparison(productId1: string, productId2: string): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/product-comparison/validate?";
+        if (productId1 === undefined || productId1 === null)
+            throw new Error("The parameter 'productId1' must be defined and cannot be null.");
+        else
+            url_ += "productId1=" + encodeURIComponent("" + productId1) + "&";
+        if (productId2 === undefined || productId2 === null)
+            throw new Error("The parameter 'productId2' must be defined and cannot be null.");
+        else
+            url_ += "productId2=" + encodeURIComponent("" + productId2) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processValidateProductsForComparison(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processValidateProductsForComparison(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processValidateProductsForComparison(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param search (optional) 
+     * @param page (optional) 
+     * @param pageSize (optional) 
+     * @return OK
+     */
+    getComparableProducts(id: string, search: string | undefined, page: number | undefined, pageSize: number | undefined): Observable<ProductDtoPagedResponseApiResponse> {
+        let url_ = this.baseUrl + "/api/product-comparison/comparable-products/{id}?";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (search === null)
+            throw new Error("The parameter 'search' cannot be null.");
+        else if (search !== undefined)
+            url_ += "search=" + encodeURIComponent("" + search) + "&";
+        if (page === null)
+            throw new Error("The parameter 'page' cannot be null.");
+        else if (page !== undefined)
+            url_ += "page=" + encodeURIComponent("" + page) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "pageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetComparableProducts(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetComparableProducts(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProductDtoPagedResponseApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProductDtoPagedResponseApiResponse>;
+        }));
+    }
+
+    protected processGetComparableProducts(response: HttpResponseBase): Observable<ProductDtoPagedResponseApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductDtoPagedResponseApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
     createProduct(body: CreateProductDto | undefined): Observable<ProductDtoApiResponse> {
         let url_ = this.baseUrl + "/api/Products";
         url_ = url_.replace(/[?&]$/, "");
@@ -15178,6 +15411,122 @@ export interface ICategoryDtoIEnumerableApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class CategoryScoreDto implements ICategoryScoreDto {
+    categoryName?: string | undefined;
+    product1Score?: number;
+    product2Score?: number;
+    weight?: number;
+    analysis?: string | undefined;
+
+    constructor(data?: ICategoryScoreDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.categoryName = _data["categoryName"];
+            this.product1Score = _data["product1Score"];
+            this.product2Score = _data["product2Score"];
+            this.weight = _data["weight"];
+            this.analysis = _data["analysis"];
+        }
+    }
+
+    static fromJS(data: any): CategoryScoreDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CategoryScoreDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["categoryName"] = this.categoryName;
+        data["product1Score"] = this.product1Score;
+        data["product2Score"] = this.product2Score;
+        data["weight"] = this.weight;
+        data["analysis"] = this.analysis;
+        return data;
+    }
+}
+
+export interface ICategoryScoreDto {
+    categoryName?: string | undefined;
+    product1Score?: number;
+    product2Score?: number;
+    weight?: number;
+    analysis?: string | undefined;
+}
+
+export class CompareProductsRequestDto implements ICompareProductsRequestDto {
+    productId1!: string;
+    productId2!: string;
+    specificationWeights?: { [key: string]: number; } | undefined;
+    includePriceAnalysis?: boolean;
+    generateRecommendations?: boolean;
+
+    constructor(data?: ICompareProductsRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productId1 = _data["productId1"];
+            this.productId2 = _data["productId2"];
+            if (_data["specificationWeights"]) {
+                this.specificationWeights = {} as any;
+                for (let key in _data["specificationWeights"]) {
+                    if (_data["specificationWeights"].hasOwnProperty(key))
+                        (<any>this.specificationWeights)![key] = _data["specificationWeights"][key];
+                }
+            }
+            this.includePriceAnalysis = _data["includePriceAnalysis"];
+            this.generateRecommendations = _data["generateRecommendations"];
+        }
+    }
+
+    static fromJS(data: any): CompareProductsRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CompareProductsRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productId1"] = this.productId1;
+        data["productId2"] = this.productId2;
+        if (this.specificationWeights) {
+            data["specificationWeights"] = {};
+            for (let key in this.specificationWeights) {
+                if (this.specificationWeights.hasOwnProperty(key))
+                    (<any>data["specificationWeights"])[key] = (<any>this.specificationWeights)[key];
+            }
+        }
+        data["includePriceAnalysis"] = this.includePriceAnalysis;
+        data["generateRecommendations"] = this.generateRecommendations;
+        return data;
+    }
+}
+
+export interface ICompareProductsRequestDto {
+    productId1: string;
+    productId2: string;
+    specificationWeights?: { [key: string]: number; } | undefined;
+    includePriceAnalysis?: boolean;
+    generateRecommendations?: boolean;
+}
+
 export class CompareTestResultsRequestDto implements ICompareTestResultsRequestDto {
     firstResultId?: string | undefined;
     secondResultId?: string | undefined;
@@ -15228,6 +15577,15 @@ export interface ICompareTestResultsRequestDto {
     includeScreenshots?: boolean;
     includeNetworkData?: boolean;
     includeDetailedDifferences?: boolean;
+}
+
+export enum ComparisonResultType {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _5 = 5,
 }
 
 export enum ComparisonTrend {
@@ -18225,6 +18583,118 @@ export interface IPopularTestUrlDto {
     lastTested?: Date | undefined;
 }
 
+export class PriceAnalysisDto implements IPriceAnalysisDto {
+    summary?: PriceComparisonSummaryDto;
+    sellerComparisons?: SellerPriceComparisonDto[] | undefined;
+    valueAnalysis?: ValueAnalysisDto;
+
+    constructor(data?: IPriceAnalysisDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.summary = _data["summary"] ? PriceComparisonSummaryDto.fromJS(_data["summary"]) : <any>undefined;
+            if (Array.isArray(_data["sellerComparisons"])) {
+                this.sellerComparisons = [] as any;
+                for (let item of _data["sellerComparisons"])
+                    this.sellerComparisons!.push(SellerPriceComparisonDto.fromJS(item));
+            }
+            this.valueAnalysis = _data["valueAnalysis"] ? ValueAnalysisDto.fromJS(_data["valueAnalysis"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): PriceAnalysisDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PriceAnalysisDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["summary"] = this.summary ? this.summary.toJSON() : <any>undefined;
+        if (Array.isArray(this.sellerComparisons)) {
+            data["sellerComparisons"] = [];
+            for (let item of this.sellerComparisons)
+                data["sellerComparisons"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["valueAnalysis"] = this.valueAnalysis ? this.valueAnalysis.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IPriceAnalysisDto {
+    summary?: PriceComparisonSummaryDto;
+    sellerComparisons?: SellerPriceComparisonDto[] | undefined;
+    valueAnalysis?: ValueAnalysisDto;
+}
+
+export class PriceComparisonSummaryDto implements IPriceComparisonSummaryDto {
+    product1LowestPrice?: number;
+    product2LowestPrice?: number;
+    priceDifference?: number;
+    priceDifferencePercentage?: number;
+    lowerPricedProduct?: string | undefined;
+    product1SellerCount?: number;
+    product2SellerCount?: number;
+
+    constructor(data?: IPriceComparisonSummaryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.product1LowestPrice = _data["product1LowestPrice"];
+            this.product2LowestPrice = _data["product2LowestPrice"];
+            this.priceDifference = _data["priceDifference"];
+            this.priceDifferencePercentage = _data["priceDifferencePercentage"];
+            this.lowerPricedProduct = _data["lowerPricedProduct"];
+            this.product1SellerCount = _data["product1SellerCount"];
+            this.product2SellerCount = _data["product2SellerCount"];
+        }
+    }
+
+    static fromJS(data: any): PriceComparisonSummaryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PriceComparisonSummaryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["product1LowestPrice"] = this.product1LowestPrice;
+        data["product2LowestPrice"] = this.product2LowestPrice;
+        data["priceDifference"] = this.priceDifference;
+        data["priceDifferencePercentage"] = this.priceDifferencePercentage;
+        data["lowerPricedProduct"] = this.lowerPricedProduct;
+        data["product1SellerCount"] = this.product1SellerCount;
+        data["product2SellerCount"] = this.product2SellerCount;
+        return data;
+    }
+}
+
+export interface IPriceComparisonSummaryDto {
+    product1LowestPrice?: number;
+    product2LowestPrice?: number;
+    priceDifference?: number;
+    priceDifferencePercentage?: number;
+    lowerPricedProduct?: string | undefined;
+    product1SellerCount?: number;
+    product2SellerCount?: number;
+}
+
 export class PriceHistoryDto implements IPriceHistoryDto {
     timestamp?: Date;
     price?: number;
@@ -18367,6 +18837,214 @@ export interface IPriceHistoryDtoIEnumerableApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProductComparisonResultDto implements IProductComparisonResultDto {
+    summary?: ProductComparisonSummaryDto;
+    product1?: ProductWithCurrentPricesDto;
+    product2?: ProductWithCurrentPricesDto;
+    specificationComparison?: SpecificationComparisonDto;
+    priceAnalysis?: PriceAnalysisDto;
+    recommendationAnalysis?: RecommendationAnalysisDto;
+    generatedAt?: Date;
+
+    constructor(data?: IProductComparisonResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.summary = _data["summary"] ? ProductComparisonSummaryDto.fromJS(_data["summary"]) : <any>undefined;
+            this.product1 = _data["product1"] ? ProductWithCurrentPricesDto.fromJS(_data["product1"]) : <any>undefined;
+            this.product2 = _data["product2"] ? ProductWithCurrentPricesDto.fromJS(_data["product2"]) : <any>undefined;
+            this.specificationComparison = _data["specificationComparison"] ? SpecificationComparisonDto.fromJS(_data["specificationComparison"]) : <any>undefined;
+            this.priceAnalysis = _data["priceAnalysis"] ? PriceAnalysisDto.fromJS(_data["priceAnalysis"]) : <any>undefined;
+            this.recommendationAnalysis = _data["recommendationAnalysis"] ? RecommendationAnalysisDto.fromJS(_data["recommendationAnalysis"]) : <any>undefined;
+            this.generatedAt = _data["generatedAt"] ? new Date(_data["generatedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProductComparisonResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductComparisonResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["summary"] = this.summary ? this.summary.toJSON() : <any>undefined;
+        data["product1"] = this.product1 ? this.product1.toJSON() : <any>undefined;
+        data["product2"] = this.product2 ? this.product2.toJSON() : <any>undefined;
+        data["specificationComparison"] = this.specificationComparison ? this.specificationComparison.toJSON() : <any>undefined;
+        data["priceAnalysis"] = this.priceAnalysis ? this.priceAnalysis.toJSON() : <any>undefined;
+        data["recommendationAnalysis"] = this.recommendationAnalysis ? this.recommendationAnalysis.toJSON() : <any>undefined;
+        data["generatedAt"] = this.generatedAt ? this.generatedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProductComparisonResultDto {
+    summary?: ProductComparisonSummaryDto;
+    product1?: ProductWithCurrentPricesDto;
+    product2?: ProductWithCurrentPricesDto;
+    specificationComparison?: SpecificationComparisonDto;
+    priceAnalysis?: PriceAnalysisDto;
+    recommendationAnalysis?: RecommendationAnalysisDto;
+    generatedAt?: Date;
+}
+
+export class ProductComparisonResultDtoApiResponse implements IProductComparisonResultDtoApiResponse {
+    success?: boolean;
+    data?: ProductComparisonResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProductComparisonResultDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ProductComparisonResultDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductComparisonResultDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductComparisonResultDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProductComparisonResultDtoApiResponse {
+    success?: boolean;
+    data?: ProductComparisonResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProductComparisonSummaryDto implements IProductComparisonSummaryDto {
+    categoryName?: string | undefined;
+    totalSpecifications?: number;
+    matchingSpecifications?: number;
+    differentSpecifications?: number;
+    product1OverallScore?: number;
+    product2OverallScore?: number;
+    recommendedProductId?: string | undefined;
+    recommendationReason?: string | undefined;
+
+    constructor(data?: IProductComparisonSummaryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.categoryName = _data["categoryName"];
+            this.totalSpecifications = _data["totalSpecifications"];
+            this.matchingSpecifications = _data["matchingSpecifications"];
+            this.differentSpecifications = _data["differentSpecifications"];
+            this.product1OverallScore = _data["product1OverallScore"];
+            this.product2OverallScore = _data["product2OverallScore"];
+            this.recommendedProductId = _data["recommendedProductId"];
+            this.recommendationReason = _data["recommendationReason"];
+        }
+    }
+
+    static fromJS(data: any): ProductComparisonSummaryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductComparisonSummaryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["categoryName"] = this.categoryName;
+        data["totalSpecifications"] = this.totalSpecifications;
+        data["matchingSpecifications"] = this.matchingSpecifications;
+        data["differentSpecifications"] = this.differentSpecifications;
+        data["product1OverallScore"] = this.product1OverallScore;
+        data["product2OverallScore"] = this.product2OverallScore;
+        data["recommendedProductId"] = this.recommendedProductId;
+        data["recommendationReason"] = this.recommendationReason;
+        return data;
+    }
+}
+
+export interface IProductComparisonSummaryDto {
+    categoryName?: string | undefined;
+    totalSpecifications?: number;
+    matchingSpecifications?: number;
+    differentSpecifications?: number;
+    product1OverallScore?: number;
+    product2OverallScore?: number;
+    recommendedProductId?: string | undefined;
+    recommendationReason?: string | undefined;
 }
 
 export class ProductDto implements IProductDto {
@@ -18671,6 +19349,90 @@ export interface IProductDtoPagedResponse {
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
     pagination?: PaginationMeta;
+}
+
+export class ProductDtoPagedResponseApiResponse implements IProductDtoPagedResponseApiResponse {
+    success?: boolean;
+    data?: ProductDtoPagedResponse;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProductDtoPagedResponseApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ProductDtoPagedResponse.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductDtoPagedResponseApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductDtoPagedResponseApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProductDtoPagedResponseApiResponse {
+    success?: boolean;
+    data?: ProductDtoPagedResponse;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class ProductSellerMappingDto implements IProductSellerMappingDto {
@@ -20711,6 +21473,146 @@ export interface IRecentAlertActivityDto {
     triggeringPrice?: number;
     status?: string | undefined;
     processingTime?: string;
+}
+
+export class RecommendationAnalysisDto implements IRecommendationAnalysisDto {
+    recommendedProductId?: string | undefined;
+    confidenceScore?: number;
+    primaryReason?: string | undefined;
+    factors?: RecommendationFactorDto[] | undefined;
+    pros?: string[] | undefined;
+    cons?: string[] | undefined;
+    useCase?: string | undefined;
+    alternativeRecommendation?: string | undefined;
+
+    constructor(data?: IRecommendationAnalysisDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.recommendedProductId = _data["recommendedProductId"];
+            this.confidenceScore = _data["confidenceScore"];
+            this.primaryReason = _data["primaryReason"];
+            if (Array.isArray(_data["factors"])) {
+                this.factors = [] as any;
+                for (let item of _data["factors"])
+                    this.factors!.push(RecommendationFactorDto.fromJS(item));
+            }
+            if (Array.isArray(_data["pros"])) {
+                this.pros = [] as any;
+                for (let item of _data["pros"])
+                    this.pros!.push(item);
+            }
+            if (Array.isArray(_data["cons"])) {
+                this.cons = [] as any;
+                for (let item of _data["cons"])
+                    this.cons!.push(item);
+            }
+            this.useCase = _data["useCase"];
+            this.alternativeRecommendation = _data["alternativeRecommendation"];
+        }
+    }
+
+    static fromJS(data: any): RecommendationAnalysisDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RecommendationAnalysisDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["recommendedProductId"] = this.recommendedProductId;
+        data["confidenceScore"] = this.confidenceScore;
+        data["primaryReason"] = this.primaryReason;
+        if (Array.isArray(this.factors)) {
+            data["factors"] = [];
+            for (let item of this.factors)
+                data["factors"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.pros)) {
+            data["pros"] = [];
+            for (let item of this.pros)
+                data["pros"].push(item);
+        }
+        if (Array.isArray(this.cons)) {
+            data["cons"] = [];
+            for (let item of this.cons)
+                data["cons"].push(item);
+        }
+        data["useCase"] = this.useCase;
+        data["alternativeRecommendation"] = this.alternativeRecommendation;
+        return data;
+    }
+}
+
+export interface IRecommendationAnalysisDto {
+    recommendedProductId?: string | undefined;
+    confidenceScore?: number;
+    primaryReason?: string | undefined;
+    factors?: RecommendationFactorDto[] | undefined;
+    pros?: string[] | undefined;
+    cons?: string[] | undefined;
+    useCase?: string | undefined;
+    alternativeRecommendation?: string | undefined;
+}
+
+export class RecommendationFactorDto implements IRecommendationFactorDto {
+    factor?: string | undefined;
+    weight?: number;
+    product1Score?: number;
+    product2Score?: number;
+    impact?: string | undefined;
+
+    constructor(data?: IRecommendationFactorDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.factor = _data["factor"];
+            this.weight = _data["weight"];
+            this.product1Score = _data["product1Score"];
+            this.product2Score = _data["product2Score"];
+            this.impact = _data["impact"];
+        }
+    }
+
+    static fromJS(data: any): RecommendationFactorDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RecommendationFactorDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["factor"] = this.factor;
+        data["weight"] = this.weight;
+        data["product1Score"] = this.product1Score;
+        data["product2Score"] = this.product2Score;
+        data["impact"] = this.impact;
+        return data;
+    }
+}
+
+export interface IRecommendationFactorDto {
+    factor?: string | undefined;
+    weight?: number;
+    product1Score?: number;
+    product2Score?: number;
+    impact?: string | undefined;
 }
 
 export class RegisterUserDto implements IRegisterUserDto {
@@ -22971,6 +23873,262 @@ export interface ISellerPerformanceMetricDtoIEnumerableApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class SellerPriceComparisonDto implements ISellerPriceComparisonDto {
+    sellerName?: string | undefined;
+    product1Price?: number | undefined;
+    product2Price?: number | undefined;
+    product1StockStatus?: string | undefined;
+    product2StockStatus?: string | undefined;
+    priceDifference?: number | undefined;
+    availabilityAdvantage?: string | undefined;
+
+    constructor(data?: ISellerPriceComparisonDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.sellerName = _data["sellerName"];
+            this.product1Price = _data["product1Price"];
+            this.product2Price = _data["product2Price"];
+            this.product1StockStatus = _data["product1StockStatus"];
+            this.product2StockStatus = _data["product2StockStatus"];
+            this.priceDifference = _data["priceDifference"];
+            this.availabilityAdvantage = _data["availabilityAdvantage"];
+        }
+    }
+
+    static fromJS(data: any): SellerPriceComparisonDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SellerPriceComparisonDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["sellerName"] = this.sellerName;
+        data["product1Price"] = this.product1Price;
+        data["product2Price"] = this.product2Price;
+        data["product1StockStatus"] = this.product1StockStatus;
+        data["product2StockStatus"] = this.product2StockStatus;
+        data["priceDifference"] = this.priceDifference;
+        data["availabilityAdvantage"] = this.availabilityAdvantage;
+        return data;
+    }
+}
+
+export interface ISellerPriceComparisonDto {
+    sellerName?: string | undefined;
+    product1Price?: number | undefined;
+    product2Price?: number | undefined;
+    product1StockStatus?: string | undefined;
+    product2StockStatus?: string | undefined;
+    priceDifference?: number | undefined;
+    availabilityAdvantage?: string | undefined;
+}
+
+export class SpecificationComparisonDto implements ISpecificationComparisonDto {
+    differences?: SpecificationDifferenceDto[] | undefined;
+    matches?: SpecificationMatchDto[] | undefined;
+    categoryScores?: { [key: string]: CategoryScoreDto; } | undefined;
+
+    constructor(data?: ISpecificationComparisonDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["differences"])) {
+                this.differences = [] as any;
+                for (let item of _data["differences"])
+                    this.differences!.push(SpecificationDifferenceDto.fromJS(item));
+            }
+            if (Array.isArray(_data["matches"])) {
+                this.matches = [] as any;
+                for (let item of _data["matches"])
+                    this.matches!.push(SpecificationMatchDto.fromJS(item));
+            }
+            if (_data["categoryScores"]) {
+                this.categoryScores = {} as any;
+                for (let key in _data["categoryScores"]) {
+                    if (_data["categoryScores"].hasOwnProperty(key))
+                        (<any>this.categoryScores)![key] = _data["categoryScores"][key] ? CategoryScoreDto.fromJS(_data["categoryScores"][key]) : new CategoryScoreDto();
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SpecificationComparisonDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SpecificationComparisonDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.differences)) {
+            data["differences"] = [];
+            for (let item of this.differences)
+                data["differences"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.matches)) {
+            data["matches"] = [];
+            for (let item of this.matches)
+                data["matches"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (this.categoryScores) {
+            data["categoryScores"] = {};
+            for (let key in this.categoryScores) {
+                if (this.categoryScores.hasOwnProperty(key))
+                    (<any>data["categoryScores"])[key] = this.categoryScores[key] ? this.categoryScores[key].toJSON() : <any>undefined;
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISpecificationComparisonDto {
+    differences?: SpecificationDifferenceDto[] | undefined;
+    matches?: SpecificationMatchDto[] | undefined;
+    categoryScores?: { [key: string]: CategoryScoreDto; } | undefined;
+}
+
+export class SpecificationDifferenceDto implements ISpecificationDifferenceDto {
+    specificationKey?: string | undefined;
+    displayName?: string | undefined;
+    category?: string | undefined;
+    product1Value?: any | undefined;
+    product2Value?: any | undefined;
+    product1DisplayValue?: string | undefined;
+    product2DisplayValue?: string | undefined;
+    comparisonResult?: ComparisonResultType;
+    impactScore?: number | undefined;
+    analysisNote?: string | undefined;
+
+    constructor(data?: ISpecificationDifferenceDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.specificationKey = _data["specificationKey"];
+            this.displayName = _data["displayName"];
+            this.category = _data["category"];
+            this.product1Value = _data["product1Value"];
+            this.product2Value = _data["product2Value"];
+            this.product1DisplayValue = _data["product1DisplayValue"];
+            this.product2DisplayValue = _data["product2DisplayValue"];
+            this.comparisonResult = _data["comparisonResult"];
+            this.impactScore = _data["impactScore"];
+            this.analysisNote = _data["analysisNote"];
+        }
+    }
+
+    static fromJS(data: any): SpecificationDifferenceDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SpecificationDifferenceDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["specificationKey"] = this.specificationKey;
+        data["displayName"] = this.displayName;
+        data["category"] = this.category;
+        data["product1Value"] = this.product1Value;
+        data["product2Value"] = this.product2Value;
+        data["product1DisplayValue"] = this.product1DisplayValue;
+        data["product2DisplayValue"] = this.product2DisplayValue;
+        data["comparisonResult"] = this.comparisonResult;
+        data["impactScore"] = this.impactScore;
+        data["analysisNote"] = this.analysisNote;
+        return data;
+    }
+}
+
+export interface ISpecificationDifferenceDto {
+    specificationKey?: string | undefined;
+    displayName?: string | undefined;
+    category?: string | undefined;
+    product1Value?: any | undefined;
+    product2Value?: any | undefined;
+    product1DisplayValue?: string | undefined;
+    product2DisplayValue?: string | undefined;
+    comparisonResult?: ComparisonResultType;
+    impactScore?: number | undefined;
+    analysisNote?: string | undefined;
+}
+
+export class SpecificationMatchDto implements ISpecificationMatchDto {
+    specificationKey?: string | undefined;
+    displayName?: string | undefined;
+    category?: string | undefined;
+    value?: any | undefined;
+    displayValue?: string | undefined;
+
+    constructor(data?: ISpecificationMatchDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.specificationKey = _data["specificationKey"];
+            this.displayName = _data["displayName"];
+            this.category = _data["category"];
+            this.value = _data["value"];
+            this.displayValue = _data["displayValue"];
+        }
+    }
+
+    static fromJS(data: any): SpecificationMatchDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SpecificationMatchDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["specificationKey"] = this.specificationKey;
+        data["displayName"] = this.displayName;
+        data["category"] = this.category;
+        data["value"] = this.value;
+        data["displayValue"] = this.displayValue;
+        return data;
+    }
+}
+
+export interface ISpecificationMatchDto {
+    specificationKey?: string | undefined;
+    displayName?: string | undefined;
+    category?: string | undefined;
+    value?: any | undefined;
+    displayValue?: string | undefined;
 }
 
 export class SpecificationParsingOptions implements ISpecificationParsingOptions {
@@ -26243,6 +27401,54 @@ export interface IValidationExampleRequest {
     email?: string | undefined;
     phone?: string | undefined;
     website?: string | undefined;
+}
+
+export class ValueAnalysisDto implements IValueAnalysisDto {
+    product1ValueScore?: number;
+    product2ValueScore?: number;
+    betterValueProduct?: string | undefined;
+    valueAnalysisReason?: string | undefined;
+
+    constructor(data?: IValueAnalysisDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.product1ValueScore = _data["product1ValueScore"];
+            this.product2ValueScore = _data["product2ValueScore"];
+            this.betterValueProduct = _data["betterValueProduct"];
+            this.valueAnalysisReason = _data["valueAnalysisReason"];
+        }
+    }
+
+    static fromJS(data: any): ValueAnalysisDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ValueAnalysisDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["product1ValueScore"] = this.product1ValueScore;
+        data["product2ValueScore"] = this.product2ValueScore;
+        data["betterValueProduct"] = this.betterValueProduct;
+        data["valueAnalysisReason"] = this.valueAnalysisReason;
+        return data;
+    }
+}
+
+export interface IValueAnalysisDto {
+    product1ValueScore?: number;
+    product2ValueScore?: number;
+    betterValueProduct?: string | undefined;
+    valueAnalysisReason?: string | undefined;
 }
 
 export class ApiException extends Error {
