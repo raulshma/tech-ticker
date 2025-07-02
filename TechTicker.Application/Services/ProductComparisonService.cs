@@ -50,14 +50,9 @@ public class ProductComparisonService : IProductComparisonService
                 return Result<ProductComparisonResultDto>.Failure(validationResult.ErrorMessage!);
             }
 
-            // Get products with current pricing information
-            var product1Task = _productService.GetProductWithCurrentPricesAsync(request.ProductId1);
-            var product2Task = _productService.GetProductWithCurrentPricesAsync(request.ProductId2);
-
-            await Task.WhenAll(product1Task, product2Task);
-
-            var product1Result = await product1Task;
-            var product2Result = await product2Task;
+            // Get products with current pricing information sequentially to avoid concurrent DbContext access
+            var product1Result = await _productService.GetProductWithCurrentPricesAsync(request.ProductId1);
+            var product2Result = await _productService.GetProductWithCurrentPricesAsync(request.ProductId2);
 
             if (!product1Result.IsSuccess)
             {
@@ -154,14 +149,9 @@ public class ProductComparisonService : IProductComparisonService
                 return Result<bool>.Failure("Cannot compare the same product with itself");
             }
 
-            // Get both products
-            var product1Task = _productService.GetProductByIdAsync(productId1);
-            var product2Task = _productService.GetProductByIdAsync(productId2);
-
-            await Task.WhenAll(product1Task, product2Task);
-
-            var product1Result = await product1Task;
-            var product2Result = await product2Task;
+            // Get both products sequentially to avoid concurrent DbContext access
+            var product1Result = await _productService.GetProductByIdAsync(productId1);
+            var product2Result = await _productService.GetProductByIdAsync(productId2);
 
             if (!product1Result.IsSuccess)
             {

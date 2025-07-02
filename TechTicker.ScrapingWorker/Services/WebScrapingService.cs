@@ -998,11 +998,39 @@ public partial class WebScrapingService
                 return;
             }
 
-            // Update specification-related fields
+            // Update specification-related fields in the mapping
             mapping.LatestSpecifications = JsonSerializer.Serialize(specResult.Specifications);
             mapping.SpecificationsLastUpdated = DateTime.UtcNow;
             mapping.SpecificationsQualityScore = specResult.Quality?.OverallScore;
-            mapping.UpdatedAt = DateTimeOffset.UtcNow;
+            mapping.UpdatedAt = DateTimeOffset.UtcNow;                // Also update the product's specifications if quality score is good enough
+            if (specResult.Quality?.OverallScore >= 0.7 && mapping.CanonicalProductId != Guid.Empty)
+            {
+                // Get the canonical product
+                var product = await _unitOfWork.Products.GetByIdAsync(mapping.CanonicalProductId);
+                if (product != null)
+                {
+                    // Merge existing specs with new specs, prioritizing new ones for duplicates
+                    var existingSpecs = product.SpecificationsDict ?? new Dictionary<string, object>();
+                    var newSpecs = specResult.Specifications ?? new Dictionary<string, object>();
+                    
+                    // First, copy all existing specs
+                    var mergedSpecs = new Dictionary<string, object>(existingSpecs);
+                    
+                    // Then add or update with new specs (overwrites existing)
+                    foreach (var spec in newSpecs)
+                    {
+                        mergedSpecs[spec.Key] = spec.Value;
+                    }
+
+                    // Update product specifications with merged data
+                    product.SpecificationsDict = mergedSpecs;
+                    product.UpdatedAt = DateTimeOffset.UtcNow;
+                    _unitOfWork.Products.Update(product);
+                    
+                    _logger.LogInformation("Updated Product {ProductId} specifications with {NewSpecCount} new items from mapping {MappingId} (total specs: {TotalSpecCount})",
+                        product.ProductId, newSpecs.Count, mappingId, mergedSpecs.Count);
+                }
+            }
 
             // Save changes
             _unitOfWork.ProductSellerMappings.Update(mapping);
