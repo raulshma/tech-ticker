@@ -5,6 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { ScraperLogsService } from '../../services/scraper-logs.service';
 import { ScraperRunLogDto } from '../../../../shared/api/api-client';
 import { Location } from '@angular/common';
+import { ProductSpecification } from '../../../../shared/components/product-specifications/product-specifications.component';
 
 @Component({
   selector: 'app-scraper-log-detail',
@@ -97,7 +98,7 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
     // If it's just a number (seconds), format it nicely
     const seconds = parseFloat(duration);
     if (isNaN(seconds)) return duration;
-    
+
     if (seconds < 1) {
       return `${Math.round(seconds * 1000)}ms`;
     } else if (seconds < 60) {
@@ -168,7 +169,7 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
 
   getHttpStatusClass(statusCode: number | undefined): string {
     if (!statusCode) return '';
-    
+
     if (statusCode >= 200 && statusCode < 300) {
       return 'http-success';
     } else if (statusCode >= 300 && statusCode < 400) {
@@ -182,8 +183,8 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
   }
 
   hasImageData(): boolean {
-    return !!(this.scraperLog?.extractedPrimaryImageUrl || 
-              this.scraperLog?.extractedAdditionalImageUrls?.length || 
+    return !!(this.scraperLog?.extractedPrimaryImageUrl ||
+              this.scraperLog?.extractedAdditionalImageUrls?.length ||
               this.scraperLog?.extractedOriginalImageUrls?.length ||
               this.scraperLog?.imageProcessingCount ||
               this.scraperLog?.imageUploadCount ||
@@ -191,19 +192,81 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
   }
 
   hasSpecificationData(): boolean {
-    return !!(this.scraperLog?.specificationData || 
-              this.scraperLog?.specificationMetadata || 
+    return !!(this.scraperLog?.specificationData ||
+              this.scraperLog?.specificationMetadata ||
               this.scraperLog?.specificationCount ||
               this.scraperLog?.specificationError);
   }
 
-  getParsedSpecifications(): any {
-    if (!this.scraperLog?.specificationData) return null;
+  getParsedSpecifications(): ProductSpecification | undefined {
+    if (!this.scraperLog?.specificationData) return undefined;
     try {
-      return JSON.parse(this.scraperLog.specificationData);
+      const rawSpecs = JSON.parse(this.scraperLog.specificationData);
+      const metadata = this.getParsedSpecificationMetadata();
+
+      // Create a properly formatted ProductSpecification object
+      return {
+        isSuccess: !this.scraperLog.specificationError, // No error means success
+        errorMessage: this.scraperLog.specificationError || undefined,
+        specifications: rawSpecs,
+        typedSpecifications: this.convertToTypedSpecifications(rawSpecs),
+        categorizedSpecs: this.categorizeSpecifications(rawSpecs),
+        metadata: metadata ? {
+          totalRows: metadata.totalRows || 0,
+          dataRows: metadata.dataRows || 0,
+          headerRows: metadata.headerRows || 0,
+          continuationRows: metadata.continuationRows || 0,
+          inlineValueCount: metadata.inlineValueCount || 0,
+          multiValueSpecs: metadata.multiValueSpecs || 0,
+          structure: metadata.tableStructure || 'Unknown',
+          warnings: metadata.warnings || [],
+          processingTimeMs: metadata.processingTimeMs || 0
+        } : {
+          totalRows: 0,
+          dataRows: 0,
+          headerRows: 0,
+          continuationRows: 0,
+          inlineValueCount: 0,
+          multiValueSpecs: 0,
+          structure: 'Unknown',
+          warnings: [],
+          processingTimeMs: 0
+        },
+        quality: {
+          overallScore: this.scraperLog.specificationQualityScore || 0,
+          structureConfidence: metadata?.confidence || 0,
+          typeDetectionAccuracy: 0.8, // Default value
+          completenessScore: 0.8 // Default value
+        },
+        parsingTimeMs: this.scraperLog.specificationParsingTime || 0
+      };
     } catch (error) {
       console.error('Error parsing specification data:', error);
-      return null;
+      return {
+        isSuccess: false,
+        errorMessage: 'Failed to parse specification data: ' + error,
+        specifications: {},
+        typedSpecifications: {},
+        categorizedSpecs: {},
+        metadata: {
+          totalRows: 0,
+          dataRows: 0,
+          headerRows: 0,
+          continuationRows: 0,
+          inlineValueCount: 0,
+          multiValueSpecs: 0,
+          structure: 'Error',
+          warnings: ['Parsing failed'],
+          processingTimeMs: 0
+        },
+        quality: {
+          overallScore: 0,
+          structureConfidence: 0,
+          typeDetectionAccuracy: 0,
+          completenessScore: 0
+        },
+        parsingTimeMs: 0
+      };
     }
   }
 
@@ -219,7 +282,7 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
 
   getSpecificationQualityBadgeClass(): string {
     if (!this.scraperLog?.specificationQualityScore) return 'badge-secondary';
-    
+
     const score = this.scraperLog.specificationQualityScore;
     if (score >= 0.9) return 'badge-success';
     if (score >= 0.7) return 'badge-warning';
@@ -244,5 +307,118 @@ export class ScraperLogDetailComponent implements OnInit, OnDestroy {
   viewRetryDetails(runId: string): void {
     // Navigate to the retry attempt details
     this.router.navigate(['/scraper-logs', runId]);
+  }
+
+  private convertToTypedSpecifications(rawSpecs: any): { [key: string]: any } {
+    const typedSpecs: { [key: string]: any } = {};
+
+    Object.entries(rawSpecs).forEach(([key, value]) => {
+      typedSpecs[key] = {
+        value: value,
+        type: this.detectSpecificationType(value),
+        unit: '',
+        numericValue: this.extractNumericValue(value),
+        confidence: 0.8,
+        category: this.categorizeSpec(key),
+        hasMultipleValues: Array.isArray(value) || (typeof value === 'object' && value !== null && typeof value !== 'string'),
+        valueCount: Array.isArray(value) ? value.length : 1,
+        alternatives: []
+      };
+    });
+
+    return typedSpecs;
+  }
+
+  private categorizeSpecifications(rawSpecs: any): { [key: string]: any } {
+    const categories: { [key: string]: any } = {};
+
+    Object.entries(rawSpecs).forEach(([key, value]) => {
+      const category = this.categorizeSpec(key);
+
+      if (!categories[category]) {
+        categories[category] = {
+          name: category,
+          specifications: {},
+          order: this.getCategoryOrder(category),
+          confidence: 0.8,
+          isExplicit: true,
+          itemCount: 0,
+          multiValueCount: 0
+        };
+      }
+
+      categories[category].specifications[key] = {
+        value: value,
+        type: this.detectSpecificationType(value),
+        unit: '',
+        numericValue: this.extractNumericValue(value),
+        confidence: 0.8,
+        category: category,
+        hasMultipleValues: Array.isArray(value) || (typeof value === 'object' && value !== null && typeof value !== 'string'),
+        valueCount: Array.isArray(value) ? value.length : 1,
+        alternatives: []
+      };
+
+      categories[category].itemCount++;
+      if (Array.isArray(value) || (typeof value === 'object' && value !== null && typeof value !== 'string')) {
+        categories[category].multiValueCount++;
+      }
+    });
+
+    return categories;
+  }
+
+  private detectSpecificationType(value: any): string {
+    if (Array.isArray(value)) return 'List';
+    if (typeof value === 'number') return 'Numeric';
+    if (typeof value === 'string') {
+      if (value.match(/\d+(\.\d+)?\s*(gb|mb|tb|ghz|mhz|w|v|a)/i)) return 'Numeric';
+      if (value.match(/\d+x\d+/i)) return 'Resolution';
+      if (value.toLowerCase().includes('clock')) return 'Clock';
+      if (value.toLowerCase().includes('memory')) return 'Memory';
+      if (value.toLowerCase().includes('power')) return 'Power';
+      if (value.toLowerCase().includes('port') || value.toLowerCase().includes('interface')) return 'Interface';
+    }
+    return 'Text';
+  }
+
+  private extractNumericValue(value: any): number | undefined {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+      const match = value.match(/(\d+(?:\.\d+)?)/);
+      return match ? parseFloat(match[1]) : undefined;
+    }
+    return undefined;
+  }
+
+  private categorizeSpec(key: string): string {
+    const lowerKey = key.toLowerCase();
+
+    if (lowerKey.includes('memory') || lowerKey.includes('ram')) return 'Memory';
+    if (lowerKey.includes('clock') || lowerKey.includes('speed') || lowerKey.includes('frequency')) return 'Performance';
+    if (lowerKey.includes('power') || lowerKey.includes('watt') || lowerKey.includes('consumption')) return 'Power';
+    if (lowerKey.includes('interface') || lowerKey.includes('port') || lowerKey.includes('connector')) return 'Connectivity';
+    if (lowerKey.includes('dimension') || lowerKey.includes('size') || lowerKey.includes('weight')) return 'Physical';
+    if (lowerKey.includes('resolution') || lowerKey.includes('display')) return 'Display';
+    if (lowerKey.includes('brand') || lowerKey.includes('model') || lowerKey.includes('series')) return 'General';
+    if (lowerKey.includes('warranty') || lowerKey.includes('support')) return 'Support';
+
+    return 'Other';
+  }
+
+  private getCategoryOrder(category: string): number {
+    const order: { [key: string]: number } = {
+      'General': 1,
+      'Performance': 2,
+      'Memory': 3,
+      'Display': 4,
+      'Connectivity': 5,
+      'Power': 6,
+      'Physical': 7,
+      'Support': 8,
+      'Other': 9
+    };
+
+    return order[category] || 10;
   }
 }
