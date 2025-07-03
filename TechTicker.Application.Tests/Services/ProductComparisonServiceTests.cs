@@ -425,11 +425,11 @@ public class ProductComparisonServiceTests
             Name = name ?? "Test Product",
             CategoryId = categoryId,
             Description = "Test Description",
-            Specifications = new Dictionary<string, object>
+            UncategorizedSpecifications = new Dictionary<string, string>
             {
                 { "Brand", "Test Brand" },
                 { "Model", "Test Model" },
-                { "Price", 100.00m }
+                { "Price", "100.00" }
             },
             IsActive = true,
             CreatedAt = DateTimeOffset.UtcNow,
@@ -455,7 +455,8 @@ public class ProductComparisonServiceTests
             Name = baseProduct.Name,
             CategoryId = baseProduct.CategoryId,
             Description = baseProduct.Description,
-            Specifications = baseProduct.Specifications,
+            NormalizedSpecifications = baseProduct.NormalizedSpecifications,
+            UncategorizedSpecifications = baseProduct.UncategorizedSpecifications,
             IsActive = baseProduct.IsActive,
             CreatedAt = baseProduct.CreatedAt,
             UpdatedAt = baseProduct.UpdatedAt,

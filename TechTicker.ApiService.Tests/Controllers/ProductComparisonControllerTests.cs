@@ -588,7 +588,7 @@ public class ProductComparisonControllerTests
             Name = name,
             CategoryId = Guid.NewGuid(),
             Description = $"Test description for {name}",
-            Specifications = new Dictionary<string, object>
+            UncategorizedSpecifications = new Dictionary<string, string>
             {
                 { "Brand", "Test Brand" },
                 { "Model", "Test Model" }
@@ -617,7 +617,8 @@ public class ProductComparisonControllerTests
             Name = baseProduct.Name,
             CategoryId = baseProduct.CategoryId,
             Description = baseProduct.Description,
-            Specifications = baseProduct.Specifications,
+            NormalizedSpecifications = baseProduct.NormalizedSpecifications,
+            UncategorizedSpecifications = baseProduct.UncategorizedSpecifications,
             IsActive = baseProduct.IsActive,
             CreatedAt = baseProduct.CreatedAt,
             UpdatedAt = baseProduct.UpdatedAt,

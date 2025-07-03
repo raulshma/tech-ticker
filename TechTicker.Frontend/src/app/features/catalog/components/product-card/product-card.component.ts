@@ -136,11 +136,23 @@ export class ProductCardComponent {
   }
 
   getKeySpecs(): string[] {
-    if (!this.product.specifications) return [];
+    // First try normalized specifications
+    if (this.product.normalizedSpecifications && Object.keys(this.product.normalizedSpecifications).length > 0) {
+      return Object.entries(this.product.normalizedSpecifications)
+        .slice(0, 3)
+        .map(([key, value]: [string, any]) => {
+          const displayValue = (value && typeof value === 'object' && value.value !== undefined) ? value.value : value;
+          return `${key}: ${displayValue}`;
+        });
+    }
 
-    // Extract first 3 key specifications for display
-    return Object.entries(this.product.specifications)
-      .slice(0, 3)
-      .map(([key, value]) => `${key}: ${value}`);
+    // Then try uncategorized specifications
+    if (this.product.uncategorizedSpecifications && Object.keys(this.product.uncategorizedSpecifications).length > 0) {
+      return Object.entries(this.product.uncategorizedSpecifications)
+        .slice(0, 3)
+        .map(([key, value]) => `${key}: ${value}`);
+    }
+
+    return [];
   }
 }

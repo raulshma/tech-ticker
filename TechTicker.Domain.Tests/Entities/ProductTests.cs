@@ -1,5 +1,6 @@
 using System.Text.Json;
 using TechTicker.Domain.Entities;
+using TechTicker.Domain.Entities.Canonical;
 
 namespace TechTicker.Domain.Tests.Entities;
 
@@ -50,74 +51,66 @@ public class ProductTests
     }
 
     [Fact]
-    public void SpecificationsDict_WithValidJson_ShouldSerializeAndDeserialize()
+    public void NormalizedSpecificationsDict_WithValidJson_ShouldSerializeAndDeserialize()
     {
         // Arrange
         var product = new Product();
-        var specifications = new Dictionary<string, object>
+        var normalizedSpecs = new Dictionary<string, NormalizedSpecificationValue>
         {
-            ["Screen Size"] = "6.1 inches",
-            ["Storage"] = "256GB",
-            ["RAM"] = "8GB",
-            ["Colors"] = new[] { "Black", "White", "Blue", "Gold" }
+            ["screen_size"] = new() { Value = "6.1", Unit = "inches", DataType = SpecificationType.Dimension, RawValue = "6.1 inches", CanonicalName = "screen_size", Confidence = 0.95 },
+            ["storage"] = new() { Value = 256, Unit = "GB", DataType = SpecificationType.Memory, RawValue = "256GB", CanonicalName = "storage", Confidence = 0.98 },
+            ["ram"] = new() { Value = 8, Unit = "GB", DataType = SpecificationType.Memory, RawValue = "8GB", CanonicalName = "ram", Confidence = 0.97 }
         };
 
         // Act
-        product.SpecificationsDict = specifications;
-        var retrievedSpecs = product.SpecificationsDict;
+        product.NormalizedSpecificationsDict = normalizedSpecs;
+        var retrievedSpecs = product.NormalizedSpecificationsDict;
 
         // Assert
-        product.Specifications.Should().NotBeNullOrEmpty();
+        product.NormalizedSpecifications.Should().NotBeNullOrEmpty();
         retrievedSpecs.Should().NotBeNull();
-        retrievedSpecs.Should().ContainKey("Screen Size");
-        retrievedSpecs.Should().ContainKey("Storage");
-        retrievedSpecs.Should().ContainKey("RAM");
-        retrievedSpecs.Should().ContainKey("Colors");
+        retrievedSpecs.Should().ContainKey("screen_size");
+        retrievedSpecs.Should().ContainKey("storage");
+        retrievedSpecs.Should().ContainKey("ram");
     }
 
     [Fact]
-    public void SpecificationsDict_WithNullValue_ShouldReturnNull()
+    public void NormalizedSpecificationsDict_WithNullValue_ShouldReturnNull()
     {
         // Arrange
         var product = new Product();
 
         // Act
-        product.SpecificationsDict = null;
+        product.NormalizedSpecificationsDict = null;
 
         // Assert
-        product.Specifications.Should().BeNull();
-        product.SpecificationsDict.Should().BeNull();
+        product.NormalizedSpecifications.Should().BeNull();
+        product.NormalizedSpecificationsDict.Should().BeNull();
     }
 
     [Fact]
-    public void SpecificationsDict_WithEmptyString_ShouldReturnNull()
+    public void UncategorizedSpecificationsDict_WithValidJson_ShouldSerializeAndDeserialize()
     {
         // Arrange
-        var product = new Product { Specifications = "" };
+        var product = new Product();
+        var uncategorizedSpecs = new Dictionary<string, string>
+        {
+            ["CPU"] = "A17 Pro",
+            ["GPU"] = "6-core",
+            ["Battery"] = "3274 mAh"
+        };
 
         // Act
-        var specs = product.SpecificationsDict;
+        product.UncategorizedSpecificationsDict = uncategorizedSpecs;
+        var retrieved = product.UncategorizedSpecificationsDict;
 
         // Assert
-        specs.Should().BeNull();
-    }
-
-    [Fact]
-    public void SpecificationsDict_WithValidJsonString_ShouldDeserialize()
-    {
-        // Arrange
-        var jsonString = """{"CPU": "A17 Pro", "GPU": "6-core", "Battery": "3274 mAh"}""";
-        var product = new Product { Specifications = jsonString };
-
-        // Act
-        var specs = product.SpecificationsDict;
-
-        // Assert
-        specs.Should().NotBeNull();
-        specs.Should().ContainKey("CPU");
-        specs.Should().ContainKey("GPU");
-        specs.Should().ContainKey("Battery");
-        specs!["CPU"].ToString().Should().Be("A17 Pro");
+        product.UncategorizedSpecifications.Should().NotBeNullOrEmpty();
+        retrieved.Should().NotBeNull();
+        retrieved.Should().ContainKey("CPU");
+        retrieved.Should().ContainKey("GPU");
+        retrieved.Should().ContainKey("Battery");
+        retrieved!["CPU"].Should().Be("A17 Pro");
     }
 
     [Theory]
@@ -181,30 +174,23 @@ public class ProductTests
     }
 
     [Fact]
-    public void Product_WithComplexSpecifications_ShouldHandleNestedObjects()
+    public void Product_ImageUrls_ShouldHandleJsonSerialization()
     {
         // Arrange
         var product = new Product();
-        var complexSpecs = new Dictionary<string, object>
-        {
-            ["Dimensions"] = new Dictionary<string, object>
-            {
-                ["Height"] = "159.9mm",
-                ["Width"] = "76.7mm",
-                ["Depth"] = "8.25mm"
-            },
-            ["Weight"] = "221g",
-            ["Features"] = new[] { "Face ID", "Wireless Charging", "Water Resistant" }
-        };
+        var additionalImages = new List<string> { "image1.jpg", "image2.jpg", "image3.jpg" };
+        var originalImages = new List<string> { "original1.jpg", "original2.jpg" };
 
         // Act
-        product.SpecificationsDict = complexSpecs;
-        var retrieved = product.SpecificationsDict;
+        product.AdditionalImageUrlsList = additionalImages;
+        product.OriginalImageUrlsList = originalImages;
 
         // Assert
-        retrieved.Should().NotBeNull();
-        retrieved.Should().ContainKey("Dimensions");
-        retrieved.Should().ContainKey("Weight");
-        retrieved.Should().ContainKey("Features");
+        product.AdditionalImageUrls.Should().NotBeNullOrEmpty();
+        product.OriginalImageUrls.Should().NotBeNullOrEmpty();
+        product.AdditionalImageUrlsList.Should().HaveCount(3);
+        product.OriginalImageUrlsList.Should().HaveCount(2);
+        product.AdditionalImageUrlsList.Should().Contain("image1.jpg");
+        product.OriginalImageUrlsList.Should().Contain("original1.jpg");
     }
 }

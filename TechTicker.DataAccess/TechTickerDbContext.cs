@@ -68,7 +68,6 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.Property(e => e.UpdatedAt).IsRequired();
 
             // Configure JSON columns for PostgreSQL
-            entity.Property(e => e.Specifications).HasColumnType("jsonb");
             entity.Property(e => e.AdditionalImageUrls).HasColumnType("jsonb");
             entity.Property(e => e.OriginalImageUrls).HasColumnType("jsonb");
             entity.Property(e => e.NormalizedSpecifications).HasColumnType("jsonb");

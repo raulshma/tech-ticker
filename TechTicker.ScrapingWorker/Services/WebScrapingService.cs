@@ -229,34 +229,7 @@ public partial class WebScrapingService
                         }
                     }
 
-                    // Normalize specifications using canonical templates
-                    Dictionary<string, Domain.Entities.Canonical.NormalizedSpecificationValue> normalized = new();
-                    Dictionary<string, string> uncategorized = new();
-                    try
-                    {
-                        // Determine product category via mapping
-                        string categoryName = string.Empty;
-                        var mapping = await _unitOfWork.ProductSellerMappings.GetByIdAsync(command.MappingId);
-                        if (mapping != null && mapping.CanonicalProductId != Guid.Empty)
-                        {
-                            var product = await _unitOfWork.Products.GetByIdAsync(mapping.CanonicalProductId);
-                            if (product?.Category != null)
-                            {
-                                categoryName = product.Category.Name;
-                            }
-                        }
-
-                        var rawStringSpecs = specificationResult.Specifications.ToDictionary(
-                            kvp => kvp.Key,
-                            kvp => kvp.Value?.ToString() ?? string.Empty,
-                            StringComparer.OrdinalIgnoreCase);
-
-                        (normalized, uncategorized) = _specNormalizer.Normalize(rawStringSpecs, categoryName);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Specification normalization failed; continuing without normalized data");
-                    }
+                    // Note: Normalization is now handled in UpdateProductSellerMappingWithSpecifications
                 }
                 catch (Exception ex)
                 {
@@ -662,10 +635,11 @@ public partial class WebScrapingService
             // Normalize specifications using canonical templates
             Dictionary<string, Domain.Entities.Canonical.NormalizedSpecificationValue> normalized = new();
             Dictionary<string, string> uncategorized = new();
+            string? categoryName = null;
+            
             try
             {
                 // Determine product category via mapping
-                string categoryName = string.Empty;
                 var mapping = await _unitOfWork.ProductSellerMappings.GetByIdAsync(mappingId);
                 if (mapping != null && mapping.CanonicalProductId != Guid.Empty)
                 {
@@ -681,19 +655,20 @@ public partial class WebScrapingService
                     kvp => kvp.Value?.ToString() ?? string.Empty,
                     StringComparer.OrdinalIgnoreCase);
 
-                (normalized, uncategorized) = _specNormalizer.Normalize(rawStringSpecs, categoryName);
+                (normalized, uncategorized) = _specNormalizer.Normalize(rawStringSpecs, categoryName ?? string.Empty);
+                
+                _logger.LogInformation("Normalized {RawCount} specifications into {NormalizedCount} canonical and {UncategorizedCount} uncategorized for mapping {MappingId}",
+                    rawStringSpecs.Count, normalized.Count, uncategorized.Count, mappingId);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Specification normalization failed; continuing without normalized data");
+                _logger.LogWarning(ex, "Specification normalization failed for mapping {MappingId}; continuing without normalized data", mappingId);
             }
 
             return new ProductSpecificationResult
             {
                 IsSuccess = true,
                 Specifications = mergedSpec.Specifications,
-                TypedSpecifications = mergedSpec.TypedSpecifications,
-                CategorizedSpecs = mergedSpec.CategorizedSpecs,
                 Metadata = mergedSpec.Metadata,
                 Quality = mergedSpec.Quality,
                 ParsingTimeMs = mergedSpec.Metadata.ProcessingTimeMs,
@@ -726,34 +701,11 @@ public partial class WebScrapingService
 
         foreach (var spec in specifications)
         {
-            // Merge specifications
+            // Merge specifications - this is the main data we care about
             foreach (var kvp in spec.Specifications)
             {
                 if (!merged.Specifications.ContainsKey(kvp.Key))
                     merged.Specifications[kvp.Key] = kvp.Value;
-            }
-
-            // Merge typed specifications
-            foreach (var kvp in spec.TypedSpecifications)
-            {
-                if (!merged.TypedSpecifications.ContainsKey(kvp.Key))
-                    merged.TypedSpecifications[kvp.Key] = kvp.Value;
-            }
-
-            // Merge categorized specs
-            foreach (var kvp in spec.CategorizedSpecs)
-            {
-                if (!merged.CategorizedSpecs.ContainsKey(kvp.Key))
-                    merged.CategorizedSpecs[kvp.Key] = kvp.Value;
-                else
-                {
-                    // Merge specifications within the same category
-                    foreach (var specKvp in kvp.Value.Specifications)
-                    {
-                        if (!merged.CategorizedSpecs[kvp.Key].Specifications.ContainsKey(specKvp.Key))
-                            merged.CategorizedSpecs[kvp.Key].Specifications[specKvp.Key] = specKvp.Value;
-                    }
-                }
             }
         }
 
@@ -1070,34 +1022,64 @@ public partial class WebScrapingService
             mapping.LatestSpecifications = JsonSerializer.Serialize(specResult.Specifications);
             mapping.SpecificationsLastUpdated = DateTime.UtcNow;
             mapping.SpecificationsQualityScore = specResult.Quality?.OverallScore;
-            mapping.UpdatedAt = DateTimeOffset.UtcNow;                // Also update the product's specifications if quality score is good enough
+            mapping.UpdatedAt = DateTimeOffset.UtcNow;
+
+            // Update both the mapping and the canonical product if quality score is good enough
             if (specResult.Quality?.OverallScore >= 0.7 && mapping.CanonicalProductId != Guid.Empty)
             {
                 // Get the canonical product
                 var product = await _unitOfWork.Products.GetByIdAsync(mapping.CanonicalProductId);
                 if (product != null)
                 {
-                    // Merge existing specs with new specs, prioritizing new ones for duplicates
-                    var existingSpecs = product.SpecificationsDict ?? new Dictionary<string, object>();
-                    var newSpecs = specResult.Specifications ?? new Dictionary<string, object>();
-                    
-                    // First, copy all existing specs
-                    var mergedSpecs = new Dictionary<string, object>(existingSpecs);
-                    
-                    // Then add or update with new specs (overwrites existing)
-                    foreach (var spec in newSpecs)
+                    // Update normalized specifications if available
+                    if (specResult.NormalizedSpecifications?.Any() == true)
                     {
-                        mergedSpecs[spec.Key] = spec.Value;
+                        var existingNormalized = product.NormalizedSpecificationsDict ?? new Dictionary<string, Domain.Entities.Canonical.NormalizedSpecificationValue>();
+                        var newNormalized = specResult.NormalizedSpecifications;
+                        
+                        // Merge normalized specifications, prioritizing newer ones
+                        var mergedNormalized = new Dictionary<string, Domain.Entities.Canonical.NormalizedSpecificationValue>(existingNormalized);
+                        foreach (var spec in newNormalized)
+                        {
+                            mergedNormalized[spec.Key] = spec.Value;
+                        }
+
+                        product.NormalizedSpecificationsDict = mergedNormalized;
+                        
+                        _logger.LogInformation("Updated Product {ProductId} normalized specifications with {NewNormalizedCount} new items from mapping {MappingId}",
+                            product.ProductId, newNormalized.Count, mappingId);
                     }
 
-                    // Update product specifications with merged data
-                    product.SpecificationsDict = mergedSpecs;
+                    // Update uncategorized specifications if available
+                    if (specResult.UncategorizedSpecifications?.Any() == true)
+                    {
+                        var existingUncategorized = product.UncategorizedSpecificationsDict ?? new Dictionary<string, string>();
+                        var newUncategorized = specResult.UncategorizedSpecifications;
+                        
+                        // Merge uncategorized specifications, prioritizing newer ones
+                        var mergedUncategorized = new Dictionary<string, string>(existingUncategorized);
+                        foreach (var spec in newUncategorized)
+                        {
+                            mergedUncategorized[spec.Key] = spec.Value;
+                        }
+
+                        product.UncategorizedSpecificationsDict = mergedUncategorized;
+                        
+                        _logger.LogInformation("Updated Product {ProductId} uncategorized specifications with {NewUncategorizedCount} new items from mapping {MappingId}",
+                            product.ProductId, newUncategorized.Count, mappingId);
+                    }
+
                     product.UpdatedAt = DateTimeOffset.UtcNow;
                     _unitOfWork.Products.Update(product);
                     
-                    _logger.LogInformation("Updated Product {ProductId} specifications with {NewSpecCount} new items from mapping {MappingId} (total specs: {TotalSpecCount})",
-                        product.ProductId, newSpecs.Count, mappingId, mergedSpecs.Count);
+                    _logger.LogInformation("Updated Product {ProductId} specifications from mapping {MappingId}",
+                        product.ProductId, mappingId);
                 }
+            }
+            else if (specResult.Quality?.OverallScore < 0.7)
+            {
+                _logger.LogInformation("Skipping product specification update for mapping {MappingId} due to low quality score: {QualityScore}",
+                    mappingId, specResult.Quality?.OverallScore ?? 0);
             }
 
             // Save changes
@@ -1112,27 +1094,4 @@ public partial class WebScrapingService
             _logger.LogWarning(ex, "Failed to update ProductSellerMapping with specification data for mapping {MappingId}", mappingId);
         }
     }
-}
-
-/// <summary>
-/// Result of a web scraping operation
-/// </summary>
-public class ScrapingResult
-{
-    public bool IsSuccess { get; set; }
-    public string? ProductName { get; set; }
-    public decimal Price { get; set; }
-    public string? StockStatus { get; set; }
-    public string? SellerNameOnPage { get; set; }
-    public DateTimeOffset ScrapedAt { get; set; }
-    public string? ErrorMessage { get; set; }
-    public string? ErrorCode { get; set; }
-
-    // Image-related properties
-    public string? PrimaryImageUrl { get; set; }
-    public List<string> AdditionalImageUrls { get; set; } = new();
-    public List<string> OriginalImageUrls { get; set; } = new();
-    
-    // Specification scraping result
-    public ProductSpecificationResult? Specifications { get; set; }
 }

@@ -105,8 +105,6 @@ public class ProductSpecificationResult
     public bool IsSuccess { get; set; }
     public string? ErrorMessage { get; set; }
     public Dictionary<string, object> Specifications { get; set; } = new();
-    public Dictionary<string, TypedSpecification> TypedSpecifications { get; set; } = new();
-    public Dictionary<string, CategoryGroup> CategorizedSpecs { get; set; } = new();
     public ParseMetadata Metadata { get; set; } = new();
     public QualityMetrics Quality { get; set; } = new();
     public long ParsingTimeMs { get; set; }

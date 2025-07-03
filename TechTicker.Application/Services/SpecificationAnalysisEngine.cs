@@ -617,15 +617,29 @@ public class SpecificationAnalysisEngine : ISpecificationAnalysisEngine
 
     private static Dictionary<string, object> BuildSpecificationDictionary(ProductDto product)
     {
+        var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        
+        // Add normalized specifications (preferred)
         if (product.NormalizedSpecifications != null && product.NormalizedSpecifications.Count > 0)
         {
-            // Use canonical names & parsed values
-            return product.NormalizedSpecifications.ToDictionary(
-                kvp => kvp.Key,
-                kvp => kvp.Value.Value ?? (object?)kvp.Value,
-                StringComparer.OrdinalIgnoreCase);
+            foreach (var kvp in product.NormalizedSpecifications)
+            {
+                result[kvp.Key] = kvp.Value?.Value ?? string.Empty;
+            }
+        }
+        
+        // Add uncategorized specifications as fallback
+        if (product.UncategorizedSpecifications != null && product.UncategorizedSpecifications.Count > 0)
+        {
+            foreach (var kvp in product.UncategorizedSpecifications)
+            {
+                if (!result.ContainsKey(kvp.Key)) // Don't override normalized specs
+                {
+                    result[kvp.Key] = kvp.Value;
+                }
+            }
         }
 
-        return product.Specifications ?? new Dictionary<string, object>();
+        return result;
     }
 }

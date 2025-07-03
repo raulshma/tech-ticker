@@ -226,65 +226,79 @@ export class ProductDetailComponent implements OnInit {
   }
 
   getSpecificationEntries(): [string, any][] {
+    // First try normalized specifications
     if (this.product?.normalizedSpecifications && Object.keys(this.product.normalizedSpecifications).length > 0) {
       return Object.entries(this.product.normalizedSpecifications).map(([k, v]: any) => [k, (v && v.value !== undefined) ? v.value : v]);
     }
-    if (!this.product?.specifications) return [];
-    return Object.entries(this.product.specifications);
+
+    // Then try uncategorized specifications
+    if (this.product?.uncategorizedSpecifications && Object.keys(this.product.uncategorizedSpecifications).length > 0) {
+      return Object.entries(this.product.uncategorizedSpecifications);
+    }
+
+    return [];
   }
 
   hasSpecifications(): boolean {
-    if (this.product?.normalizedSpecifications && Object.keys(this.product.normalizedSpecifications).length > 0) {
-      return true;
-    }
-    return this.getSpecificationEntries().length > 0;
+    const normalizedCount = this.product?.normalizedSpecifications ? Object.keys(this.product.normalizedSpecifications).length : 0;
+    const uncategorizedCount = this.product?.uncategorizedSpecifications ? Object.keys(this.product.uncategorizedSpecifications).length : 0;
+    return normalizedCount > 0 || uncategorizedCount > 0;
   }
 
   hasEnhancedSpecifications(): boolean {
-    // Check if specifications are in the enhanced format from scraping
-    if (!this.product?.specifications) return false;
-
-    // Enhanced specifications should have structured metadata
-    return !!(this.product.specifications['_metadata'] ||
-              this.product.specifications['_quality'] ||
-              this.product.specifications['_typed'] ||
-              this.product.specifications['_categorized']);
+    // Check if we have normalized specifications (these are considered "enhanced")
+    return !!(this.product?.normalizedSpecifications && Object.keys(this.product.normalizedSpecifications).length > 0);
   }
 
   getEnhancedSpecifications(): any {
     if (!this.hasEnhancedSpecifications()) return null;
 
-    // Convert the enhanced specification format to what ProductSpecificationsComponent expects
-    const specs = this.product?.specifications;
-    if (!specs) return null;
+    const normalizedSpecs = this.product?.normalizedSpecifications;
+    if (!normalizedSpecs) return null;
 
-    // If it's already in the right format, return it
-    if (specs['isSuccess'] !== undefined) {
-      return specs;
-    }
-
-    // Otherwise, construct the format
-    const metadata = specs['_metadata'] || {};
-    const quality = specs['_quality'] || { overallScore: 0.8 };
-    const typed = specs['_typed'] || {};
-    const categorized = specs['_categorized'] || {};
-
-    // Filter out metadata keys to get actual specifications
+    // Convert normalized specifications to the format expected by ProductSpecificationsComponent
     const actualSpecs: { [key: string]: any } = {};
-    Object.keys(specs).forEach(key => {
-      if (!key.startsWith('_')) {
-        actualSpecs[key] = specs[key];
+    const typedSpecs: { [key: string]: any } = {};
+    const categorizedSpecs: { [key: string]: any } = {};
+
+    Object.entries(normalizedSpecs).forEach(([key, value]: [string, any]) => {
+      if (value && typeof value === 'object' && value.value !== undefined) {
+        actualSpecs[key] = value.value;
+        typedSpecs[key] = {
+          value: value.value,
+          type: value.dataType || 'string',
+          unit: value.unit,
+          confidence: value.confidence || 1.0
+        };
+        // Group by category if available
+        const category = value.category || 'General';
+        if (!categorizedSpecs[category]) {
+          categorizedSpecs[category] = {};
+        }
+        categorizedSpecs[category][key] = value.value;
+      } else {
+        actualSpecs[key] = value;
+        typedSpecs[key] = { value: value, type: 'string' };
+        categorizedSpecs['General'] = categorizedSpecs['General'] || {};
+        categorizedSpecs['General'][key] = value;
       }
     });
 
     return {
       isSuccess: true,
       specifications: actualSpecs,
-      typedSpecifications: typed,
-      categorizedSpecs: categorized,
-      metadata: metadata,
-      quality: quality,
-      parsingTimeMs: metadata.processingTimeMs || 0
+      typedSpecifications: typedSpecs,
+      categorizedSpecs: categorizedSpecs,
+      metadata: {
+        totalSpecifications: Object.keys(actualSpecs).length,
+        processingTimeMs: 0
+      },
+      quality: {
+        overallScore: 0.9,
+        completeness: 1.0,
+        accuracy: 0.9
+      },
+      parsingTimeMs: 0
     };
   }
 

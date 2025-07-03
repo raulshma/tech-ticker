@@ -521,11 +521,11 @@ public class RecommendationGenerationServiceTests
             Name = name,
             CategoryId = Guid.NewGuid(),
             Description = $"Test description for {name}",
-            Specifications = new Dictionary<string, object>
+            UncategorizedSpecifications = new Dictionary<string, string>
             {
                 { "Brand", "Test Brand" },
                 { "Model", "Test Model" },
-                { "Performance_Score", 85 }
+                { "Performance_Score", "85" }
             },
             IsActive = true,
             CreatedAt = DateTimeOffset.UtcNow,

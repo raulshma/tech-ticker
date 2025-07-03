@@ -110,7 +110,8 @@ public class MappingServiceTests
             CategoryId = category.CategoryId,
             Category = category,
             Description = "Latest iPhone",
-            Specifications = """{"storage": "256GB", "color": "Black"}""",
+            NormalizedSpecifications = """{"storage": {"value": "256GB", "type": 1, "confidence": 0.95}, "color": {"value": "Black", "type": 0, "confidence": 0.95}}""",
+            UncategorizedSpecifications = """{"screen_size": "6.1 inches"}""",
             IsActive = true,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
@@ -144,12 +145,7 @@ public class MappingServiceTests
             ModelNumber = "M3",
             SKU = "APL-MBP-M3",
             CategoryId = Guid.NewGuid(),
-            Description = "Professional laptop",
-            Specifications = new Dictionary<string, object>
-            {
-                { "cpu", "M3" },
-                { "ram", "16GB" }
-            }
+            Description = "Professional laptop"
         };
 
         // Act

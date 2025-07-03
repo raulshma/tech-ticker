@@ -589,7 +589,7 @@ public class SpecificationAnalysisEngineTests
             Name = name,
             CategoryId = Guid.NewGuid(),
             Description = $"Test description for {name}",
-            Specifications = specifications ?? new Dictionary<string, object>(),
+            UncategorizedSpecifications = specifications?.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString() ?? string.Empty) ?? new Dictionary<string, string>(),
             IsActive = true,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow,

@@ -41,11 +41,6 @@ public class Product
     /// </summary>
     public string? UncategorizedSpecifications { get; set; }
 
-    /// <summary>
-    /// JSON string containing product specifications (stored as JSONB in PostgreSQL)
-    /// </summary>
-    public string? Specifications { get; set; }
-
     public bool IsActive { get; set; } = true;
 
     /// <summary>
@@ -81,16 +76,6 @@ public class Product
 
     public ICollection<ProductSellerMapping> ProductSellerMappings { get; set; } = new List<ProductSellerMapping>();
     public ICollection<AlertRule> AlertRules { get; set; } = new List<AlertRule>();
-
-    // Helper property for working with specifications as JSON
-    [NotMapped]
-    public Dictionary<string, object>? SpecificationsDict
-    {
-        get => string.IsNullOrEmpty(Specifications)
-            ? null
-            : JsonSerializer.Deserialize<Dictionary<string, object>>(Specifications);
-        set => Specifications = value == null ? null : JsonSerializer.Serialize(value);
-    }
 
     // Helper properties for working with image URLs as JSON arrays
     [NotMapped]

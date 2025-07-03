@@ -15921,7 +15921,6 @@ export class CreateProductDto implements ICreateProductDto {
     sku?: string | undefined;
     categoryId!: string;
     description?: string | undefined;
-    specifications?: { [key: string]: any; } | undefined;
     primaryImageUrl?: string | undefined;
     additionalImageUrls?: string[] | undefined;
 
@@ -15942,13 +15941,6 @@ export class CreateProductDto implements ICreateProductDto {
             this.sku = _data["sku"];
             this.categoryId = _data["categoryId"];
             this.description = _data["description"];
-            if (_data["specifications"]) {
-                this.specifications = {} as any;
-                for (let key in _data["specifications"]) {
-                    if (_data["specifications"].hasOwnProperty(key))
-                        (<any>this.specifications)![key] = _data["specifications"][key];
-                }
-            }
             this.primaryImageUrl = _data["primaryImageUrl"];
             if (Array.isArray(_data["additionalImageUrls"])) {
                 this.additionalImageUrls = [] as any;
@@ -15973,13 +15965,6 @@ export class CreateProductDto implements ICreateProductDto {
         data["sku"] = this.sku;
         data["categoryId"] = this.categoryId;
         data["description"] = this.description;
-        if (this.specifications) {
-            data["specifications"] = {};
-            for (let key in this.specifications) {
-                if (this.specifications.hasOwnProperty(key))
-                    (<any>data["specifications"])[key] = (<any>this.specifications)[key];
-            }
-        }
         data["primaryImageUrl"] = this.primaryImageUrl;
         if (Array.isArray(this.additionalImageUrls)) {
             data["additionalImageUrls"] = [];
@@ -15997,7 +15982,6 @@ export interface ICreateProductDto {
     sku?: string | undefined;
     categoryId: string;
     description?: string | undefined;
-    specifications?: { [key: string]: any; } | undefined;
     primaryImageUrl?: string | undefined;
     additionalImageUrls?: string[] | undefined;
 }
@@ -19111,7 +19095,6 @@ export class ProductDto implements IProductDto {
     sku?: string | undefined;
     categoryId?: string;
     description?: string | undefined;
-    specifications?: { [key: string]: any; } | undefined;
     normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
     uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean;
@@ -19141,13 +19124,6 @@ export class ProductDto implements IProductDto {
             this.sku = _data["sku"];
             this.categoryId = _data["categoryId"];
             this.description = _data["description"];
-            if (_data["specifications"]) {
-                this.specifications = {} as any;
-                for (let key in _data["specifications"]) {
-                    if (_data["specifications"].hasOwnProperty(key))
-                        (<any>this.specifications)![key] = _data["specifications"][key];
-                }
-            }
             if (_data["normalizedSpecifications"]) {
                 this.normalizedSpecifications = {} as any;
                 for (let key in _data["normalizedSpecifications"]) {
@@ -19197,13 +19173,6 @@ export class ProductDto implements IProductDto {
         data["sku"] = this.sku;
         data["categoryId"] = this.categoryId;
         data["description"] = this.description;
-        if (this.specifications) {
-            data["specifications"] = {};
-            for (let key in this.specifications) {
-                if (this.specifications.hasOwnProperty(key))
-                    (<any>data["specifications"])[key] = (<any>this.specifications)[key];
-            }
-        }
         if (this.normalizedSpecifications) {
             data["normalizedSpecifications"] = {};
             for (let key in this.normalizedSpecifications) {
@@ -19246,7 +19215,6 @@ export interface IProductDto {
     sku?: string | undefined;
     categoryId?: string;
     description?: string | undefined;
-    specifications?: { [key: string]: any; } | undefined;
     normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
     uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean;
@@ -19803,7 +19771,6 @@ export class ProductWithCurrentPricesDto implements IProductWithCurrentPricesDto
     sku?: string | undefined;
     categoryId?: string;
     description?: string | undefined;
-    specifications?: { [key: string]: any; } | undefined;
     normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
     uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean;
@@ -19837,13 +19804,6 @@ export class ProductWithCurrentPricesDto implements IProductWithCurrentPricesDto
             this.sku = _data["sku"];
             this.categoryId = _data["categoryId"];
             this.description = _data["description"];
-            if (_data["specifications"]) {
-                this.specifications = {} as any;
-                for (let key in _data["specifications"]) {
-                    if (_data["specifications"].hasOwnProperty(key))
-                        (<any>this.specifications)![key] = _data["specifications"][key];
-                }
-            }
             if (_data["normalizedSpecifications"]) {
                 this.normalizedSpecifications = {} as any;
                 for (let key in _data["normalizedSpecifications"]) {
@@ -19901,13 +19861,6 @@ export class ProductWithCurrentPricesDto implements IProductWithCurrentPricesDto
         data["sku"] = this.sku;
         data["categoryId"] = this.categoryId;
         data["description"] = this.description;
-        if (this.specifications) {
-            data["specifications"] = {};
-            for (let key in this.specifications) {
-                if (this.specifications.hasOwnProperty(key))
-                    (<any>data["specifications"])[key] = (<any>this.specifications)[key];
-            }
-        }
         if (this.normalizedSpecifications) {
             data["normalizedSpecifications"] = {};
             for (let key in this.normalizedSpecifications) {
@@ -19958,7 +19911,6 @@ export interface IProductWithCurrentPricesDto {
     sku?: string | undefined;
     categoryId?: string;
     description?: string | undefined;
-    specifications?: { [key: string]: any; } | undefined;
     normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
     uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean;
@@ -26456,7 +26408,6 @@ export class UpdateProductDto implements IUpdateProductDto {
     sku?: string | undefined;
     categoryId?: string | undefined;
     description?: string | undefined;
-    specifications?: { [key: string]: any; } | undefined;
     normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
     uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean | undefined;
@@ -26480,13 +26431,6 @@ export class UpdateProductDto implements IUpdateProductDto {
             this.sku = _data["sku"];
             this.categoryId = _data["categoryId"];
             this.description = _data["description"];
-            if (_data["specifications"]) {
-                this.specifications = {} as any;
-                for (let key in _data["specifications"]) {
-                    if (_data["specifications"].hasOwnProperty(key))
-                        (<any>this.specifications)![key] = _data["specifications"][key];
-                }
-            }
             if (_data["normalizedSpecifications"]) {
                 this.normalizedSpecifications = {} as any;
                 for (let key in _data["normalizedSpecifications"]) {
@@ -26526,13 +26470,6 @@ export class UpdateProductDto implements IUpdateProductDto {
         data["sku"] = this.sku;
         data["categoryId"] = this.categoryId;
         data["description"] = this.description;
-        if (this.specifications) {
-            data["specifications"] = {};
-            for (let key in this.specifications) {
-                if (this.specifications.hasOwnProperty(key))
-                    (<any>data["specifications"])[key] = (<any>this.specifications)[key];
-            }
-        }
         if (this.normalizedSpecifications) {
             data["normalizedSpecifications"] = {};
             for (let key in this.normalizedSpecifications) {
@@ -26565,7 +26502,6 @@ export interface IUpdateProductDto {
     sku?: string | undefined;
     categoryId?: string | undefined;
     description?: string | undefined;
-    specifications?: { [key: string]: any; } | undefined;
     normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
     uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean | undefined;

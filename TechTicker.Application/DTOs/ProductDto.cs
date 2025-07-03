@@ -15,7 +15,6 @@ public class ProductDto
     public string? SKU { get; set; }
     public Guid CategoryId { get; set; }
     public string? Description { get; set; }
-    public Dictionary<string, object>? Specifications { get; set; }
     public Dictionary<string, NormalizedSpecificationValue>? NormalizedSpecifications { get; set; }
     public Dictionary<string, string>? UncategorizedSpecifications { get; set; }
     public bool IsActive { get; set; }
@@ -55,8 +54,6 @@ public class CreateProductDto
 
     public string? Description { get; set; }
 
-    public Dictionary<string, object>? Specifications { get; set; }
-
     // Image properties (optional for creation)
     public string? PrimaryImageUrl { get; set; }
     public List<string>? AdditionalImageUrls { get; set; }
@@ -82,8 +79,6 @@ public class UpdateProductDto
     public Guid? CategoryId { get; set; }
 
     public string? Description { get; set; }
-
-    public Dictionary<string, object>? Specifications { get; set; }
 
     public Dictionary<string, NormalizedSpecificationValue>? NormalizedSpecifications { get; set; }
 

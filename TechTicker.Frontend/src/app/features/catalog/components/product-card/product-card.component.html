@@ -67,7 +67,7 @@
 
       <!-- List View Additional Info -->
       <div class="list-additional-info" *ngIf="viewMode === 'list'">
-        <div class="specifications" *ngIf="product.specifications">
+        <div class="specifications" *ngIf="getKeySpecs().length > 0">
           <span class="spec-label">Key Features:</span>
           <div class="spec-items">
             <span *ngFor="let spec of getKeySpecs()" class="spec-item">{{ spec }}</span>

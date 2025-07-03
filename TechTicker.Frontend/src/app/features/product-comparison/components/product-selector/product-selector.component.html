@@ -119,11 +119,11 @@
             </div>
           </div>
 
-          <div class="product-specs" *ngIf="selectedProduct.specifications">
+          <div class="product-specs" *ngIf="hasSpecifications(selectedProduct)">
             <h4>Key Specifications</h4>
             <div class="specs-grid">
               <div
-                *ngFor="let spec of getKeySpecs(selectedProduct.specifications)"
+                *ngFor="let spec of getKeySpecs(selectedProduct)"
                 class="spec-item">
                 <span class="spec-label">{{ spec.key }}:</span>
                 <span class="spec-value">{{ spec.value }}</span>

@@ -91,26 +91,44 @@ export class ProductSelectorComponent implements OnInit, OnDestroy {
     this.productSelected.emit({} as ProductDto); // Emit empty product to clear selection
   }
 
-  getKeySpecs(specifications: { [key: string]: any } | undefined): { key: string, value: string }[] {
-    if (!specifications) return [];
+  getKeySpecs(product: ProductDto): { key: string, value: string }[] {
+    if (!product) return [];
 
-    // Get the first 3-4 most important specifications for display
-    const importantKeys = ['CPU', 'GPU', 'RAM', 'Storage', 'Display', 'Screen Size', 'Resolution', 'Price'];
     const specs: { key: string, value: string }[] = [];
 
-    for (const key of importantKeys) {
-      if (specifications[key] && specs.length < 4) {
-        specs.push({
-          key: key,
-          value: String(specifications[key])
-        });
+    // First try normalized specifications
+    if (product.normalizedSpecifications && Object.keys(product.normalizedSpecifications).length > 0) {
+      const importantKeys = ['CPU', 'GPU', 'RAM', 'Storage', 'Display', 'Screen Size', 'Resolution', 'Processor'];
+
+      for (const key of importantKeys) {
+        if (product.normalizedSpecifications[key] && specs.length < 4) {
+          const spec = product.normalizedSpecifications[key];
+          const value = (spec && typeof spec === 'object' && spec.value !== undefined) ? spec.value : spec;
+          specs.push({
+            key: key,
+            value: String(value)
+          });
+        }
+      }
+
+      // If we don't have enough important specs, add any other normalized specs
+      if (specs.length < 4) {
+        for (const [key, value] of Object.entries(product.normalizedSpecifications)) {
+          if (!importantKeys.includes(key) && specs.length < 4) {
+            const displayValue = (value && typeof value === 'object' && value.value !== undefined) ? value.value : value;
+            specs.push({
+              key: key,
+              value: String(displayValue)
+            });
+          }
+        }
       }
     }
 
-    // If we don't have enough important specs, add any other specs
-    if (specs.length < 4) {
-      for (const [key, value] of Object.entries(specifications)) {
-        if (!importantKeys.includes(key) && specs.length < 4) {
+    // If still not enough specs, try uncategorized specifications
+    if (specs.length < 4 && product.uncategorizedSpecifications && Object.keys(product.uncategorizedSpecifications).length > 0) {
+      for (const [key, value] of Object.entries(product.uncategorizedSpecifications)) {
+        if (specs.length < 4) {
           specs.push({
             key: key,
             value: String(value)
@@ -120,5 +138,14 @@ export class ProductSelectorComponent implements OnInit, OnDestroy {
     }
 
     return specs;
+  }
+
+  hasSpecifications(product: ProductDto | null): boolean {
+    if (!product) return false;
+
+    const normalizedCount = product.normalizedSpecifications ? Object.keys(product.normalizedSpecifications).length : 0;
+    const uncategorizedCount = product.uncategorizedSpecifications ? Object.keys(product.uncategorizedSpecifications).length : 0;
+
+    return normalizedCount > 0 || uncategorizedCount > 0;
   }
 }

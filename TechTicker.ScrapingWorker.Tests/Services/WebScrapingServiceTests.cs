@@ -69,6 +69,7 @@ public class WebScrapingServiceTests : IDisposable
         var mockTableParser = new Mock<ITableParser>();
         var mockMemoryCache = new Mock<IMemoryCache>();
         var mockUnitOfWork = new Mock<IUnitOfWork>();
+        var mockSpecNormalizer = new Mock<ISpecificationNormalizer>();
         
         _webScrapingService = new WebScrapingService(
             _mockLogger.Object, 
@@ -77,7 +78,8 @@ public class WebScrapingServiceTests : IDisposable
             mockImageScrapingService.Object,
             mockTableParser.Object,
             mockMemoryCache.Object,
-            mockUnitOfWork.Object);
+            mockUnitOfWork.Object,
+            mockSpecNormalizer.Object);
     }
 
     [Fact]

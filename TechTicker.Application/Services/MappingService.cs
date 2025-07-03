@@ -60,7 +60,8 @@ public class MappingService : IMappingService
             SKU = product.SKU,
             CategoryId = product.CategoryId,
             Description = product.Description,
-            Specifications = product.SpecificationsDict,
+            NormalizedSpecifications = product.NormalizedSpecificationsDict,
+            UncategorizedSpecifications = product.UncategorizedSpecificationsDict,
             IsActive = product.IsActive,
             CreatedAt = product.CreatedAt,
             UpdatedAt = product.UpdatedAt,
@@ -83,7 +84,7 @@ public class MappingService : IMappingService
             SKU = createDto.SKU,
             CategoryId = createDto.CategoryId,
             Description = createDto.Description,
-            SpecificationsDict = createDto.Specifications,
+            // Legacy specifications property removed - use normalized/uncategorized instead
             IsActive = true,
             PrimaryImageUrl = createDto.PrimaryImageUrl,
             AdditionalImageUrlsList = createDto.AdditionalImageUrls
@@ -110,8 +111,11 @@ public class MappingService : IMappingService
         if (updateDto.Description != null)
             product.Description = updateDto.Description;
 
-        if (updateDto.Specifications != null)
-            product.SpecificationsDict = updateDto.Specifications;
+        if (updateDto.NormalizedSpecifications != null)
+            product.NormalizedSpecificationsDict = updateDto.NormalizedSpecifications;
+
+        if (updateDto.UncategorizedSpecifications != null)
+            product.UncategorizedSpecificationsDict = updateDto.UncategorizedSpecifications;
 
         if (updateDto.IsActive.HasValue)
             product.IsActive = updateDto.IsActive.Value;

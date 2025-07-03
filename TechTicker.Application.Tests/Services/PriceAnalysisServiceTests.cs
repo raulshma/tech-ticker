@@ -428,7 +428,7 @@ public class PriceAnalysisServiceTests
             Name = name,
             CategoryId = Guid.NewGuid(),
             Description = $"Test description for {name}",
-            Specifications = new Dictionary<string, object>
+            UncategorizedSpecifications = new Dictionary<string, string>
             {
                 { "Brand", "Test Brand" },
                 { "Model", "Test Model" }
