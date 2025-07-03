@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using TechTicker.Domain.Entities.Canonical;
 
 namespace TechTicker.Application.DTOs;
 
@@ -15,6 +16,8 @@ public class ProductDto
     public Guid CategoryId { get; set; }
     public string? Description { get; set; }
     public Dictionary<string, object>? Specifications { get; set; }
+    public Dictionary<string, NormalizedSpecificationValue>? NormalizedSpecifications { get; set; }
+    public Dictionary<string, string>? UncategorizedSpecifications { get; set; }
     public bool IsActive { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
@@ -81,6 +84,10 @@ public class UpdateProductDto
     public string? Description { get; set; }
 
     public Dictionary<string, object>? Specifications { get; set; }
+
+    public Dictionary<string, NormalizedSpecificationValue>? NormalizedSpecifications { get; set; }
+
+    public Dictionary<string, string>? UncategorizedSpecifications { get; set; }
 
     public bool? IsActive { get; set; }
 

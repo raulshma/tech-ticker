@@ -50,8 +50,8 @@ public class SpecificationAnalysisEngine : ISpecificationAnalysisEngine
             _logger.LogInformation("Analyzing specifications for products {Product1} and {Product2}", 
                 product1.ProductId, product2.ProductId);
 
-            var spec1 = product1.Specifications ?? new Dictionary<string, object>();
-            var spec2 = product2.Specifications ?? new Dictionary<string, object>();
+            var spec1 = BuildSpecificationDictionary(product1);
+            var spec2 = BuildSpecificationDictionary(product2);
             
             // If product specifications are empty, try to get them from ProductSellerMapping
             if (spec1.Count == 0)
@@ -613,5 +613,19 @@ public class SpecificationAnalysisEngine : ISpecificationAnalysisEngine
             _logger.LogWarning(ex, "Error getting specifications from ProductSellerMapping for product {ProductId}", productId);
             return null;
         }
+    }
+
+    private static Dictionary<string, object> BuildSpecificationDictionary(ProductDto product)
+    {
+        if (product.NormalizedSpecifications != null && product.NormalizedSpecifications.Count > 0)
+        {
+            // Use canonical names & parsed values
+            return product.NormalizedSpecifications.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Value ?? (object?)kvp.Value,
+                StringComparer.OrdinalIgnoreCase);
+        }
+
+        return product.Specifications ?? new Dictionary<string, object>();
     }
 }

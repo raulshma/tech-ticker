@@ -28,6 +28,7 @@ public partial class WebScrapingService
     private readonly ITableParser _tableParser;
     private readonly IMemoryCache _cache;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ISpecificationNormalizer _specNormalizer;
 
     [GeneratedRegex(@"[\d,]+\.?\d*")]
     private static partial Regex PriceRegex();
@@ -39,7 +40,8 @@ public partial class WebScrapingService
         IImageScrapingService imageScrapingService,
         ITableParser tableParser,
         IMemoryCache cache,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ISpecificationNormalizer specNormalizer)
     {
         _logger = logger;
         _proxyHttpClient = proxyHttpClient;
@@ -48,6 +50,7 @@ public partial class WebScrapingService
         _tableParser = tableParser;
         _cache = cache;
         _unitOfWork = unitOfWork;
+        _specNormalizer = specNormalizer;
     }
 
     public async Task<ScrapingResult> ScrapeProductPageAsync(TechTicker.Application.Messages.ScrapeProductPageCommand command)
@@ -224,6 +227,35 @@ public partial class WebScrapingService
                         {
                             await UpdateRunLogWithSpecifications(runId.Value, specificationResult);
                         }
+                    }
+
+                    // Normalize specifications using canonical templates
+                    Dictionary<string, Domain.Entities.Canonical.NormalizedSpecificationValue> normalized = new();
+                    Dictionary<string, string> uncategorized = new();
+                    try
+                    {
+                        // Determine product category via mapping
+                        string categoryName = string.Empty;
+                        var mapping = await _unitOfWork.ProductSellerMappings.GetByIdAsync(command.MappingId);
+                        if (mapping != null && mapping.CanonicalProductId != Guid.Empty)
+                        {
+                            var product = await _unitOfWork.Products.GetByIdAsync(mapping.CanonicalProductId);
+                            if (product?.Category != null)
+                            {
+                                categoryName = product.Category.Name;
+                            }
+                        }
+
+                        var rawStringSpecs = specificationResult.Specifications.ToDictionary(
+                            kvp => kvp.Key,
+                            kvp => kvp.Value?.ToString() ?? string.Empty,
+                            StringComparer.OrdinalIgnoreCase);
+
+                        (normalized, uncategorized) = _specNormalizer.Normalize(rawStringSpecs, categoryName);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Specification normalization failed; continuing without normalized data");
                     }
                 }
                 catch (Exception ex)
@@ -627,6 +659,35 @@ public partial class WebScrapingService
             _logger.LogInformation("Successfully parsed {SpecCount} specifications for mapping {MappingId}", 
                 mergedSpec.Specifications.Count, mappingId);
 
+            // Normalize specifications using canonical templates
+            Dictionary<string, Domain.Entities.Canonical.NormalizedSpecificationValue> normalized = new();
+            Dictionary<string, string> uncategorized = new();
+            try
+            {
+                // Determine product category via mapping
+                string categoryName = string.Empty;
+                var mapping = await _unitOfWork.ProductSellerMappings.GetByIdAsync(mappingId);
+                if (mapping != null && mapping.CanonicalProductId != Guid.Empty)
+                {
+                    var product = await _unitOfWork.Products.GetByIdAsync(mapping.CanonicalProductId);
+                    if (product?.Category != null)
+                    {
+                        categoryName = product.Category.Name;
+                    }
+                }
+
+                var rawStringSpecs = mergedSpec.Specifications.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value?.ToString() ?? string.Empty,
+                    StringComparer.OrdinalIgnoreCase);
+
+                (normalized, uncategorized) = _specNormalizer.Normalize(rawStringSpecs, categoryName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Specification normalization failed; continuing without normalized data");
+            }
+
             return new ProductSpecificationResult
             {
                 IsSuccess = true,
@@ -635,7 +696,9 @@ public partial class WebScrapingService
                 CategorizedSpecs = mergedSpec.CategorizedSpecs,
                 Metadata = mergedSpec.Metadata,
                 Quality = mergedSpec.Quality,
-                ParsingTimeMs = mergedSpec.Metadata.ProcessingTimeMs
+                ParsingTimeMs = mergedSpec.Metadata.ProcessingTimeMs,
+                NormalizedSpecifications = normalized,
+                UncategorizedSpecifications = uncategorized
             };
         }
         catch (Exception ex)

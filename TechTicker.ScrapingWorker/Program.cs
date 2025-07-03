@@ -70,6 +70,9 @@ builder.Services.AddScoped<PriceDataProcessingService>();
 // Register specification parsing services
 builder.Services.AddSingleton<ITableParser, UniversalTableParser>();
 
+// Register specification normalizer
+builder.Services.AddSingleton<ISpecificationNormalizer, SpecificationNormalizer>();
+
 // Add the worker
 builder.Services.AddHostedService<Worker>();
 

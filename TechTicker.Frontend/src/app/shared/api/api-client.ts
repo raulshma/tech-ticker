@@ -17383,6 +17383,62 @@ export interface INetworkRequestDto {
     timestamp?: Date;
 }
 
+export class NormalizedSpecificationValue implements INormalizedSpecificationValue {
+    value?: any | undefined;
+    unit?: string | undefined;
+    dataType?: SpecificationType;
+    rawValue?: string | undefined;
+    canonicalName?: string | undefined;
+    confidence?: number;
+
+    constructor(data?: INormalizedSpecificationValue) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.value = _data["value"];
+            this.unit = _data["unit"];
+            this.dataType = _data["dataType"];
+            this.rawValue = _data["rawValue"];
+            this.canonicalName = _data["canonicalName"];
+            this.confidence = _data["confidence"];
+        }
+    }
+
+    static fromJS(data: any): NormalizedSpecificationValue {
+        data = typeof data === 'object' ? data : {};
+        let result = new NormalizedSpecificationValue();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["value"] = this.value;
+        data["unit"] = this.unit;
+        data["dataType"] = this.dataType;
+        data["rawValue"] = this.rawValue;
+        data["canonicalName"] = this.canonicalName;
+        data["confidence"] = this.confidence;
+        return data;
+    }
+}
+
+export interface INormalizedSpecificationValue {
+    value?: any | undefined;
+    unit?: string | undefined;
+    dataType?: SpecificationType;
+    rawValue?: string | undefined;
+    canonicalName?: string | undefined;
+    confidence?: number;
+}
+
 export class NotificationChannelStatsDto implements INotificationChannelStatsDto {
     channelName?: string | undefined;
     totalNotifications?: number;
@@ -19056,6 +19112,8 @@ export class ProductDto implements IProductDto {
     categoryId?: string;
     description?: string | undefined;
     specifications?: { [key: string]: any; } | undefined;
+    normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
+    uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -19088,6 +19146,20 @@ export class ProductDto implements IProductDto {
                 for (let key in _data["specifications"]) {
                     if (_data["specifications"].hasOwnProperty(key))
                         (<any>this.specifications)![key] = _data["specifications"][key];
+                }
+            }
+            if (_data["normalizedSpecifications"]) {
+                this.normalizedSpecifications = {} as any;
+                for (let key in _data["normalizedSpecifications"]) {
+                    if (_data["normalizedSpecifications"].hasOwnProperty(key))
+                        (<any>this.normalizedSpecifications)![key] = _data["normalizedSpecifications"][key] ? NormalizedSpecificationValue.fromJS(_data["normalizedSpecifications"][key]) : new NormalizedSpecificationValue();
+                }
+            }
+            if (_data["uncategorizedSpecifications"]) {
+                this.uncategorizedSpecifications = {} as any;
+                for (let key in _data["uncategorizedSpecifications"]) {
+                    if (_data["uncategorizedSpecifications"].hasOwnProperty(key))
+                        (<any>this.uncategorizedSpecifications)![key] = _data["uncategorizedSpecifications"][key];
                 }
             }
             this.isActive = _data["isActive"];
@@ -19132,6 +19204,20 @@ export class ProductDto implements IProductDto {
                     (<any>data["specifications"])[key] = (<any>this.specifications)[key];
             }
         }
+        if (this.normalizedSpecifications) {
+            data["normalizedSpecifications"] = {};
+            for (let key in this.normalizedSpecifications) {
+                if (this.normalizedSpecifications.hasOwnProperty(key))
+                    (<any>data["normalizedSpecifications"])[key] = this.normalizedSpecifications[key] ? this.normalizedSpecifications[key].toJSON() : <any>undefined;
+            }
+        }
+        if (this.uncategorizedSpecifications) {
+            data["uncategorizedSpecifications"] = {};
+            for (let key in this.uncategorizedSpecifications) {
+                if (this.uncategorizedSpecifications.hasOwnProperty(key))
+                    (<any>data["uncategorizedSpecifications"])[key] = (<any>this.uncategorizedSpecifications)[key];
+            }
+        }
         data["isActive"] = this.isActive;
         data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
         data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
@@ -19161,6 +19247,8 @@ export interface IProductDto {
     categoryId?: string;
     description?: string | undefined;
     specifications?: { [key: string]: any; } | undefined;
+    normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
+    uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -19716,6 +19804,8 @@ export class ProductWithCurrentPricesDto implements IProductWithCurrentPricesDto
     categoryId?: string;
     description?: string | undefined;
     specifications?: { [key: string]: any; } | undefined;
+    normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
+    uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -19752,6 +19842,20 @@ export class ProductWithCurrentPricesDto implements IProductWithCurrentPricesDto
                 for (let key in _data["specifications"]) {
                     if (_data["specifications"].hasOwnProperty(key))
                         (<any>this.specifications)![key] = _data["specifications"][key];
+                }
+            }
+            if (_data["normalizedSpecifications"]) {
+                this.normalizedSpecifications = {} as any;
+                for (let key in _data["normalizedSpecifications"]) {
+                    if (_data["normalizedSpecifications"].hasOwnProperty(key))
+                        (<any>this.normalizedSpecifications)![key] = _data["normalizedSpecifications"][key] ? NormalizedSpecificationValue.fromJS(_data["normalizedSpecifications"][key]) : new NormalizedSpecificationValue();
+                }
+            }
+            if (_data["uncategorizedSpecifications"]) {
+                this.uncategorizedSpecifications = {} as any;
+                for (let key in _data["uncategorizedSpecifications"]) {
+                    if (_data["uncategorizedSpecifications"].hasOwnProperty(key))
+                        (<any>this.uncategorizedSpecifications)![key] = _data["uncategorizedSpecifications"][key];
                 }
             }
             this.isActive = _data["isActive"];
@@ -19804,6 +19908,20 @@ export class ProductWithCurrentPricesDto implements IProductWithCurrentPricesDto
                     (<any>data["specifications"])[key] = (<any>this.specifications)[key];
             }
         }
+        if (this.normalizedSpecifications) {
+            data["normalizedSpecifications"] = {};
+            for (let key in this.normalizedSpecifications) {
+                if (this.normalizedSpecifications.hasOwnProperty(key))
+                    (<any>data["normalizedSpecifications"])[key] = this.normalizedSpecifications[key] ? this.normalizedSpecifications[key].toJSON() : <any>undefined;
+            }
+        }
+        if (this.uncategorizedSpecifications) {
+            data["uncategorizedSpecifications"] = {};
+            for (let key in this.uncategorizedSpecifications) {
+                if (this.uncategorizedSpecifications.hasOwnProperty(key))
+                    (<any>data["uncategorizedSpecifications"])[key] = (<any>this.uncategorizedSpecifications)[key];
+            }
+        }
         data["isActive"] = this.isActive;
         data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
         data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
@@ -19841,6 +19959,8 @@ export interface IProductWithCurrentPricesDto {
     categoryId?: string;
     description?: string | undefined;
     specifications?: { [key: string]: any; } | undefined;
+    normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
+    uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -24183,6 +24303,32 @@ export interface ISpecificationParsingOptions {
     preferredVendor?: string | undefined;
 }
 
+export enum SpecificationType {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _5 = 5,
+    _6 = 6,
+    _7 = 7,
+    _8 = 8,
+    _9 = 9,
+    _10 = 10,
+    _11 = 11,
+    _12 = 12,
+    _13 = 13,
+    _14 = 14,
+    _15 = 15,
+    _16 = 16,
+    _17 = 17,
+    _18 = 18,
+    _19 = 19,
+    _20 = 20,
+    _21 = 21,
+    _22 = 22,
+}
+
 export class StringApiResponse implements IStringApiResponse {
     success?: boolean;
     data?: string | undefined;
@@ -26311,6 +26457,8 @@ export class UpdateProductDto implements IUpdateProductDto {
     categoryId?: string | undefined;
     description?: string | undefined;
     specifications?: { [key: string]: any; } | undefined;
+    normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
+    uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean | undefined;
     primaryImageUrl?: string | undefined;
     additionalImageUrls?: string[] | undefined;
@@ -26337,6 +26485,20 @@ export class UpdateProductDto implements IUpdateProductDto {
                 for (let key in _data["specifications"]) {
                     if (_data["specifications"].hasOwnProperty(key))
                         (<any>this.specifications)![key] = _data["specifications"][key];
+                }
+            }
+            if (_data["normalizedSpecifications"]) {
+                this.normalizedSpecifications = {} as any;
+                for (let key in _data["normalizedSpecifications"]) {
+                    if (_data["normalizedSpecifications"].hasOwnProperty(key))
+                        (<any>this.normalizedSpecifications)![key] = _data["normalizedSpecifications"][key] ? NormalizedSpecificationValue.fromJS(_data["normalizedSpecifications"][key]) : new NormalizedSpecificationValue();
+                }
+            }
+            if (_data["uncategorizedSpecifications"]) {
+                this.uncategorizedSpecifications = {} as any;
+                for (let key in _data["uncategorizedSpecifications"]) {
+                    if (_data["uncategorizedSpecifications"].hasOwnProperty(key))
+                        (<any>this.uncategorizedSpecifications)![key] = _data["uncategorizedSpecifications"][key];
                 }
             }
             this.isActive = _data["isActive"];
@@ -26371,6 +26533,20 @@ export class UpdateProductDto implements IUpdateProductDto {
                     (<any>data["specifications"])[key] = (<any>this.specifications)[key];
             }
         }
+        if (this.normalizedSpecifications) {
+            data["normalizedSpecifications"] = {};
+            for (let key in this.normalizedSpecifications) {
+                if (this.normalizedSpecifications.hasOwnProperty(key))
+                    (<any>data["normalizedSpecifications"])[key] = this.normalizedSpecifications[key] ? this.normalizedSpecifications[key].toJSON() : <any>undefined;
+            }
+        }
+        if (this.uncategorizedSpecifications) {
+            data["uncategorizedSpecifications"] = {};
+            for (let key in this.uncategorizedSpecifications) {
+                if (this.uncategorizedSpecifications.hasOwnProperty(key))
+                    (<any>data["uncategorizedSpecifications"])[key] = (<any>this.uncategorizedSpecifications)[key];
+            }
+        }
         data["isActive"] = this.isActive;
         data["primaryImageUrl"] = this.primaryImageUrl;
         if (Array.isArray(this.additionalImageUrls)) {
@@ -26390,6 +26566,8 @@ export interface IUpdateProductDto {
     categoryId?: string | undefined;
     description?: string | undefined;
     specifications?: { [key: string]: any; } | undefined;
+    normalizedSpecifications?: { [key: string]: NormalizedSpecificationValue; } | undefined;
+    uncategorizedSpecifications?: { [key: string]: string; } | undefined;
     isActive?: boolean | undefined;
     primaryImageUrl?: string | undefined;
     additionalImageUrls?: string[] | undefined;

@@ -71,6 +71,8 @@ public class TechTickerDbContext : IdentityDbContext<ApplicationUser, IdentityRo
             entity.Property(e => e.Specifications).HasColumnType("jsonb");
             entity.Property(e => e.AdditionalImageUrls).HasColumnType("jsonb");
             entity.Property(e => e.OriginalImageUrls).HasColumnType("jsonb");
+            entity.Property(e => e.NormalizedSpecifications).HasColumnType("jsonb");
+            entity.Property(e => e.UncategorizedSpecifications).HasColumnType("jsonb");
 
             // Indexes
             entity.HasIndex(e => e.Name);

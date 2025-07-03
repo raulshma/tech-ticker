@@ -226,11 +226,17 @@ export class ProductDetailComponent implements OnInit {
   }
 
   getSpecificationEntries(): [string, any][] {
+    if (this.product?.normalizedSpecifications && Object.keys(this.product.normalizedSpecifications).length > 0) {
+      return Object.entries(this.product.normalizedSpecifications).map(([k, v]: any) => [k, (v && v.value !== undefined) ? v.value : v]);
+    }
     if (!this.product?.specifications) return [];
     return Object.entries(this.product.specifications);
   }
 
   hasSpecifications(): boolean {
+    if (this.product?.normalizedSpecifications && Object.keys(this.product.normalizedSpecifications).length > 0) {
+      return true;
+    }
     return this.getSpecificationEntries().length > 0;
   }
 

@@ -110,6 +110,8 @@ public class ProductSpecificationResult
     public ParseMetadata Metadata { get; set; } = new();
     public QualityMetrics Quality { get; set; } = new();
     public long ParsingTimeMs { get; set; }
+    public Dictionary<string, Domain.Entities.Canonical.NormalizedSpecificationValue> NormalizedSpecifications { get; set; } = new();
+    public Dictionary<string, string> UncategorizedSpecifications { get; set; } = new();
 }
 
 /// <summary>

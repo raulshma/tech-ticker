@@ -1,0 +1,213 @@
+{
+  "Category": "Graphics Card",
+  "Properties": [
+    {
+      "CanonicalName": "graphics_engine",
+      "DisplayName": "Graphics Engine",
+      "Aliases": ["graphics engine", "gpu", "graphics processing", "chipset", "graphics coprocessor"],
+      "DataType": "Text",
+      "Unit": null,
+      "IsPrimaryIdentifier": true
+    },
+    {
+      "CanonicalName": "bus_standard",
+      "DisplayName": "Bus Standard",
+      "Aliases": ["bus standard", "card bus", "pci express", "pci-e", "graphic card interface"],
+      "DataType": "Interface",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "directx_version",
+      "DisplayName": "DirectX",
+      "Aliases": ["directx", "directx support"],
+      "DataType": "Version",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "opengl_version",
+      "DisplayName": "OpenGL",
+      "Aliases": ["opengl", "opengl support"],
+      "DataType": "Version",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "memory_type",
+      "DisplayName": "Memory Type",
+      "Aliases": ["memory type", "graphics ram type", "graphic memory type"],
+      "DataType": "Text",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "memory_size_gb",
+      "DisplayName": "Memory Size",
+      "Aliases": ["memory size", "mem size", "gpu memory", "graphics card ram", "graphic memory size"],
+      "DataType": "Memory",
+      "Unit": "GB",
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "engine_clock_boost_mhz",
+      "DisplayName": "Engine Clock (Boost)",
+      "Aliases": ["engine clock boost", "boost clock", "core clock", "gpu clock speed"],
+      "DataType": "Clock",
+      "Unit": "MHz",
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "engine_clock_game_mhz",
+      "DisplayName": "Engine Clock (Game)",
+      "Aliases": ["game clock"],
+      "DataType": "Clock",
+      "Unit": "MHz",
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "stream_processors",
+      "DisplayName": "Stream Processors",
+      "Aliases": ["stream processors", "shader processors"],
+      "DataType": "Count",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "cuda_cores",
+      "DisplayName": "CUDA Cores",
+      "Aliases": ["cuda cores", "gpu cores", "gpu core (cuda core)", "gpu core", "gpu core (cuda)"],
+      "DataType": "Count",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "compute_units",
+      "DisplayName": "Compute Units",
+      "Aliases": ["compute units"],
+      "DataType": "Count",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "memory_clock_gbps",
+      "DisplayName": "Memory Clock",
+      "Aliases": ["memory clock", "memory clock speed", "memory clock gbps", "memory clock speed gbps"],
+      "DataType": "Speed",
+      "Unit": "Gbps",
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "memory_interface_bit",
+      "DisplayName": "Memory Interface",
+      "Aliases": ["memory interface", "memory bus", "graphic interface", "memory interface bits", "graphic interface bits"],
+      "DataType": "Interface",
+      "Unit": "bit",
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "max_resolution",
+      "DisplayName": "Max Digital Resolution",
+      "Aliases": ["resolution", "digital max resolution", "resolution max", "digital max resolution", "digital max resolution"],
+      "DataType": "Resolution",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "display_outputs",
+      "DisplayName": "Display Outputs",
+      "Aliases": ["interface", "output", "ports", "display outputs", "video output interface"],
+      "DataType": "DisplayOutput",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "hdcp_support",
+      "DisplayName": "HDCP Support",
+      "Aliases": ["hdcp", "hdcp support"],
+      "DataType": "Support",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "multi_view_count",
+      "DisplayName": "Multi-view",
+      "Aliases": ["multi-view", "multi view", "max display support", "multi-view support"],
+      "DataType": "Count",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "recommended_psu_w",
+      "DisplayName": "Recommended PSU",
+      "Aliases": ["recommended psu", "psu", "recommended psu w", "recommended power supply"],
+      "DataType": "Power",
+      "Unit": "W",
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "tdp_w",
+      "DisplayName": "TDP",
+      "Aliases": ["tdp", "tdp w"],
+      "DataType": "Power",
+      "Unit": "W",
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "power_connector",
+      "DisplayName": "Power Connector",
+      "Aliases": ["power connector", "power connectors", "connectors", "power connectors 8 pin"],
+      "DataType": "Connector",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "dimensions_mm",
+      "DisplayName": "Dimensions",
+      "Aliases": ["dimensions", "card size", "dimensions (l x w x h)"],
+      "DataType": "Dimension",
+      "Unit": "mm",
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "weight_g",
+      "DisplayName": "Net Weight",
+      "Aliases": ["net weight", "weight", "weight g", "weight kg"],
+      "DataType": "Weight",
+      "Unit": "g",
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "accessories",
+      "DisplayName": "Accessories",
+      "Aliases": ["accessories", "quick guide", "quick installation guide"],
+      "DataType": "Accessory",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "warranty_years",
+      "DisplayName": "Warranty",
+      "Aliases": ["warranty", "warranty years"],
+      "DataType": "Text",
+      "Unit": "years",
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "brand",
+      "DisplayName": "Brand",
+      "Aliases": ["brand", "manufacturer"],
+      "DataType": "Text",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    },
+    {
+      "CanonicalName": "color",
+      "DisplayName": "Color",
+      "Aliases": ["color"],
+      "DataType": "Text",
+      "Unit": null,
+      "IsPrimaryIdentifier": false
+    }
+  ]
+}

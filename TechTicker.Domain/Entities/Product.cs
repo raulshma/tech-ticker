@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
+using TechTicker.Domain.Entities.Canonical;
 
 namespace TechTicker.Domain.Entities;
 
@@ -29,6 +30,16 @@ public class Product
     public Guid CategoryId { get; set; }
 
     public string? Description { get; set; }
+
+    /// <summary>
+    /// JSON string of normalized specifications keyed by canonical name (jsonb)
+    /// </summary>
+    public string? NormalizedSpecifications { get; set; }
+
+    /// <summary>
+    /// Raw unmatched specification key/value pairs (jsonb)
+    /// </summary>
+    public string? UncategorizedSpecifications { get; set; }
 
     /// <summary>
     /// JSON string containing product specifications (stored as JSONB in PostgreSQL)
@@ -98,5 +109,24 @@ public class Product
             ? null
             : JsonSerializer.Deserialize<List<string>>(OriginalImageUrls);
         set => OriginalImageUrls = value == null ? null : JsonSerializer.Serialize(value);
+    }
+
+    // Helper properties for normalized and uncategorized specs
+    [NotMapped]
+    public Dictionary<string, NormalizedSpecificationValue>? NormalizedSpecificationsDict
+    {
+        get => string.IsNullOrEmpty(NormalizedSpecifications)
+            ? null
+            : JsonSerializer.Deserialize<Dictionary<string, NormalizedSpecificationValue>>(NormalizedSpecifications);
+        set => NormalizedSpecifications = value == null ? null : JsonSerializer.Serialize(value);
+    }
+
+    [NotMapped]
+    public Dictionary<string, string>? UncategorizedSpecificationsDict
+    {
+        get => string.IsNullOrEmpty(UncategorizedSpecifications)
+            ? null
+            : JsonSerializer.Deserialize<Dictionary<string, string>>(UncategorizedSpecifications);
+        set => UncategorizedSpecifications = value == null ? null : JsonSerializer.Serialize(value);
     }
 }
