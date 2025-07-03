@@ -519,30 +519,35 @@ public partial class WebScrapingService
         try
         {
             var element = document.QuerySelector(selector);
-            var rawStockText = element?.TextContent?.Trim();
+            if (element == null)
+                return "In Stock"; // Assuming default to "In Stock" if element is not found
+
+            var rawStockText = element.TextContent?.Trim();
             var stockText = SanitizeString(rawStockText);
 
             if (string.IsNullOrEmpty(stockText))
-                return "Unknown";
+                return "Unknown"; // Return "Unknown" if stockText is null or whitespace
 
-            // Normalize stock status
+            // Normalize stock status to handle different cases and edge cases
             var lowerStock = stockText.ToLower();
 
+            // Check for common stock status phrases
             if (lowerStock.Contains("in stock") || lowerStock.Contains("available") || lowerStock.Contains("in-stock"))
                 return "In Stock";
 
-            if (lowerStock.Contains("out of stock") || lowerStock.Contains("unavailable") || lowerStock.Contains("sold out"))
+            if (lowerStock.Contains("out of stock") || lowerStock.Contains("unavailable") || lowerStock.Contains("sold out") || lowerStock == "unavailable")
                 return "Out of Stock";
 
             if (lowerStock.Contains("limited") || lowerStock.Contains("few left"))
                 return "Limited Stock";
 
-            return stockText; // Return original text if no pattern matches
+            // Return original text if no pattern matches to ensure all cases are handled
+            return stockText;
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to extract stock status using selector {Selector}", selector);
-            return "Unknown";
+            return "Unknown"; // Return "Unknown" in case of an exception
         }
     }
 
