@@ -1,0 +1,116 @@
+<div class="product-mapping-dialog-container">
+  <div mat-dialog-title class="dialog-header-modern">
+    <div class="header-content">
+      <mat-icon class="header-icon">{{ data.isEdit ? 'edit_note' : 'add_circle' }}</mat-icon>
+      <div class="header-text">
+        <h2 class="mat-headline-6">{{ data.isEdit ? 'Edit Seller Mapping' : 'Add Seller Mapping' }}</h2>
+        <p class="mat-body-2">{{ data.isEdit ? 'Update the seller mapping details' : 'Add a new product-seller mapping' }}</p>
+      </div>
+    </div>
+    <button mat-icon-button class="close-button" (click)="onCancel()" [disabled]="isLoading">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="dialog-content-modern">
+    <form [formGroup]="mappingForm" (ngSubmit)="onSubmit()" class="mapping-form-modern" autocomplete="off">
+      
+      <!-- Basic Information -->
+      <div class="form-section-modern">
+        <h3 class="mat-title-medium section-title-modern">Basic Information</h3>
+        <div class="form-grid-modern">
+          <!-- Seller Name Field -->
+          <mat-form-field appearance="outline" class="modern-form-field full-width">
+            <mat-label>Seller Name</mat-label>
+            <input matInput formControlName="sellerName" placeholder="Enter seller/retailer name" maxlength="100" cdkFocusInitial>
+            <mat-icon matSuffix>store</mat-icon>
+            <mat-hint>Name of the seller or retailer</mat-hint>
+            <mat-error *ngIf="mappingForm.get('sellerName')?.invalid && mappingForm.get('sellerName')?.touched">
+              {{ getFieldErrorMessage('sellerName') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Product URL Field -->
+          <mat-form-field appearance="outline" class="modern-form-field full-width">
+            <mat-label>Product URL</mat-label>
+            <input matInput formControlName="exactProductUrl" placeholder="https://example.com/product/..." maxlength="2048">
+            <mat-icon matSuffix>link</mat-icon>
+            <mat-hint>Direct link to the product page</mat-hint>
+            <mat-error *ngIf="mappingForm.get('exactProductUrl')?.invalid && mappingForm.get('exactProductUrl')?.touched">
+              {{ getFieldErrorMessage('exactProductUrl') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Site Configuration -->
+      <div class="form-section-modern">
+        <h3 class="mat-title-medium section-title-modern">Site Configuration</h3>
+        <div class="form-grid-modern">
+          <mat-form-field appearance="outline" class="modern-form-field full-width">
+            <mat-label>Site Configuration</mat-label>
+            <mat-select formControlName="siteConfigId">
+              <mat-option value="">Auto-detect or manual</mat-option>
+              <mat-option *ngFor="let config of data.siteConfigurations" [value]="config.siteConfigId">
+                {{ config.siteDomain }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>settings</mat-icon>
+            <mat-hint>Optional: Use specific scraping configuration</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Advanced Options -->
+      <mat-expansion-panel class="modern-expansion-panel">
+        <mat-expansion-panel-header class="panel-header-modern">
+          <mat-panel-title class="mat-title-large">
+            <mat-icon class="panel-icon">tune</mat-icon>
+            Advanced Options
+          </mat-panel-title>
+          <mat-panel-description class="mat-body-medium">Configure scraping behavior and status</mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="panel-content-modern">
+          <div class="form-grid-modern">
+            <!-- Active Status Field -->
+            <div class="status-field-modern full-width">
+              <div class="status-header">
+                <mat-icon class="status-icon">power_settings_new</mat-icon>
+                <div class="status-text">
+                  <h4 class="mat-title-medium status-label">Scraping Status</h4>
+                  <p class="mat-body-small status-description">Enable or disable this mapping for scraping</p>
+                </div>
+              </div>
+              <mat-slide-toggle formControlName="isActiveForScraping" class="status-toggle-modern">
+                {{ mappingForm.get('isActiveForScraping')?.value ? 'Active' : 'Inactive' }}
+              </mat-slide-toggle>
+            </div>
+
+            <!-- Scraping Frequency Override Field -->
+            <mat-form-field appearance="outline" class="modern-form-field full-width">
+              <mat-label>Scraping Frequency Override</mat-label>
+              <input matInput formControlName="scrapingFrequencyOverride" placeholder="e.g., PT1H, PT30M" maxlength="50">
+              <mat-icon matSuffix>schedule</mat-icon>
+              <mat-hint>ISO 8601 duration format (e.g., PT1H for 1 hour)</mat-hint>
+              <mat-error *ngIf="mappingForm.get('scrapingFrequencyOverride')?.invalid && mappingForm.get('scrapingFrequencyOverride')?.touched">
+                {{ getFieldErrorMessage('scrapingFrequencyOverride') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </form>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions-modern">
+    <button mat-stroked-button type="button" (click)="onCancel()" [disabled]="isLoading">
+      Cancel
+    </button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="mappingForm.invalid || isLoading">
+      <mat-spinner *ngIf="isLoading" diameter="20" class="form-spinner"></mat-spinner>
+      <span *ngIf="!isLoading">{{ data.isEdit ? 'Update Mapping' : 'Add Mapping' }}</span>
+      <span *ngIf="isLoading">{{ data.isEdit ? 'Updating...' : 'Adding...' }}</span>
+    </button>
+  </div>
+</div> 

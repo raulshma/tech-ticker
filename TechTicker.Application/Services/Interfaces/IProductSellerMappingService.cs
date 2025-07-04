@@ -14,4 +14,5 @@ public interface IProductSellerMappingService
     Task<Result<IEnumerable<ProductSellerMappingDto>>> GetAllMappingsAsync();
     Task<Result<ProductSellerMappingDto>> UpdateMappingAsync(Guid mappingId, UpdateProductSellerMappingDto updateDto);
     Task<Result> DeleteMappingAsync(Guid mappingId);
+    Task<Result<IEnumerable<ProductSellerMappingDto>>> BulkUpdateProductMappingsAsync(Guid productId, ProductSellerMappingBulkUpdateDto bulkUpdateDto);
 }

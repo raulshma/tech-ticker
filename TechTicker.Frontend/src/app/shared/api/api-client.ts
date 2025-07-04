@@ -4476,6 +4476,65 @@ export class TechTickerApiClient {
     }
 
     /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkUpdateProductMappings(productId: string, body: ProductSellerMappingBulkUpdateDto | undefined): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
+        let url_ = this.baseUrl + "/api/Mappings/products/{productId}/bulk";
+        if (productId === undefined || productId === null)
+            throw new Error("The parameter 'productId' must be defined.");
+        url_ = url_.replace("{productId}", encodeURIComponent("" + productId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkUpdateProductMappings(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkUpdateProductMappings(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProductSellerMappingDtoIEnumerableApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProductSellerMappingDtoIEnumerableApiResponse>;
+        }));
+    }
+
+    protected processBulkUpdateProductMappings(response: HttpResponseBase): Observable<ProductSellerMappingDtoIEnumerableApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductSellerMappingDtoIEnumerableApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @return OK
      */
     getNotificationPreferences(): Observable<UserNotificationPreferencesDtoApiResponse> {
@@ -14525,6 +14584,58 @@ export interface IBrowserTestSessionDtoListApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class BulkCreateProductSellerMappingDto implements IBulkCreateProductSellerMappingDto {
+    sellerName!: string;
+    exactProductUrl!: string;
+    isActiveForScraping?: boolean;
+    scrapingFrequencyOverride?: string | undefined;
+    siteConfigId?: string | undefined;
+
+    constructor(data?: IBulkCreateProductSellerMappingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.sellerName = _data["sellerName"];
+            this.exactProductUrl = _data["exactProductUrl"];
+            this.isActiveForScraping = _data["isActiveForScraping"];
+            this.scrapingFrequencyOverride = _data["scrapingFrequencyOverride"];
+            this.siteConfigId = _data["siteConfigId"];
+        }
+    }
+
+    static fromJS(data: any): BulkCreateProductSellerMappingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkCreateProductSellerMappingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["sellerName"] = this.sellerName;
+        data["exactProductUrl"] = this.exactProductUrl;
+        data["isActiveForScraping"] = this.isActiveForScraping;
+        data["scrapingFrequencyOverride"] = this.scrapingFrequencyOverride;
+        data["siteConfigId"] = this.siteConfigId;
+        return data;
+    }
+}
+
+export interface IBulkCreateProductSellerMappingDto {
+    sellerName: string;
+    exactProductUrl: string;
+    isActiveForScraping?: boolean;
+    scrapingFrequencyOverride?: string | undefined;
+    siteConfigId?: string | undefined;
+}
+
 export class BulkDeleteResultDto implements IBulkDeleteResultDto {
     totalRequested?: number;
     successfullyDeleted?: number;
@@ -15177,6 +15288,62 @@ export interface IBulkProxyTestDto {
     proxyIds: string[];
     testUrl?: string | undefined;
     timeoutSeconds?: number;
+}
+
+export class BulkUpdateProductSellerMappingDto implements IBulkUpdateProductSellerMappingDto {
+    mappingId!: string;
+    sellerName?: string | undefined;
+    exactProductUrl?: string | undefined;
+    isActiveForScraping?: boolean | undefined;
+    scrapingFrequencyOverride?: string | undefined;
+    siteConfigId?: string | undefined;
+
+    constructor(data?: IBulkUpdateProductSellerMappingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.mappingId = _data["mappingId"];
+            this.sellerName = _data["sellerName"];
+            this.exactProductUrl = _data["exactProductUrl"];
+            this.isActiveForScraping = _data["isActiveForScraping"];
+            this.scrapingFrequencyOverride = _data["scrapingFrequencyOverride"];
+            this.siteConfigId = _data["siteConfigId"];
+        }
+    }
+
+    static fromJS(data: any): BulkUpdateProductSellerMappingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkUpdateProductSellerMappingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["mappingId"] = this.mappingId;
+        data["sellerName"] = this.sellerName;
+        data["exactProductUrl"] = this.exactProductUrl;
+        data["isActiveForScraping"] = this.isActiveForScraping;
+        data["scrapingFrequencyOverride"] = this.scrapingFrequencyOverride;
+        data["siteConfigId"] = this.siteConfigId;
+        return data;
+    }
+}
+
+export interface IBulkUpdateProductSellerMappingDto {
+    mappingId: string;
+    sellerName?: string | undefined;
+    exactProductUrl?: string | undefined;
+    isActiveForScraping?: boolean | undefined;
+    scrapingFrequencyOverride?: string | undefined;
+    siteConfigId?: string | undefined;
 }
 
 export class CategoryDto implements ICategoryDto {
@@ -19489,6 +19656,74 @@ export interface IProductDtoPagedResponseApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProductSellerMappingBulkUpdateDto implements IProductSellerMappingBulkUpdateDto {
+    create?: BulkCreateProductSellerMappingDto[] | undefined;
+    update?: BulkUpdateProductSellerMappingDto[] | undefined;
+    deleteIds?: string[] | undefined;
+
+    constructor(data?: IProductSellerMappingBulkUpdateDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["create"])) {
+                this.create = [] as any;
+                for (let item of _data["create"])
+                    this.create!.push(BulkCreateProductSellerMappingDto.fromJS(item));
+            }
+            if (Array.isArray(_data["update"])) {
+                this.update = [] as any;
+                for (let item of _data["update"])
+                    this.update!.push(BulkUpdateProductSellerMappingDto.fromJS(item));
+            }
+            if (Array.isArray(_data["deleteIds"])) {
+                this.deleteIds = [] as any;
+                for (let item of _data["deleteIds"])
+                    this.deleteIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductSellerMappingBulkUpdateDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductSellerMappingBulkUpdateDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.create)) {
+            data["create"] = [];
+            for (let item of this.create)
+                data["create"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.update)) {
+            data["update"] = [];
+            for (let item of this.update)
+                data["update"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.deleteIds)) {
+            data["deleteIds"] = [];
+            for (let item of this.deleteIds)
+                data["deleteIds"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IProductSellerMappingBulkUpdateDto {
+    create?: BulkCreateProductSellerMappingDto[] | undefined;
+    update?: BulkUpdateProductSellerMappingDto[] | undefined;
+    deleteIds?: string[] | undefined;
 }
 
 export class ProductSellerMappingDto implements IProductSellerMappingDto {
@@ -24256,29 +24491,29 @@ export interface ISpecificationParsingOptions {
 }
 
 export enum SpecificationType {
-    _0 = 0,
-    _1 = 1,
-    _2 = 2,
-    _3 = 3,
-    _4 = 4,
-    _5 = 5,
-    _6 = 6,
-    _7 = 7,
-    _8 = 8,
-    _9 = 9,
-    _10 = 10,
-    _11 = 11,
-    _12 = 12,
-    _13 = 13,
-    _14 = 14,
-    _15 = 15,
-    _16 = 16,
-    _17 = 17,
-    _18 = 18,
-    _19 = 19,
-    _20 = 20,
-    _21 = 21,
-    _22 = 22,
+    Text = "Text",
+    Numeric = "Numeric",
+    Boolean = "Boolean",
+    List = "List",
+    Memory = "Memory",
+    Clock = "Clock",
+    Power = "Power",
+    Dimension = "Dimension",
+    Interface = "Interface",
+    Resolution = "Resolution",
+    Currency = "Currency",
+    Percentage = "Percentage",
+    Count = "Count",
+    Speed = "Speed",
+    Version = "Version",
+    ModelNumber = "ModelNumber",
+    Connector = "Connector",
+    Support = "Support",
+    Accessory = "Accessory",
+    Software = "Software",
+    Weight = "Weight",
+    DisplayOutput = "DisplayOutput",
+    Unknown = "Unknown",
 }
 
 export class StringApiResponse implements IStringApiResponse {

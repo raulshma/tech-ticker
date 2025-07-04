@@ -17,6 +17,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatDividerModule } from '@angular/material/divider';
 import { BaseChartDirective } from 'ng2-charts';
 
 import { ProductsRoutingModule } from './products-routing.module';
@@ -25,13 +28,17 @@ import { ProductsListComponent } from './components/products-list/products-list.
 import { ProductFormComponent } from './components/product-form/product-form.component';
 import { ProductDeleteDialogComponent } from './components/product-delete-dialog/product-delete-dialog.component';
 import { PriceHistoryComponent } from './components/price-history/price-history.component';
+import { ProductMappingsComponent } from './components/product-mappings/product-mappings.component';
+import { ProductMappingDialogComponent } from './components/product-mappings/product-mapping-dialog/product-mapping-dialog.component';
 
 @NgModule({
   declarations: [
     ProductsListComponent,
     ProductFormComponent,
     ProductDeleteDialogComponent,
-    PriceHistoryComponent
+    PriceHistoryComponent,
+    ProductMappingsComponent,
+    ProductMappingDialogComponent
   ],
   imports: [
     CommonModule,
@@ -54,6 +61,9 @@ import { PriceHistoryComponent } from './components/price-history/price-history.
     MatChipsModule,
     MatSlideToggleModule,
     MatButtonToggleModule,
+    MatTabsModule,
+    MatExpansionModule,
+    MatDividerModule,
     BaseChartDirective
   ]
 })

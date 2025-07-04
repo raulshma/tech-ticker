@@ -48,6 +48,7 @@ import { RbacModule } from './modules/rbac.module';
     ProductSpecificationsComponent,
     AiAssistantComponent,
     RbacModule,
+    MatDividerModule,
   ]
 })
 export class SharedModule { }

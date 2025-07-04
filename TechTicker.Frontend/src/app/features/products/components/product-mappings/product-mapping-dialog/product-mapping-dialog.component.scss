@@ -1,0 +1,170 @@
+@use '@angular/material' as mat;
+
+.product-mapping-dialog-container {
+  background: var(--mat-sys-surface-container-high);
+  border-radius: 28px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  max-width: 600px;
+  min-width: 520px;
+}
+
+.dialog-header-modern {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .header-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: var(--mat-sys-primary);
+    }
+
+    .header-text {
+      h2 {
+        margin: 0;
+        font-weight: 500;
+        color: var(--mat-sys-on-surface);
+      }
+      p {
+        margin: 0;
+        color: var(--mat-sys-on-surface-variant);
+      }
+    }
+  }
+
+  .close-button {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.dialog-content-modern {
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.mapping-form-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-section-modern {
+  .section-title-modern {
+    margin-bottom: 16px;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.form-grid-modern {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.modern-form-field {
+  width: 100%;
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.modern-expansion-panel {
+  border-radius: 16px !important;
+  border: 1px solid var(--mat-sys-outline-variant) !important;
+  background: var(--mat-sys-surface-container-low) !important;
+  box-shadow: none !important;
+
+  &.mat-expanded {
+    border-color: var(--mat-sys-primary) !important;
+  }
+
+  .panel-header-modern {
+    padding: 16px 24px !important;
+    .mat-expansion-panel-header-title {
+      gap: 12px !important;
+      color: var(--mat-sys-on-surface) !important;
+      font-weight: 500 !important;
+    }
+    .panel-icon {
+      color: var(--mat-sys-primary) !important;
+    }
+  }
+
+  .panel-content-modern {
+    padding: 0 24px 24px 24px;
+  }
+}
+
+.status-field-modern {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: var(--mat-sys-surface-container);
+  border-radius: 12px;
+  border: 1px solid var(--mat-sys-outline-variant);
+
+  .status-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    .status-icon {
+      color: var(--mat-sys-primary);
+    }
+    .status-text {
+      .status-label, .status-description {
+        margin: 0;
+      }
+    }
+  }
+}
+
+.dialog-actions-modern {
+  padding: 16px 24px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  button {
+    min-width: 100px;
+    border-radius: 20px;
+  }
+
+  .form-spinner {
+    margin-right: 8px;
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .product-mapping-dialog-container {
+    min-width: 99vw;
+    max-width: 99vw;
+    .dialog-header-modern, .dialog-content-modern, .dialog-actions-modern {
+      padding-left: 8vw;
+      padding-right: 8vw;
+    }
+    .dialog-content-modern {
+      padding-top: 18px;
+      padding-bottom: 8px;
+    }
+    .dialog-actions-modern {
+      flex-direction: column-reverse;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

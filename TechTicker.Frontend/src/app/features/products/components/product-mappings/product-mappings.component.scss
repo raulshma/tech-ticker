@@ -1,0 +1,135 @@
+.mappings-container {
+  padding: 16px;
+  
+  .mappings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    
+    h3 {
+      margin: 0;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+
+      .save-spinner {
+        margin-right: 8px;
+      }
+    }
+  }
+  
+  .no-mappings {
+    text-align: center;
+    padding: 48px 16px;
+    color: #666;
+    
+    .no-mappings-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    p {
+      margin: 8px 0;
+      
+      &:first-of-type {
+        font-weight: 500;
+        font-size: 16px;
+      }
+      
+      &:last-of-type {
+        font-size: 14px;
+        opacity: 0.8;
+      }
+    }
+  }
+  
+  .mappings-table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    
+    .mappings-table {
+      width: 100%;
+      
+      .mat-column-sellerName {
+        flex: 0 0 150px;
+      }
+      
+      .mat-column-exactProductUrl {
+        flex: 1 1 auto;
+        min-width: 200px;
+      }
+      
+      .mat-column-isActiveForScraping {
+        flex: 0 0 100px;
+      }
+      
+      .mat-column-siteConfiguration {
+        flex: 0 0 130px;
+      }
+      
+      .mat-column-actions {
+        flex: 0 0 100px;
+      }
+      
+      .url-cell {
+        .product-url {
+          display: flex;
+          align-items: center;
+          color: #1976d2;
+          text-decoration: none;
+          
+          &:hover {
+            text-decoration: underline;
+          }
+          
+          .external-link-icon {
+            margin-left: 4px;
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+      
+      .actions-cell {
+        .mat-icon-button {
+          margin: 0 2px;
+        }
+      }
+      
+      .status-active {
+        background-color: #4caf50;
+        color: white;
+      }
+      
+      .status-inactive {
+        background-color: #f44336;
+        color: white;
+      }
+    }
+  }
+  
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 16px;
+    
+    p {
+      margin-top: 16px;
+      color: #666;
+    }
+  }
+} 

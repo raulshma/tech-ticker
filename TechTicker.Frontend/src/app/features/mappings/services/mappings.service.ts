@@ -12,6 +12,30 @@ import {
   ApiResponse
 } from '../../../shared/api/api-client';
 
+// Temporary DTOs until API client is regenerated
+export interface BulkCreateProductSellerMappingDto {
+  sellerName: string;
+  exactProductUrl: string;
+  isActiveForScraping?: boolean;
+  scrapingFrequencyOverride?: string;
+  siteConfigId?: string;
+}
+
+export interface BulkUpdateProductSellerMappingDto {
+  mappingId: string;
+  sellerName?: string;
+  exactProductUrl?: string;
+  isActiveForScraping?: boolean;
+  scrapingFrequencyOverride?: string;
+  siteConfigId?: string;
+}
+
+export interface ProductSellerMappingBulkUpdateDto {
+  create: BulkCreateProductSellerMappingDto[];
+  update: BulkUpdateProductSellerMappingDto[];
+  deleteIds: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -123,6 +147,24 @@ export class MappingsService {
         catchError(error => {
           console.error('Error fetching site configurations:', error);
           return of([]); // Return empty array on error instead of throwing
+        })
+      );
+  }
+
+  // Bulk update method for product mappings
+  bulkUpdateProductMappings(productId: string, bulkUpdateDto: ProductSellerMappingBulkUpdateDto): Observable<ProductSellerMappingDto[]> {
+    const url = `/api/mappings/products/${productId}/bulk`;
+    return this.http.post<ProductSellerMappingDtoIEnumerableApiResponse>(url, bulkUpdateDto)
+      .pipe(
+        map((response: ProductSellerMappingDtoIEnumerableApiResponse) => {
+          if (!response.success || !response.data) {
+            throw new Error(response.message || 'Failed to update mappings');
+          }
+          return response.data;
+        }),
+        catchError(error => {
+          console.error('Error bulk updating mappings:', error);
+          return throwError(() => error);
         })
       );
   }

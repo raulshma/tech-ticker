@@ -1,0 +1,101 @@
+<div class="mappings-container">
+  <div class="mappings-header">
+    <h3>Seller Mappings</h3>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="addMapping()" [disabled]="isLoading || isSaving">
+        <mat-icon>add</mat-icon>
+        Add Mapping
+      </button>
+      <button mat-button (click)="discardChanges()" *ngIf="hasPendingChanges()" [disabled]="isLoading || isSaving">
+        <mat-icon>refresh</mat-icon>
+        Discard Changes
+      </button>
+      <button mat-raised-button color="accent" (click)="saveChanges()" *ngIf="hasPendingChanges()" [disabled]="isLoading || isSaving">
+        <mat-spinner *ngIf="isSaving" diameter="20" class="save-spinner"></mat-spinner>
+        <mat-icon *ngIf="!isSaving">save</mat-icon>
+        <span *ngIf="!isSaving">Save Changes</span>
+        <span *ngIf="isSaving">Saving...</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mappings-content" *ngIf="!isLoading">
+    <div *ngIf="productMappingGroups.length === 0" class="no-mappings">
+      <mat-icon class="no-mappings-icon">store</mat-icon>
+      <p>No seller mappings configured for this product.</p>
+      <p>Add a mapping to enable price tracking from online retailers.</p>
+    </div>
+
+    <mat-accordion *ngIf="productMappingGroups.length > 0" multi>
+      <mat-expansion-panel *ngFor="let group of productMappingGroups" [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ group.productName }} ({{ group.mappings.length }} mappings)
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="mappings-table-container">
+      <table mat-table [dataSource]="group.mappings" class="mappings-table">
+        <!-- Seller Name Column -->
+        <ng-container matColumnDef="sellerName">
+          <th mat-header-cell *matHeaderCellDef>Seller</th>
+          <td mat-cell *matCellDef="let mapping">
+            {{ mapping.sellerName }}
+          </td>
+        </ng-container>
+
+        <!-- Product URL Column -->
+        <ng-container matColumnDef="exactProductUrl">
+          <th mat-header-cell *matHeaderCellDef>Product URL</th>
+          <td mat-cell *matCellDef="let mapping" class="url-cell">
+            <a [href]="mapping.exactProductUrl" target="_blank" class="product-url">
+              {{ mapping.exactProductUrl | slice:0:50 }}{{ mapping.exactProductUrl.length > 50 ? '...' : '' }}
+              <mat-icon class="external-link-icon">open_in_new</mat-icon>
+            </a>
+          </td>
+        </ng-container>
+
+        <!-- Active Status Column -->
+        <ng-container matColumnDef="isActiveForScraping">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let mapping">
+            <mat-chip [class]="mapping.isActiveForScraping ? 'status-active' : 'status-inactive'">
+              {{ mapping.isActiveForScraping ? 'Active' : 'Inactive' }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Site Configuration Column -->
+        <ng-container matColumnDef="siteConfiguration">
+          <th mat-header-cell *matHeaderCellDef>Site Config</th>
+          <td mat-cell *matCellDef="let mapping">
+            {{ getSiteConfigurationName(mapping.siteConfigId) }}
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let mapping" class="actions-cell">
+            <button mat-icon-button (click)="editMapping(mapping)" matTooltip="Edit mapping">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteMapping(mapping)" matTooltip="Delete mapping">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading mappings...</p>
+  </div>
+</div> 

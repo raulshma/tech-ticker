@@ -184,4 +184,134 @@ public class ProductSellerMappingService : IProductSellerMappingService
             return Result<IEnumerable<ProductSellerMappingDto>>.Failure("An error occurred while retrieving all mappings.", "INTERNAL_ERROR");
         }
     }
+
+    public async Task<Result<IEnumerable<ProductSellerMappingDto>>> BulkUpdateProductMappingsAsync(Guid productId, ProductSellerMappingBulkUpdateDto bulkUpdateDto)
+    {
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync();
+
+            // Validate product exists
+            var productExists = await _unitOfWork.Products.ExistsAsync(p => p.ProductId == productId);
+            if (!productExists)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                return Result<IEnumerable<ProductSellerMappingDto>>.Failure("Product not found.", "PRODUCT_NOT_FOUND");
+            }
+
+            var resultMappings = new List<ProductSellerMappingDto>();
+
+            // Process deletions first
+            foreach (var deleteId in bulkUpdateDto.DeleteIds)
+            {
+                var mappingToDelete = await _unitOfWork.ProductSellerMappings.GetByIdAsync(deleteId);
+                if (mappingToDelete != null && mappingToDelete.CanonicalProductId == productId)
+                {
+                    _unitOfWork.ProductSellerMappings.Remove(mappingToDelete);
+                    _logger.LogInformation("Deleted product seller mapping {MappingId} in bulk operation", deleteId);
+                }
+            }
+
+            // Process updates
+            foreach (var updateDto in bulkUpdateDto.Update)
+            {
+                var mappingToUpdate = await _unitOfWork.ProductSellerMappings.GetByIdAsync(updateDto.MappingId);
+                if (mappingToUpdate == null || mappingToUpdate.CanonicalProductId != productId)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return Result<IEnumerable<ProductSellerMappingDto>>.Failure($"Mapping {updateDto.MappingId} not found or doesn't belong to this product.", "MAPPING_NOT_FOUND");
+                }
+
+                // Validate site configuration exists if being updated
+                if (updateDto.SiteConfigId.HasValue)
+                {
+                    var configExists = await _unitOfWork.ScraperSiteConfigurations.ExistsAsync(s => s.SiteConfigId == updateDto.SiteConfigId.Value);
+                    if (!configExists)
+                    {
+                        await _unitOfWork.RollbackTransactionAsync();
+                        return Result<IEnumerable<ProductSellerMappingDto>>.Failure("Site configuration not found.", "SITE_CONFIG_NOT_FOUND");
+                    }
+                }
+
+                // Update mapping
+                if (!string.IsNullOrWhiteSpace(updateDto.SellerName))
+                    mappingToUpdate.SellerName = updateDto.SellerName;
+                if (!string.IsNullOrWhiteSpace(updateDto.ExactProductUrl))
+                    mappingToUpdate.ExactProductUrl = updateDto.ExactProductUrl;
+                if (updateDto.IsActiveForScraping.HasValue)
+                    mappingToUpdate.IsActiveForScraping = updateDto.IsActiveForScraping.Value;
+                if (updateDto.ScrapingFrequencyOverride != null)
+                    mappingToUpdate.ScrapingFrequencyOverride = updateDto.ScrapingFrequencyOverride;
+                if (updateDto.SiteConfigId != null)
+                    mappingToUpdate.SiteConfigId = updateDto.SiteConfigId;
+
+                mappingToUpdate.UpdatedAt = DateTimeOffset.UtcNow;
+                _unitOfWork.ProductSellerMappings.Update(mappingToUpdate);
+
+                _logger.LogInformation("Updated product seller mapping {MappingId} in bulk operation", updateDto.MappingId);
+            }
+
+            // Process creates
+            foreach (var createDto in bulkUpdateDto.Create)
+            {
+                // Validate site configuration exists if provided
+                if (createDto.SiteConfigId.HasValue)
+                {
+                    var configExists = await _unitOfWork.ScraperSiteConfigurations.ExistsAsync(s => s.SiteConfigId == createDto.SiteConfigId.Value);
+                    if (!configExists)
+                    {
+                        await _unitOfWork.RollbackTransactionAsync();
+                        return Result<IEnumerable<ProductSellerMappingDto>>.Failure("Site configuration not found.", "SITE_CONFIG_NOT_FOUND");
+                    }
+                }
+
+                // Check for duplicate mapping
+                var existingMapping = await _unitOfWork.ProductSellerMappings.FirstOrDefaultAsync(m =>
+                    m.CanonicalProductId == productId &&
+                    m.SellerName == createDto.SellerName &&
+                    m.ExactProductUrl == createDto.ExactProductUrl);
+
+                if (existingMapping != null)
+                {
+                    await _unitOfWork.RollbackTransactionAsync();
+                    return Result<IEnumerable<ProductSellerMappingDto>>.Failure($"A mapping with seller '{createDto.SellerName}' and URL '{createDto.ExactProductUrl}' already exists.", "MAPPING_EXISTS");
+                }
+
+                var newMapping = new ProductSellerMapping
+                {
+                    MappingId = Guid.NewGuid(),
+                    CanonicalProductId = productId,
+                    SellerName = createDto.SellerName,
+                    ExactProductUrl = createDto.ExactProductUrl,
+                    IsActiveForScraping = createDto.IsActiveForScraping,
+                    ScrapingFrequencyOverride = createDto.ScrapingFrequencyOverride,
+                    SiteConfigId = createDto.SiteConfigId,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    UpdatedAt = DateTimeOffset.UtcNow,
+                    NextScrapeAt = DateTimeOffset.UtcNow // Initialize for immediate scraping
+                };
+
+                await _unitOfWork.ProductSellerMappings.AddAsync(newMapping);
+                _logger.LogInformation("Created product seller mapping {MappingId} for product {ProductId} in bulk operation", newMapping.MappingId, productId);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+
+            // Get updated mappings for the product to return
+            var updatedMappings = await _unitOfWork.ProductSellerMappings.GetByProductIdAsync(productId);
+            var mappingDtos = updatedMappings.Select(_mappingService.MapToDto);
+
+            _logger.LogInformation("Completed bulk update for product {ProductId}: {CreateCount} created, {UpdateCount} updated, {DeleteCount} deleted", 
+                productId, bulkUpdateDto.Create.Count, bulkUpdateDto.Update.Count, bulkUpdateDto.DeleteIds.Count);
+
+            return Result<IEnumerable<ProductSellerMappingDto>>.Success(mappingDtos);
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            _logger.LogError(ex, "Error performing bulk update for product {ProductId}", productId);
+            return Result<IEnumerable<ProductSellerMappingDto>>.Failure("An error occurred while performing bulk update.", "INTERNAL_ERROR");
+        }
+    }
 }

@@ -130,4 +130,19 @@ public class MappingsController : BaseApiController
             return HandleResult(result);
         }
     }
+
+    /// <summary>
+    /// Bulk update mappings for a specific product (create, update, delete)
+    /// </summary>
+    /// <param name="productId">Product ID</param>
+    /// <param name="bulkUpdateDto">Bulk update operations</param>
+    /// <returns>Updated list of mappings for the product</returns>
+    [HttpPost("products/{productId:guid}/bulk", Name = "BulkUpdateProductMappings")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<ProductSellerMappingDto>>>> BulkUpdateProductMappings(
+        Guid productId, 
+        [FromBody] ProductSellerMappingBulkUpdateDto bulkUpdateDto)
+    {
+        var result = await _mappingService.BulkUpdateProductMappingsAsync(productId, bulkUpdateDto);
+        return HandleResult(result);
+    }
 }
