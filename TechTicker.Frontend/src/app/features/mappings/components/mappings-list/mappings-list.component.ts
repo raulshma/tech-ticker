@@ -21,7 +21,19 @@ import { MappingDeleteDialogComponent } from '../mapping-delete-dialog/mapping-d
 export class MappingsListComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['product', 'sellerName', 'exactProductUrl', 'isActiveForScraping', 'lastScrapedAt', 'lastScrapeStatus', 'actions'];
   dataSource = new MatTableDataSource<ProductSellerMappingDto>();
+  /**
+   * Table used inside each product group (product column omitted because the
+   * product is already the expansion-panel header).
+   */
+  innerDisplayedColumns: string[] = ['sellerName', 'exactProductUrl', 'isActiveForScraping', 'lastScrapedAt', 'lastScrapeStatus', 'actions'];
   isLoading = false;
+
+  /**
+   * Collection of mappings grouped by product name. Used by the template to
+   * render an accordion where each expansion panel corresponds to a product
+   * and contains its mappings.
+   */
+  mappingGroups: { productName: string; mappings: ProductSellerMappingDto[] }[] = [];
 
   // Filters
   productControl = new FormControl('');
@@ -95,6 +107,8 @@ export class MappingsListComponent implements OnInit, AfterViewInit {
     this.mappingsService.getMappings(productId, isActiveForScraping).subscribe({
       next: (mappings) => {
         this.dataSource.data = mappings;
+        // Apply any active filters (search / status) and initialise the grouped view
+        this.applyFilters();
         this.isLoading = false;
       },
       error: (error) => {
@@ -110,6 +124,7 @@ export class MappingsListComponent implements OnInit, AfterViewInit {
     this.showAllMappingsControl.setValue(true);
     this.searchText = '';
     this.statusFilter = '';
+    this.applyFilters();
   }
 
   onFilterChange(): void {
@@ -137,6 +152,29 @@ export class MappingsListComponent implements OnInit, AfterViewInit {
 
     // Trigger filter by setting filter value
     this.dataSource.filter = 'trigger';
+
+    // After filtering, regroup the data for the accordion view
+    this.groupMappingsByProduct(this.dataSource.filteredData);
+  }
+
+  /**
+   * Groups a flat list of mappings by their *product name* for accordion display.
+   */
+  private groupMappingsByProduct(mappings: ProductSellerMappingDto[]): void {
+    const groups: { [productName: string]: ProductSellerMappingDto[] } = {};
+
+    for (const mapping of mappings) {
+      const productName = this.getProductName(mapping.canonicalProductId || '') || 'Unknown Product';
+      if (!groups[productName]) {
+        groups[productName] = [];
+      }
+      groups[productName].push(mapping);
+    }
+
+    this.mappingGroups = Object.keys(groups).map(productName => ({
+      productName,
+      mappings: groups[productName]
+    }));
   }
 
   editMapping(mapping: ProductSellerMappingDto): void {
