@@ -6,17 +6,59 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, startWith } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { ProductSellerMappingDto, ProductDto } from '../../../../shared/api/api-client';
 import { MappingsService } from '../../services/mappings.service';
 import { ProductsService } from '../../../products/services/products.service';
 import { MappingDeleteDialogComponent } from '../mapping-delete-dialog/mapping-delete-dialog.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
   selector: 'app-mappings-list',
   templateUrl: './mappings-list.component.html',
   styleUrls: ['./mappings-list.component.scss'],
-  standalone: false
+  standalone: true,
+  imports: [
+    // Angular
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+
+    // Material
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatCardModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+    MatChipsModule,
+    MatCheckboxModule,
+    MatExpansionModule
+  ]
 })
 export class MappingsListComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['product', 'sellerName', 'exactProductUrl', 'isActiveForScraping', 'lastScrapedAt', 'lastScrapeStatus', 'actions'];
