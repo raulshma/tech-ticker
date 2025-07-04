@@ -63,10 +63,10 @@ export class SpecificationComparisonComponent implements OnInit {
       if (diff.specificationKey && diff.displayName && diff.category) {
         specifications.push({
           key: diff.specificationKey,
-          displayName: diff.displayName,
+          displayName: this.formatDisplayName(diff.displayName),
           category: diff.category,
-          product1Value: diff.product1DisplayValue || String(diff.product1Value || 'N/A'),
-          product2Value: diff.product2DisplayValue || String(diff.product2Value || 'N/A'),
+          product1Value: this.formatSpecificationValue(diff.product1DisplayValue, diff.product1Value),
+          product2Value: this.formatSpecificationValue(diff.product2DisplayValue, diff.product2Value),
           comparisonResult: diff.comparisonResult || ComparisonResultType._5, // Default to incomparable
           impactScore: diff.impactScore,
           analysisNote: diff.analysisNote,
@@ -80,10 +80,10 @@ export class SpecificationComparisonComponent implements OnInit {
       if (match.specificationKey && match.displayName && match.category) {
         specifications.push({
           key: match.specificationKey,
-          displayName: match.displayName,
+          displayName: this.formatDisplayName(match.displayName),
           category: match.category,
-          product1Value: match.displayValue || String(match.value || 'N/A'),
-          product2Value: match.displayValue || String(match.value || 'N/A'),
+          product1Value: this.formatSpecificationValue(match.displayValue, match.value),
+          product2Value: this.formatSpecificationValue(match.displayValue, match.value),
           comparisonResult: ComparisonResultType._0, // Equivalent
           isMatch: true
         });
@@ -95,6 +95,34 @@ export class SpecificationComparisonComponent implements OnInit {
 
     // Extract unique categories
     this.categories = Array.from(new Set(specifications.map(spec => spec.category))).sort();
+  }
+
+  private formatDisplayName(displayName: string): string {
+    // If the display name is already in a good format, return it
+    if (displayName && !displayName.includes('_')) {
+      return displayName;
+    }
+
+    // Otherwise, format from snake_case to Title Case
+    return displayName
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  private formatSpecificationValue(displayValue: string | null | undefined, value: any): string {
+    // Use display value if available
+    if (displayValue) {
+      return String(displayValue);
+    }
+
+    // Handle objects from normalized specifications
+    if (value && typeof value === 'object' && value.value !== undefined) {
+      return String(value.value);
+    }
+
+    // Fallback to the raw value
+    return String(value || 'N/A');
   }
 
   getFilteredData(): SpecificationDisplayDto[] {

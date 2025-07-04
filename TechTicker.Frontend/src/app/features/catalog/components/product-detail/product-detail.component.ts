@@ -261,26 +261,89 @@ export class ProductDetailComponent implements OnInit {
     const typedSpecs: { [key: string]: any } = {};
     const categorizedSpecs: { [key: string]: any } = {};
 
+    // Categories for better organization
+    const categoryMap: { [key: string]: string } = {
+      'brand': 'General',
+      'gpu_model': 'Graphics',
+      'gpu_clock': 'Performance',
+      'memory_type': 'Memory',
+      'memory_clock': 'Memory',
+      'memory_interface_width': 'Memory',
+      'stream_processors': 'Performance',
+      'compute_units': 'Performance',
+      'bus_interface': 'Connectivity',
+      'output_ports': 'Connectivity',
+      'power_connectors': 'Power',
+      'recommended_psu': 'Power',
+      'dimensions': 'Physical',
+      'weight': 'Physical',
+      'max_resolution': 'Display',
+      'multi_display_support': 'Display',
+      'directx_version': 'Software',
+      'opengl_version': 'Software',
+      'hdcp_support': 'Software',
+      'warranty': 'General',
+      'accessories': 'General'
+    };
+
     Object.entries(normalizedSpecs).forEach(([key, value]: [string, any]) => {
+      // Convert key to display format (snake_case to Title Case)
+      const displayKey = this.formatSpecificationKey(key);
+
       if (value && typeof value === 'object' && value.value !== undefined) {
-        actualSpecs[key] = value.value;
-        typedSpecs[key] = {
+        actualSpecs[displayKey] = value.value;
+        typedSpecs[displayKey] = {
           value: value.value,
-          type: value.dataType || 'string',
-          unit: value.unit,
-          confidence: value.confidence || 1.0
+          type: value.dataType || 'Text',
+          unit: value.unit || '',
+          confidence: value.confidence || 1.0,
+          category: categoryMap[key] || 'General',
+          hasMultipleValues: false,
+          valueCount: 1,
+          alternatives: []
         };
-        // Group by category if available
-        const category = value.category || 'General';
+
+        // Group by category
+        const category = categoryMap[key] || 'General';
         if (!categorizedSpecs[category]) {
-          categorizedSpecs[category] = {};
+          categorizedSpecs[category] = {
+            name: category,
+            specifications: {},
+            order: Object.keys(categorizedSpecs).length,
+            confidence: 1.0,
+            isExplicit: true,
+            itemCount: 0,
+            multiValueCount: 0
+          };
         }
-        categorizedSpecs[category][key] = value.value;
+        categorizedSpecs[category].specifications[displayKey] = typedSpecs[displayKey];
+        categorizedSpecs[category].itemCount++;
       } else {
-        actualSpecs[key] = value;
-        typedSpecs[key] = { value: value, type: 'string' };
-        categorizedSpecs['General'] = categorizedSpecs['General'] || {};
-        categorizedSpecs['General'][key] = value;
+        actualSpecs[displayKey] = value;
+        typedSpecs[displayKey] = {
+          value: value,
+          type: 'Text',
+          unit: '',
+          confidence: 1.0,
+          category: 'General',
+          hasMultipleValues: false,
+          valueCount: 1,
+          alternatives: []
+        };
+
+        if (!categorizedSpecs['General']) {
+          categorizedSpecs['General'] = {
+            name: 'General',
+            specifications: {},
+            order: Object.keys(categorizedSpecs).length,
+            confidence: 1.0,
+            isExplicit: true,
+            itemCount: 0,
+            multiValueCount: 0
+          };
+        }
+        categorizedSpecs['General'].specifications[displayKey] = typedSpecs[displayKey];
+        categorizedSpecs['General'].itemCount++;
       }
     });
 
@@ -290,16 +353,32 @@ export class ProductDetailComponent implements OnInit {
       typedSpecifications: typedSpecs,
       categorizedSpecs: categorizedSpecs,
       metadata: {
-        totalSpecifications: Object.keys(actualSpecs).length,
+        totalRows: Object.keys(actualSpecs).length,
+        dataRows: Object.keys(actualSpecs).length,
+        headerRows: 0,
+        continuationRows: 0,
+        inlineValueCount: 0,
+        multiValueSpecs: 0,
+        structure: 'normalized_api',
+        warnings: [],
         processingTimeMs: 0
       },
       quality: {
         overallScore: 0.9,
-        completeness: 1.0,
-        accuracy: 0.9
+        structureConfidence: 1.0,
+        typeDetectionAccuracy: 0.9,
+        completenessScore: 1.0
       },
       parsingTimeMs: 0
     };
+  }
+
+  private formatSpecificationKey(key: string): string {
+    // Convert snake_case to Title Case
+    return key
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
   }
 
   hasProductImages(): boolean {

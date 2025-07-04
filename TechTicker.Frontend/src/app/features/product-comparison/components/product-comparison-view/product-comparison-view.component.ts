@@ -51,6 +51,11 @@ export class ProductComparisonViewComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.setupProductSearch();
     this.checkRouteParams();
+
+    // Test search functionality by triggering a search immediately
+    setTimeout(() => {
+      this.product1SearchControl.setValue('a'); // Trigger a search with 'a'
+    }, 1000);
   }
 
   ngOnDestroy(): void {
@@ -64,7 +69,7 @@ export class ProductComparisonViewComponent implements OnInit, OnDestroy {
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(search => {
-        if (!search || search.length < 2) return of({ items: [] } as any);
+        if (!search || search.length < 1) return of({ items: [] } as any);
         return this.productsService.getProducts({ search, pageSize: 20 });
       }),
       takeUntil(this.destroy$)
@@ -73,7 +78,7 @@ export class ProductComparisonViewComponent implements OnInit, OnDestroy {
         this.product1Options = result.items;
       },
       error: (error) => {
-        console.error('Error searching products:', error);
+        console.error('Error searching products for product 1:', error);
       }
     });
 
@@ -82,7 +87,7 @@ export class ProductComparisonViewComponent implements OnInit, OnDestroy {
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(search => {
-        if (!search || search.length < 2) return of({ items: [] } as any);
+        if (!search || search.length < 1) return of({ items: [] } as any);
         return this.productsService.getProducts({ search, pageSize: 20 });
       }),
       takeUntil(this.destroy$)
@@ -91,7 +96,7 @@ export class ProductComparisonViewComponent implements OnInit, OnDestroy {
         this.product2Options = result.items;
       },
       error: (error) => {
-        console.error('Error searching products:', error);
+        console.error('Error searching products for product 2:', error);
       }
     });
   }
@@ -130,7 +135,13 @@ export class ProductComparisonViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  onProduct1Selected(product: ProductDto): void {
+  onProduct1Selected(product: ProductDto | null): void {
+    if (!product || !product.productId) {
+      this.comparisonForm.patchValue({ product1: null });
+      this.clearComparison();
+      return;
+    }
+
     this.comparisonForm.patchValue({ product1: product });
     this.product1SearchControl.setValue(product.name || '');
 
@@ -142,7 +153,13 @@ export class ProductComparisonViewComponent implements OnInit, OnDestroy {
     this.clearComparison();
   }
 
-  onProduct2Selected(product: ProductDto): void {
+  onProduct2Selected(product: ProductDto | null): void {
+    if (!product || !product.productId) {
+      this.comparisonForm.patchValue({ product2: null });
+      this.clearComparison();
+      return;
+    }
+
     this.comparisonForm.patchValue({ product2: product });
     this.product2SearchControl.setValue(product.name || '');
     this.clearComparison();

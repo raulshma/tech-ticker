@@ -1,6 +1,7 @@
 using System.Text.Json;
 using TechTicker.Domain.Entities;
 using TechTicker.Domain.Entities.Canonical;
+using TechTicker.Shared.Utilities.Html;
 
 namespace TechTicker.Domain.Tests.Entities;
 

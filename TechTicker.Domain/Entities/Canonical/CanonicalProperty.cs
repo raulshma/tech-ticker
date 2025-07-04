@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TechTicker.Shared.Utilities.Html;
 
 namespace TechTicker.Domain.Entities.Canonical;
 

@@ -1,3 +1,5 @@
+using TechTicker.Shared.Utilities.Html;
+
 namespace TechTicker.Domain.Entities.Canonical;
 
 public class NormalizedSpecificationValue
@@ -8,4 +10,4 @@ public class NormalizedSpecificationValue
     public string RawValue { get; set; } = null!;  // Original scraped value
     public string CanonicalName { get; set; } = null!; // Link back to CanonicalProperty
     public double Confidence { get; set; }
-} 
+}

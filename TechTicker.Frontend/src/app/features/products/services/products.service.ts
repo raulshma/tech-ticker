@@ -33,23 +33,49 @@ export class ProductsService {
   constructor(private apiClient: TechTickerApiClient) {}
 
   getProducts(filter: ProductsFilter = {}): Observable<PagedResult<ProductDto>> {
+
     return this.apiClient.getProducts(
       filter.categoryId,
       filter.search,
       filter.page || 1,
       filter.pageSize || 10
     ).pipe(
-      map((response: ProductDtoPagedResponse) => {
-        if (!response.success || !response.data) {
-          throw new Error(response.message || 'Failed to fetch products');
+      map((response: any) => {
+        // Handle the response format that you showed in your example
+        if (response && response.success === true && Array.isArray(response.data)) {
+          return {
+            items: response.data,
+            totalCount: response.pagination?.totalCount || response.data.length,
+            page: response.pagination?.pageNumber || filter.page || 1,
+            pageSize: response.pagination?.pageSize || filter.pageSize || 10,
+            totalPages: response.pagination?.totalPages || Math.ceil((response.pagination?.totalCount || response.data.length) / (filter.pageSize || 10))
+          };
         }
-        return {
-          items: response.data || [],
-          totalCount: response.pagination?.totalCount || 0,
-          page: response.pagination?.pageNumber || 1,
-          pageSize: response.pagination?.pageSize || 10,
-          totalPages: response.pagination?.totalPages || 0
-        };
+
+        // Fallback for other formats
+        if (Array.isArray(response)) {
+          return {
+            items: response,
+            totalCount: response.length,
+            page: filter.page || 1,
+            pageSize: filter.pageSize || 10,
+            totalPages: Math.ceil(response.length / (filter.pageSize || 10))
+          };
+        }
+
+        // If response has items property
+        if (response && response.items && Array.isArray(response.items)) {
+          return {
+            items: response.items,
+            totalCount: response.totalCount || response.items.length,
+            page: response.page || filter.page || 1,
+            pageSize: response.pageSize || filter.pageSize || 10,
+            totalPages: response.totalPages || Math.ceil((response.totalCount || response.items.length) / (filter.pageSize || 10))
+          };
+        }
+
+        console.error('Unexpected response format:', response);
+        throw new Error('Unexpected response format from API');
       }),
       catchError(error => {
         console.error('Error fetching products:', error);

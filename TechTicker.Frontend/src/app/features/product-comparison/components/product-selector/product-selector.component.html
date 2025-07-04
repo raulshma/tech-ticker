@@ -1,4 +1,9 @@
 <div class="product-selector">
+  <!-- Debug info -->
+  <div class="debug-info" style="font-size: 12px; color: gray; margin-bottom: 8px;">
+    Options count: {{ options.length }} | Search value: "{{ searchControl.value }}"
+  </div>
+
   <mat-form-field class="full-width" appearance="outline">
     <mat-label>{{ label }}</mat-label>
     <input
@@ -20,57 +25,23 @@
     </button>
 
     <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayProductName">
-      <mat-option
-        *ngFor="let product of options"
-        [value]="product"
-        (onSelectionChange)="onProductSelected(product)"
-        class="product-option">
-
-        <div class="product-option-content">
-          <div class="product-image">
-            <app-image-gallery
-              *ngIf="hasProductImages(product)"
-              [primaryImageUrl]="getPrimaryImageUrl(product)"
-              [additionalImageUrls]="getAdditionalImageUrls(product)"
-              [altText]="product.name || 'Product image'"
-              [maxHeight]="'60px'"
-              [maxWidth]="'60px'"
-              [showThumbnails]="false">
-            </app-image-gallery>
-
-            <div *ngIf="!hasProductImages(product)"
-                 class="no-image-placeholder">
-              <mat-icon>image_not_supported</mat-icon>
-            </div>
-          </div>
-
-          <div class="product-info">
-            <div class="product-name">
-              <span class="manufacturer">{{ product.manufacturer }}</span>
-              <span class="name">{{ product.name }}</span>
-            </div>
-            <div class="product-meta">
-              <span class="category">{{ getProductCategory(product) }}</span>
-              <span class="model" *ngIf="product.modelNumber">
-                Model: {{ product.modelNumber }}
-              </span>
-            </div>
-          </div>
-
-          <div class="product-status">
-            <mat-chip
-              [color]="product.isActive ? 'primary' : 'accent'"
-              selected>
-              {{ product.isActive ? 'Active' : 'Inactive' }}
-            </mat-chip>
-          </div>
+      <!-- Debug option to show when options are available -->
+      <mat-option *ngIf="options.length === 0 && searchControl.value" disabled>
+        <div class="debug-info">
+          <span>No options available (Total: {{ options.length }})</span>
         </div>
       </mat-option>
 
-      <mat-option *ngIf="options.length === 0 && searchControl.value" disabled>
-        <div class="no-results">
-          <mat-icon>search_off</mat-icon>
-          <span>No products found</span>
+      <mat-option
+        *ngFor="let product of options; trackBy: trackByProduct"
+        [value]="product"
+        (onSelectionChange)="$event.isUserInput && onProductSelected(product)"
+        class="product-option">
+
+        <!-- Simplified product display for debugging -->
+        <div class="simple-product-content">
+          <span class="product-name">{{ displayProductName(product) }}</span>
+          <span class="product-category">{{ getProductCategory(product) }}</span>
         </div>
       </mat-option>
     </mat-autocomplete>

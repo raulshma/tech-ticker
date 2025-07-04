@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TechTicker.Domain\TechTicker.Domain.csproj" />
+    <ProjectReference Include="..\TechTicker.Shared\TechTicker.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

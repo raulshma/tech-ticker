@@ -643,11 +643,27 @@ public partial class WebScrapingService
                 var mapping = await _unitOfWork.ProductSellerMappings.GetByIdAsync(mappingId);
                 if (mapping != null && mapping.CanonicalProductId != Guid.Empty)
                 {
-                    var product = await _unitOfWork.Products.GetByIdAsync(mapping.CanonicalProductId);
+                    // Use GetByIdWithCategoryAsync to ensure Category is loaded
+                    var product = await _unitOfWork.Products.GetByIdWithCategoryAsync(mapping.CanonicalProductId);
                     if (product?.Category != null)
                     {
                         categoryName = product.Category.Name;
+                        _logger.LogInformation("Found product category '{Category}' for mapping {MappingId}", categoryName, mappingId);
                     }
+                    else if (product != null)
+                    {
+                        _logger.LogWarning("Product found but category is null for mapping {MappingId}, product ID: {ProductId}", 
+                            mappingId, mapping.CanonicalProductId);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Product not found for mapping {MappingId}, canonical product ID: {ProductId}", 
+                            mappingId, mapping.CanonicalProductId);
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("Mapping not found or has empty canonical product ID for mapping {MappingId}", mappingId);
                 }
 
                 var rawStringSpecs = mergedSpec.Specifications.ToDictionary(
@@ -655,14 +671,23 @@ public partial class WebScrapingService
                     kvp => kvp.Value?.ToString() ?? string.Empty,
                     StringComparer.OrdinalIgnoreCase);
 
+                _logger.LogInformation("Starting normalization of {SpecCount} specifications for category '{Category}' on mapping {MappingId}", 
+                    rawStringSpecs.Count, categoryName ?? "Unknown", mappingId);
+
                 (normalized, uncategorized) = _specNormalizer.Normalize(rawStringSpecs, categoryName ?? string.Empty);
                 
                 _logger.LogInformation("Normalized {RawCount} specifications into {NormalizedCount} canonical and {UncategorizedCount} uncategorized for mapping {MappingId}",
                     rawStringSpecs.Count, normalized.Count, uncategorized.Count, mappingId);
+                
+                if (normalized.Count == 0 && rawStringSpecs.Count > 0)
+                {
+                    _logger.LogWarning("No specifications were normalized! Category: '{Category}', Raw specs: {RawSpecs}", 
+                        categoryName ?? "Unknown", string.Join(", ", rawStringSpecs.Keys.Take(5)));
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Specification normalization failed for mapping {MappingId}; continuing without normalized data", mappingId);
+                _logger.LogError(ex, "Specification normalization failed for mapping {MappingId}; continuing without normalized data", mappingId);
             }
 
             return new ProductSpecificationResult
@@ -1022,15 +1047,19 @@ public partial class WebScrapingService
             mapping.LatestSpecifications = JsonSerializer.Serialize(specResult.Specifications);
             mapping.SpecificationsLastUpdated = DateTime.UtcNow;
             mapping.SpecificationsQualityScore = specResult.Quality?.OverallScore;
-            mapping.UpdatedAt = DateTimeOffset.UtcNow;
-
-            // Update both the mapping and the canonical product if quality score is good enough
-            if (specResult.Quality?.OverallScore >= 0.7 && mapping.CanonicalProductId != Guid.Empty)
+            mapping.UpdatedAt = DateTimeOffset.UtcNow;            // Update both the mapping and the canonical product if quality score is good enough
+            // Lowered threshold from 0.7 to 0.5 to be more permissive for debugging
+            if (specResult.Quality?.OverallScore >= 0.5 && mapping.CanonicalProductId != Guid.Empty)
             {
-                // Get the canonical product
-                var product = await _unitOfWork.Products.GetByIdAsync(mapping.CanonicalProductId);
+                _logger.LogInformation("Quality score {QualityScore:F2} meets threshold for mapping {MappingId}, updating canonical product {ProductId}", 
+                    specResult.Quality.OverallScore, mappingId, mapping.CanonicalProductId);
+
+                // Get the canonical product with category included
+                var product = await _unitOfWork.Products.GetByIdWithCategoryAsync(mapping.CanonicalProductId);
                 if (product != null)
                 {
+                    bool productUpdated = false;
+
                     // Update normalized specifications if available
                     if (specResult.NormalizedSpecifications?.Any() == true)
                     {
@@ -1045,9 +1074,14 @@ public partial class WebScrapingService
                         }
 
                         product.NormalizedSpecificationsDict = mergedNormalized;
-                        
-                        _logger.LogInformation("Updated Product {ProductId} normalized specifications with {NewNormalizedCount} new items from mapping {MappingId}",
-                            product.ProductId, newNormalized.Count, mappingId);
+                        productUpdated = true;
+
+                        _logger.LogInformation("Updated Product {ProductId} normalized specifications with {NewNormalizedCount} new items from mapping {MappingId}. Total normalized specs: {TotalCount}",
+                            product.ProductId, newNormalized.Count, mappingId, mergedNormalized.Count);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("No normalized specifications found in result for mapping {MappingId}", mappingId);
                     }
 
                     // Update uncategorized specifications if available
@@ -1064,22 +1098,44 @@ public partial class WebScrapingService
                         }
 
                         product.UncategorizedSpecificationsDict = mergedUncategorized;
-                        
-                        _logger.LogInformation("Updated Product {ProductId} uncategorized specifications with {NewUncategorizedCount} new items from mapping {MappingId}",
-                            product.ProductId, newUncategorized.Count, mappingId);
+                        productUpdated = true;
+
+                        _logger.LogInformation("Updated Product {ProductId} uncategorized specifications with {NewUncategorizedCount} new items from mapping {MappingId}. Total uncategorized specs: {TotalCount}",
+                            product.ProductId, newUncategorized.Count, mappingId, mergedUncategorized.Count);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("No uncategorized specifications found in result for mapping {MappingId}", mappingId);
                     }
 
-                    product.UpdatedAt = DateTimeOffset.UtcNow;
-                    _unitOfWork.Products.Update(product);
-                    
-                    _logger.LogInformation("Updated Product {ProductId} specifications from mapping {MappingId}",
-                        product.ProductId, mappingId);
+                    if (productUpdated)
+                    {
+                        product.UpdatedAt = DateTimeOffset.UtcNow;
+                        _unitOfWork.Products.Update(product);
+                        
+                        _logger.LogInformation("Updated Product {ProductId} specifications from mapping {MappingId}",
+                            product.ProductId, mappingId);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("No specifications were available to update for Product {ProductId} from mapping {MappingId}",
+                            product.ProductId, mappingId);
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("Canonical product {ProductId} not found for mapping {MappingId}", 
+                        mapping.CanonicalProductId, mappingId);
                 }
             }
-            else if (specResult.Quality?.OverallScore < 0.7)
+            else if (specResult.Quality?.OverallScore < 0.5)
             {
-                _logger.LogInformation("Skipping product specification update for mapping {MappingId} due to low quality score: {QualityScore}",
+                _logger.LogWarning("Skipping product specification update for mapping {MappingId} due to low quality score: {QualityScore:F2} (threshold: 0.5)",
                     mappingId, specResult.Quality?.OverallScore ?? 0);
+            }
+            else
+            {
+                _logger.LogWarning("Skipping product specification update for mapping {MappingId} due to empty canonical product ID", mappingId);
             }
 
             // Save changes
