@@ -29,11 +29,11 @@ import { MappingDeleteDialogComponent } from './components/mapping-delete-dialog
 
 @NgModule({
   declarations: [
-    MappingsListComponent,
     MappingFormComponent,
     MappingDeleteDialogComponent
   ],
   imports: [
+    MappingsListComponent,
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
