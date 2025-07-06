@@ -373,7 +373,7 @@ public class ProductComparisonControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
         var apiResponse = Assert.IsType<ApiResponse<PagedResponse<ProductDto>>>(okResult.Value);
         Assert.True(apiResponse.Success);
-        Assert.Equal(2, apiResponse.Data!.Data.Count());
+        Assert.Equal(2, apiResponse.Data!.Data!.Count());
         _productComparisonServiceMock.Verify(x => x.GetComparableProductsAsync(productId, search, 1, 10), Times.Once);
     }
 
@@ -401,7 +401,7 @@ public class ProductComparisonControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
         var apiResponse = Assert.IsType<ApiResponse<PagedResponse<ProductDto>>>(okResult.Value);
         Assert.True(apiResponse.Success);
-        Assert.Equal(1, apiResponse.Data!.Data!.Count());
+        Assert.Single(apiResponse.Data!.Data!);
         _productComparisonServiceMock.Verify(x => x.GetComparableProductsAsync(productId, null, 1, 10), Times.Once);
     }
 

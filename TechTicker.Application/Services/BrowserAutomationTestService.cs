@@ -46,7 +46,7 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
         _sessionCancellationTokens = new ConcurrentDictionary<string, CancellationTokenSource>();
     }
 
-    public async Task<Result<BrowserTestSessionDto>> StartTestSessionAsync(
+    public Task<Result<BrowserTestSessionDto>> StartTestSessionAsync(
         BrowserAutomationTestRequestDto request,
         CancellationToken cancellationToken = default)
     {
@@ -87,15 +87,15 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
             // Start the test execution in the background
             _ = Task.Run(async () => await ExecuteTestAsync(session, sessionCts.Token), sessionCts.Token);
 
-            return Result<BrowserTestSessionDto>.Success(sessionDto);
+            return Task.FromResult(Result<BrowserTestSessionDto>.Success(sessionDto));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error starting test session {SessionId}", sessionId);
             CleanupSession(sessionId);
-            return Result<BrowserTestSessionDto>.Failure(
+            return Task.FromResult(Result<BrowserTestSessionDto>.Failure(
                 "Failed to start test session", 
-                "TEST_SESSION_START_ERROR");
+                "TEST_SESSION_START_ERROR"));
         }
     }
 
@@ -292,8 +292,6 @@ public class BrowserAutomationTestService : IBrowserAutomationTestService
                 "ACTIVE_SESSIONS_ERROR"));
         }
     }
-
-
 
     private async Task ExecuteTestAsync(TestSession session, CancellationToken cancellationToken)
     {

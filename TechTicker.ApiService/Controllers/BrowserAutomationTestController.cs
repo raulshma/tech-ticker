@@ -203,8 +203,6 @@ public class BrowserAutomationTestController : BaseApiController
         }
     }
 
-
-
     /// <summary>
     /// Validate a browser automation profile without executing
     /// </summary>
@@ -213,7 +211,7 @@ public class BrowserAutomationTestController : BaseApiController
     /// <returns>Validation result</returns>
     [HttpPost("validate")]
     [RequirePermission(Permissions.ScrapersViewLogs)]
-    public async Task<ActionResult<ApiResponse<ProfileValidationResultDto>>> ValidateProfile(
+    public Task<ActionResult<ApiResponse<ProfileValidationResultDto>>> ValidateProfile(
         [FromBody] ProfileValidationRequestDto request,
         CancellationToken cancellationToken = default)
     {
@@ -268,17 +266,15 @@ public class BrowserAutomationTestController : BaseApiController
                 validationResult.IsValid = false;
             }
 
-            return ApiResponse<ProfileValidationResultDto>.SuccessResult(validationResult);
+            return Task.FromResult<ActionResult<ApiResponse<ProfileValidationResultDto>>>(ApiResponse<ProfileValidationResultDto>.SuccessResult(validationResult));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error validating browser automation profile");
-            return StatusCode(500, ApiResponse<ProfileValidationResultDto>.FailureResult("Internal server error", 500));
+            return Task.FromResult<ActionResult<ApiResponse<ProfileValidationResultDto>>>(StatusCode(500, ApiResponse<ProfileValidationResultDto>.FailureResult("Internal server error", 500)));
         }
     }
 }
-
-
 
 /// <summary>
 /// Request DTO for profile validation

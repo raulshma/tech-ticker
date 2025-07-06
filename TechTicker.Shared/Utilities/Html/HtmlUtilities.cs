@@ -17,8 +17,8 @@ namespace TechTicker.Shared.Utilities.Html
     // Interfaces and supporting classes
     public interface ITableParser
     {
-        Task<string> ParseToJsonAsync(string html, ParsingOptions options = null, JsonSerializerOptions jsonOptions = null);
-        Task<ParsingResult<List<ProductSpecification>>> ParseAsync(string html, ParsingOptions options = null);
+        Task<string> ParseToJsonAsync(string html, ParsingOptions? options = null, JsonSerializerOptions? jsonOptions = null);
+        Task<ParsingResult<List<ProductSpecification>>> ParseAsync(string html, ParsingOptions? options = null);
     }
 
     public class ParsingOptions
@@ -37,7 +37,7 @@ namespace TechTicker.Shared.Utilities.Html
     public class ParsingResult<T>
     {
         public bool Success { get; set; }
-        public T Data { get; set; }
+        public required T Data { get; set; }
         public List<string> Errors { get; set; } = new List<string>();
         public List<string> Warnings { get; set; } = new List<string>();
         public TimeSpan ProcessingTime { get; set; }
@@ -366,7 +366,7 @@ namespace TechTicker.Shared.Utilities.Html
     public class TypedSpecification
     {
         [JsonPropertyName("value")]
-        public object Value { get; set; }
+        public required object Value { get; set; }
         
         [JsonPropertyName("type")]
         public SpecificationType Type { get; set; }
@@ -488,8 +488,8 @@ namespace TechTicker.Shared.Utilities.Html
         private readonly string _userLogin;
 
         public UniversalTableParser(
-            ILogger<UniversalTableParser> logger = null,
-            IMemoryCache cache = null)
+            ILogger<UniversalTableParser>? logger = null,
+            IMemoryCache? cache = null)
         {
             _logger = logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<UniversalTableParser>.Instance;
             _cache = cache ?? new MemoryCache(new MemoryCacheOptions());
@@ -502,7 +502,7 @@ namespace TechTicker.Shared.Utilities.Html
             _userLogin = "raulshma";
         }
 
-        public async Task<string> ParseToJsonAsync(string html, ParsingOptions options = null, JsonSerializerOptions jsonOptions = null)
+        public async Task<string> ParseToJsonAsync(string html, ParsingOptions? options = null, JsonSerializerOptions? jsonOptions = null)
         {
             var result = await ParseAsync(html, options);
             
@@ -537,7 +537,7 @@ namespace TechTicker.Shared.Utilities.Html
             return JsonSerializer.Serialize(response, jsonOptions);
         }
 
-        public async Task<ParsingResult<List<ProductSpecification>>> ParseAsync(string html, ParsingOptions options = null)
+        public async Task<ParsingResult<List<ProductSpecification>>> ParseAsync(string html, ParsingOptions? options = null)
         {
             var startTime = DateTime.UtcNow;
             var result = new ParsingResult<List<ProductSpecification>>
@@ -561,7 +561,7 @@ namespace TechTicker.Shared.Utilities.Html
 
                 var cacheKey = GenerateUniversalCacheKey(html, options);
                 
-                if (options.EnableCaching && _cache.TryGetValue(cacheKey, out List<ProductSpecification> cachedResult))
+                if (options.EnableCaching && _cache.TryGetValue(cacheKey, out List<ProductSpecification>? cachedResult) && cachedResult != null)
                 {
                     _logger?.LogDebug("Cache hit for universal parser: {CacheKey}", cacheKey[..16] + "...");
                     result.Data = cachedResult;
@@ -572,7 +572,7 @@ namespace TechTicker.Shared.Utilities.Html
                 var doc = new HtmlDocument();
                 doc.LoadHtml(html);
 
-                var tables = doc.DocumentNode.SelectNodes("//table") ?? new HtmlNodeCollection(null);
+                var tables = doc.DocumentNode.SelectNodes("//table") ?? new HtmlNodeCollection(doc.DocumentNode);
                 _logger?.LogInformation("Processing {TableCount} tables with universal parser", tables.Count);
 
                 // Process tables with universal strategy
@@ -632,7 +632,7 @@ namespace TechTicker.Shared.Utilities.Html
                 if (!rows.Any())
                 {
                     _logger?.LogDebug("Skipping empty table");
-                    return null;
+                    return null!;
                 }
 
                 // Universal source detection with inline multi-value detection
@@ -680,7 +680,7 @@ namespace TechTicker.Shared.Utilities.Html
             catch (Exception ex)
             {
                 _logger?.LogWarning(ex, "Failed to process universal table");
-                return null;
+                return null!;
             }
         }
 
@@ -771,7 +771,7 @@ namespace TechTicker.Shared.Utilities.Html
         {
             await Task.Run(() =>
             {
-                string currentKey = null;
+                string? currentKey = null;
                 var currentValues = new List<SpecificationValue>();
                 var valueOrder = 0;
 
@@ -893,7 +893,7 @@ namespace TechTicker.Shared.Utilities.Html
         {
             await Task.Run(() =>
             {
-                string currentKey = null;
+                string? currentKey = null;
                 var currentValues = new List<SpecificationValue>();
                 var valueOrder = 0;
 
@@ -951,7 +951,7 @@ namespace TechTicker.Shared.Utilities.Html
         {
             await Task.Run(() =>
             {
-                string currentKey = null;
+                string? currentKey = null;
                 var currentValues = new List<SpecificationValue>();
                 var valueOrder = 0;
 
@@ -1029,6 +1029,7 @@ namespace TechTicker.Shared.Utilities.Html
 
             var typedSpec = new TypedSpecification
             {
+                Value = values.FirstOrDefault()?.NormalizedValue ?? values.FirstOrDefault()?.Value ?? "",
                 HasMultipleValues = values.Count > 1,
                 ValueCount = values.Count,
                 Confidence = values.Average(v => v.Confidence),
@@ -1039,7 +1040,7 @@ namespace TechTicker.Shared.Utilities.Html
             typedSpec.Metadata["hasContinuations"] = values.Any(v => v.IsContinuation);
             typedSpec.Metadata["continuationCount"] = values.Count(v => v.IsContinuation);
             typedSpec.Metadata["inlineValueCount"] = values.Count(v => v.IsInlineValue);
-            typedSpec.Metadata["primaryValue"] = values.FirstOrDefault(v => !v.IsContinuation)?.Value ?? "";
+            typedSpec.Metadata["primaryValue"] = values.FirstOrDefault(v => !v.IsContinuation)?.Value ?? string.Empty;
 
             if (values.Count == 1)
             {

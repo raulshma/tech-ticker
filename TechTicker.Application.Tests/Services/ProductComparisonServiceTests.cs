@@ -325,7 +325,7 @@ public class ProductComparisonServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Data);
-        Assert.True(result.Data.Data.Any());
+        Assert.True(result.Data!.Data!.Any());
     }
 
     [Fact]
@@ -367,7 +367,7 @@ public class ProductComparisonServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Data);
-        Assert.Empty(result.Data.Data);
+        Assert.Empty(result.Data!.Data!);
     }
 
     #endregion
