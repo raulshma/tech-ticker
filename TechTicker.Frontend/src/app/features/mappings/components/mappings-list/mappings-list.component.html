@@ -145,136 +145,148 @@
           </div>
         </div>
 
-        <!-- Grouped Mappings View -->
-        <div *ngIf="!isLoading" class="grouped-container">
-          <ng-container *ngIf="mappingGroups.length > 0; else noMappings">
-            <mat-accordion multi>
-              <mat-expansion-panel *ngFor="let group of mappingGroups" [expanded]="true">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    {{ group.productName }} ({{ group.mappings.length }} mappings)
-                  </mat-panel-title>
-                </mat-expansion-panel-header>
+        <!-- Mappings Table -->
+        <div *ngIf="!isLoading" class="table-container">
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="dataSource" matSort class="mappings-table-modern">
+              <!-- Product Column -->
+              <ng-container matColumnDef="product">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="product-header">Product</th>
+                <td mat-cell *matCellDef="let mapping" class="product-cell">
+                  <div class="product-info-modern">
+                    <h4 class="mat-title-medium product-name">{{getProductName(mapping.canonicalProductId)}}</h4>
+                    <p *ngIf="mapping.product?.manufacturer" class="mat-body-small product-details">
+                      {{mapping.product.manufacturer}} - {{mapping.product.modelNumber}}
+                    </p>
+                  </div>
+                </td>
+              </ng-container>
 
-                <div class="table-wrapper">
-                  <table mat-table [dataSource]="group.mappings" class="mappings-table-modern">
-                    <!-- Seller Column -->
-                    <ng-container matColumnDef="sellerName">
-                      <th mat-header-cell *matHeaderCellDef class="seller-header">Seller</th>
-                      <td mat-cell *matCellDef="let mapping" class="seller-cell">
-                        <div class="seller-info">
-                          <span class="mat-body-medium seller-name">{{mapping.sellerName || 'N/A'}}</span>
-                        </div>
-                      </td>
-                    </ng-container>
+              <!-- Seller Column -->
+              <ng-container matColumnDef="sellerName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="seller-header">Seller</th>
+                <td mat-cell *matCellDef="let mapping" class="seller-cell">
+                  <div class="seller-info">
+                    <span class="mat-body-medium seller-name">{{mapping.sellerName || 'N/A'}}</span>
+                  </div>
+                </td>
+              </ng-container>
 
-                    <!-- Product URL Column -->
-                    <ng-container matColumnDef="exactProductUrl">
-                      <th mat-header-cell *matHeaderCellDef class="url-header">Product URL</th>
-                      <td mat-cell *matCellDef="let mapping" class="url-cell">
-                        <a *ngIf="mapping.exactProductUrl"
-                           [href]="mapping.exactProductUrl"
-                           target="_blank"
-                           class="product-url-modern"
-                           matTooltip="Open product page">
-                          <mat-icon>open_in_new</mat-icon>
-                          <span>View Product</span>
-                        </a>
-                        <span *ngIf="!mapping.exactProductUrl" class="no-url">No URL</span>
-                      </td>
-                    </ng-container>
+              <!-- Product URL Column -->
+              <ng-container matColumnDef="exactProductUrl">
+                <th mat-header-cell *matHeaderCellDef class="url-header">Product URL</th>
+                <td mat-cell *matCellDef="let mapping" class="url-cell">
+                  <a *ngIf="mapping.exactProductUrl"
+                     [href]="mapping.exactProductUrl"
+                     target="_blank"
+                     class="product-url-modern"
+                     matTooltip="Open product page">
+                    <mat-icon>open_in_new</mat-icon>
+                    <span>View Product</span>
+                  </a>
+                  <span *ngIf="!mapping.exactProductUrl" class="no-url">No URL</span>
+                </td>
+              </ng-container>
 
-                    <!-- Status Column -->
-                    <ng-container matColumnDef="isActiveForScraping">
-                      <th mat-header-cell *matHeaderCellDef class="status-header">Scraping Status</th>
-                      <td mat-cell *matCellDef="let mapping" class="status-cell">
-                        <mat-chip [class]="'status-chip-' + (mapping.isActiveForScraping ? 'primary' : 'warn')">
-                          <mat-icon>{{mapping.isActiveForScraping ? 'check_circle' : 'pause_circle'}}</mat-icon>
-                          {{mapping.isActiveForScraping ? 'Active' : 'Inactive'}}
-                        </mat-chip>
-                      </td>
-                    </ng-container>
+              <!-- Status Column -->
+              <ng-container matColumnDef="isActiveForScraping">
+                <th mat-header-cell *matHeaderCellDef class="status-header">Scraping Status</th>
+                <td mat-cell *matCellDef="let mapping" class="status-cell">
+                  <mat-chip [class]="'status-chip-' + (mapping.isActiveForScraping ? 'primary' : 'warn')">
+                    <mat-icon>{{mapping.isActiveForScraping ? 'check_circle' : 'pause_circle'}}</mat-icon>
+                    {{mapping.isActiveForScraping ? 'Active' : 'Inactive'}}
+                  </mat-chip>
+                </td>
+              </ng-container>
 
-                    <!-- Last Scraped Column -->
-                    <ng-container matColumnDef="lastScrapedAt">
-                      <th mat-header-cell *matHeaderCellDef class="scraped-header">Last Scraped</th>
-                      <td mat-cell *matCellDef="let mapping" class="scraped-cell">
-                        <div *ngIf="mapping.lastScrapedAt; else neverScrapedGrouped" class="scraped-info">
-                          <span class="mat-body-medium scraped-date">{{mapping.lastScrapedAt | date:'MMM d, y'}}</span>
-                          <span class="mat-body-small scraped-time">{{mapping.lastScrapedAt | date:'shortTime'}}</span>
-                        </div>
-                        <ng-template #neverScrapedGrouped>
-                          <span class="never-scraped">Never</span>
-                        </ng-template>
-                      </td>
-                    </ng-container>
+              <!-- Last Scraped Column -->
+              <ng-container matColumnDef="lastScrapedAt">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="scraped-header">Last Scraped</th>
+                <td mat-cell *matCellDef="let mapping" class="scraped-cell">
+                  <div *ngIf="mapping.lastScrapedAt; else neverScraped" class="scraped-info">
+                    <span class="mat-body-medium scraped-date">{{mapping.lastScrapedAt | date:'MMM d, y'}}</span>
+                    <span class="mat-body-small scraped-time">{{mapping.lastScrapedAt | date:'shortTime'}}</span>
+                  </div>
+                  <ng-template #neverScraped>
+                    <span class="never-scraped">Never</span>
+                  </ng-template>
+                </td>
+              </ng-container>
 
-                    <!-- Scrape Status Column -->
-                    <ng-container matColumnDef="lastScrapeStatus">
-                      <th mat-header-cell *matHeaderCellDef class="scrape-status-header">Status</th>
-                      <td mat-cell *matCellDef="let mapping" class="scrape-status-cell">
-                        <mat-chip [class]="'status-chip-' + getStatusColor(mapping.lastScrapeStatus)">
-                          <mat-icon>{{getStatusIcon(mapping.lastScrapeStatus)}}</mat-icon>
-                          {{mapping.lastScrapeStatus || 'Unknown'}}
-                        </mat-chip>
-                      </td>
-                    </ng-container>
+              <!-- Scrape Status Column -->
+              <ng-container matColumnDef="lastScrapeStatus">
+                <th mat-header-cell *matHeaderCellDef class="scrape-status-header">Status</th>
+                <td mat-cell *matCellDef="let mapping" class="scrape-status-cell">
+                  <mat-chip [class]="'status-chip-' + getStatusColor(mapping.lastScrapeStatus)">
+                    <mat-icon>{{getStatusIcon(mapping.lastScrapeStatus)}}</mat-icon>
+                    {{mapping.lastScrapeStatus || 'Unknown'}}
+                  </mat-chip>
+                </td>
+              </ng-container>
 
-                    <!-- Actions Column -->
-                    <ng-container matColumnDef="actions">
-                      <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
-                      <td mat-cell *matCellDef="let mapping" class="actions-cell">
-                        <div class="actions-group">
-                          <button matIconButton
-                                  (click)="triggerScraping(mapping)"
-                                  [disabled]="!mapping.isActiveForScraping || isScrapingInProgress(mapping.mappingId)"
-                                  matTooltip="Scrape now">
-                            <mat-icon>refresh</mat-icon>
-                          </button>
-                          <button matIconButton
-                                  (click)="editMapping(mapping)"
-                                  matTooltip="Edit mapping">
-                            <mat-icon>edit</mat-icon>
-                          </button>
-                          <button matIconButton
-                                  (click)="deleteMapping(mapping)"
-                                  matTooltip="Delete mapping">
-                            <mat-icon>delete</mat-icon>
-                          </button>
-                        </div>
-                      </td>
-                    </ng-container>
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+                <td mat-cell *matCellDef="let mapping" class="actions-cell">
+                  <div class="actions-group">
+                    <button matIconButton
+                            (click)="triggerScraping(mapping)"
+                            [disabled]="!mapping.isActiveForScraping || isScrapingInProgress(mapping.mappingId)"
+                            matTooltip="Scrape now">
+                      <mat-icon>refresh</mat-icon>
+                    </button>
+                    <button matIconButton
+                            (click)="editMapping(mapping)"
+                            matTooltip="Edit mapping">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button matIconButton
+                            (click)="deleteMapping(mapping)"
+                            matTooltip="Delete mapping">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="innerDisplayedColumns" class="header-row-modern"></tr>
-                    <tr mat-row *matRowDef="let row; columns: innerDisplayedColumns;" class="table-row-modern"></tr>
-                  </table>
-                </div>
-              </mat-expansion-panel>
-            </mat-accordion>
-          </ng-container>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns" class="header-row-modern"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row-modern"></tr>
 
-          <!-- Empty state when there are no mappings -->
-          <ng-template #noMappings>
-            <div class="empty-state-modern">
-              <div class="empty-content">
-                <mat-icon class="empty-icon">link_off</mat-icon>
-                <h3 class="mat-title-large empty-title">No Mappings Found</h3>
-                <p class="mat-body-large empty-subtitle">
-                  {{ hasFilters() ? 'Try adjusting your filters or search terms' : 'Get started by creating your first product mapping' }}
-                </p>
-                <div class="empty-actions">
-                  <button matButton="filled" color="primary" (click)="createMapping()" *ngIf="!hasFilters()">
-                    <mat-icon>add</mat-icon>
-                    Create First Mapping
-                  </button>
-                  <button matButton="outlined" (click)="clearFilters()" *ngIf="hasFilters()">
-                    <mat-icon>clear</mat-icon>
-                    Clear Filters
-                  </button>
-                </div>
-              </div>
-            </div>
-          </ng-template>
+              <!-- No data row -->
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                  <div class="empty-state-modern">
+                    <div class="empty-content">
+                      <mat-icon class="empty-icon">link_off</mat-icon>
+                      <h3 class="mat-title-large empty-title">No Mappings Found</h3>
+                      <p class="mat-body-large empty-subtitle">
+                        {{ hasFilters() ? 'Try adjusting your filters or search terms' : 'Get started by creating your first product mapping' }}
+                      </p>
+                      <div class="empty-actions">
+                        <button matButton="filled" color="primary" (click)="createMapping()" *ngIf="!hasFilters()">
+                          <mat-icon>add</mat-icon>
+                          Create First Mapping
+                        </button>
+                        <button matButton="outlined" (click)="clearFilters()" *ngIf="hasFilters()">
+                          <mat-icon>clear</mat-icon>
+                          Clear Filters
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Enhanced Pagination -->
+          <div class="pagination-container">
+            <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]"
+                           showFirstLastButtons
+                           class="modern-paginator"
+                           aria-label="Select page of mappings">
+            </mat-paginator>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
