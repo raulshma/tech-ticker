@@ -11,6 +11,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
 
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -36,6 +40,10 @@ import { RbacModule } from '../../shared/modules/rbac.module';
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatMenuModule,
+    MatCheckboxModule,
+    MatSelectModule,
+    MatChipsModule,
     RbacModule
   ]
 })
