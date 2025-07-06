@@ -87,6 +87,11 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    public TechTickerDbContext GetDbContext()
+    {
+        return _context;
+    }
+
     public void Dispose()
     {
         _transaction?.Dispose();

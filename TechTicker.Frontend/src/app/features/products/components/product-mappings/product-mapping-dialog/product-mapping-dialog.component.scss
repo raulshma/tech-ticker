@@ -146,6 +146,38 @@
   }
 }
 
+// Form Actions Modern
+.form-actions-modern {
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  padding-top: 24px;
+  margin-top: 8px;
+  
+  .actions-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    align-items: center;
+    
+    @media (max-width: 768px) {
+      flex-direction: column-reverse;
+      gap: 12px;
+    }
+  }
+  
+  button {
+    min-width: 100px;
+    border-radius: 20px;
+    
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+  
+  .form-spinner {
+    margin-right: 8px;
+  }
+}
+
 // Responsive design
 @media (max-width: 600px) {
   .product-mapping-dialog-container {

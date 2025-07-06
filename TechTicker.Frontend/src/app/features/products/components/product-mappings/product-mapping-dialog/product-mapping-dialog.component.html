@@ -100,17 +100,20 @@
           </div>
         </div>
       </mat-expansion-panel>
-    </form>
-  </div>
 
-  <div mat-dialog-actions class="dialog-actions-modern">
-    <button mat-stroked-button type="button" (click)="onCancel()" [disabled]="isLoading">
-      Cancel
-    </button>
-    <button mat-flat-button color="primary" type="submit" [disabled]="mappingForm.invalid || isLoading">
-      <mat-spinner *ngIf="isLoading" diameter="20" class="form-spinner"></mat-spinner>
-      <span *ngIf="!isLoading">{{ data.isEdit ? 'Update Mapping' : 'Add Mapping' }}</span>
-      <span *ngIf="isLoading">{{ data.isEdit ? 'Updating...' : 'Adding...' }}</span>
-    </button>
+      <!-- Form Actions -->
+      <div class="form-actions-modern">
+        <div class="actions-container">
+          <button mat-stroked-button type="button" (click)="onCancel()" [disabled]="isLoading">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="mappingForm.invalid || isLoading">
+            <mat-spinner *ngIf="isLoading" diameter="20" class="form-spinner"></mat-spinner>
+            <span *ngIf="!isLoading">{{ data.isEdit ? 'Update Mapping' : 'Add Mapping' }}</span>
+            <span *ngIf="isLoading">{{ data.isEdit ? 'Updating...' : 'Adding...' }}</span>
+          </button>
+        </div>
+      </div>
+    </form>
   </div>
 </div> 
