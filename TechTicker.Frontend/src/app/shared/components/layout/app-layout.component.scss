@@ -1192,4 +1192,20 @@ mat-sidenav-content {
   .expandable-header {
     border: 1px solid var(--mat-sys-color-outline);
   }
+}
+
+// When sidebar is closed on desktop, make main content full width
+.sidenav-container.sidebar-closed {
+  .modern-sidenav {
+    width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  mat-sidenav-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
 } 

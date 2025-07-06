@@ -1,4 +1,4 @@
-<mat-sidenav-container class="sidenav-container">
+<mat-sidenav-container class="sidenav-container" [class.sidebar-closed]="!isSidebarOpen && !isMobile">
   <!-- Sidebar -->
   <mat-sidenav #drawer 
                class="sidenav modern-sidenav" 
