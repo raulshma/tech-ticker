@@ -27,6 +27,7 @@ public class ProxyConfigurationDto
     public int MaxRetries { get; set; }
     public string? LastErrorMessage { get; set; }
     public string? LastErrorCode { get; set; }
+    public int? LastResponseTime { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
     

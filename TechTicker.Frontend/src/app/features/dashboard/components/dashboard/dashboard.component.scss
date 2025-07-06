@@ -287,6 +287,11 @@
       background: #F3E5F5;
       mat-icon { color: #7B1FA2; }
     }
+
+    &.analytics-surface {
+      background: linear-gradient(135deg, #E8EAF6 0%, #C5CAE9 100%);
+      mat-icon { color: #3F51B5; }
+    }
   }
 
   h3 {

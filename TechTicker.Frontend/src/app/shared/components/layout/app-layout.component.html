@@ -62,6 +62,17 @@
                 <div class="nav-indicator"></div>
               </div>
             </a>
+
+            <a class="nav-item primary-item" 
+               routerLink="/dashboard/analytics" 
+               routerLinkActive="active"
+               *hasRole="'Admin'">
+              <div class="nav-item-wrapper">
+                <mat-icon class="nav-icon">analytics</mat-icon>
+                <span class="nav-label">Analytics</span>
+                <div class="nav-indicator"></div>
+              </div>
+            </a>
           </div>
         </div>
 
@@ -175,6 +186,16 @@
             </button>
             
             <div class="nav-items" [class.expanded]="expandedSections['monitoring']">
+              <a class="nav-item" 
+                 routerLink="/dashboard/analytics" 
+                 routerLinkActive="active">
+                <div class="nav-item-wrapper">
+                  <mat-icon class="nav-icon">analytics</mat-icon>
+                  <span class="nav-label">Analytics Dashboard</span>
+                  <div class="nav-indicator"></div>
+                </div>
+              </a>
+              
               <a class="nav-item" 
                  routerLink="/scraper-logs" 
                  routerLinkActive="active">

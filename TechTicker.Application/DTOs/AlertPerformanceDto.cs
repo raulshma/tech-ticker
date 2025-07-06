@@ -73,6 +73,10 @@ public class AlertSystemHealthDto
     public double CpuUsagePercent { get; set; }
     public int QueueBacklog { get; set; }
     public TimeSpan AverageProcessingDelay { get; set; }
+    public double OverallSuccessRate { get; set; }
+    public double AverageResponseTime { get; set; }
+    public int AlertsInLastHour { get; set; }
+    public int NotificationsInLastHour { get; set; }
 }
 
 /// <summary>

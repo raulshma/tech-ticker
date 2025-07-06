@@ -3803,6 +3803,362 @@ export class TechTickerApiClient {
     }
 
     /**
+     * @param dateFrom (optional) 
+     * @param dateTo (optional) 
+     * @return OK
+     */
+    getAnalyticsDashboard(dateFrom: Date | undefined, dateTo: Date | undefined): Observable<AnalyticsDashboardDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Dashboard/analytics?";
+        if (dateFrom === null)
+            throw new Error("The parameter 'dateFrom' cannot be null.");
+        else if (dateFrom !== undefined)
+            url_ += "dateFrom=" + encodeURIComponent(dateFrom ? "" + dateFrom.toISOString() : "") + "&";
+        if (dateTo === null)
+            throw new Error("The parameter 'dateTo' cannot be null.");
+        else if (dateTo !== undefined)
+            url_ += "dateTo=" + encodeURIComponent(dateTo ? "" + dateTo.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAnalyticsDashboard(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAnalyticsDashboard(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AnalyticsDashboardDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AnalyticsDashboardDtoApiResponse>;
+        }));
+    }
+
+    protected processGetAnalyticsDashboard(response: HttpResponseBase): Observable<AnalyticsDashboardDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AnalyticsDashboardDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dateFrom (optional) 
+     * @param dateTo (optional) 
+     * @return OK
+     */
+    getBrowserAutomationAnalytics(dateFrom: Date | undefined, dateTo: Date | undefined): Observable<BrowserAutomationAnalyticsDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Dashboard/analytics/browser-automation?";
+        if (dateFrom === null)
+            throw new Error("The parameter 'dateFrom' cannot be null.");
+        else if (dateFrom !== undefined)
+            url_ += "dateFrom=" + encodeURIComponent(dateFrom ? "" + dateFrom.toISOString() : "") + "&";
+        if (dateTo === null)
+            throw new Error("The parameter 'dateTo' cannot be null.");
+        else if (dateTo !== undefined)
+            url_ += "dateTo=" + encodeURIComponent(dateTo ? "" + dateTo.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetBrowserAutomationAnalytics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetBrowserAutomationAnalytics(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BrowserAutomationAnalyticsDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BrowserAutomationAnalyticsDtoApiResponse>;
+        }));
+    }
+
+    protected processGetBrowserAutomationAnalytics(response: HttpResponseBase): Observable<BrowserAutomationAnalyticsDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BrowserAutomationAnalyticsDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dateFrom (optional) 
+     * @param dateTo (optional) 
+     * @return OK
+     */
+    getAlertSystemAnalytics(dateFrom: Date | undefined, dateTo: Date | undefined): Observable<AlertSystemAnalyticsDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Dashboard/analytics/alert-system?";
+        if (dateFrom === null)
+            throw new Error("The parameter 'dateFrom' cannot be null.");
+        else if (dateFrom !== undefined)
+            url_ += "dateFrom=" + encodeURIComponent(dateFrom ? "" + dateFrom.toISOString() : "") + "&";
+        if (dateTo === null)
+            throw new Error("The parameter 'dateTo' cannot be null.");
+        else if (dateTo !== undefined)
+            url_ += "dateTo=" + encodeURIComponent(dateTo ? "" + dateTo.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAlertSystemAnalytics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAlertSystemAnalytics(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AlertSystemAnalyticsDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AlertSystemAnalyticsDtoApiResponse>;
+        }));
+    }
+
+    protected processGetAlertSystemAnalytics(response: HttpResponseBase): Observable<AlertSystemAnalyticsDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AlertSystemAnalyticsDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dateFrom (optional) 
+     * @param dateTo (optional) 
+     * @return OK
+     */
+    getProxyManagementAnalytics(dateFrom: Date | undefined, dateTo: Date | undefined): Observable<ProxyManagementAnalyticsDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Dashboard/analytics/proxy-management?";
+        if (dateFrom === null)
+            throw new Error("The parameter 'dateFrom' cannot be null.");
+        else if (dateFrom !== undefined)
+            url_ += "dateFrom=" + encodeURIComponent(dateFrom ? "" + dateFrom.toISOString() : "") + "&";
+        if (dateTo === null)
+            throw new Error("The parameter 'dateTo' cannot be null.");
+        else if (dateTo !== undefined)
+            url_ += "dateTo=" + encodeURIComponent(dateTo ? "" + dateTo.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetProxyManagementAnalytics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetProxyManagementAnalytics(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProxyManagementAnalyticsDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProxyManagementAnalyticsDtoApiResponse>;
+        }));
+    }
+
+    protected processGetProxyManagementAnalytics(response: HttpResponseBase): Observable<ProxyManagementAnalyticsDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProxyManagementAnalyticsDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dateFrom (optional) 
+     * @param dateTo (optional) 
+     * @return OK
+     */
+    getScrapingWorkerAnalytics(dateFrom: Date | undefined, dateTo: Date | undefined): Observable<ScrapingWorkerAnalyticsDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Dashboard/analytics/scraping-worker?";
+        if (dateFrom === null)
+            throw new Error("The parameter 'dateFrom' cannot be null.");
+        else if (dateFrom !== undefined)
+            url_ += "dateFrom=" + encodeURIComponent(dateFrom ? "" + dateFrom.toISOString() : "") + "&";
+        if (dateTo === null)
+            throw new Error("The parameter 'dateTo' cannot be null.");
+        else if (dateTo !== undefined)
+            url_ += "dateTo=" + encodeURIComponent(dateTo ? "" + dateTo.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetScrapingWorkerAnalytics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetScrapingWorkerAnalytics(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ScrapingWorkerAnalyticsDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ScrapingWorkerAnalyticsDtoApiResponse>;
+        }));
+    }
+
+    protected processGetScrapingWorkerAnalytics(response: HttpResponseBase): Observable<ScrapingWorkerAnalyticsDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ScrapingWorkerAnalyticsDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getRealTimeSystemStatus(): Observable<RealTimeSystemStatusDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Dashboard/analytics/real-time-status";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetRealTimeSystemStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetRealTimeSystemStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RealTimeSystemStatusDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RealTimeSystemStatusDtoApiResponse>;
+        }));
+    }
+
+    protected processGetRealTimeSystemStatus(response: HttpResponseBase): Observable<RealTimeSystemStatusDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RealTimeSystemStatusDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @return OK
      */
     getSuccessExample(): Observable<ObjectApiResponse> {
@@ -11577,6 +11933,58 @@ export interface IAlertPerformanceTrendDtoListApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class AlertResponseTimeDataPoint implements IAlertResponseTimeDataPoint {
+    date?: Date;
+    averageResponseTime?: number;
+    minResponseTime?: number;
+    maxResponseTime?: number;
+    alertCount?: number;
+
+    constructor(data?: IAlertResponseTimeDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.averageResponseTime = _data["averageResponseTime"];
+            this.minResponseTime = _data["minResponseTime"];
+            this.maxResponseTime = _data["maxResponseTime"];
+            this.alertCount = _data["alertCount"];
+        }
+    }
+
+    static fromJS(data: any): AlertResponseTimeDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertResponseTimeDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["averageResponseTime"] = this.averageResponseTime;
+        data["minResponseTime"] = this.minResponseTime;
+        data["maxResponseTime"] = this.maxResponseTime;
+        data["alertCount"] = this.alertCount;
+        return data;
+    }
+}
+
+export interface IAlertResponseTimeDataPoint {
+    date?: Date;
+    averageResponseTime?: number;
+    minResponseTime?: number;
+    maxResponseTime?: number;
+    alertCount?: number;
+}
+
 export class AlertRuleDto implements IAlertRuleDto {
     alertRuleId?: string;
     userId?: string;
@@ -12456,6 +12864,186 @@ export interface IAlertRuleValidationResultDtoApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class AlertSystemAnalyticsDto implements IAlertSystemAnalyticsDto {
+    triggerFrequency?: AlertTriggerDataPoint[] | undefined;
+    notificationSuccessRate?: NotificationSuccessDataPoint[] | undefined;
+    responseTimeTrend?: AlertResponseTimeDataPoint[] | undefined;
+    topPerformers?: AlertRulePerformanceAnalysisDto[] | undefined;
+    poorPerformers?: AlertRulePerformanceAnalysisDto[] | undefined;
+    systemHealth?: AlertSystemHealthDto;
+
+    constructor(data?: IAlertSystemAnalyticsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["triggerFrequency"])) {
+                this.triggerFrequency = [] as any;
+                for (let item of _data["triggerFrequency"])
+                    this.triggerFrequency!.push(AlertTriggerDataPoint.fromJS(item));
+            }
+            if (Array.isArray(_data["notificationSuccessRate"])) {
+                this.notificationSuccessRate = [] as any;
+                for (let item of _data["notificationSuccessRate"])
+                    this.notificationSuccessRate!.push(NotificationSuccessDataPoint.fromJS(item));
+            }
+            if (Array.isArray(_data["responseTimeTrend"])) {
+                this.responseTimeTrend = [] as any;
+                for (let item of _data["responseTimeTrend"])
+                    this.responseTimeTrend!.push(AlertResponseTimeDataPoint.fromJS(item));
+            }
+            if (Array.isArray(_data["topPerformers"])) {
+                this.topPerformers = [] as any;
+                for (let item of _data["topPerformers"])
+                    this.topPerformers!.push(AlertRulePerformanceAnalysisDto.fromJS(item));
+            }
+            if (Array.isArray(_data["poorPerformers"])) {
+                this.poorPerformers = [] as any;
+                for (let item of _data["poorPerformers"])
+                    this.poorPerformers!.push(AlertRulePerformanceAnalysisDto.fromJS(item));
+            }
+            this.systemHealth = _data["systemHealth"] ? AlertSystemHealthDto.fromJS(_data["systemHealth"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): AlertSystemAnalyticsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertSystemAnalyticsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.triggerFrequency)) {
+            data["triggerFrequency"] = [];
+            for (let item of this.triggerFrequency)
+                data["triggerFrequency"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.notificationSuccessRate)) {
+            data["notificationSuccessRate"] = [];
+            for (let item of this.notificationSuccessRate)
+                data["notificationSuccessRate"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.responseTimeTrend)) {
+            data["responseTimeTrend"] = [];
+            for (let item of this.responseTimeTrend)
+                data["responseTimeTrend"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.topPerformers)) {
+            data["topPerformers"] = [];
+            for (let item of this.topPerformers)
+                data["topPerformers"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.poorPerformers)) {
+            data["poorPerformers"] = [];
+            for (let item of this.poorPerformers)
+                data["poorPerformers"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["systemHealth"] = this.systemHealth ? this.systemHealth.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IAlertSystemAnalyticsDto {
+    triggerFrequency?: AlertTriggerDataPoint[] | undefined;
+    notificationSuccessRate?: NotificationSuccessDataPoint[] | undefined;
+    responseTimeTrend?: AlertResponseTimeDataPoint[] | undefined;
+    topPerformers?: AlertRulePerformanceAnalysisDto[] | undefined;
+    poorPerformers?: AlertRulePerformanceAnalysisDto[] | undefined;
+    systemHealth?: AlertSystemHealthDto;
+}
+
+export class AlertSystemAnalyticsDtoApiResponse implements IAlertSystemAnalyticsDtoApiResponse {
+    success?: boolean;
+    data?: AlertSystemAnalyticsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAlertSystemAnalyticsDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AlertSystemAnalyticsDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AlertSystemAnalyticsDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertSystemAnalyticsDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAlertSystemAnalyticsDtoApiResponse {
+    success?: boolean;
+    data?: AlertSystemAnalyticsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class AlertSystemEventDto implements IAlertSystemEventDto {
     timestamp?: Date;
     eventType?: string | undefined;
@@ -12531,6 +13119,10 @@ export class AlertSystemHealthDto implements IAlertSystemHealthDto {
     cpuUsagePercent?: number;
     queueBacklog?: number;
     averageProcessingDelay?: string;
+    overallSuccessRate?: number;
+    averageResponseTime?: number;
+    alertsInLastHour?: number;
+    notificationsInLastHour?: number;
 
     constructor(data?: IAlertSystemHealthDto) {
         if (data) {
@@ -12557,6 +13149,10 @@ export class AlertSystemHealthDto implements IAlertSystemHealthDto {
             this.cpuUsagePercent = _data["cpuUsagePercent"];
             this.queueBacklog = _data["queueBacklog"];
             this.averageProcessingDelay = _data["averageProcessingDelay"];
+            this.overallSuccessRate = _data["overallSuccessRate"];
+            this.averageResponseTime = _data["averageResponseTime"];
+            this.alertsInLastHour = _data["alertsInLastHour"];
+            this.notificationsInLastHour = _data["notificationsInLastHour"];
         }
     }
 
@@ -12583,6 +13179,10 @@ export class AlertSystemHealthDto implements IAlertSystemHealthDto {
         data["cpuUsagePercent"] = this.cpuUsagePercent;
         data["queueBacklog"] = this.queueBacklog;
         data["averageProcessingDelay"] = this.averageProcessingDelay;
+        data["overallSuccessRate"] = this.overallSuccessRate;
+        data["averageResponseTime"] = this.averageResponseTime;
+        data["alertsInLastHour"] = this.alertsInLastHour;
+        data["notificationsInLastHour"] = this.notificationsInLastHour;
         return data;
     }
 }
@@ -12598,6 +13198,10 @@ export interface IAlertSystemHealthDto {
     cpuUsagePercent?: number;
     queueBacklog?: number;
     averageProcessingDelay?: string;
+    overallSuccessRate?: number;
+    averageResponseTime?: number;
+    alertsInLastHour?: number;
+    notificationsInLastHour?: number;
 }
 
 export class AlertSystemHealthDtoApiResponse implements IAlertSystemHealthDtoApiResponse {
@@ -13436,6 +14040,194 @@ export interface IAlertTestingStatsDtoApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class AlertTriggerDataPoint implements IAlertTriggerDataPoint {
+    date?: Date;
+    triggerCount?: number;
+    uniqueAlerts?: number;
+    averageResponseTime?: number;
+
+    constructor(data?: IAlertTriggerDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.triggerCount = _data["triggerCount"];
+            this.uniqueAlerts = _data["uniqueAlerts"];
+            this.averageResponseTime = _data["averageResponseTime"];
+        }
+    }
+
+    static fromJS(data: any): AlertTriggerDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new AlertTriggerDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["triggerCount"] = this.triggerCount;
+        data["uniqueAlerts"] = this.uniqueAlerts;
+        data["averageResponseTime"] = this.averageResponseTime;
+        return data;
+    }
+}
+
+export interface IAlertTriggerDataPoint {
+    date?: Date;
+    triggerCount?: number;
+    uniqueAlerts?: number;
+    averageResponseTime?: number;
+}
+
+export class AnalyticsDashboardDto implements IAnalyticsDashboardDto {
+    browserAutomation?: BrowserAutomationAnalyticsDto;
+    alertSystem?: AlertSystemAnalyticsDto;
+    proxyManagement?: ProxyManagementAnalyticsDto;
+    scrapingWorker?: ScrapingWorkerAnalyticsDto;
+    systemWideMetrics?: SystemWideMetricsDto;
+    realTimeStatus?: RealTimeSystemStatusDto;
+
+    constructor(data?: IAnalyticsDashboardDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.browserAutomation = _data["browserAutomation"] ? BrowserAutomationAnalyticsDto.fromJS(_data["browserAutomation"]) : <any>undefined;
+            this.alertSystem = _data["alertSystem"] ? AlertSystemAnalyticsDto.fromJS(_data["alertSystem"]) : <any>undefined;
+            this.proxyManagement = _data["proxyManagement"] ? ProxyManagementAnalyticsDto.fromJS(_data["proxyManagement"]) : <any>undefined;
+            this.scrapingWorker = _data["scrapingWorker"] ? ScrapingWorkerAnalyticsDto.fromJS(_data["scrapingWorker"]) : <any>undefined;
+            this.systemWideMetrics = _data["systemWideMetrics"] ? SystemWideMetricsDto.fromJS(_data["systemWideMetrics"]) : <any>undefined;
+            this.realTimeStatus = _data["realTimeStatus"] ? RealTimeSystemStatusDto.fromJS(_data["realTimeStatus"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): AnalyticsDashboardDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AnalyticsDashboardDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["browserAutomation"] = this.browserAutomation ? this.browserAutomation.toJSON() : <any>undefined;
+        data["alertSystem"] = this.alertSystem ? this.alertSystem.toJSON() : <any>undefined;
+        data["proxyManagement"] = this.proxyManagement ? this.proxyManagement.toJSON() : <any>undefined;
+        data["scrapingWorker"] = this.scrapingWorker ? this.scrapingWorker.toJSON() : <any>undefined;
+        data["systemWideMetrics"] = this.systemWideMetrics ? this.systemWideMetrics.toJSON() : <any>undefined;
+        data["realTimeStatus"] = this.realTimeStatus ? this.realTimeStatus.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IAnalyticsDashboardDto {
+    browserAutomation?: BrowserAutomationAnalyticsDto;
+    alertSystem?: AlertSystemAnalyticsDto;
+    proxyManagement?: ProxyManagementAnalyticsDto;
+    scrapingWorker?: ScrapingWorkerAnalyticsDto;
+    systemWideMetrics?: SystemWideMetricsDto;
+    realTimeStatus?: RealTimeSystemStatusDto;
+}
+
+export class AnalyticsDashboardDtoApiResponse implements IAnalyticsDashboardDtoApiResponse {
+    success?: boolean;
+    data?: AnalyticsDashboardDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IAnalyticsDashboardDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? AnalyticsDashboardDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): AnalyticsDashboardDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AnalyticsDashboardDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAnalyticsDashboardDtoApiResponse {
+    success?: boolean;
+    data?: AnalyticsDashboardDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class ApiResponse implements IApiResponse {
     success?: boolean;
     data?: any | undefined;
@@ -13862,6 +14654,202 @@ export interface IBrowserAutomationActionDto {
     delayMs?: number | undefined;
     repeat?: number | undefined;
     options?: { [key: string]: any; } | undefined;
+}
+
+export class BrowserAutomationAnalyticsDto implements IBrowserAutomationAnalyticsDto {
+    successRateTrend?: TestSuccessRateDataPoint[] | undefined;
+    executionTimeTrend?: TestExecutionTimeDataPoint[] | undefined;
+    commonFailurePoints?: FailurePointDto[] | undefined;
+    browserReliability?: { [key: string]: number; } | undefined;
+    popularTestUrls?: PopularTestUrlDto[] | undefined;
+    flakyTests?: FlakyTestDto[] | undefined;
+    overallStatistics?: TestExecutionStatisticsDto;
+
+    constructor(data?: IBrowserAutomationAnalyticsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["successRateTrend"])) {
+                this.successRateTrend = [] as any;
+                for (let item of _data["successRateTrend"])
+                    this.successRateTrend!.push(TestSuccessRateDataPoint.fromJS(item));
+            }
+            if (Array.isArray(_data["executionTimeTrend"])) {
+                this.executionTimeTrend = [] as any;
+                for (let item of _data["executionTimeTrend"])
+                    this.executionTimeTrend!.push(TestExecutionTimeDataPoint.fromJS(item));
+            }
+            if (Array.isArray(_data["commonFailurePoints"])) {
+                this.commonFailurePoints = [] as any;
+                for (let item of _data["commonFailurePoints"])
+                    this.commonFailurePoints!.push(FailurePointDto.fromJS(item));
+            }
+            if (_data["browserReliability"]) {
+                this.browserReliability = {} as any;
+                for (let key in _data["browserReliability"]) {
+                    if (_data["browserReliability"].hasOwnProperty(key))
+                        (<any>this.browserReliability)![key] = _data["browserReliability"][key];
+                }
+            }
+            if (Array.isArray(_data["popularTestUrls"])) {
+                this.popularTestUrls = [] as any;
+                for (let item of _data["popularTestUrls"])
+                    this.popularTestUrls!.push(PopularTestUrlDto.fromJS(item));
+            }
+            if (Array.isArray(_data["flakyTests"])) {
+                this.flakyTests = [] as any;
+                for (let item of _data["flakyTests"])
+                    this.flakyTests!.push(FlakyTestDto.fromJS(item));
+            }
+            this.overallStatistics = _data["overallStatistics"] ? TestExecutionStatisticsDto.fromJS(_data["overallStatistics"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): BrowserAutomationAnalyticsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserAutomationAnalyticsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.successRateTrend)) {
+            data["successRateTrend"] = [];
+            for (let item of this.successRateTrend)
+                data["successRateTrend"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.executionTimeTrend)) {
+            data["executionTimeTrend"] = [];
+            for (let item of this.executionTimeTrend)
+                data["executionTimeTrend"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.commonFailurePoints)) {
+            data["commonFailurePoints"] = [];
+            for (let item of this.commonFailurePoints)
+                data["commonFailurePoints"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (this.browserReliability) {
+            data["browserReliability"] = {};
+            for (let key in this.browserReliability) {
+                if (this.browserReliability.hasOwnProperty(key))
+                    (<any>data["browserReliability"])[key] = (<any>this.browserReliability)[key];
+            }
+        }
+        if (Array.isArray(this.popularTestUrls)) {
+            data["popularTestUrls"] = [];
+            for (let item of this.popularTestUrls)
+                data["popularTestUrls"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.flakyTests)) {
+            data["flakyTests"] = [];
+            for (let item of this.flakyTests)
+                data["flakyTests"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["overallStatistics"] = this.overallStatistics ? this.overallStatistics.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IBrowserAutomationAnalyticsDto {
+    successRateTrend?: TestSuccessRateDataPoint[] | undefined;
+    executionTimeTrend?: TestExecutionTimeDataPoint[] | undefined;
+    commonFailurePoints?: FailurePointDto[] | undefined;
+    browserReliability?: { [key: string]: number; } | undefined;
+    popularTestUrls?: PopularTestUrlDto[] | undefined;
+    flakyTests?: FlakyTestDto[] | undefined;
+    overallStatistics?: TestExecutionStatisticsDto;
+}
+
+export class BrowserAutomationAnalyticsDtoApiResponse implements IBrowserAutomationAnalyticsDtoApiResponse {
+    success?: boolean;
+    data?: BrowserAutomationAnalyticsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IBrowserAutomationAnalyticsDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? BrowserAutomationAnalyticsDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BrowserAutomationAnalyticsDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new BrowserAutomationAnalyticsDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBrowserAutomationAnalyticsDtoApiResponse {
+    success?: boolean;
+    data?: BrowserAutomationAnalyticsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class BrowserAutomationProfileDto implements IBrowserAutomationProfileDto {
@@ -16874,6 +17862,166 @@ export interface IExecutionMetricsDto {
     networkBytesSent?: number;
 }
 
+export class FailurePointDto implements IFailurePointDto {
+    testUrl?: string | undefined;
+    profileHash?: string | undefined;
+    failureCount?: number;
+    failureRate?: number;
+    commonError?: string | undefined;
+
+    constructor(data?: IFailurePointDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.testUrl = _data["testUrl"];
+            this.profileHash = _data["profileHash"];
+            this.failureCount = _data["failureCount"];
+            this.failureRate = _data["failureRate"];
+            this.commonError = _data["commonError"];
+        }
+    }
+
+    static fromJS(data: any): FailurePointDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FailurePointDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["testUrl"] = this.testUrl;
+        data["profileHash"] = this.profileHash;
+        data["failureCount"] = this.failureCount;
+        data["failureRate"] = this.failureRate;
+        data["commonError"] = this.commonError;
+        return data;
+    }
+}
+
+export interface IFailurePointDto {
+    testUrl?: string | undefined;
+    profileHash?: string | undefined;
+    failureCount?: number;
+    failureRate?: number;
+    commonError?: string | undefined;
+}
+
+export class FlakyTestDto implements IFlakyTestDto {
+    testUrl?: string | undefined;
+    profileHash?: string | undefined;
+    successCount?: number;
+    failureCount?: number;
+    flakinessScore?: number;
+
+    constructor(data?: IFlakyTestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.testUrl = _data["testUrl"];
+            this.profileHash = _data["profileHash"];
+            this.successCount = _data["successCount"];
+            this.failureCount = _data["failureCount"];
+            this.flakinessScore = _data["flakinessScore"];
+        }
+    }
+
+    static fromJS(data: any): FlakyTestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FlakyTestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["testUrl"] = this.testUrl;
+        data["profileHash"] = this.profileHash;
+        data["successCount"] = this.successCount;
+        data["failureCount"] = this.failureCount;
+        data["flakinessScore"] = this.flakinessScore;
+        return data;
+    }
+}
+
+export interface IFlakyTestDto {
+    testUrl?: string | undefined;
+    profileHash?: string | undefined;
+    successCount?: number;
+    failureCount?: number;
+    flakinessScore?: number;
+}
+
+export class FrequentlyScrapedProductDto implements IFrequentlyScrapedProductDto {
+    productId?: string;
+    productName?: string | undefined;
+    scrapeCount?: number;
+    successRate?: number;
+    averageScrapingTime?: number;
+    lastScraped?: Date;
+
+    constructor(data?: IFrequentlyScrapedProductDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productId = _data["productId"];
+            this.productName = _data["productName"];
+            this.scrapeCount = _data["scrapeCount"];
+            this.successRate = _data["successRate"];
+            this.averageScrapingTime = _data["averageScrapingTime"];
+            this.lastScraped = _data["lastScraped"] ? new Date(_data["lastScraped"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): FrequentlyScrapedProductDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FrequentlyScrapedProductDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productId"] = this.productId;
+        data["productName"] = this.productName;
+        data["scrapeCount"] = this.scrapeCount;
+        data["successRate"] = this.successRate;
+        data["averageScrapingTime"] = this.averageScrapingTime;
+        data["lastScraped"] = this.lastScraped ? this.lastScraped.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IFrequentlyScrapedProductDto {
+    productId?: string;
+    productName?: string | undefined;
+    scrapeCount?: number;
+    successRate?: number;
+    averageScrapingTime?: number;
+    lastScraped?: Date;
+}
+
 export class GeneratedBrowserAction implements IGeneratedBrowserAction {
     actionType?: string | undefined;
     selector?: string | undefined;
@@ -18144,6 +19292,58 @@ export interface INotificationProductSelectionDtoIEnumerableApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class NotificationSuccessDataPoint implements INotificationSuccessDataPoint {
+    date?: Date;
+    successRate?: number;
+    totalNotifications?: number;
+    successfulDeliveries?: number;
+    failedDeliveries?: number;
+
+    constructor(data?: INotificationSuccessDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.successRate = _data["successRate"];
+            this.totalNotifications = _data["totalNotifications"];
+            this.successfulDeliveries = _data["successfulDeliveries"];
+            this.failedDeliveries = _data["failedDeliveries"];
+        }
+    }
+
+    static fromJS(data: any): NotificationSuccessDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new NotificationSuccessDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["successRate"] = this.successRate;
+        data["totalNotifications"] = this.totalNotifications;
+        data["successfulDeliveries"] = this.successfulDeliveries;
+        data["failedDeliveries"] = this.failedDeliveries;
+        return data;
+    }
+}
+
+export interface INotificationSuccessDataPoint {
+    date?: Date;
+    successRate?: number;
+    totalNotifications?: number;
+    successfulDeliveries?: number;
+    failedDeliveries?: number;
 }
 
 export class ObjectApiResponse implements IObjectApiResponse {
@@ -20583,6 +21783,7 @@ export class ProxyConfigurationDto implements IProxyConfigurationDto {
     maxRetries?: number;
     lastErrorMessage?: string | undefined;
     lastErrorCode?: string | undefined;
+    lastResponseTime?: number | undefined;
     createdAt?: Date;
     updatedAt?: Date;
     displayName?: string | undefined;
@@ -20621,6 +21822,7 @@ export class ProxyConfigurationDto implements IProxyConfigurationDto {
             this.maxRetries = _data["maxRetries"];
             this.lastErrorMessage = _data["lastErrorMessage"];
             this.lastErrorCode = _data["lastErrorCode"];
+            this.lastResponseTime = _data["lastResponseTime"];
             this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
             this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
             this.displayName = _data["displayName"];
@@ -20659,6 +21861,7 @@ export class ProxyConfigurationDto implements IProxyConfigurationDto {
         data["maxRetries"] = this.maxRetries;
         data["lastErrorMessage"] = this.lastErrorMessage;
         data["lastErrorCode"] = this.lastErrorCode;
+        data["lastResponseTime"] = this.lastResponseTime;
         data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
         data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
         data["displayName"] = this.displayName;
@@ -20690,6 +21893,7 @@ export interface IProxyConfigurationDto {
     maxRetries?: number;
     lastErrorMessage?: string | undefined;
     lastErrorCode?: string | undefined;
+    lastResponseTime?: number | undefined;
     createdAt?: Date;
     updatedAt?: Date;
     displayName?: string | undefined;
@@ -20874,6 +22078,102 @@ export interface IProxyConfigurationDtoIEnumerableApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class ProxyFailureDataPoint implements IProxyFailureDataPoint {
+    date?: Date;
+    failureCount?: number;
+    failureRate?: number;
+    totalRequests?: number;
+
+    constructor(data?: IProxyFailureDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.failureCount = _data["failureCount"];
+            this.failureRate = _data["failureRate"];
+            this.totalRequests = _data["totalRequests"];
+        }
+    }
+
+    static fromJS(data: any): ProxyFailureDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyFailureDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["failureCount"] = this.failureCount;
+        data["failureRate"] = this.failureRate;
+        data["totalRequests"] = this.totalRequests;
+        return data;
+    }
+}
+
+export interface IProxyFailureDataPoint {
+    date?: Date;
+    failureCount?: number;
+    failureRate?: number;
+    totalRequests?: number;
+}
+
+export class ProxyHealthDataPoint implements IProxyHealthDataPoint {
+    date?: Date;
+    totalProxies?: number;
+    healthyProxies?: number;
+    healthPercentage?: number;
+
+    constructor(data?: IProxyHealthDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.totalProxies = _data["totalProxies"];
+            this.healthyProxies = _data["healthyProxies"];
+            this.healthPercentage = _data["healthPercentage"];
+        }
+    }
+
+    static fromJS(data: any): ProxyHealthDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyHealthDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["totalProxies"] = this.totalProxies;
+        data["healthyProxies"] = this.healthyProxies;
+        data["healthPercentage"] = this.healthPercentage;
+        return data;
+    }
+}
+
+export interface IProxyHealthDataPoint {
+    date?: Date;
+    totalProxies?: number;
+    healthyProxies?: number;
+    healthPercentage?: number;
+}
+
 export class ProxyImportItemDto implements IProxyImportItemDto {
     host!: string;
     port!: number;
@@ -21048,6 +22348,210 @@ export interface IProxyImportItemDtoIEnumerableApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProxyManagementAnalyticsDto implements IProxyManagementAnalyticsDto {
+    healthStatusTrend?: ProxyHealthDataPoint[] | undefined;
+    failureRateTrend?: ProxyFailureDataPoint[] | undefined;
+    performanceImpact?: ProxyPerformanceDataPoint[] | undefined;
+    usageStatistics?: ProxyUsageStatisticsDto;
+
+    constructor(data?: IProxyManagementAnalyticsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["healthStatusTrend"])) {
+                this.healthStatusTrend = [] as any;
+                for (let item of _data["healthStatusTrend"])
+                    this.healthStatusTrend!.push(ProxyHealthDataPoint.fromJS(item));
+            }
+            if (Array.isArray(_data["failureRateTrend"])) {
+                this.failureRateTrend = [] as any;
+                for (let item of _data["failureRateTrend"])
+                    this.failureRateTrend!.push(ProxyFailureDataPoint.fromJS(item));
+            }
+            if (Array.isArray(_data["performanceImpact"])) {
+                this.performanceImpact = [] as any;
+                for (let item of _data["performanceImpact"])
+                    this.performanceImpact!.push(ProxyPerformanceDataPoint.fromJS(item));
+            }
+            this.usageStatistics = _data["usageStatistics"] ? ProxyUsageStatisticsDto.fromJS(_data["usageStatistics"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProxyManagementAnalyticsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyManagementAnalyticsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.healthStatusTrend)) {
+            data["healthStatusTrend"] = [];
+            for (let item of this.healthStatusTrend)
+                data["healthStatusTrend"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.failureRateTrend)) {
+            data["failureRateTrend"] = [];
+            for (let item of this.failureRateTrend)
+                data["failureRateTrend"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.performanceImpact)) {
+            data["performanceImpact"] = [];
+            for (let item of this.performanceImpact)
+                data["performanceImpact"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["usageStatistics"] = this.usageStatistics ? this.usageStatistics.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProxyManagementAnalyticsDto {
+    healthStatusTrend?: ProxyHealthDataPoint[] | undefined;
+    failureRateTrend?: ProxyFailureDataPoint[] | undefined;
+    performanceImpact?: ProxyPerformanceDataPoint[] | undefined;
+    usageStatistics?: ProxyUsageStatisticsDto;
+}
+
+export class ProxyManagementAnalyticsDtoApiResponse implements IProxyManagementAnalyticsDtoApiResponse {
+    success?: boolean;
+    data?: ProxyManagementAnalyticsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProxyManagementAnalyticsDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ProxyManagementAnalyticsDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProxyManagementAnalyticsDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyManagementAnalyticsDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProxyManagementAnalyticsDtoApiResponse {
+    success?: boolean;
+    data?: ProxyManagementAnalyticsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProxyPerformanceDataPoint implements IProxyPerformanceDataPoint {
+    date?: Date;
+    averageResponseTime?: number;
+    successRate?: number;
+    requestCount?: number;
+
+    constructor(data?: IProxyPerformanceDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.averageResponseTime = _data["averageResponseTime"];
+            this.successRate = _data["successRate"];
+            this.requestCount = _data["requestCount"];
+        }
+    }
+
+    static fromJS(data: any): ProxyPerformanceDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyPerformanceDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["averageResponseTime"] = this.averageResponseTime;
+        data["successRate"] = this.successRate;
+        data["requestCount"] = this.requestCount;
+        return data;
+    }
+}
+
+export interface IProxyPerformanceDataPoint {
+    date?: Date;
+    averageResponseTime?: number;
+    successRate?: number;
+    requestCount?: number;
 }
 
 export class ProxyStatsDto implements IProxyStatsDto {
@@ -21502,6 +23006,70 @@ export interface IProxyTextParseDto {
     defaultProxyType?: string | undefined;
 }
 
+export class ProxyUsageStatisticsDto implements IProxyUsageStatisticsDto {
+    totalProxies?: number;
+    activeProxies?: number;
+    healthyProxies?: number;
+    healthPercentage?: number;
+    averageResponseTime?: number;
+    overallSuccessRate?: number;
+    totalRequests?: number;
+    failedRequests?: number;
+
+    constructor(data?: IProxyUsageStatisticsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalProxies = _data["totalProxies"];
+            this.activeProxies = _data["activeProxies"];
+            this.healthyProxies = _data["healthyProxies"];
+            this.healthPercentage = _data["healthPercentage"];
+            this.averageResponseTime = _data["averageResponseTime"];
+            this.overallSuccessRate = _data["overallSuccessRate"];
+            this.totalRequests = _data["totalRequests"];
+            this.failedRequests = _data["failedRequests"];
+        }
+    }
+
+    static fromJS(data: any): ProxyUsageStatisticsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProxyUsageStatisticsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalProxies"] = this.totalProxies;
+        data["activeProxies"] = this.activeProxies;
+        data["healthyProxies"] = this.healthyProxies;
+        data["healthPercentage"] = this.healthPercentage;
+        data["averageResponseTime"] = this.averageResponseTime;
+        data["overallSuccessRate"] = this.overallSuccessRate;
+        data["totalRequests"] = this.totalRequests;
+        data["failedRequests"] = this.failedRequests;
+        return data;
+    }
+}
+
+export interface IProxyUsageStatisticsDto {
+    totalProxies?: number;
+    activeProxies?: number;
+    healthyProxies?: number;
+    healthPercentage?: number;
+    averageResponseTime?: number;
+    overallSuccessRate?: number;
+    totalRequests?: number;
+    failedRequests?: number;
+}
+
 export class ProxyUsageUpdateDto implements IProxyUsageUpdateDto {
     proxyConfigurationId?: string;
     success?: boolean;
@@ -21714,6 +23282,170 @@ export class RealTimeAlertMonitoringDtoApiResponse implements IRealTimeAlertMoni
 export interface IRealTimeAlertMonitoringDtoApiResponse {
     success?: boolean;
     data?: RealTimeAlertMonitoringDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class RealTimeSystemStatusDto implements IRealTimeSystemStatusDto {
+    systemHealthy?: boolean;
+    recentAlerts?: number;
+    recentNotifications?: number;
+    notificationSuccessRate?: number;
+    recentScraperRuns?: number;
+    scraperSuccessRate?: number;
+    healthyProxies?: number;
+    proxyHealthPercentage?: number;
+    activeIssues?: string[] | undefined;
+    lastUpdated?: Date;
+
+    constructor(data?: IRealTimeSystemStatusDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.systemHealthy = _data["systemHealthy"];
+            this.recentAlerts = _data["recentAlerts"];
+            this.recentNotifications = _data["recentNotifications"];
+            this.notificationSuccessRate = _data["notificationSuccessRate"];
+            this.recentScraperRuns = _data["recentScraperRuns"];
+            this.scraperSuccessRate = _data["scraperSuccessRate"];
+            this.healthyProxies = _data["healthyProxies"];
+            this.proxyHealthPercentage = _data["proxyHealthPercentage"];
+            if (Array.isArray(_data["activeIssues"])) {
+                this.activeIssues = [] as any;
+                for (let item of _data["activeIssues"])
+                    this.activeIssues!.push(item);
+            }
+            this.lastUpdated = _data["lastUpdated"] ? new Date(_data["lastUpdated"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): RealTimeSystemStatusDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RealTimeSystemStatusDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["systemHealthy"] = this.systemHealthy;
+        data["recentAlerts"] = this.recentAlerts;
+        data["recentNotifications"] = this.recentNotifications;
+        data["notificationSuccessRate"] = this.notificationSuccessRate;
+        data["recentScraperRuns"] = this.recentScraperRuns;
+        data["scraperSuccessRate"] = this.scraperSuccessRate;
+        data["healthyProxies"] = this.healthyProxies;
+        data["proxyHealthPercentage"] = this.proxyHealthPercentage;
+        if (Array.isArray(this.activeIssues)) {
+            data["activeIssues"] = [];
+            for (let item of this.activeIssues)
+                data["activeIssues"].push(item);
+        }
+        data["lastUpdated"] = this.lastUpdated ? this.lastUpdated.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IRealTimeSystemStatusDto {
+    systemHealthy?: boolean;
+    recentAlerts?: number;
+    recentNotifications?: number;
+    notificationSuccessRate?: number;
+    recentScraperRuns?: number;
+    scraperSuccessRate?: number;
+    healthyProxies?: number;
+    proxyHealthPercentage?: number;
+    activeIssues?: string[] | undefined;
+    lastUpdated?: Date;
+}
+
+export class RealTimeSystemStatusDtoApiResponse implements IRealTimeSystemStatusDtoApiResponse {
+    success?: boolean;
+    data?: RealTimeSystemStatusDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IRealTimeSystemStatusDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? RealTimeSystemStatusDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): RealTimeSystemStatusDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new RealTimeSystemStatusDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IRealTimeSystemStatusDtoApiResponse {
+    success?: boolean;
+    data?: RealTimeSystemStatusDto;
     message?: string | undefined;
     errors?: string[] | undefined;
     timestamp?: Date;
@@ -23918,6 +25650,174 @@ export interface IScraperSiteConfigurationDtoIEnumerableApiResponse {
     meta?: { [key: string]: any; } | undefined;
 }
 
+export class ScraperStatisticsDto implements IScraperStatisticsDto {
+    totalScrapes?: number;
+    successfulScrapes?: number;
+    successRate?: number;
+    averageScrapingTime?: number;
+    uniqueProducts?: number;
+    uniqueSellers?: number;
+    firstScrape?: Date | undefined;
+    lastScrape?: Date | undefined;
+
+    constructor(data?: IScraperStatisticsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalScrapes = _data["totalScrapes"];
+            this.successfulScrapes = _data["successfulScrapes"];
+            this.successRate = _data["successRate"];
+            this.averageScrapingTime = _data["averageScrapingTime"];
+            this.uniqueProducts = _data["uniqueProducts"];
+            this.uniqueSellers = _data["uniqueSellers"];
+            this.firstScrape = _data["firstScrape"] ? new Date(_data["firstScrape"].toString()) : <any>undefined;
+            this.lastScrape = _data["lastScrape"] ? new Date(_data["lastScrape"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ScraperStatisticsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperStatisticsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalScrapes"] = this.totalScrapes;
+        data["successfulScrapes"] = this.successfulScrapes;
+        data["successRate"] = this.successRate;
+        data["averageScrapingTime"] = this.averageScrapingTime;
+        data["uniqueProducts"] = this.uniqueProducts;
+        data["uniqueSellers"] = this.uniqueSellers;
+        data["firstScrape"] = this.firstScrape ? this.firstScrape.toISOString() : <any>undefined;
+        data["lastScrape"] = this.lastScrape ? this.lastScrape.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IScraperStatisticsDto {
+    totalScrapes?: number;
+    successfulScrapes?: number;
+    successRate?: number;
+    averageScrapingTime?: number;
+    uniqueProducts?: number;
+    uniqueSellers?: number;
+    firstScrape?: Date | undefined;
+    lastScrape?: Date | undefined;
+}
+
+export class ScraperSuccessDataPoint implements IScraperSuccessDataPoint {
+    date?: Date;
+    successRate?: number;
+    totalScrapes?: number;
+    successfulScrapes?: number;
+    failedScrapes?: number;
+
+    constructor(data?: IScraperSuccessDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.successRate = _data["successRate"];
+            this.totalScrapes = _data["totalScrapes"];
+            this.successfulScrapes = _data["successfulScrapes"];
+            this.failedScrapes = _data["failedScrapes"];
+        }
+    }
+
+    static fromJS(data: any): ScraperSuccessDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperSuccessDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["successRate"] = this.successRate;
+        data["totalScrapes"] = this.totalScrapes;
+        data["successfulScrapes"] = this.successfulScrapes;
+        data["failedScrapes"] = this.failedScrapes;
+        return data;
+    }
+}
+
+export interface IScraperSuccessDataPoint {
+    date?: Date;
+    successRate?: number;
+    totalScrapes?: number;
+    successfulScrapes?: number;
+    failedScrapes?: number;
+}
+
+export class ScraperTimeDataPoint implements IScraperTimeDataPoint {
+    date?: Date;
+    averageScrapingTime?: number;
+    minScrapingTime?: number;
+    maxScrapingTime?: number;
+    productCount?: number;
+
+    constructor(data?: IScraperTimeDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.averageScrapingTime = _data["averageScrapingTime"];
+            this.minScrapingTime = _data["minScrapingTime"];
+            this.maxScrapingTime = _data["maxScrapingTime"];
+            this.productCount = _data["productCount"];
+        }
+    }
+
+    static fromJS(data: any): ScraperTimeDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScraperTimeDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["averageScrapingTime"] = this.averageScrapingTime;
+        data["minScrapingTime"] = this.minScrapingTime;
+        data["maxScrapingTime"] = this.maxScrapingTime;
+        data["productCount"] = this.productCount;
+        return data;
+    }
+}
+
+export interface IScraperTimeDataPoint {
+    date?: Date;
+    averageScrapingTime?: number;
+    minScrapingTime?: number;
+    maxScrapingTime?: number;
+    productCount?: number;
+}
+
 export class ScrapingSelectorsDto implements IScrapingSelectorsDto {
     productNameSelector?: string | undefined;
     priceSelector?: string | undefined;
@@ -23982,6 +25882,174 @@ export interface IScrapingSelectorsDto {
     specificationOptions?: SpecificationParsingOptions;
 }
 
+export class ScrapingWorkerAnalyticsDto implements IScrapingWorkerAnalyticsDto {
+    successRateTrend?: ScraperSuccessDataPoint[] | undefined;
+    scrapingTimeTrend?: ScraperTimeDataPoint[] | undefined;
+    frequentlyScrapedProducts?: FrequentlyScrapedProductDto[] | undefined;
+    sellerPerformance?: SellerPerformanceDto[] | undefined;
+    overallStatistics?: ScraperStatisticsDto;
+
+    constructor(data?: IScrapingWorkerAnalyticsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["successRateTrend"])) {
+                this.successRateTrend = [] as any;
+                for (let item of _data["successRateTrend"])
+                    this.successRateTrend!.push(ScraperSuccessDataPoint.fromJS(item));
+            }
+            if (Array.isArray(_data["scrapingTimeTrend"])) {
+                this.scrapingTimeTrend = [] as any;
+                for (let item of _data["scrapingTimeTrend"])
+                    this.scrapingTimeTrend!.push(ScraperTimeDataPoint.fromJS(item));
+            }
+            if (Array.isArray(_data["frequentlyScrapedProducts"])) {
+                this.frequentlyScrapedProducts = [] as any;
+                for (let item of _data["frequentlyScrapedProducts"])
+                    this.frequentlyScrapedProducts!.push(FrequentlyScrapedProductDto.fromJS(item));
+            }
+            if (Array.isArray(_data["sellerPerformance"])) {
+                this.sellerPerformance = [] as any;
+                for (let item of _data["sellerPerformance"])
+                    this.sellerPerformance!.push(SellerPerformanceDto.fromJS(item));
+            }
+            this.overallStatistics = _data["overallStatistics"] ? ScraperStatisticsDto.fromJS(_data["overallStatistics"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ScrapingWorkerAnalyticsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScrapingWorkerAnalyticsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.successRateTrend)) {
+            data["successRateTrend"] = [];
+            for (let item of this.successRateTrend)
+                data["successRateTrend"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.scrapingTimeTrend)) {
+            data["scrapingTimeTrend"] = [];
+            for (let item of this.scrapingTimeTrend)
+                data["scrapingTimeTrend"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.frequentlyScrapedProducts)) {
+            data["frequentlyScrapedProducts"] = [];
+            for (let item of this.frequentlyScrapedProducts)
+                data["frequentlyScrapedProducts"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.sellerPerformance)) {
+            data["sellerPerformance"] = [];
+            for (let item of this.sellerPerformance)
+                data["sellerPerformance"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["overallStatistics"] = this.overallStatistics ? this.overallStatistics.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IScrapingWorkerAnalyticsDto {
+    successRateTrend?: ScraperSuccessDataPoint[] | undefined;
+    scrapingTimeTrend?: ScraperTimeDataPoint[] | undefined;
+    frequentlyScrapedProducts?: FrequentlyScrapedProductDto[] | undefined;
+    sellerPerformance?: SellerPerformanceDto[] | undefined;
+    overallStatistics?: ScraperStatisticsDto;
+}
+
+export class ScrapingWorkerAnalyticsDtoApiResponse implements IScrapingWorkerAnalyticsDtoApiResponse {
+    success?: boolean;
+    data?: ScrapingWorkerAnalyticsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IScrapingWorkerAnalyticsDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ScrapingWorkerAnalyticsDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ScrapingWorkerAnalyticsDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ScrapingWorkerAnalyticsDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IScrapingWorkerAnalyticsDtoApiResponse {
+    success?: boolean;
+    data?: ScrapingWorkerAnalyticsDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class ScreenshotCaptureDto implements IScreenshotCaptureDto {
     id?: string | undefined;
     timestamp?: Date;
@@ -24032,6 +26100,74 @@ export interface IScreenshotCaptureDto {
     base64Data?: string | undefined;
     actionIndex?: number;
     actionType?: string | undefined;
+}
+
+export class SellerPerformanceDto implements ISellerPerformanceDto {
+    sellerName?: string | undefined;
+    totalScrapes?: number;
+    successfulScrapes?: number;
+    successRate?: number;
+    averageScrapingTime?: number;
+    errorCount?: number;
+    commonErrors?: string[] | undefined;
+
+    constructor(data?: ISellerPerformanceDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.sellerName = _data["sellerName"];
+            this.totalScrapes = _data["totalScrapes"];
+            this.successfulScrapes = _data["successfulScrapes"];
+            this.successRate = _data["successRate"];
+            this.averageScrapingTime = _data["averageScrapingTime"];
+            this.errorCount = _data["errorCount"];
+            if (Array.isArray(_data["commonErrors"])) {
+                this.commonErrors = [] as any;
+                for (let item of _data["commonErrors"])
+                    this.commonErrors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): SellerPerformanceDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SellerPerformanceDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["sellerName"] = this.sellerName;
+        data["totalScrapes"] = this.totalScrapes;
+        data["successfulScrapes"] = this.successfulScrapes;
+        data["successRate"] = this.successRate;
+        data["averageScrapingTime"] = this.averageScrapingTime;
+        data["errorCount"] = this.errorCount;
+        if (Array.isArray(this.commonErrors)) {
+            data["commonErrors"] = [];
+            for (let item of this.commonErrors)
+                data["commonErrors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ISellerPerformanceDto {
+    sellerName?: string | undefined;
+    totalScrapes?: number;
+    successfulScrapes?: number;
+    successRate?: number;
+    averageScrapingTime?: number;
+    errorCount?: number;
+    commonErrors?: string[] | undefined;
 }
 
 export class SellerPerformanceMetricDto implements ISellerPerformanceMetricDto {
@@ -24944,6 +27080,70 @@ export interface ISystemEventRequestDto {
     metadata?: { [key: string]: any; } | undefined;
 }
 
+export class SystemWideMetricsDto implements ISystemWideMetricsDto {
+    totalProducts?: number;
+    totalCategories?: number;
+    activeMappings?: number;
+    activeAlerts?: number;
+    totalUsers?: number;
+    totalProxies?: number;
+    systemUptime?: number;
+    overallHealthScore?: number;
+
+    constructor(data?: ISystemWideMetricsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalProducts = _data["totalProducts"];
+            this.totalCategories = _data["totalCategories"];
+            this.activeMappings = _data["activeMappings"];
+            this.activeAlerts = _data["activeAlerts"];
+            this.totalUsers = _data["totalUsers"];
+            this.totalProxies = _data["totalProxies"];
+            this.systemUptime = _data["systemUptime"];
+            this.overallHealthScore = _data["overallHealthScore"];
+        }
+    }
+
+    static fromJS(data: any): SystemWideMetricsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SystemWideMetricsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalProducts"] = this.totalProducts;
+        data["totalCategories"] = this.totalCategories;
+        data["activeMappings"] = this.activeMappings;
+        data["activeAlerts"] = this.activeAlerts;
+        data["totalUsers"] = this.totalUsers;
+        data["totalProxies"] = this.totalProxies;
+        data["systemUptime"] = this.systemUptime;
+        data["overallHealthScore"] = this.overallHealthScore;
+        return data;
+    }
+}
+
+export interface ISystemWideMetricsDto {
+    totalProducts?: number;
+    totalCategories?: number;
+    activeMappings?: number;
+    activeAlerts?: number;
+    totalUsers?: number;
+    totalProxies?: number;
+    systemUptime?: number;
+    overallHealthScore?: number;
+}
+
 export class TestAlertRuleDto implements ITestAlertRuleDto {
     canonicalProductId!: string;
     conditionType!: string;
@@ -25286,6 +27486,122 @@ export interface ITestErrorDto {
     details?: string | undefined;
     actionIndex?: number | undefined;
     timestamp?: Date;
+}
+
+export class TestExecutionStatisticsDto implements ITestExecutionStatisticsDto {
+    totalExecutions?: number;
+    successfulExecutions?: number;
+    successRate?: number;
+    averageExecutionTime?: number;
+    firstExecution?: Date | undefined;
+    lastExecution?: Date | undefined;
+    uniqueUrls?: number;
+    uniqueProfiles?: number;
+
+    constructor(data?: ITestExecutionStatisticsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalExecutions = _data["totalExecutions"];
+            this.successfulExecutions = _data["successfulExecutions"];
+            this.successRate = _data["successRate"];
+            this.averageExecutionTime = _data["averageExecutionTime"];
+            this.firstExecution = _data["firstExecution"] ? new Date(_data["firstExecution"].toString()) : <any>undefined;
+            this.lastExecution = _data["lastExecution"] ? new Date(_data["lastExecution"].toString()) : <any>undefined;
+            this.uniqueUrls = _data["uniqueUrls"];
+            this.uniqueProfiles = _data["uniqueProfiles"];
+        }
+    }
+
+    static fromJS(data: any): TestExecutionStatisticsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestExecutionStatisticsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalExecutions"] = this.totalExecutions;
+        data["successfulExecutions"] = this.successfulExecutions;
+        data["successRate"] = this.successRate;
+        data["averageExecutionTime"] = this.averageExecutionTime;
+        data["firstExecution"] = this.firstExecution ? this.firstExecution.toISOString() : <any>undefined;
+        data["lastExecution"] = this.lastExecution ? this.lastExecution.toISOString() : <any>undefined;
+        data["uniqueUrls"] = this.uniqueUrls;
+        data["uniqueProfiles"] = this.uniqueProfiles;
+        return data;
+    }
+}
+
+export interface ITestExecutionStatisticsDto {
+    totalExecutions?: number;
+    successfulExecutions?: number;
+    successRate?: number;
+    averageExecutionTime?: number;
+    firstExecution?: Date | undefined;
+    lastExecution?: Date | undefined;
+    uniqueUrls?: number;
+    uniqueProfiles?: number;
+}
+
+export class TestExecutionTimeDataPoint implements ITestExecutionTimeDataPoint {
+    date?: Date;
+    averageExecutionTime?: number;
+    minExecutionTime?: number;
+    maxExecutionTime?: number;
+    testCount?: number;
+
+    constructor(data?: ITestExecutionTimeDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.averageExecutionTime = _data["averageExecutionTime"];
+            this.minExecutionTime = _data["minExecutionTime"];
+            this.maxExecutionTime = _data["maxExecutionTime"];
+            this.testCount = _data["testCount"];
+        }
+    }
+
+    static fromJS(data: any): TestExecutionTimeDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestExecutionTimeDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["averageExecutionTime"] = this.averageExecutionTime;
+        data["minExecutionTime"] = this.minExecutionTime;
+        data["maxExecutionTime"] = this.maxExecutionTime;
+        data["testCount"] = this.testCount;
+        return data;
+    }
+}
+
+export interface ITestExecutionTimeDataPoint {
+    date?: Date;
+    averageExecutionTime?: number;
+    minExecutionTime?: number;
+    maxExecutionTime?: number;
+    testCount?: number;
 }
 
 export class TestExecutionTrendsDto implements ITestExecutionTrendsDto {
@@ -26206,6 +28522,58 @@ export interface ITestStatisticsApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class TestSuccessRateDataPoint implements ITestSuccessRateDataPoint {
+    date?: Date;
+    successRate?: number;
+    totalTests?: number;
+    successfulTests?: number;
+    failedTests?: number;
+
+    constructor(data?: ITestSuccessRateDataPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : <any>undefined;
+            this.successRate = _data["successRate"];
+            this.totalTests = _data["totalTests"];
+            this.successfulTests = _data["successfulTests"];
+            this.failedTests = _data["failedTests"];
+        }
+    }
+
+    static fromJS(data: any): TestSuccessRateDataPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new TestSuccessRateDataPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["successRate"] = this.successRate;
+        data["totalTests"] = this.totalTests;
+        data["successfulTests"] = this.successfulTests;
+        data["failedTests"] = this.failedTests;
+        return data;
+    }
+}
+
+export interface ITestSuccessRateDataPoint {
+    date?: Date;
+    successRate?: number;
+    totalTests?: number;
+    successfulTests?: number;
+    failedTests?: number;
 }
 
 export class TestTrendDataPoint implements ITestTrendDataPoint {

@@ -306,6 +306,21 @@
           <p class="mat-body-medium">Manage system users</p>
         </mat-card-content>
       </mat-card>
+
+      <mat-card class="action-card" 
+                appearance="outlined" 
+                routerLink="/dashboard/analytics"
+                role="button"
+                tabindex="0"
+                (keydown)="onCardKeydown($event)">
+        <mat-card-content>
+          <div class="action-icon analytics-surface">
+            <mat-icon aria-hidden="true">analytics</mat-icon>
+          </div>
+          <h3 class="mat-title-medium">Analytics Dashboard</h3>
+          <p class="mat-body-medium">View comprehensive system analytics</p>
+        </mat-card-content>
+      </mat-card>
     </div>
   </section>
 

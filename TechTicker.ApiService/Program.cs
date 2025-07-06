@@ -159,6 +159,9 @@ builder.Services.AddScoped<INetworkMonitor, NetworkMonitor>();
 builder.Services.AddScoped<ISavedTestResultRepository, SavedTestResultRepository>();
 builder.Services.AddScoped<ITestExecutionHistoryRepository, TestExecutionHistoryRepository>();
 
+// Add Alert History Repository
+builder.Services.AddScoped<IAlertHistoryRepository, AlertHistoryRepository>();
+
 // Add messaging services
 builder.Services.AddSingleton<IMessagePublisher, RabbitMQPublisher>();
 builder.Services.AddSingleton<IMessageConsumer, RabbitMQConsumer>();

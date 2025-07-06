@@ -1,0 +1,416 @@
+<div class="analytics-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1 class="dashboard-title">
+        <mat-icon>analytics</mat-icon>
+        Analytics Dashboard
+      </h1>
+      <p class="dashboard-subtitle">Comprehensive system analytics and performance metrics</p>
+    </div>
+    
+    <!-- Date Range Picker -->
+    <div class="date-range-picker">
+      <mat-form-field appearance="outline">
+        <mat-label>From Date</mat-label>
+        <input matInput [matDatepicker]="fromPicker" [(ngModel)]="dateFrom" (dateChange)="onDateRangeChange()">
+        <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>To Date</mat-label>
+        <input matInput [matDatepicker]="toPicker" [(ngModel)]="dateTo" (dateChange)="onDateRangeChange()">
+        <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+      
+      <button mat-raised-button color="primary" (click)="loadAnalyticsData()" [disabled]="isLoading">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading analytics data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-container">
+    <mat-card class="error-card">
+      <mat-card-content>
+        <mat-icon class="error-icon">error</mat-icon>
+        <h3>Error Loading Analytics</h3>
+        <p>{{ error }}</p>
+        <button mat-raised-button color="primary" (click)="loadAnalyticsData()">
+          <mat-icon>refresh</mat-icon>
+          Try Again
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Analytics Content -->
+  <div *ngIf="!isLoading && !error && analyticsData" class="analytics-content">
+    
+    <!-- Real-time Status Cards -->
+    <div class="status-cards">
+      <mat-card class="status-card system-health">
+        <mat-card-content>
+          <div class="card-header">
+            <mat-icon [class]="getSystemHealthClass()">{{ getSystemHealthIcon() }}</mat-icon>
+            <h3>System Health</h3>
+          </div>
+          <div class="card-value">
+            <span class="status-text" [class]="getSystemHealthClass()">
+              {{ analyticsData.realTimeStatus.systemHealthy ? 'Healthy' : 'Issues Detected' }}
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="status-card">
+        <mat-card-content>
+          <div class="card-header">
+            <mat-icon>notifications</mat-icon>
+            <h3>Recent Alerts</h3>
+          </div>
+          <div class="card-value">
+            <span class="number">{{ analyticsData.realTimeStatus.recentAlerts }}</span>
+            <span class="label">in last hour</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="status-card">
+        <mat-card-content>
+          <div class="card-header">
+            <mat-icon>scatter_plot</mat-icon>
+            <h3>Scraper Success</h3>
+          </div>
+          <div class="card-value">
+            <span class="number">{{ analyticsData.realTimeStatus.scraperSuccessRate | number:'1.1-1' }}%</span>
+            <span class="label">success rate</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="status-card">
+        <mat-card-content>
+          <div class="card-header">
+            <mat-icon>router</mat-icon>
+            <h3>Proxy Health</h3>
+          </div>
+          <div class="card-value">
+            <span class="number">{{ analyticsData.realTimeStatus.proxyHealthPercentage | number:'1.1-1' }}%</span>
+            <span class="label">healthy proxies</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <mat-tab-group (selectedTabChange)="onTabChange($event.tab.textLabel.toLowerCase())" class="analytics-tabs">
+      
+      <!-- Overview Tab -->
+      <mat-tab label="Overview">
+        <div class="tab-content">
+          <div class="overview-grid">
+            
+            <!-- System-wide Metrics -->
+            <mat-card class="overview-card">
+              <mat-card-header>
+                <mat-card-title>System-wide Metrics</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="metrics-grid">
+                  <div class="metric-item">
+                    <span class="metric-label">Total Products</span>
+                    <span class="metric-value">{{ analyticsData.systemWideMetrics.totalProducts | number }}</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Total Categories</span>
+                    <span class="metric-value">{{ analyticsData.systemWideMetrics.totalCategories | number }}</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Active Mappings</span>
+                    <span class="metric-value">{{ analyticsData.systemWideMetrics.activeMappings | number }}</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Active Alerts</span>
+                    <span class="metric-value">{{ analyticsData.systemWideMetrics.activeAlerts | number }}</span>
+                  </div>
+                  <div class="metric-item" *ngIf="isAdmin">
+                    <span class="metric-label">Total Users</span>
+                    <span class="metric-value">{{ analyticsData.systemWideMetrics.totalUsers | number }}</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Total Proxies</span>
+                    <span class="metric-value">{{ analyticsData.systemWideMetrics.totalProxies | number }}</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Browser Automation Summary -->
+            <mat-card class="overview-card">
+              <mat-card-header>
+                <mat-card-title>Browser Automation</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="summary-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Success Rate</span>
+                    <span class="stat-value">{{ analyticsData.browserAutomation.overallStatistics.successRate | number:'1.1-1' }}%</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Total Tests</span>
+                    <span class="stat-value">{{ analyticsData.browserAutomation.overallStatistics.totalExecutions | number }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Avg Execution Time</span>
+                    <span class="stat-value">{{ analyticsData.browserAutomation.overallStatistics.averageExecutionTime | number:'1.0-0' }}ms</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Alert System Summary -->
+            <mat-card class="overview-card">
+              <mat-card-header>
+                <mat-card-title>Alert System</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="summary-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Notification Success</span>
+                    <span class="stat-value">{{ analyticsData.alertSystem.systemHealth.overallSuccessRate | number:'1.1-1' }}%</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Active Rules</span>
+                    <span class="stat-value">{{ analyticsData.alertSystem.systemHealth.activeAlertRules | number }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Avg Response Time</span>
+                    <span class="stat-value">{{ analyticsData.alertSystem.systemHealth.averageResponseTime | number:'1.0-0' }}ms</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Scraping Worker Summary -->
+            <mat-card class="overview-card">
+              <mat-card-header>
+                <mat-card-title>Scraping Worker</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="summary-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Success Rate</span>
+                    <span class="stat-value">{{ analyticsData.scrapingWorker.overallStatistics.successRate | number:'1.1-1' }}%</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Total Scrapes</span>
+                    <span class="stat-value">{{ analyticsData.scrapingWorker.overallStatistics.totalScrapes | number }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Avg Scraping Time</span>
+                    <span class="stat-value">{{ analyticsData.scrapingWorker.overallStatistics.averageScrapingTime | number:'1.0-0' }}ms</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Browser Automation Tab -->
+      <mat-tab label="Browser Automation">
+        <div class="tab-content">
+          <div class="browser-automation-content">
+            <!-- Success Rate Trend Chart -->
+            <mat-card class="chart-card">
+              <mat-card-header>
+                <mat-card-title>Test Success Rate Trend</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="chart-placeholder">
+                  <mat-icon>show_chart</mat-icon>
+                  <p>Success rate trend chart will be implemented here</p>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Popular Test URLs -->
+            <mat-card class="chart-card">
+              <mat-card-header>
+                <mat-card-title>Popular Test URLs</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="popular-urls-list" *ngIf="analyticsData.browserAutomation.popularTestUrls.length > 0">
+                  <div class="url-item" *ngFor="let url of analyticsData.browserAutomation.popularTestUrls.slice(0, 5)">
+                    <div class="url-info">
+                      <span class="url-text">{{ url.url }}</span>
+                      <span class="url-stats">
+                        {{ url.testCount }} tests, {{ url.successRate | number:'1.1-1' }}% success
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="analyticsData.browserAutomation.popularTestUrls.length === 0" class="no-data">
+                  <mat-icon>info</mat-icon>
+                  <p>No test data available</p>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Alert System Tab -->
+      <mat-tab label="Alert System">
+        <div class="tab-content">
+          <div class="alert-system-content">
+            <!-- Top Performers -->
+            <mat-card class="chart-card">
+              <mat-card-header>
+                <mat-card-title>Top Performing Alert Rules</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="alert-rules-list" *ngIf="analyticsData.alertSystem.topPerformers.length > 0">
+                  <div class="rule-item" *ngFor="let rule of analyticsData.alertSystem.topPerformers.slice(0, 5)">
+                    <div class="rule-info">
+                      <span class="rule-description">{{ rule.ruleDescription }}</span>
+                      <span class="rule-stats">
+                        {{ rule.timesTriggered }} triggers, {{ rule.notificationSuccessRate | number:'1.1-1' }}% success
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="analyticsData.alertSystem.topPerformers.length === 0" class="no-data">
+                  <mat-icon>info</mat-icon>
+                  <p>No alert rule data available</p>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- System Health -->
+            <mat-card class="chart-card">
+              <mat-card-header>
+                <mat-card-title>System Health Metrics</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="health-metrics">
+                  <div class="health-item">
+                    <span class="health-label">Active Rules</span>
+                    <span class="health-value">{{ analyticsData.alertSystem.systemHealth.activeAlertRules }}</span>
+                  </div>
+                  <div class="health-item">
+                    <span class="health-label">Rules with Errors</span>
+                    <span class="health-value">{{ analyticsData.alertSystem.systemHealth.alertRulesWithErrors }}</span>
+                  </div>
+                  <div class="health-item">
+                    <span class="health-label">Queue Backlog</span>
+                    <span class="health-value">{{ analyticsData.alertSystem.systemHealth.queueBacklog }}</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Proxy Management Tab -->
+      <mat-tab label="Proxy Management">
+        <div class="tab-content">
+          <div class="proxy-management-content">
+            <!-- Proxy Usage Statistics -->
+            <mat-card class="chart-card">
+              <mat-card-header>
+                <mat-card-title>Proxy Usage Statistics</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="proxy-stats">
+                  <div class="proxy-stat-item">
+                    <span class="proxy-stat-label">Total Proxies</span>
+                    <span class="proxy-stat-value">{{ analyticsData.proxyManagement.usageStatistics.totalProxies }}</span>
+                  </div>
+                  <div class="proxy-stat-item">
+                    <span class="proxy-stat-label">Healthy Proxies</span>
+                    <span class="proxy-stat-value">{{ analyticsData.proxyManagement.usageStatistics.healthyProxies }}</span>
+                  </div>
+                  <div class="proxy-stat-item">
+                    <span class="proxy-stat-label">Health Percentage</span>
+                    <span class="proxy-stat-value">{{ analyticsData.proxyManagement.usageStatistics.healthPercentage | number:'1.1-1' }}%</span>
+                  </div>
+                  <div class="proxy-stat-item">
+                    <span class="proxy-stat-label">Success Rate</span>
+                    <span class="proxy-stat-value">{{ analyticsData.proxyManagement.usageStatistics.overallSuccessRate | number:'1.1-1' }}%</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Scraping Worker Tab -->
+      <mat-tab label="Scraping Worker">
+        <div class="tab-content">
+          <div class="scraping-worker-content">
+            <!-- Seller Performance -->
+            <mat-card class="chart-card">
+              <mat-card-header>
+                <mat-card-title>Top Seller Performance</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="seller-performance-list" *ngIf="analyticsData.scrapingWorker.sellerPerformance.length > 0">
+                  <div class="seller-item" *ngFor="let seller of analyticsData.scrapingWorker.sellerPerformance.slice(0, 5)">
+                    <div class="seller-info">
+                      <span class="seller-name">{{ seller.sellerName }}</span>
+                      <span class="seller-stats">
+                        {{ seller.totalScrapes }} scrapes, {{ seller.successRate | number:'1.1-1' }}% success
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="analyticsData.scrapingWorker.sellerPerformance.length === 0" class="no-data">
+                  <mat-icon>info</mat-icon>
+                  <p>No seller performance data available</p>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Overall Statistics -->
+            <mat-card class="chart-card">
+              <mat-card-header>
+                <mat-card-title>Overall Statistics</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="overall-stats">
+                  <div class="overall-stat-item">
+                    <span class="overall-stat-label">Total Scrapes</span>
+                    <span class="overall-stat-value">{{ analyticsData.scrapingWorker.overallStatistics.totalScrapes | number }}</span>
+                  </div>
+                  <div class="overall-stat-item">
+                    <span class="overall-stat-label">Unique Products</span>
+                    <span class="overall-stat-value">{{ analyticsData.scrapingWorker.overallStatistics.uniqueProducts | number }}</span>
+                  </div>
+                  <div class="overall-stat-item">
+                    <span class="overall-stat-label">Unique Sellers</span>
+                    <span class="overall-stat-value">{{ analyticsData.scrapingWorker.overallStatistics.uniqueSellers | number }}</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </div>
+</div> 
