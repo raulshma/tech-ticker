@@ -236,6 +236,10 @@ builder.Services.AddScoped<ISpecificationAnalysisEngine, SpecificationAnalysisEn
 builder.Services.AddScoped<IPriceAnalysisService, PriceAnalysisService>();
 builder.Services.AddScoped<IRecommendationGenerationService, RecommendationGenerationService>();
 
+// Add Integrations and Features Service
+builder.Services.AddScoped<IIntegrationsAndFeaturesService, IntegrationsAndFeaturesService>();
+builder.Services.AddHttpClient<IntegrationsAndFeaturesService>();
+
 // Add Browser Automation Test Services
 builder.Services.AddScoped<IBrowserAutomationWebSocketService, BrowserAutomationWebSocketService>();
 

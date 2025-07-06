@@ -86,6 +86,12 @@ const routes: Routes = [
         canActivate: [AuthGuard] // Available to all authenticated users
       },
       {
+        path: 'integrations-features',
+        loadChildren: () => import('./features/integrations-features/integrations-features.module').then(m => m.IntegrationsFeaturesModule),
+        canActivate: [AuthGuard] // Available to all authenticated users
+      },
+
+      {
         path: 'admin',
         loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
         canActivate: [AdminGuard]

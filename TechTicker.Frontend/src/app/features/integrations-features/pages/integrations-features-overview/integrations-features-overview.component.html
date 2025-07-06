@@ -1,0 +1,284 @@
+<div class="integrations-features-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <h1 class="mat-display-small">Integrations & Features</h1>
+      <p class="mat-body-large header-subtitle">
+        Manage and monitor all available features and integrations in your TechTicker system
+      </p>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button 
+              color="primary" 
+              (click)="onRefreshAllHealth()" 
+              [disabled]="loading"
+              matTooltip="Refresh all integration health checks">
+        <mat-icon>refresh</mat-icon>
+        Refresh Health
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-section">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading system overview...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && overview" class="content-section">
+    
+    <!-- System Health Overview -->
+    <mat-card class="health-overview-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>health_and_safety</mat-icon>
+          System Health Overview
+        </mat-card-title>
+        <mat-card-subtitle>
+          Overall system status and health metrics
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="health-metrics">
+          <!-- Health Score -->
+          <div class="metric-card">
+            <div class="metric-value" [ngClass]="getHealthScoreColor(overview.systemHealth?.healthScore || 0)">
+              {{ overview.systemHealth?.healthScore || 0 }}%
+            </div>
+            <div class="metric-label">Health Score</div>
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="overview.systemHealth?.healthScore || 0"
+              [color]="getHealthScoreColor(overview.systemHealth?.healthScore || 0)">
+            </mat-progress-bar>
+          </div>
+
+          <!-- Features Status -->
+          <div class="metric-card">
+            <div class="metric-value primary">
+              {{ overview.systemHealth?.activeFeatures || 0 }} / {{ overview.systemHealth?.totalFeatures || 0 }}
+            </div>
+            <div class="metric-label">Active Features</div>
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="((overview.systemHealth?.activeFeatures || 0) / (overview.systemHealth?.totalFeatures || 1)) * 100"
+              color="primary">
+            </mat-progress-bar>
+          </div>
+
+          <!-- Integrations Status -->
+          <div class="metric-card">
+            <div class="metric-value primary">
+              {{ overview.systemHealth?.healthyIntegrations || 0 }} / {{ overview.systemHealth?.totalIntegrations || 0 }}
+            </div>
+            <div class="metric-label">Healthy Integrations</div>
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="((overview.systemHealth?.healthyIntegrations || 0) / (overview.systemHealth?.totalIntegrations || 1)) * 100"
+              color="primary">
+            </mat-progress-bar>
+          </div>
+
+          <!-- Configuration Issues -->
+          <div class="metric-card">
+            <div class="metric-value" [ngClass]="(overview.systemHealth?.configurationIssues || 0) > 0 ? 'warn' : 'primary'">
+              {{ overview.systemHealth?.configurationIssues || 0 }}
+            </div>
+            <div class="metric-label">Configuration Issues</div>
+            <mat-icon *ngIf="(overview.systemHealth?.configurationIssues || 0) === 0" class="status-icon success">check_circle</mat-icon>
+            <mat-icon *ngIf="(overview.systemHealth?.configurationIssues || 0) > 0" class="status-icon warning">warning</mat-icon>
+          </div>
+        </div>
+
+        <!-- Issues List -->
+        <div *ngIf="(overview.systemHealth?.issues?.length || 0) > 0" class="issues-section">
+          <h4>Active Issues</h4>
+          <mat-chip-listbox class="issues-list">
+            <mat-chip-option *ngFor="let issue of overview.systemHealth?.issues || []" color="warn" selected>
+              <mat-icon matChipAvatar>warning</mat-icon>
+              {{ issue }}
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tabs for Features and Integrations -->
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="main-tabs">
+      
+      <!-- Features Tab -->
+      <mat-tab label="Features">
+        <ng-template matTabContent>
+          <div class="tab-content">
+            <div *ngFor="let category of getCategoryKeys()" class="category-section">
+              <h3 class="category-title">{{ category }}</h3>
+              <div class="features-grid">
+                <mat-card 
+                  *ngFor="let feature of featuresByCategory[category]" 
+                  class="feature-card"
+                  [ngClass]="{ 
+                    'available': feature.isAvailable, 
+                    'unavailable': !feature.isAvailable,
+                    'needs-config': isFeatureStatusEqual(feature.status, FeatureStatus.NeedsConfiguration)
+                  }"
+                  (click)="onFeatureClick(feature)">
+                  
+                  <mat-card-header>
+                    <mat-icon mat-card-avatar [color]="getFeatureStatusColor(getFeatureStatusSafe(feature.status))">
+                      {{ feature.icon || 'extension' }}
+                    </mat-icon>
+                    <mat-card-title>{{ feature.name }}</mat-card-title>
+                    <mat-card-subtitle>{{ feature.description }}</mat-card-subtitle>
+                  </mat-card-header>
+
+                  <mat-card-content>
+                    <!-- Status Badge -->
+                    <div class="status-section">
+                      <mat-chip [color]="getFeatureStatusColor(getFeatureStatusSafe(feature.status))" selected>
+                        {{ getFeatureStatusSafe(feature.status) }}
+                      </mat-chip>
+                      <span *ngIf="!feature.isAvailable" class="unavailable-reason">
+                        {{ feature.unavailableReason }}
+                      </span>
+                    </div>
+
+                    <!-- Usage Stats -->
+                    <div *ngIf="feature.isAvailable && feature.usageCount" class="usage-stats">
+                      <small>
+                        Used {{ feature.usageCount }} times
+                        <span *ngIf="feature.lastUsed"> • Last used {{ feature.lastUsed | date:'short' }}</span>
+                      </small>
+                    </div>
+
+                    <!-- Configuration Steps -->
+                    <div *ngIf="isFeatureStatusEqual(feature.status, FeatureStatus.NeedsConfiguration) && feature.configurationSteps && feature.configurationSteps.length > 0" 
+                         class="config-steps">
+                      <small>Configuration needed:</small>
+                      <ul>
+                        <li *ngFor="let step of feature.configurationSteps">
+                          <mat-icon [color]="step.isCompleted ? 'primary' : 'warn'">
+                            {{ step.isCompleted ? 'check_circle' : 'radio_button_unchecked' }}
+                          </mat-icon>
+                          {{ step.title }}
+                        </li>
+                      </ul>
+                    </div>
+                  </mat-card-content>
+
+                  <mat-card-actions *ngIf="feature.isAvailable">
+                    <button mat-button color="primary" (click)="onFeatureClick(feature); $event.stopPropagation()">
+                      <mat-icon>open_in_new</mat-icon>
+                      Open
+                    </button>
+                  </mat-card-actions>
+                </mat-card>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Integrations Tab -->
+      <mat-tab label="Integrations">
+        <ng-template matTabContent>
+          <div class="tab-content">
+            <div *ngFor="let type of getIntegrationTypeKeys()" class="category-section">
+              <h3 class="category-title">{{ type }}</h3>
+              <div class="integrations-grid">
+                <mat-card 
+                  *ngFor="let integration of integrationsByType[type]" 
+                  class="integration-card"
+                  [ngClass]="{ 
+                    'healthy': integration.isHealthy, 
+                    'unhealthy': !integration.isHealthy,
+                    'required': integration.isRequired
+                  }">
+                  
+                  <mat-card-header>
+                    <mat-icon mat-card-avatar [color]="getIntegrationStatusColor(getIntegrationStatusSafe(integration.status))">
+                      {{ integration.icon || 'integration_instructions' }}
+                    </mat-icon>
+                    <mat-card-title>
+                      {{ integration.name }}
+                      <mat-chip *ngIf="integration.isRequired" color="accent" class="required-chip">Required</mat-chip>
+                    </mat-card-title>
+                    <mat-card-subtitle>{{ integration.description }}</mat-card-subtitle>
+                  </mat-card-header>
+
+                  <mat-card-content>
+                    <!-- Status and Health -->
+                    <div class="status-section">
+                      <mat-chip [color]="getIntegrationStatusColor(getIntegrationStatusSafe(integration.status))" selected>
+                        {{ getIntegrationStatusSafe(integration.status) }}
+                      </mat-chip>
+                      <div class="health-indicator">
+                        <mat-icon [color]="integration.isHealthy ? 'primary' : 'warn'">
+                          {{ integration.isHealthy ? 'check_circle' : 'error' }}
+                        </mat-icon>
+                        <span class="health-message">{{ integration.healthMessage || 'No health data' }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Version Info -->
+                    <div *ngIf="integration.version" class="version-info">
+                      <small>Version: {{ integration.version }}</small>
+                    </div>
+
+                    <!-- Last Health Check -->
+                    <div *ngIf="integration.lastHealthCheck" class="health-check-info">
+                      <small>Last checked: {{ integration.lastHealthCheck | date:'short' }}</small>
+                    </div>
+
+                    <!-- Configuration Steps -->
+                    <div *ngIf="isIntegrationStatusEqual(integration.status, IntegrationStatus.NeedsConfiguration) && integration.configurationSteps && integration.configurationSteps.length > 0" 
+                         class="config-steps">
+                      <small>Configuration needed:</small>
+                      <ul>
+                        <li *ngFor="let step of integration.configurationSteps">
+                          <mat-icon [color]="step.isCompleted ? 'primary' : 'warn'">
+                            {{ step.isCompleted ? 'check_circle' : 'radio_button_unchecked' }}
+                          </mat-icon>
+                          {{ step.title }}
+                        </li>
+                      </ul>
+                    </div>
+                  </mat-card-content>
+
+                  <mat-card-actions>
+                    <button 
+                      *ngIf="integration.configurationRoute" 
+                      mat-button 
+                      color="primary" 
+                      (click)="onIntegrationConfigure(integration)">
+                      <mat-icon>settings</mat-icon>
+                      Configure
+                    </button>
+                    <button 
+                      mat-button 
+                      color="accent" 
+                      (click)="onIntegrationHealthCheck(integration)">
+                      <mat-icon>health_and_safety</mat-icon>
+                      Health Check
+                    </button>
+                  </mat-card-actions>
+                </mat-card>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !overview" class="empty-state">
+    <mat-icon>error_outline</mat-icon>
+    <h3>Failed to Load System Overview</h3>
+    <p>Unable to retrieve system information. Please try refreshing the page.</p>
+    <button mat-raised-button color="primary" (click)="loadOverview()">
+      <mat-icon>refresh</mat-icon>
+      Retry
+    </button>
+  </div>
+</div> 

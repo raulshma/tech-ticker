@@ -4497,6 +4497,617 @@ export class TechTickerApiClient {
     }
 
     /**
+     * @return OK
+     */
+    getIntegrationsAndFeatures(): Observable<IntegrationsAndFeaturesDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/IntegrationsAndFeatures";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetIntegrationsAndFeatures(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetIntegrationsAndFeatures(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<IntegrationsAndFeaturesDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<IntegrationsAndFeaturesDtoApiResponse>;
+        }));
+    }
+
+    protected processGetIntegrationsAndFeatures(response: HttpResponseBase): Observable<IntegrationsAndFeaturesDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = IntegrationsAndFeaturesDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ObjectApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ObjectApiResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getFeatures(): Observable<FeatureDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/IntegrationsAndFeatures/features";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFeatures(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFeatures(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FeatureDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FeatureDtoListApiResponse>;
+        }));
+    }
+
+    protected processGetFeatures(response: HttpResponseBase): Observable<FeatureDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FeatureDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ObjectApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ObjectApiResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getIntegrations(): Observable<IntegrationDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/IntegrationsAndFeatures/integrations";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetIntegrations(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetIntegrations(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<IntegrationDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<IntegrationDtoListApiResponse>;
+        }));
+    }
+
+    protected processGetIntegrations(response: HttpResponseBase): Observable<IntegrationDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = IntegrationDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ObjectApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ObjectApiResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getSystemHealth2(): Observable<SystemHealthDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/IntegrationsAndFeatures/system-health";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSystemHealth2(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSystemHealth2(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SystemHealthDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SystemHealthDtoApiResponse>;
+        }));
+    }
+
+    protected processGetSystemHealth2(response: HttpResponseBase): Observable<SystemHealthDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SystemHealthDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ObjectApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ObjectApiResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    checkIntegrationHealth(integrationId: string): Observable<IntegrationHealthCheckDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/IntegrationsAndFeatures/integrations/{integrationId}/health-check";
+        if (integrationId === undefined || integrationId === null)
+            throw new Error("The parameter 'integrationId' must be defined.");
+        url_ = url_.replace("{integrationId}", encodeURIComponent("" + integrationId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCheckIntegrationHealth(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCheckIntegrationHealth(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<IntegrationHealthCheckDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<IntegrationHealthCheckDtoApiResponse>;
+        }));
+    }
+
+    protected processCheckIntegrationHealth(response: HttpResponseBase): Observable<IntegrationHealthCheckDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = IntegrationHealthCheckDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ObjectApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ObjectApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ObjectApiResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getConfigurationGuide(id: string): Observable<ConfigurationGuideDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/IntegrationsAndFeatures/configuration-guide/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetConfigurationGuide(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetConfigurationGuide(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ConfigurationGuideDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ConfigurationGuideDtoApiResponse>;
+        }));
+    }
+
+    protected processGetConfigurationGuide(response: HttpResponseBase): Observable<ConfigurationGuideDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ConfigurationGuideDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ObjectApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ObjectApiResponse.fromJS(resultData404);
+            return throwException("Not Found", status, _responseText, _headers, result404);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ObjectApiResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    recordFeatureUsage(featureId: string): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/IntegrationsAndFeatures/features/{featureId}/usage";
+        if (featureId === undefined || featureId === null)
+            throw new Error("The parameter 'featureId' must be defined.");
+        url_ = url_.replace("{featureId}", encodeURIComponent("" + featureId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRecordFeatureUsage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRecordFeatureUsage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processRecordFeatureUsage(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ObjectApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ObjectApiResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getFeatureUsage(featureId: string): Observable<FeatureUsageDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/IntegrationsAndFeatures/features/{featureId}/usage";
+        if (featureId === undefined || featureId === null)
+            throw new Error("The parameter 'featureId' must be defined.");
+        url_ = url_.replace("{featureId}", encodeURIComponent("" + featureId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFeatureUsage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFeatureUsage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FeatureUsageDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FeatureUsageDtoApiResponse>;
+        }));
+    }
+
+    protected processGetFeatureUsage(response: HttpResponseBase): Observable<FeatureUsageDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FeatureUsageDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ObjectApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ObjectApiResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    refreshIntegrationHealth(): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/IntegrationsAndFeatures/integrations/refresh-health";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRefreshIntegrationHealth(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRefreshIntegrationHealth(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processRefreshIntegrationHealth(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ObjectApiResponse.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ObjectApiResponse.fromJS(resultData500);
+            return throwException("Internal Server Error", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return OK
      */
@@ -16749,6 +17360,230 @@ export enum ComparisonTrend {
     _2 = 2,
 }
 
+export class ConfigurationGuideDto implements IConfigurationGuideDto {
+    featureOrIntegrationId?: string | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    steps?: ConfigurationStepDto[] | undefined;
+    prerequisites?: string[] | undefined;
+    documentationUrl?: string | undefined;
+    videoUrl?: string | undefined;
+
+    constructor(data?: IConfigurationGuideDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.featureOrIntegrationId = _data["featureOrIntegrationId"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            if (Array.isArray(_data["steps"])) {
+                this.steps = [] as any;
+                for (let item of _data["steps"])
+                    this.steps!.push(ConfigurationStepDto.fromJS(item));
+            }
+            if (Array.isArray(_data["prerequisites"])) {
+                this.prerequisites = [] as any;
+                for (let item of _data["prerequisites"])
+                    this.prerequisites!.push(item);
+            }
+            this.documentationUrl = _data["documentationUrl"];
+            this.videoUrl = _data["videoUrl"];
+        }
+    }
+
+    static fromJS(data: any): ConfigurationGuideDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConfigurationGuideDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["featureOrIntegrationId"] = this.featureOrIntegrationId;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        if (Array.isArray(this.steps)) {
+            data["steps"] = [];
+            for (let item of this.steps)
+                data["steps"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.prerequisites)) {
+            data["prerequisites"] = [];
+            for (let item of this.prerequisites)
+                data["prerequisites"].push(item);
+        }
+        data["documentationUrl"] = this.documentationUrl;
+        data["videoUrl"] = this.videoUrl;
+        return data;
+    }
+}
+
+export interface IConfigurationGuideDto {
+    featureOrIntegrationId?: string | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    steps?: ConfigurationStepDto[] | undefined;
+    prerequisites?: string[] | undefined;
+    documentationUrl?: string | undefined;
+    videoUrl?: string | undefined;
+}
+
+export class ConfigurationGuideDtoApiResponse implements IConfigurationGuideDtoApiResponse {
+    success?: boolean;
+    data?: ConfigurationGuideDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IConfigurationGuideDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ConfigurationGuideDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ConfigurationGuideDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConfigurationGuideDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IConfigurationGuideDtoApiResponse {
+    success?: boolean;
+    data?: ConfigurationGuideDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ConfigurationStepDto implements IConfigurationStepDto {
+    id?: string | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    isCompleted?: boolean;
+    isRequired?: boolean;
+    actionUrl?: string | undefined;
+    actionText?: string | undefined;
+    order?: number;
+
+    constructor(data?: IConfigurationStepDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.isCompleted = _data["isCompleted"];
+            this.isRequired = _data["isRequired"];
+            this.actionUrl = _data["actionUrl"];
+            this.actionText = _data["actionText"];
+            this.order = _data["order"];
+        }
+    }
+
+    static fromJS(data: any): ConfigurationStepDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConfigurationStepDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["isCompleted"] = this.isCompleted;
+        data["isRequired"] = this.isRequired;
+        data["actionUrl"] = this.actionUrl;
+        data["actionText"] = this.actionText;
+        data["order"] = this.order;
+        return data;
+    }
+}
+
+export interface IConfigurationStepDto {
+    id?: string | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    isCompleted?: boolean;
+    isRequired?: boolean;
+    actionUrl?: string | undefined;
+    actionText?: string | undefined;
+    order?: number;
+}
+
 export class ConsoleMessageDto implements IConsoleMessageDto {
     level?: string | undefined;
     message?: string | undefined;
@@ -17914,6 +18749,350 @@ export interface IFailurePointDto {
     commonError?: string | undefined;
 }
 
+export class FeatureDto implements IFeatureDto {
+    id?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    category?: string | undefined;
+    status?: FeatureStatus;
+    icon?: string | undefined;
+    route?: string | undefined;
+    requiredRoles?: string[] | undefined;
+    requiredPermissions?: string[] | undefined;
+    isAvailable?: boolean;
+    unavailableReason?: string | undefined;
+    lastUsed?: Date | undefined;
+    usageCount?: number | undefined;
+    configurationSteps?: ConfigurationStepDto[] | undefined;
+
+    constructor(data?: IFeatureDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.category = _data["category"];
+            this.status = _data["status"];
+            this.icon = _data["icon"];
+            this.route = _data["route"];
+            if (Array.isArray(_data["requiredRoles"])) {
+                this.requiredRoles = [] as any;
+                for (let item of _data["requiredRoles"])
+                    this.requiredRoles!.push(item);
+            }
+            if (Array.isArray(_data["requiredPermissions"])) {
+                this.requiredPermissions = [] as any;
+                for (let item of _data["requiredPermissions"])
+                    this.requiredPermissions!.push(item);
+            }
+            this.isAvailable = _data["isAvailable"];
+            this.unavailableReason = _data["unavailableReason"];
+            this.lastUsed = _data["lastUsed"] ? new Date(_data["lastUsed"].toString()) : <any>undefined;
+            this.usageCount = _data["usageCount"];
+            if (Array.isArray(_data["configurationSteps"])) {
+                this.configurationSteps = [] as any;
+                for (let item of _data["configurationSteps"])
+                    this.configurationSteps!.push(ConfigurationStepDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): FeatureDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FeatureDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["category"] = this.category;
+        data["status"] = this.status;
+        data["icon"] = this.icon;
+        data["route"] = this.route;
+        if (Array.isArray(this.requiredRoles)) {
+            data["requiredRoles"] = [];
+            for (let item of this.requiredRoles)
+                data["requiredRoles"].push(item);
+        }
+        if (Array.isArray(this.requiredPermissions)) {
+            data["requiredPermissions"] = [];
+            for (let item of this.requiredPermissions)
+                data["requiredPermissions"].push(item);
+        }
+        data["isAvailable"] = this.isAvailable;
+        data["unavailableReason"] = this.unavailableReason;
+        data["lastUsed"] = this.lastUsed ? this.lastUsed.toISOString() : <any>undefined;
+        data["usageCount"] = this.usageCount;
+        if (Array.isArray(this.configurationSteps)) {
+            data["configurationSteps"] = [];
+            for (let item of this.configurationSteps)
+                data["configurationSteps"].push(item ? item.toJSON() : <any>undefined);
+        }
+        return data;
+    }
+}
+
+export interface IFeatureDto {
+    id?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    category?: string | undefined;
+    status?: FeatureStatus;
+    icon?: string | undefined;
+    route?: string | undefined;
+    requiredRoles?: string[] | undefined;
+    requiredPermissions?: string[] | undefined;
+    isAvailable?: boolean;
+    unavailableReason?: string | undefined;
+    lastUsed?: Date | undefined;
+    usageCount?: number | undefined;
+    configurationSteps?: ConfigurationStepDto[] | undefined;
+}
+
+export class FeatureDtoListApiResponse implements IFeatureDtoListApiResponse {
+    success?: boolean;
+    data?: FeatureDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IFeatureDtoListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(FeatureDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): FeatureDtoListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new FeatureDtoListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IFeatureDtoListApiResponse {
+    success?: boolean;
+    data?: FeatureDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export enum FeatureStatus {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+}
+
+export class FeatureUsageDto implements IFeatureUsageDto {
+    featureId?: string | undefined;
+    userId?: string | undefined;
+    lastAccessed?: Date;
+    accessCount?: number;
+
+    constructor(data?: IFeatureUsageDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.featureId = _data["featureId"];
+            this.userId = _data["userId"];
+            this.lastAccessed = _data["lastAccessed"] ? new Date(_data["lastAccessed"].toString()) : <any>undefined;
+            this.accessCount = _data["accessCount"];
+        }
+    }
+
+    static fromJS(data: any): FeatureUsageDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FeatureUsageDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["featureId"] = this.featureId;
+        data["userId"] = this.userId;
+        data["lastAccessed"] = this.lastAccessed ? this.lastAccessed.toISOString() : <any>undefined;
+        data["accessCount"] = this.accessCount;
+        return data;
+    }
+}
+
+export interface IFeatureUsageDto {
+    featureId?: string | undefined;
+    userId?: string | undefined;
+    lastAccessed?: Date;
+    accessCount?: number;
+}
+
+export class FeatureUsageDtoApiResponse implements IFeatureUsageDtoApiResponse {
+    success?: boolean;
+    data?: FeatureUsageDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IFeatureUsageDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? FeatureUsageDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): FeatureUsageDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new FeatureUsageDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IFeatureUsageDtoApiResponse {
+    success?: boolean;
+    data?: FeatureUsageDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class FlakyTestDto implements IFlakyTestDto {
     testUrl?: string | undefined;
     profileHash?: string | undefined;
@@ -18358,6 +19537,510 @@ export class Int32ApiResponse implements IInt32ApiResponse {
 export interface IInt32ApiResponse {
     success?: boolean;
     data?: number;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class IntegrationDto implements IIntegrationDto {
+    id?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    type?: string | undefined;
+    status?: IntegrationStatus;
+    icon?: string | undefined;
+    version?: string | undefined;
+    configurationRoute?: string | undefined;
+    isRequired?: boolean;
+    isHealthy?: boolean;
+    healthMessage?: string | undefined;
+    lastHealthCheck?: Date | undefined;
+    configurationSteps?: ConfigurationStepDto[] | undefined;
+    metadata?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IIntegrationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.type = _data["type"];
+            this.status = _data["status"];
+            this.icon = _data["icon"];
+            this.version = _data["version"];
+            this.configurationRoute = _data["configurationRoute"];
+            this.isRequired = _data["isRequired"];
+            this.isHealthy = _data["isHealthy"];
+            this.healthMessage = _data["healthMessage"];
+            this.lastHealthCheck = _data["lastHealthCheck"] ? new Date(_data["lastHealthCheck"].toString()) : <any>undefined;
+            if (Array.isArray(_data["configurationSteps"])) {
+                this.configurationSteps = [] as any;
+                for (let item of _data["configurationSteps"])
+                    this.configurationSteps!.push(ConfigurationStepDto.fromJS(item));
+            }
+            if (_data["metadata"]) {
+                this.metadata = {} as any;
+                for (let key in _data["metadata"]) {
+                    if (_data["metadata"].hasOwnProperty(key))
+                        (<any>this.metadata)![key] = _data["metadata"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): IntegrationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new IntegrationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["type"] = this.type;
+        data["status"] = this.status;
+        data["icon"] = this.icon;
+        data["version"] = this.version;
+        data["configurationRoute"] = this.configurationRoute;
+        data["isRequired"] = this.isRequired;
+        data["isHealthy"] = this.isHealthy;
+        data["healthMessage"] = this.healthMessage;
+        data["lastHealthCheck"] = this.lastHealthCheck ? this.lastHealthCheck.toISOString() : <any>undefined;
+        if (Array.isArray(this.configurationSteps)) {
+            data["configurationSteps"] = [];
+            for (let item of this.configurationSteps)
+                data["configurationSteps"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (this.metadata) {
+            data["metadata"] = {};
+            for (let key in this.metadata) {
+                if (this.metadata.hasOwnProperty(key))
+                    (<any>data["metadata"])[key] = (<any>this.metadata)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IIntegrationDto {
+    id?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    type?: string | undefined;
+    status?: IntegrationStatus;
+    icon?: string | undefined;
+    version?: string | undefined;
+    configurationRoute?: string | undefined;
+    isRequired?: boolean;
+    isHealthy?: boolean;
+    healthMessage?: string | undefined;
+    lastHealthCheck?: Date | undefined;
+    configurationSteps?: ConfigurationStepDto[] | undefined;
+    metadata?: { [key: string]: any; } | undefined;
+}
+
+export class IntegrationDtoListApiResponse implements IIntegrationDtoListApiResponse {
+    success?: boolean;
+    data?: IntegrationDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IIntegrationDtoListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(IntegrationDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): IntegrationDtoListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new IntegrationDtoListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IIntegrationDtoListApiResponse {
+    success?: boolean;
+    data?: IntegrationDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class IntegrationHealthCheckDto implements IIntegrationHealthCheckDto {
+    integrationId?: string | undefined;
+    isHealthy?: boolean;
+    message?: string | undefined;
+    checkedAt?: Date;
+    responseTime?: string;
+    details?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IIntegrationHealthCheckDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.integrationId = _data["integrationId"];
+            this.isHealthy = _data["isHealthy"];
+            this.message = _data["message"];
+            this.checkedAt = _data["checkedAt"] ? new Date(_data["checkedAt"].toString()) : <any>undefined;
+            this.responseTime = _data["responseTime"];
+            if (_data["details"]) {
+                this.details = {} as any;
+                for (let key in _data["details"]) {
+                    if (_data["details"].hasOwnProperty(key))
+                        (<any>this.details)![key] = _data["details"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): IntegrationHealthCheckDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new IntegrationHealthCheckDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["integrationId"] = this.integrationId;
+        data["isHealthy"] = this.isHealthy;
+        data["message"] = this.message;
+        data["checkedAt"] = this.checkedAt ? this.checkedAt.toISOString() : <any>undefined;
+        data["responseTime"] = this.responseTime;
+        if (this.details) {
+            data["details"] = {};
+            for (let key in this.details) {
+                if (this.details.hasOwnProperty(key))
+                    (<any>data["details"])[key] = (<any>this.details)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IIntegrationHealthCheckDto {
+    integrationId?: string | undefined;
+    isHealthy?: boolean;
+    message?: string | undefined;
+    checkedAt?: Date;
+    responseTime?: string;
+    details?: { [key: string]: any; } | undefined;
+}
+
+export class IntegrationHealthCheckDtoApiResponse implements IIntegrationHealthCheckDtoApiResponse {
+    success?: boolean;
+    data?: IntegrationHealthCheckDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IIntegrationHealthCheckDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? IntegrationHealthCheckDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): IntegrationHealthCheckDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new IntegrationHealthCheckDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IIntegrationHealthCheckDtoApiResponse {
+    success?: boolean;
+    data?: IntegrationHealthCheckDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export enum IntegrationStatus {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+}
+
+export class IntegrationsAndFeaturesDto implements IIntegrationsAndFeaturesDto {
+    features?: FeatureDto[] | undefined;
+    integrations?: IntegrationDto[] | undefined;
+    systemHealth?: SystemHealthDto;
+
+    constructor(data?: IIntegrationsAndFeaturesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["features"])) {
+                this.features = [] as any;
+                for (let item of _data["features"])
+                    this.features!.push(FeatureDto.fromJS(item));
+            }
+            if (Array.isArray(_data["integrations"])) {
+                this.integrations = [] as any;
+                for (let item of _data["integrations"])
+                    this.integrations!.push(IntegrationDto.fromJS(item));
+            }
+            this.systemHealth = _data["systemHealth"] ? SystemHealthDto.fromJS(_data["systemHealth"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): IntegrationsAndFeaturesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new IntegrationsAndFeaturesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.features)) {
+            data["features"] = [];
+            for (let item of this.features)
+                data["features"].push(item ? item.toJSON() : <any>undefined);
+        }
+        if (Array.isArray(this.integrations)) {
+            data["integrations"] = [];
+            for (let item of this.integrations)
+                data["integrations"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["systemHealth"] = this.systemHealth ? this.systemHealth.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IIntegrationsAndFeaturesDto {
+    features?: FeatureDto[] | undefined;
+    integrations?: IntegrationDto[] | undefined;
+    systemHealth?: SystemHealthDto;
+}
+
+export class IntegrationsAndFeaturesDtoApiResponse implements IIntegrationsAndFeaturesDtoApiResponse {
+    success?: boolean;
+    data?: IntegrationsAndFeaturesDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IIntegrationsAndFeaturesDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? IntegrationsAndFeaturesDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): IntegrationsAndFeaturesDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new IntegrationsAndFeaturesDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IIntegrationsAndFeaturesDtoApiResponse {
+    success?: boolean;
+    data?: IntegrationsAndFeaturesDto;
     message?: string | undefined;
     errors?: string[] | undefined;
     timestamp?: Date;
@@ -27078,6 +28761,166 @@ export interface ISystemEventRequestDto {
     message?: string | undefined;
     component?: string | undefined;
     metadata?: { [key: string]: any; } | undefined;
+}
+
+export class SystemHealthDto implements ISystemHealthDto {
+    isHealthy?: boolean;
+    healthScore?: number;
+    totalFeatures?: number;
+    activeFeatures?: number;
+    totalIntegrations?: number;
+    healthyIntegrations?: number;
+    configurationIssues?: number;
+    issues?: string[] | undefined;
+    lastUpdated?: Date;
+
+    constructor(data?: ISystemHealthDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isHealthy = _data["isHealthy"];
+            this.healthScore = _data["healthScore"];
+            this.totalFeatures = _data["totalFeatures"];
+            this.activeFeatures = _data["activeFeatures"];
+            this.totalIntegrations = _data["totalIntegrations"];
+            this.healthyIntegrations = _data["healthyIntegrations"];
+            this.configurationIssues = _data["configurationIssues"];
+            if (Array.isArray(_data["issues"])) {
+                this.issues = [] as any;
+                for (let item of _data["issues"])
+                    this.issues!.push(item);
+            }
+            this.lastUpdated = _data["lastUpdated"] ? new Date(_data["lastUpdated"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): SystemHealthDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SystemHealthDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isHealthy"] = this.isHealthy;
+        data["healthScore"] = this.healthScore;
+        data["totalFeatures"] = this.totalFeatures;
+        data["activeFeatures"] = this.activeFeatures;
+        data["totalIntegrations"] = this.totalIntegrations;
+        data["healthyIntegrations"] = this.healthyIntegrations;
+        data["configurationIssues"] = this.configurationIssues;
+        if (Array.isArray(this.issues)) {
+            data["issues"] = [];
+            for (let item of this.issues)
+                data["issues"].push(item);
+        }
+        data["lastUpdated"] = this.lastUpdated ? this.lastUpdated.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface ISystemHealthDto {
+    isHealthy?: boolean;
+    healthScore?: number;
+    totalFeatures?: number;
+    activeFeatures?: number;
+    totalIntegrations?: number;
+    healthyIntegrations?: number;
+    configurationIssues?: number;
+    issues?: string[] | undefined;
+    lastUpdated?: Date;
+}
+
+export class SystemHealthDtoApiResponse implements ISystemHealthDtoApiResponse {
+    success?: boolean;
+    data?: SystemHealthDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ISystemHealthDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? SystemHealthDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): SystemHealthDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SystemHealthDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ISystemHealthDtoApiResponse {
+    success?: boolean;
+    data?: SystemHealthDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
 }
 
 export class SystemWideMetricsDto implements ISystemWideMetricsDto {
