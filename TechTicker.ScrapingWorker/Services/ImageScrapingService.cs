@@ -51,66 +51,21 @@ public partial class ImageScrapingService : IImageScrapingService
 
             _logger.LogInformation("Starting image scraping with selector: {Selector}", imageSelector);
 
-            // Early check: if product already has recent images, skip processing entirely
-            var shouldSkip = await _productImageService.ShouldSkipImageProcessingAsync(productId, TimeSpan.FromDays(7), maxImages);
-            if (shouldSkip)
+            var existingImagePaths = await _imageStorageService.GetProductImagePathsAsync(productId);
+            var validImageCount = 0;
+            foreach (var path in existingImagePaths)
             {
-                _logger.LogInformation("Product {ProductId} has recent images, skipping image scraping", productId);
-                
-                // Get existing valid images to return in result
-                var recentImagePaths = await _imageStorageService.GetProductImagePathsAsync(productId);
-                var validRecentPaths = new List<string>();
-                
-                foreach (var path in recentImagePaths)
+                if (await _imageStorageService.ImageExistsAsync(path))
                 {
-                    if (await _imageStorageService.ImageExistsAsync(path))
-                    {
-                        validRecentPaths.Add(path);
-                    }
+                    validImageCount++;
                 }
-
-                result.IsSuccess = true;
-                result.PrimaryImageUrl = validRecentPaths.FirstOrDefault();
-                result.AdditionalImageUrls = validRecentPaths.Skip(1).ToList();
-                result.SuccessfulUploads = validRecentPaths.Count;
-                result.ProcessedCount = 0;
-                return result;
             }
 
-            // Early check: if product already has sufficient images, skip processing entirely
-            var hasExistingImages = await _productImageService.HasAnyImagesAsync(productId);
-            if (hasExistingImages)
+            if (validImageCount >= maxImages)
             {
-                var currentImagePaths = await _imageStorageService.GetProductImagePathsAsync(productId);
-                var validCurrentPaths = new List<string>();
-                
-                // Verify that existing images are still valid
-                foreach (var path in currentImagePaths)
-                {
-                    if (await _imageStorageService.ImageExistsAsync(path))
-                    {
-                        validCurrentPaths.Add(path);
-                    }
-                }
-
-                // If we have sufficient valid images, skip processing
-                if (validCurrentPaths.Count >= maxImages)
-                {
-                    _logger.LogInformation("Product {ProductId} already has {Count} valid images (>= {MaxImages}), skipping image scraping", 
-                        productId, validCurrentPaths.Count, maxImages);
-                    
-                    result.IsSuccess = true;
-                    result.PrimaryImageUrl = validCurrentPaths.FirstOrDefault();
-                    result.AdditionalImageUrls = validCurrentPaths.Skip(1).ToList();
-                    result.SuccessfulUploads = validCurrentPaths.Count;
-                    result.ProcessedCount = 0;
-                    return result;
-                }
-                else if (validCurrentPaths.Count > 0)
-                {
-                    _logger.LogInformation("Product {ProductId} has {ExistingCount} valid images, will process up to {RemainingCount} more", 
-                        productId, validCurrentPaths.Count, maxImages - validCurrentPaths.Count);
-                }
+                _logger.LogInformation("Product {ProductId} already has {Count} valid images, skipping scraping.", productId, validImageCount);
+                result.IsSuccess = true;
+                return result;
             }
 
             // Extract image URLs from HTML
@@ -266,36 +221,24 @@ public partial class ImageScrapingService : IImageScrapingService
 
         try
         {
-            var imageElements = document.QuerySelectorAll(selector);
-            
-            foreach (var element in imageElements)
-            {
-                // Try different attributes in priority order
-                var urls = new List<string?>();
-                
-                // 1. High-resolution zoom image (common in e-commerce)
-                urls.Add(element.GetAttribute("data-zoom-image"));
-                urls.Add(element.GetAttribute("data-large-image"));
-                
-                // 2. Standard src attribute
-                urls.Add(element.GetAttribute("src"));
-                
-                // 3. Parse srcset for highest resolution
-                var srcset = element.GetAttribute("srcset");
-                if (!string.IsNullOrEmpty(srcset))
-                {
-                    urls.Add(ParseHighestResolutionFromSrcset(srcset));
-                }
+            var containers = document.QuerySelectorAll(selector);
+            var imageElements = new List<IElement>();
 
-                // Process URLs
-                foreach (var url in urls.Where(u => !string.IsNullOrEmpty(u)))
+            if (containers.Any(e => e.LocalName.Equals("img", StringComparison.OrdinalIgnoreCase)))
+            {
+                imageElements.AddRange(containers);
+            }
+            else
+            {
+                imageElements.AddRange(containers.SelectMany(c => c.QuerySelectorAll("img")));
+            }
+
+            foreach (var element in imageElements.Distinct())
+            {
+                var bestUrl = FindBestImageUrl(element, baseUrl);
+                if (!string.IsNullOrEmpty(bestUrl))
                 {
-                    var absoluteUrl = ConvertToAbsoluteUrl(url!, baseUrl);
-                    if (!string.IsNullOrEmpty(absoluteUrl) && IsValidImageUrl(absoluteUrl))
-                    {
-                        imageUrls.Add(absoluteUrl);
-                        break; // Take the first valid URL for this element
-                    }
+                    imageUrls.Add(bestUrl);
                 }
             }
         }
@@ -307,43 +250,77 @@ public partial class ImageScrapingService : IImageScrapingService
         return imageUrls.ToList();
     }
 
+    private string? FindBestImageUrl(IElement element, string baseUrl)
+    {
+        var potentialUrls = new List<string?>();
+
+        // Priority 1: High-resolution data attributes on the element itself
+        potentialUrls.Add(element.GetAttribute("data-zoom-image"));
+        potentialUrls.Add(element.GetAttribute("data-large-image"));
+        potentialUrls.Add(element.GetAttribute("data-full-image"));
+        potentialUrls.Add(element.GetAttribute("data-highres-image"));
+
+        // Priority 2: Parent element attributes (e.g., link to full image)
+        var parent = element.ParentElement;
+        if (parent != null)
+        {
+            potentialUrls.Add(parent.GetAttribute("data-zoom-image"));
+            potentialUrls.Add(parent.GetAttribute("data-large-image"));
+            if (parent.LocalName.Equals("a", StringComparison.OrdinalIgnoreCase))
+            {
+                potentialUrls.Add(parent.GetAttribute("href"));
+            }
+        }
+
+        // Priority 3: srcset - find the highest resolution
+        var srcset = element.GetAttribute("srcset");
+        if (!string.IsNullOrEmpty(srcset))
+        {
+            potentialUrls.Add(ParseHighestResolutionFromSrcset(srcset));
+        }
+
+        // Priority 4: Standard src attribute
+        potentialUrls.Add(element.GetAttribute("src"));
+
+        // Find the first valid, absolute URL in the prioritized list
+        foreach (var url in potentialUrls)
+        {
+            if (string.IsNullOrEmpty(url)) continue;
+
+            var absoluteUrl = ConvertToAbsoluteUrl(url, baseUrl);
+            if (IsValidImageUrl(absoluteUrl))
+            {
+                return absoluteUrl;
+            }
+        }
+
+        return null;
+    }
+
     private string? ParseHighestResolutionFromSrcset(string srcset)
     {
         try
         {
-            // Parse srcset format: "url1 100w, url2 200w, url3 300w"
-            var entries = srcset.Split(',')
-                .Select(entry => entry.Trim())
-                .Where(entry => !string.IsNullOrEmpty(entry))
+            var sources = srcset.Split(',')
+                .Select(s => s.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
+                .Where(parts => parts.Length > 0)
+                .Select(parts => new
+                {
+                    Url = parts[0],
+                    Width = parts.Length > 1 && parts[1].EndsWith("w")
+                            ? int.Parse(parts[1].TrimEnd('w'))
+                            : 0
+                })
+                .OrderByDescending(s => s.Width)
                 .ToList();
 
-            if (!entries.Any()) return null;
-
-            // Find entry with highest width
-            string? bestUrl = null;
-            int maxWidth = 0;
-
-            foreach (var entry in entries)
-            {
-                var parts = entry.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length >= 2)
-                {
-                    var url = parts[0];
-                    var widthStr = parts[1].Replace("w", "").Replace("x", "");
-                    
-                    if (int.TryParse(widthStr, out var width) && width > maxWidth)
-                    {
-                        maxWidth = width;
-                        bestUrl = url;
-                    }
-                }
-            }
-
-            return bestUrl ?? entries.First().Split(' ')[0]; // Fallback to first URL
+            return sources.FirstOrDefault()?.Url;
         }
-        catch
+        catch (Exception ex)
         {
-            return null;
+            _logger.LogWarning(ex, "Could not parse srcset: {Srcset}", srcset);
+            // Fallback to just taking the first URL
+            return srcset.Split(',').FirstOrDefault()?.Trim().Split(' ').FirstOrDefault();
         }
     }
 
@@ -351,13 +328,22 @@ public partial class ImageScrapingService : IImageScrapingService
     {
         try
         {
+            // Handle protocol-relative URLs
+            if (url.StartsWith("//"))
+            {
+                var baseUri = new Uri(baseUrl);
+                return new Uri(baseUri, url).ToString();
+            }
+            
+            // Check if it's already absolute
             if (AbsoluteUrlRegex().IsMatch(url))
             {
-                return url; // Already absolute
+                return url;
             }
 
-            var baseUri = new Uri(baseUrl);
-            var absoluteUri = new Uri(baseUri, url);
+            // Handle relative URLs
+            var baseUriForRelative = new Uri(baseUrl);
+            var absoluteUri = new Uri(baseUriForRelative, url);
             return absoluteUri.ToString();
         }
         catch
@@ -368,14 +354,38 @@ public partial class ImageScrapingService : IImageScrapingService
 
     private static bool IsValidImageUrl(string url)
     {
-        var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp" };
-        var lowerUrl = url.ToLower();
+        if (string.IsNullOrWhiteSpace(url) || url.Trim().StartsWith("data:image", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".svg" };
         
-        // Check if URL contains image extension or common image patterns
-        return imageExtensions.Any(ext => lowerUrl.Contains(ext)) ||
-               lowerUrl.Contains("image") ||
-               lowerUrl.Contains("photo") ||
-               lowerUrl.Contains("picture");
+        try
+        {
+            // Ensure we have an absolute URL to properly parse the path
+            var uri = new Uri(url, UriKind.Absolute);
+            var path = uri.AbsolutePath;
+            
+            var pathWithoutQuery = path.Split('?')[0];
+            var extension = Path.GetExtension(pathWithoutQuery);
+            
+            return !string.IsNullOrEmpty(extension) && imageExtensions.Contains(extension.ToLowerInvariant());
+        }
+        catch (UriFormatException)
+        {
+            // This can happen if ConvertToAbsoluteUrl failed and returned a relative path
+            try
+            {
+                var pathWithoutQuery = url.Split('?')[0];
+                var extension = Path.GetExtension(pathWithoutQuery);
+                return !string.IsNullOrEmpty(extension) && imageExtensions.Contains(extension.ToLowerInvariant());
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 
     private async Task<ImageUploadData?> DownloadImageAsync(string imageUrl)

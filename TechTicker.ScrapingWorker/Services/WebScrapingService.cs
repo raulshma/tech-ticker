@@ -63,6 +63,7 @@ public partial class WebScrapingService
         var overallStopwatch = Stopwatch.StartNew();
         Guid? runId = null;
         ProxyAwareHttpResponse? proxyResponse = null;
+        ImageScrapingResult? imageResult = null;
 
         try
         {
@@ -179,7 +180,6 @@ public partial class WebScrapingService
             var sellerNameOnPage = ExtractSellerName(document, command.Selectors.SellerNameOnPageSelector);
 
             // Scrape images if selector is provided
-            ImageScrapingResult? imageResult = null;
             if (!string.IsNullOrEmpty(command.Selectors.ImageSelector))
             {
                 try
@@ -753,6 +753,8 @@ public partial class WebScrapingService
             command.MappingId, command.ExactProductUrl);
 
         Guid? runId = null;
+        ImageScrapingResult? imageResult = null;
+
         try
         {
             // Create initial run log entry
@@ -924,14 +926,32 @@ public partial class WebScrapingService
             }
 
             // Scrape images if selector is provided
-            List<string> imageUrls = new();
             if (!string.IsNullOrEmpty(command.Selectors.ImageSelector))
             {
-                var imageElements = await page.QuerySelectorAllAsync(command.Selectors.ImageSelector);
-                foreach (var img in imageElements)
+                var product = await _unitOfWork.Products.GetByIdAsync(command.CanonicalProductId);
+                if (product != null && !string.IsNullOrEmpty(product.PrimaryImageUrl))
                 {
-                    var src = await img.GetAttributeAsync("src");
-                    if (!string.IsNullOrEmpty(src)) imageUrls.Add(src);
+                    _logger.LogInformation("[BrowserAutomation] Skipping image scraping for product {ProductId} as it already has a primary image.", product.ProductId);
+                    imageResult = new ImageScrapingResult
+                    {
+                        IsSuccess = true,
+                        PrimaryImageUrl = product.PrimaryImageUrl,
+                        AdditionalImageUrls = product.AdditionalImageUrlsList ?? new List<string>(),
+                        SuccessfulUploads = 1 + (product.AdditionalImageUrlsList?.Count ?? 0)
+                    };
+                }
+                else
+                {
+                    var pageContent = await page.ContentAsync();
+                    var config = AngleSharp.Configuration.Default;
+                    var angleSharpContext = BrowsingContext.New(config);
+                    var document = await angleSharpContext.OpenAsync(req => req.Content(pageContent));
+
+                    imageResult = await _imageScrapingService.ScrapeImagesAsync(
+                        document,
+                        command.Selectors.ImageSelector,
+                        command.ExactProductUrl,
+                        command.CanonicalProductId);
                 }
             }
 
@@ -990,9 +1010,9 @@ public partial class WebScrapingService
                 ScrapedAt = DateTimeOffset.UtcNow,
                 ErrorMessage = price.HasValue ? null : "Could not extract price from the page (browser automation)",
                 ErrorCode = price.HasValue ? null : "BROWSER_AUTOMATION_EXTRACTION_FAILED",
-                PrimaryImageUrl = imageUrls.FirstOrDefault(),
-                AdditionalImageUrls = imageUrls.Skip(1).ToList(),
-                OriginalImageUrls = imageUrls,
+                PrimaryImageUrl = imageResult?.PrimaryImageUrl,
+                AdditionalImageUrls = imageResult?.AdditionalImageUrls,
+                OriginalImageUrls = imageResult?.OriginalImageUrls,
                 Specifications = specificationResult
             };
         }
