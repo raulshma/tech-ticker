@@ -1,141 +1,151 @@
-<div class="action-templates-dialog">
-  <div class="dialog-header">
-    <h2 mat-dialog-title class="mat-headline-large">
-      <mat-icon>template</mat-icon>
-      Action Templates
-    </h2>
-    <p class="mat-body-large dialog-subtitle">
-      Save and reuse browser automation action sequences
-    </p>
+<div class="action-templates-dialog-container">
+  <!-- Modern Dialog Header -->
+  <div mat-dialog-title class="dialog-header-modern">
+    <div class="header-content">
+      <mat-icon class="header-icon">template</mat-icon>
+      <div class="header-text">
+        <h2 class="mat-headline-6">Action Templates</h2>
+        <p class="mat-body-2">Save and reuse browser automation action sequences</p>
+      </div>
+    </div>
+    <button mat-icon-button class="close-button" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
 
-  <div mat-dialog-content class="dialog-content">
+  <div mat-dialog-content class="dialog-content-modern">
     <!-- Template Management Section -->
-    <div class="templates-section" *ngIf="!isEditing">
+    <div class="templates-section-modern" *ngIf="!isEditing">
       <!-- Search and Filter Controls -->
-      <div class="controls-section">
-        <div class="search-controls">
-          <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Search templates</mat-label>
-            <input matInput 
-                   [(ngModel)]="searchTerm" 
-                   (ngModelChange)="onSearchChange()"
-                   placeholder="Search by name or description">
-            <mat-icon matSuffix>search</mat-icon>
-          </mat-form-field>
+      <div class="form-section-modern">
+        <div class="controls-section-modern">
+          <div class="search-controls-modern">
+            <mat-form-field appearance="outline" class="modern-form-field search-field">
+              <mat-label>Search templates</mat-label>
+              <input matInput 
+                     [(ngModel)]="searchTerm" 
+                     (ngModelChange)="onSearchChange()"
+                     placeholder="Search by name or description">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="modern-form-field category-filter">
+              <mat-label>Category</mat-label>
+              <mat-select [(ngModel)]="selectedCategory" (ngModelChange)="onCategoryChange()">
+                <mat-option value="all">All Categories</mat-option>
+                <mat-option *ngFor="let category of categories" [value]="category.value">
+                  <mat-icon>{{category.icon}}</mat-icon>
+                  {{category.label}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
           
-          <mat-form-field appearance="outline" class="category-filter">
-            <mat-label>Category</mat-label>
-            <mat-select [(ngModel)]="selectedCategory" (ngModelChange)="onCategoryChange()">
-              <mat-option value="all">All Categories</mat-option>
-              <mat-option *ngFor="let category of categories" [value]="category.value">
-                <mat-icon>{{category.icon}}</mat-icon>
-                {{category.label}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+          <button mat-flat-button 
+                  color="primary" 
+                  (click)="createNewTemplate()"
+                  class="create-button-modern">
+            <mat-icon>add</mat-icon>
+            Create Template
+          </button>
         </div>
-        
-        <button matButton="elevated" 
-                color="primary" 
-                (click)="createNewTemplate()"
-                class="create-button">
-          <mat-icon>add</mat-icon>
-          Create Template
-        </button>
       </div>
 
       <!-- Templates List -->
-      <div class="templates-list" *ngIf="filteredTemplates.length > 0">
-        <div class="template-card" *ngFor="let template of filteredTemplates">
-          <mat-card appearance="outlined" class="template-item">
-            <mat-card-header>
-              <mat-card-title class="template-title">
-                <mat-icon class="category-icon">{{getCategoryIcon(template.category)}}</mat-icon>
-                {{template.name}}
-              </mat-card-title>
-              <mat-card-subtitle class="template-subtitle">
-                {{template.description || 'No description'}}
-              </mat-card-subtitle>
+      <div class="templates-list-modern" *ngIf="filteredTemplates.length > 0">
+        <div class="template-card-modern" *ngFor="let template of filteredTemplates">
+          <mat-card appearance="outlined" class="template-item-modern">
+            <mat-card-header class="template-header-modern">
+              <div class="template-title-section">
+                <div class="template-title-modern">
+                  <mat-icon class="category-icon-modern">{{getCategoryIcon(template.category)}}</mat-icon>
+                  <h3 class="mat-title-medium">{{template.name}}</h3>
+                </div>
+                <p class="mat-body-2 template-description-modern">
+                  {{template.description || 'No description'}}
+                </p>
+              </div>
+              <button mat-icon-button 
+                      [matMenuTriggerFor]="templateMenu"
+                      class="more-button-modern">
+                <mat-icon>more_vert</mat-icon>
+              </button>
             </mat-card-header>
             
-            <mat-card-content class="template-content">
-              <div class="template-actions">
-                <mat-chip-set class="action-chips">
-                  <mat-chip *ngFor="let action of template.actions.slice(0, 3)" 
-                           class="action-chip">
-                    <mat-icon>{{getActionIcon(action.actionType)}}</mat-icon>
-                    {{action.actionType}}
-                  </mat-chip>
-                  <mat-chip *ngIf="template.actions.length > 3" class="more-chip">
-                    +{{template.actions.length - 3}} more
-                  </mat-chip>
-                </mat-chip-set>
-              </div>
-              
-              <div class="template-meta">
-                <div class="meta-item">
-                  <mat-icon>schedule</mat-icon>
-                  <span class="mat-caption">Created {{template.createdAt | date:'short'}}</span>
+            <mat-card-content class="template-content-modern">
+              <div class="template-actions-preview">
+                <div class="actions-chips-modern">
+                  <mat-chip-set class="action-chips-set">
+                    <mat-chip *ngFor="let action of template.actions.slice(0, 3)" 
+                             class="action-chip-modern">
+                      <mat-icon>{{getActionIcon(action.actionType)}}</mat-icon>
+                      {{action.actionType}}
+                    </mat-chip>
+                    <mat-chip *ngIf="template.actions.length > 3" class="more-chip-modern">
+                      +{{template.actions.length - 3}} more
+                    </mat-chip>
+                  </mat-chip-set>
                 </div>
-                <div class="meta-item" *ngIf="template.lastUsed">
-                  <mat-icon>access_time</mat-icon>
-                  <span class="mat-caption">Used {{template.lastUsed | date:'short'}}</span>
-                </div>
-                <div class="meta-item">
-                  <mat-icon>trending_up</mat-icon>
-                  <span class="mat-caption">{{template.usageCount}} uses</span>
+                
+                <div class="template-meta-modern">
+                  <div class="meta-item-modern">
+                    <mat-icon>schedule</mat-icon>
+                    <span class="mat-caption">{{template.createdAt | date:'short'}}</span>
+                  </div>
+                  <div class="meta-item-modern" *ngIf="template.lastUsed">
+                    <mat-icon>access_time</mat-icon>
+                    <span class="mat-caption">{{template.lastUsed | date:'short'}}</span>
+                  </div>
+                  <div class="meta-item-modern">
+                    <mat-icon>trending_up</mat-icon>
+                    <span class="mat-caption">{{template.usageCount}} uses</span>
+                  </div>
                 </div>
               </div>
             </mat-card-content>
             
-            <mat-card-actions class="template-actions">
-              <button matButton="elevated" 
+            <mat-card-actions class="template-actions-modern">
+              <button mat-flat-button 
                       color="primary" 
                       (click)="useTemplate(template)"
-                      class="use-button">
+                      class="use-button-modern">
                 <mat-icon>play_arrow</mat-icon>
                 Use Template
               </button>
-              
-              <button matIconButton 
-                      [matMenuTriggerFor]="templateMenu"
-                      class="more-button">
-                <mat-icon>more_vert</mat-icon>
-              </button>
-              
-              <mat-menu #templateMenu="matMenu">
-                <button mat-menu-item (click)="editTemplate(template)">
-                  <mat-icon>edit</mat-icon>
-                  <span>Edit</span>
-                </button>
-                <button mat-menu-item (click)="duplicateTemplate(template)">
-                  <mat-icon>content_copy</mat-icon>
-                  <span>Duplicate</span>
-                </button>
-                <mat-divider></mat-divider>
-                <button mat-menu-item (click)="deleteTemplate(template)" class="delete-item">
-                  <mat-icon>delete</mat-icon>
-                  <span>Delete</span>
-                </button>
-              </mat-menu>
             </mat-card-actions>
+            
+            <mat-menu #templateMenu="matMenu">
+              <button mat-menu-item (click)="editTemplate(template)">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="duplicateTemplate(template)">
+                <mat-icon>content_copy</mat-icon>
+                <span>Duplicate</span>
+              </button>
+              <mat-divider></mat-divider>
+              <button mat-menu-item (click)="deleteTemplate(template)" class="delete-item-modern">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
           </mat-card>
         </div>
       </div>
 
       <!-- Empty State -->
-      <div class="empty-state" *ngIf="filteredTemplates.length === 0">
-        <div class="empty-content">
-          <mat-icon class="empty-icon">template</mat-icon>
+      <div class="empty-state-modern" *ngIf="filteredTemplates.length === 0">
+        <div class="empty-content-modern">
+          <mat-icon class="empty-icon-modern">template</mat-icon>
           <h3 class="mat-headline-medium">No templates found</h3>
           <p class="mat-body-large">
             {{searchTerm || selectedCategory !== 'all' ? 'Try adjusting your search or filters' : 'Create your first action template to get started'}}
           </p>
-          <button matButton="elevated" 
+          <button mat-flat-button 
                   color="primary" 
                   (click)="createNewTemplate()"
-                  *ngIf="!searchTerm && selectedCategory === 'all'">
+                  *ngIf="!searchTerm && selectedCategory === 'all'"
+                  class="create-first-button-modern">
             <mat-icon>add</mat-icon>
             Create First Template
           </button>
@@ -144,82 +154,97 @@
     </div>
 
     <!-- Template Editor Section -->
-    <div class="template-editor" *ngIf="isEditing">
-      <div class="editor-header">
-        <h3 class="mat-headline-medium">
-          {{editingTemplateId ? 'Edit Template' : 'Create New Template'}}
-        </h3>
-        <button matIconButton (click)="cancelEdit()">
+    <div class="template-editor-modern" *ngIf="isEditing">
+      <div class="editor-header-modern">
+        <div class="editor-title-section">
+          <mat-icon class="editor-icon">{{editingTemplateId ? 'edit' : 'add_circle'}}</mat-icon>
+          <div class="editor-title-text">
+            <h3 class="mat-headline-6">{{editingTemplateId ? 'Edit Template' : 'Create New Template'}}</h3>
+            <p class="mat-body-2">{{editingTemplateId ? 'Update template details and actions' : 'Define template name, category, and actions'}}</p>
+          </div>
+        </div>
+        <button mat-icon-button (click)="cancelEdit()" class="close-editor-button">
           <mat-icon>close</mat-icon>
         </button>
       </div>
 
-      <form [formGroup]="templateForm" class="template-form">
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="name-field">
-            <mat-label>Template Name</mat-label>
-            <input matInput formControlName="name" placeholder="Enter template name">
-            <mat-error *ngIf="templateForm.get('name')?.hasError('required')">
-              Template name is required
-            </mat-error>
-            <mat-error *ngIf="templateForm.get('name')?.hasError('minlength')">
-              Template name must be at least 3 characters
-            </mat-error>
-          </mat-form-field>
-          
-          <mat-form-field appearance="outline" class="category-field">
-            <mat-label>Category</mat-label>
-            <mat-select formControlName="category">
-              <mat-option *ngFor="let category of categories" [value]="category.value">
-                <mat-icon>{{category.icon}}</mat-icon>
-                {{category.label}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+      <form [formGroup]="templateForm" class="template-form-modern">
+        <!-- Basic Information -->
+        <div class="form-section-modern">
+          <h4 class="mat-title-medium section-title-modern">Basic Information</h4>
+          <div class="form-grid-modern">
+            <mat-form-field appearance="outline" class="modern-form-field">
+              <mat-label>Template Name</mat-label>
+              <input matInput formControlName="name" placeholder="Enter template name">
+              <mat-icon matSuffix>label</mat-icon>
+              <mat-error *ngIf="templateForm.get('name')?.hasError('required')">
+                Template name is required
+              </mat-error>
+              <mat-error *ngIf="templateForm.get('name')?.hasError('minlength')">
+                Template name must be at least 3 characters
+              </mat-error>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="modern-form-field">
+              <mat-label>Category</mat-label>
+              <mat-select formControlName="category">
+                <mat-option *ngFor="let category of categories" [value]="category.value">
+                  <mat-icon>{{category.icon}}</mat-icon>
+                  {{category.label}}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="modern-form-field full-width">
+              <mat-label>Description (Optional)</mat-label>
+              <textarea matInput 
+                        formControlName="description" 
+                        placeholder="Describe what this template does"
+                        rows="2"></textarea>
+              <mat-icon matSuffix>description</mat-icon>
+            </mat-form-field>
+          </div>
         </div>
 
-        <mat-form-field appearance="outline" class="description-field">
-          <mat-label>Description (Optional)</mat-label>
-          <textarea matInput 
-                    formControlName="description" 
-                    placeholder="Describe what this template does"
-                    rows="2"></textarea>
-        </mat-form-field>
-
         <!-- Actions Section -->
-        <div class="actions-section">
-          <div class="actions-header">
-            <h4 class="mat-title-medium">Actions</h4>
-            <button matButton="elevated" 
+        <div class="form-section-modern">
+          <div class="actions-header-modern">
+            <h4 class="mat-title-medium section-title-modern">Actions</h4>
+            <button mat-flat-button 
+                    color="primary"
                     type="button" 
                     (click)="addAction()"
-                    class="add-action-button">
+                    class="add-action-button-modern">
               <mat-icon>add</mat-icon>
               Add Action
             </button>
           </div>
 
-          <div class="actions-list" formArrayName="actions">
-            <div class="action-item" 
+          <div class="actions-list-modern" formArrayName="actions">
+            <div class="action-item-modern" 
                  *ngFor="let action of actions.controls; let i = index" 
                  [formGroupName]="i">
-              <mat-card appearance="outlined" class="action-card">
-                <mat-card-content>
-                  <div class="action-header">
-                    <div class="action-number">
-                      <span class="action-index">{{i + 1}}</span>
-                    </div>
-                    <button matIconButton 
-                            type="button" 
-                            (click)="removeAction(i)"
-                            class="remove-action-button"
-                            color="warn">
-                      <mat-icon>delete</mat-icon>
-                    </button>
+              <mat-card appearance="outlined" class="action-card-modern">
+                <mat-card-header class="action-header-modern">
+                  <div class="action-number-modern">
+                    <span class="action-index-modern">{{i + 1}}</span>
                   </div>
+                  <div class="action-title-modern">
+                    <h5 class="mat-title-small">Action {{i + 1}}</h5>
+                  </div>
+                  <button mat-icon-button 
+                          type="button" 
+                          (click)="removeAction(i)"
+                          class="remove-action-button-modern"
+                          color="warn">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </mat-card-header>
 
-                  <div class="action-fields">
-                    <mat-form-field appearance="outline" class="action-type-field">
+                <mat-card-content class="action-content-modern">
+                  <div class="action-fields-modern">
+                    <mat-form-field appearance="outline" class="modern-form-field full-width">
                       <mat-label>Action Type</mat-label>
                       <mat-select formControlName="actionType">
                         <mat-option *ngFor="let actionType of actionTypes" [value]="actionType.value">
@@ -227,33 +252,39 @@
                           {{actionType.label}}
                         </mat-option>
                       </mat-select>
+                      <mat-icon matSuffix>play_circle</mat-icon>
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" 
-                                   class="selector-field"
+                                   class="modern-form-field full-width"
                                    *ngIf="actionNeedsSelector(action.value?.actionType)">
                       <mat-label>CSS Selector</mat-label>
                       <input matInput formControlName="selector" placeholder="e.g., #button, .class, [data-testid]">
+                      <mat-icon matSuffix>code</mat-icon>
+                      <mat-hint>CSS selector to target the element</mat-hint>
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" 
-                                   class="value-field"
+                                   class="modern-form-field full-width"
                                    *ngIf="actionNeedsValue(action.value?.actionType)">
                       <mat-label>{{getValueLabel(action.value?.actionType)}}</mat-label>
                       <input matInput formControlName="value" 
                              [placeholder]="getValuePlaceholder(action.value?.actionType)">
+                      <mat-icon matSuffix>input</mat-icon>
                       <mat-hint *ngIf="getValueHint(action.value?.actionType)">{{getValueHint(action.value?.actionType)}}</mat-hint>
                     </mat-form-field>
 
-                    <div class="action-options">
-                      <mat-form-field appearance="outline" class="repeat-field">
+                    <div class="action-options-modern">
+                      <mat-form-field appearance="outline" class="modern-form-field">
                         <mat-label>Repeat</mat-label>
                         <input matInput type="number" formControlName="repeat" min="1">
+                        <mat-icon matSuffix>repeat</mat-icon>
                       </mat-form-field>
 
-                      <mat-form-field appearance="outline" class="delay-field">
+                      <mat-form-field appearance="outline" class="modern-form-field">
                         <mat-label>Delay (ms)</mat-label>
                         <input matInput type="number" formControlName="delayMs" min="0">
+                        <mat-icon matSuffix>timer</mat-icon>
                       </mat-form-field>
                     </div>
                   </div>
@@ -262,16 +293,20 @@
             </div>
           </div>
 
-          <div class="no-actions" *ngIf="actions.length === 0">
-            <mat-icon>playlist_add</mat-icon>
-            <p class="mat-body-medium">No actions added yet. Click "Add Action" to get started.</p>
+          <div class="no-actions-modern" *ngIf="actions.length === 0">
+            <div class="no-actions-content">
+              <mat-icon class="no-actions-icon">playlist_add</mat-icon>
+              <h4 class="mat-title-medium">No actions added yet</h4>
+              <p class="mat-body-medium">Click "Add Action" to get started with your template.</p>
+            </div>
           </div>
         </div>
       </form>
 
-      <div class="editor-actions">
-        <button matButton="text" (click)="cancelEdit()">Cancel</button>
-        <button matButton="elevated" 
+      <!-- Editor Actions -->
+      <div class="editor-actions-modern">
+        <button mat-stroked-button (click)="cancelEdit()">Cancel</button>
+        <button mat-flat-button 
                 color="primary" 
                 (click)="saveTemplate()"
                 [disabled]="!templateForm.valid || actions.length === 0">
@@ -280,9 +315,5 @@
         </button>
       </div>
     </div>
-  </div>
-
-  <div mat-dialog-actions class="dialog-actions" *ngIf="!isEditing">
-    <button matButton="text" (click)="close()">Close</button>
   </div>
 </div> 
