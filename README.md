@@ -2,6 +2,8 @@
 
 [![.NET](https://github.com/raulshma/tech-ticker/actions/workflows/dotnet.yml/badge.svg)](https://github.com/raulshma/tech-ticker/actions/workflows/dotnet.yml)
 
+> **⚠️ DISCLAIMER: This project is for educational purposes only. Please ensure compliance with the terms of service of any websites you interact with and respect their robots.txt files and rate limiting policies.**
+
 TechTicker is a comprehensive system designed to track prices of specified computer hardware and related products across multiple e-commerce websites. It provides users with historical price data and alerts them to price changes based on user-defined rules. The system features an administration portal for managing products, categories, and system configurations.
 
 ## Goals
