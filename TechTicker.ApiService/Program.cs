@@ -27,6 +27,9 @@ builder.AddNpgsqlDbContext<TechTickerDbContext>("techticker-db");
 // Add RabbitMQ client
 builder.AddRabbitMQClient("messaging");
 
+// Add Redis distributed cache
+builder.AddRedisDistributedCache("cache");
+
 // Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
 {

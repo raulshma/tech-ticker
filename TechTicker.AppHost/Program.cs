@@ -11,11 +11,17 @@ var techtickerDb = postgres.AddDatabase("techticker-db");
 var rabbitmq = builder.AddRabbitMQ("messaging")
     .WithDataVolume();
 
+// Add Redis cache
+var redis = builder.AddRedis("cache")
+    .WithDataVolume();
+
 // Add API Service
 var apiService = builder.AddProject<Projects.TechTicker_ApiService>("apiservice")
     .WaitFor(rabbitmq)
+    .WaitFor(redis)
     .WithReference(techtickerDb)
-    .WithReference(rabbitmq);
+    .WithReference(rabbitmq)
+    .WithReference(redis);
 
 // Add Scraping Worker
 var scrapingWorker = builder.AddProject<Projects.TechTicker_ScrapingWorker>("scrapingworker")
