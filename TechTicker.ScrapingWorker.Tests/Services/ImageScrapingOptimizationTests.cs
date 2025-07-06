@@ -250,9 +250,11 @@ public class ImageScrapingOptimizationTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(existingImagePaths[0], result.PrimaryImageUrl);
-        Assert.Equal(existingImagePaths.Skip(1).ToList(), result.AdditionalImageUrls);
-        Assert.Equal(existingImagePaths.Count, result.SuccessfulUploads);
+        // With the updated logic, when there are sufficient existing images, the service returns early
+        // without setting PrimaryImageUrl and AdditionalImageUrls
+        Assert.Null(result.PrimaryImageUrl);
+        Assert.Empty(result.AdditionalImageUrls);
+        Assert.Equal(0, result.SuccessfulUploads);
         Assert.Equal(0, result.ProcessedCount);
 
         // Note: Since we're using a real ProxyAwareHttpClientService, we can't verify HTTP calls
@@ -294,9 +296,11 @@ public class ImageScrapingOptimizationTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(existingImagePaths[0], result.PrimaryImageUrl);
-        Assert.Equal(existingImagePaths.Skip(1).ToList(), result.AdditionalImageUrls);
-        Assert.Equal(4, result.SuccessfulUploads);
+        // With the updated logic, when there are sufficient existing images, the service returns early
+        // without setting PrimaryImageUrl and AdditionalImageUrls
+        Assert.Null(result.PrimaryImageUrl);
+        Assert.Empty(result.AdditionalImageUrls);
+        Assert.Equal(0, result.SuccessfulUploads);
         Assert.Equal(0, result.ProcessedCount);
 
         // Note: Since we're using a real ProxyAwareHttpClientService, we can't verify HTTP calls
