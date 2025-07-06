@@ -1,13 +1,12 @@
 <div class="action-templates-dialog-container">
   <!-- Modern Dialog Header -->
   <div mat-dialog-title class="dialog-header-modern">
-    <div class="header-content">
-      <mat-icon class="header-icon">template</mat-icon>
-      <div class="header-text">
-        <h2 class="mat-headline-6">Action Templates</h2>
-        <p class="mat-body-2">Save and reuse browser automation action sequences</p>
-      </div>
+    <!-- <div class="header-content"> -->
+    <div class="header-text">
+      <h2 class="mat-headline-6">Action Templates</h2>
+      <!-- <p class="mat-body-2">Save and reuse browser automation action sequences</p> -->
     </div>
+    <!-- </div> -->
     <button mat-icon-button class="close-button" (click)="close()">
       <mat-icon>close</mat-icon>
     </button>
@@ -22,13 +21,11 @@
           <div class="search-controls-modern">
             <mat-form-field appearance="outline" class="modern-form-field search-field">
               <mat-label>Search templates</mat-label>
-              <input matInput 
-                     [(ngModel)]="searchTerm" 
-                     (ngModelChange)="onSearchChange()"
-                     placeholder="Search by name or description">
+              <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
+                placeholder="Search by name or description">
               <mat-icon matSuffix>search</mat-icon>
             </mat-form-field>
-            
+
             <mat-form-field appearance="outline" class="modern-form-field category-filter">
               <mat-label>Category</mat-label>
               <mat-select [(ngModel)]="selectedCategory" (ngModelChange)="onCategoryChange()">
@@ -40,11 +37,8 @@
               </mat-select>
             </mat-form-field>
           </div>
-          
-          <button mat-flat-button 
-                  color="primary" 
-                  (click)="createNewTemplate()"
-                  class="create-button-modern">
+
+          <button mat-flat-button color="primary" (click)="createNewTemplate()" class="create-button-modern">
             <mat-icon>add</mat-icon>
             Create Template
           </button>
@@ -65,19 +59,16 @@
                   {{template.description || 'No description'}}
                 </p>
               </div>
-              <button mat-icon-button 
-                      [matMenuTriggerFor]="templateMenu"
-                      class="more-button-modern">
+              <button mat-icon-button [matMenuTriggerFor]="templateMenu" class="more-button-modern">
                 <mat-icon>more_vert</mat-icon>
               </button>
             </mat-card-header>
-            
+
             <mat-card-content class="template-content-modern">
               <div class="template-actions-preview">
                 <div class="actions-chips-modern">
                   <mat-chip-set class="action-chips-set">
-                    <mat-chip *ngFor="let action of template.actions.slice(0, 3)" 
-                             class="action-chip-modern">
+                    <mat-chip *ngFor="let action of template.actions.slice(0, 3)" class="action-chip-modern">
                       <mat-icon>{{getActionIcon(action.actionType)}}</mat-icon>
                       {{action.actionType}}
                     </mat-chip>
@@ -86,7 +77,7 @@
                     </mat-chip>
                   </mat-chip-set>
                 </div>
-                
+
                 <div class="template-meta-modern">
                   <div class="meta-item-modern">
                     <mat-icon>schedule</mat-icon>
@@ -103,17 +94,14 @@
                 </div>
               </div>
             </mat-card-content>
-            
+
             <mat-card-actions class="template-actions-modern">
-              <button mat-flat-button 
-                      color="primary" 
-                      (click)="useTemplate(template)"
-                      class="use-button-modern">
+              <button mat-flat-button color="primary" (click)="useTemplate(template)" class="use-button-modern">
                 <mat-icon>play_arrow</mat-icon>
                 Use Template
               </button>
             </mat-card-actions>
-            
+
             <mat-menu #templateMenu="matMenu">
               <button mat-menu-item (click)="editTemplate(template)">
                 <mat-icon>edit</mat-icon>
@@ -139,13 +127,11 @@
           <mat-icon class="empty-icon-modern">template</mat-icon>
           <h3 class="mat-headline-medium">No templates found</h3>
           <p class="mat-body-large">
-            {{searchTerm || selectedCategory !== 'all' ? 'Try adjusting your search or filters' : 'Create your first action template to get started'}}
+            {{searchTerm || selectedCategory !== 'all' ? 'Try adjusting your search or filters' : 'Create your first
+            action template to get started'}}
           </p>
-          <button mat-flat-button 
-                  color="primary" 
-                  (click)="createNewTemplate()"
-                  *ngIf="!searchTerm && selectedCategory === 'all'"
-                  class="create-first-button-modern">
+          <button mat-flat-button color="primary" (click)="createNewTemplate()"
+            *ngIf="!searchTerm && selectedCategory === 'all'" class="create-first-button-modern">
             <mat-icon>add</mat-icon>
             Create First Template
           </button>
@@ -160,7 +146,8 @@
           <mat-icon class="editor-icon">{{editingTemplateId ? 'edit' : 'add_circle'}}</mat-icon>
           <div class="editor-title-text">
             <h3 class="mat-headline-6">{{editingTemplateId ? 'Edit Template' : 'Create New Template'}}</h3>
-            <p class="mat-body-2">{{editingTemplateId ? 'Update template details and actions' : 'Define template name, category, and actions'}}</p>
+            <p class="mat-body-2">{{editingTemplateId ? 'Update template details and actions' : 'Define template name,
+              category, and actions'}}</p>
           </div>
         </div>
         <button mat-icon-button (click)="cancelEdit()" class="close-editor-button">
@@ -184,7 +171,7 @@
                 Template name must be at least 3 characters
               </mat-error>
             </mat-form-field>
-            
+
             <mat-form-field appearance="outline" class="modern-form-field">
               <mat-label>Category</mat-label>
               <mat-select formControlName="category">
@@ -198,10 +185,8 @@
 
             <mat-form-field appearance="outline" class="modern-form-field full-width">
               <mat-label>Description (Optional)</mat-label>
-              <textarea matInput 
-                        formControlName="description" 
-                        placeholder="Describe what this template does"
-                        rows="2"></textarea>
+              <textarea matInput formControlName="description" placeholder="Describe what this template does"
+                rows="2"></textarea>
               <mat-icon matSuffix>description</mat-icon>
             </mat-form-field>
           </div>
@@ -211,20 +196,15 @@
         <div class="form-section-modern">
           <div class="actions-header-modern">
             <h4 class="mat-title-medium section-title-modern">Actions</h4>
-            <button mat-flat-button 
-                    color="primary"
-                    type="button" 
-                    (click)="addAction()"
-                    class="add-action-button-modern">
+            <button mat-flat-button color="primary" type="button" (click)="addAction()"
+              class="add-action-button-modern">
               <mat-icon>add</mat-icon>
               Add Action
             </button>
           </div>
 
           <div class="actions-list-modern" formArrayName="actions">
-            <div class="action-item-modern" 
-                 *ngFor="let action of actions.controls; let i = index" 
-                 [formGroupName]="i">
+            <div class="action-item-modern" *ngFor="let action of actions.controls; let i = index" [formGroupName]="i">
               <mat-card appearance="outlined" class="action-card-modern">
                 <mat-card-header class="action-header-modern">
                   <div class="action-number-modern">
@@ -233,11 +213,8 @@
                   <div class="action-title-modern">
                     <h5 class="mat-title-small">Action {{i + 1}}</h5>
                   </div>
-                  <button mat-icon-button 
-                          type="button" 
-                          (click)="removeAction(i)"
-                          class="remove-action-button-modern"
-                          color="warn">
+                  <button mat-icon-button type="button" (click)="removeAction(i)" class="remove-action-button-modern"
+                    color="warn">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </mat-card-header>
@@ -255,23 +232,22 @@
                       <mat-icon matSuffix>play_circle</mat-icon>
                     </mat-form-field>
 
-                    <mat-form-field appearance="outline" 
-                                   class="modern-form-field full-width"
-                                   *ngIf="actionNeedsSelector(action.value?.actionType)">
+                    <mat-form-field appearance="outline" class="modern-form-field full-width"
+                      *ngIf="actionNeedsSelector(action.value?.actionType)">
                       <mat-label>CSS Selector</mat-label>
                       <input matInput formControlName="selector" placeholder="e.g., #button, .class, [data-testid]">
                       <mat-icon matSuffix>code</mat-icon>
                       <mat-hint>CSS selector to target the element</mat-hint>
                     </mat-form-field>
 
-                    <mat-form-field appearance="outline" 
-                                   class="modern-form-field full-width"
-                                   *ngIf="actionNeedsValue(action.value?.actionType)">
+                    <mat-form-field appearance="outline" class="modern-form-field full-width"
+                      *ngIf="actionNeedsValue(action.value?.actionType)">
                       <mat-label>{{getValueLabel(action.value?.actionType)}}</mat-label>
-                      <input matInput formControlName="value" 
-                             [placeholder]="getValuePlaceholder(action.value?.actionType)">
+                      <input matInput formControlName="value"
+                        [placeholder]="getValuePlaceholder(action.value?.actionType)">
                       <mat-icon matSuffix>input</mat-icon>
-                      <mat-hint *ngIf="getValueHint(action.value?.actionType)">{{getValueHint(action.value?.actionType)}}</mat-hint>
+                      <mat-hint
+                        *ngIf="getValueHint(action.value?.actionType)">{{getValueHint(action.value?.actionType)}}</mat-hint>
                     </mat-form-field>
 
                     <div class="action-options-modern">
@@ -306,14 +282,12 @@
       <!-- Editor Actions -->
       <div class="editor-actions-modern">
         <button mat-stroked-button (click)="cancelEdit()">Cancel</button>
-        <button mat-flat-button 
-                color="primary" 
-                (click)="saveTemplate()"
-                [disabled]="!templateForm.valid || actions.length === 0">
+        <button mat-flat-button color="primary" (click)="saveTemplate()"
+          [disabled]="!templateForm.valid || actions.length === 0">
           <mat-icon>save</mat-icon>
           {{editingTemplateId ? 'Update' : 'Save'}} Template
         </button>
       </div>
     </div>
   </div>
-</div> 
+</div>
