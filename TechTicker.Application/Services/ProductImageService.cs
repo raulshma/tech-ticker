@@ -550,23 +550,32 @@ public class ProductImageService : IProductImageService
 
             var imageMappings = new Dictionary<string, string>();
 
-            // Add primary image if it exists
+            // Get original URLs list
+            var originalUrls = product.OriginalImageUrlsList ?? new List<string>();
+            
+            // Create a list of local URLs in order: primary first, then additional
+            var localUrls = new List<string>();
+            
             if (!string.IsNullOrEmpty(product.PrimaryImageUrl))
             {
-                // For now, we're using the URL as both the key and value since we don't have separate mapping storage
-                // In a full implementation, you might want to store URL->local path mappings in a separate table
-                imageMappings[product.PrimaryImageUrl] = product.PrimaryImageUrl;
+                localUrls.Add(product.PrimaryImageUrl);
             }
-
-            // Add additional images if they exist
+            
             if (product.AdditionalImageUrlsList != null)
             {
-                foreach (var imageUrl in product.AdditionalImageUrlsList)
+                localUrls.AddRange(product.AdditionalImageUrlsList);
+            }
+
+            // Map original URLs to local URLs based on position/order
+            // Assumes the order in OriginalImageUrls corresponds to the order of local images
+            for (int i = 0; i < Math.Min(originalUrls.Count, localUrls.Count); i++)
+            {
+                var originalUrl = originalUrls[i];
+                var localUrl = localUrls[i];
+                
+                if (!string.IsNullOrEmpty(originalUrl) && !string.IsNullOrEmpty(localUrl))
                 {
-                    if (!string.IsNullOrEmpty(imageUrl) && !imageMappings.ContainsKey(imageUrl))
-                    {
-                        imageMappings[imageUrl] = imageUrl;
-                    }
+                    imageMappings[originalUrl] = localUrl;
                 }
             }
 
