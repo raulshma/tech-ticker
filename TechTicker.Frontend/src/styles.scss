@@ -28,7 +28,7 @@ html, body {
         plain-family: 'Roboto',
         brand-family: 'Montserrat',
       ),
-      density: -3,
+      density: 3,
     )
   );
 }
@@ -49,7 +49,7 @@ html, body {
         plain-family: 'Roboto',
         brand-family: 'Montserrat',
       ),
-      density: -3,
+      density: 3,
     )
   );
 }
@@ -121,4 +121,20 @@ button:focus,
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
   }
+}
+
+/* Full-screen dialog styles */
+.full-screen-dialog .mat-mdc-dialog-container {
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.full-screen-dialog .mat-mdc-dialog-content {
+  max-height: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }

@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using TechTicker.Application.Configuration;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Messages;
 using TechTicker.Application.Services.Interfaces;
@@ -16,13 +18,19 @@ public class AlertTestingService : IAlertTestingService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<AlertTestingService> _logger;
+    private readonly IMessagePublisher _messagePublisher;
+    private readonly MessagingConfiguration _messagingConfig;
 
     public AlertTestingService(
         IUnitOfWork unitOfWork,
-        ILogger<AlertTestingService> logger)
+        ILogger<AlertTestingService> logger,
+        IMessagePublisher messagePublisher,
+        IOptions<MessagingConfiguration> messagingConfig)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _messagePublisher = messagePublisher;
+        _messagingConfig = messagingConfig.Value;
     }
 
     public async Task<Result<AlertTestResultDto>> TestAlertRuleAsync(Guid alertRuleId, TestPricePointDto testPricePoint)
@@ -48,6 +56,26 @@ public class AlertTestingService : IAlertTestingService
             var wouldTrigger = await EvaluateAlertCondition(alertRule, pricePoint);
             var triggerReason = await GetTriggerReason(alertRule, pricePoint, wouldTrigger);
 
+            var match = new AlertTestMatchDto
+            {
+                Price = pricePoint.Price,
+                StockStatus = pricePoint.StockStatus,
+                SellerName = pricePoint.SellerName,
+                Timestamp = pricePoint.Timestamp,
+                SourceUrl = pricePoint.SourceUrl,
+                TriggerReason = triggerReason,
+                WouldTrigger = wouldTrigger
+            };
+
+            // Send Discord notification if enabled and would trigger
+            if (testPricePoint.SendNotification && wouldTrigger)
+            {
+                var notificationResult = await SendTestNotificationAsync(alertRule, pricePoint, isTest: true);
+                match.NotificationSent = notificationResult.Success;
+                match.NotificationStatus = notificationResult.Success ? "SENT" : "FAILED";
+                match.NotificationError = notificationResult.Success ? null : notificationResult.ErrorMessage;
+            }
+
             var result = new AlertTestResultDto
             {
                 AlertRuleId = alertRuleId,
@@ -56,19 +84,11 @@ public class AlertTestingService : IAlertTestingService
                 TestType = "SINGLE_POINT",
                 TotalPointsTested = 1,
                 TriggeredCount = wouldTrigger ? 1 : 0,
-                Matches = new List<AlertTestMatchDto>
-                {
-                    new AlertTestMatchDto
-                    {
-                        Price = pricePoint.Price,
-                        StockStatus = pricePoint.StockStatus,
-                        SellerName = pricePoint.SellerName,
-                        Timestamp = pricePoint.Timestamp,
-                        SourceUrl = pricePoint.SourceUrl,
-                        TriggerReason = triggerReason,
-                        WouldTrigger = wouldTrigger
-                    }
-                }
+                NotificationsEnabled = testPricePoint.SendNotification,
+                NotificationsSent = match.NotificationSent ? 1 : 0,
+                NotificationsFailed = match.NotificationSent ? 0 : (testPricePoint.SendNotification && wouldTrigger ? 1 : 0),
+                OverallNotificationStatus = GetOverallNotificationStatus(match.NotificationSent, testPricePoint.SendNotification, wouldTrigger),
+                Matches = new List<AlertTestMatchDto> { match }
             };
 
             return Result<AlertTestResultDto>.Success(result);
@@ -100,6 +120,8 @@ public class AlertTestingService : IAlertTestingService
 
             var matches = new List<AlertTestMatchDto>();
             int triggeredCount = 0;
+            int notificationsSent = 0;
+            int notificationsFailed = 0;
 
             foreach (var priceRecord in priceHistory)
             {
@@ -116,12 +138,7 @@ public class AlertTestingService : IAlertTestingService
                 var wouldTrigger = await EvaluateAlertCondition(alertRule, pricePoint);
                 var triggerReason = await GetTriggerReason(alertRule, pricePoint, wouldTrigger);
 
-                if (wouldTrigger)
-                {
-                    triggeredCount++;
-                }
-
-                matches.Add(new AlertTestMatchDto
+                var match = new AlertTestMatchDto
                 {
                     Price = priceRecord.Price,
                     StockStatus = priceRecord.StockStatus,
@@ -130,7 +147,28 @@ public class AlertTestingService : IAlertTestingService
                     SourceUrl = priceRecord.SourceUrl,
                     TriggerReason = triggerReason,
                     WouldTrigger = wouldTrigger
-                });
+                };
+
+                if (wouldTrigger)
+                {
+                    triggeredCount++;
+
+                    // Send Discord notification if enabled
+                    if (request.SendNotification)
+                    {
+                        var notificationResult = await SendTestNotificationAsync(alertRule, pricePoint, isTest: true);
+                        match.NotificationSent = notificationResult.Success;
+                        match.NotificationStatus = notificationResult.Success ? "SENT" : "FAILED";
+                        match.NotificationError = notificationResult.Success ? null : notificationResult.ErrorMessage;
+
+                        if (notificationResult.Success)
+                            notificationsSent++;
+                        else
+                            notificationsFailed++;
+                    }
+                }
+
+                matches.Add(match);
             }
 
             var result = new AlertTestResultDto
@@ -141,6 +179,10 @@ public class AlertTestingService : IAlertTestingService
                 TestType = "HISTORICAL_RANGE",
                 TotalPointsTested = matches.Count,
                 TriggeredCount = triggeredCount,
+                NotificationsEnabled = request.SendNotification,
+                NotificationsSent = notificationsSent,
+                NotificationsFailed = notificationsFailed,
+                OverallNotificationStatus = GetHistoricalNotificationStatus(notificationsSent, notificationsFailed, request.SendNotification, triggeredCount),
                 Matches = matches.OrderByDescending(m => m.Timestamp).ToList()
             };
 
@@ -645,5 +687,70 @@ public class AlertTestingService : IAlertTestingService
             _logger.LogError(ex, "Error getting alert testing statistics");
             return Result<AlertTestingStatsDto>.Failure("Failed to get alert testing statistics", "STATS_FAILED");
         }
+    }
+
+    private async Task<(bool Success, string? ErrorMessage)> SendTestNotificationAsync(AlertRule alertRule, PricePointRecordedEvent pricePoint, bool isTest = false)
+    {
+        try
+        {
+            var alertEvent = new AlertTriggeredEvent
+            {
+                AlertRuleId = alertRule.AlertRuleId,
+                UserId = alertRule.UserId,
+                UserEmail = alertRule.User?.Email ?? "test@example.com",
+                UserFirstName = alertRule.User?.FirstName ?? "Test User",
+                CanonicalProductId = pricePoint.CanonicalProductId,
+                ProductName = alertRule.Product?.Name ?? "Test Product",
+                ProductCategoryName = alertRule.Product?.Category?.Name,
+                SellerName = pricePoint.SellerName,
+                TriggeringPrice = pricePoint.Price,
+                TriggeringStockStatus = pricePoint.StockStatus,
+                RuleDescription = isTest ? $"[TEST] {alertRule.RuleDescription}" : alertRule.RuleDescription,
+                ProductPageUrl = pricePoint.SourceUrl,
+                Timestamp = DateTimeOffset.UtcNow
+            };
+
+            // Publish to notification queue for Discord processing
+            await _messagePublisher.PublishAsync(
+                alertEvent,
+                _messagingConfig.AlertsExchange,
+                _messagingConfig.AlertTriggeredRoutingKey);
+
+            _logger.LogInformation("Sent test notification for alert rule {AlertRuleId} (Test: {IsTest})", alertRule.AlertRuleId, isTest);
+            return (true, null);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending test notification for alert rule {AlertRuleId}", alertRule.AlertRuleId);
+            return (false, ex.Message);
+        }
+    }
+
+    private string GetOverallNotificationStatus(bool notificationSent, bool notificationsEnabled, bool wouldTrigger)
+    {
+        if (!notificationsEnabled)
+            return "Notifications disabled";
+        
+        if (!wouldTrigger)
+            return "Alert did not trigger - no notification needed";
+            
+        return notificationSent ? "Notification sent successfully" : "Notification failed to send";
+    }
+
+    private string GetHistoricalNotificationStatus(int notificationsSent, int notificationsFailed, bool notificationsEnabled, int triggeredCount)
+    {
+        if (!notificationsEnabled)
+            return "Notifications disabled";
+        
+        if (triggeredCount == 0)
+            return "No alerts triggered - no notifications needed";
+            
+        if (notificationsSent == 0 && notificationsFailed == 0)
+            return "No notifications attempted";
+            
+        if (notificationsFailed == 0)
+            return $"All {notificationsSent} notifications sent successfully";
+            
+        return $"{notificationsSent} notifications sent, {notificationsFailed} failed";
     }
 }

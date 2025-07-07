@@ -13250,6 +13250,7 @@ export class AlertRuleSimulationRequestDto implements IAlertRuleSimulationReques
     startDate?: Date | undefined;
     endDate?: Date | undefined;
     maxRecords?: number | undefined;
+    sendNotification?: boolean;
 
     constructor(data?: IAlertRuleSimulationRequestDto) {
         if (data) {
@@ -13270,6 +13271,7 @@ export class AlertRuleSimulationRequestDto implements IAlertRuleSimulationReques
             this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : <any>undefined;
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : <any>undefined;
             this.maxRecords = _data["maxRecords"];
+            this.sendNotification = _data["sendNotification"];
         }
     }
 
@@ -13287,6 +13289,7 @@ export class AlertRuleSimulationRequestDto implements IAlertRuleSimulationReques
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
         data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
         data["maxRecords"] = this.maxRecords;
+        data["sendNotification"] = this.sendNotification;
         return data;
     }
 }
@@ -13297,6 +13300,7 @@ export interface IAlertRuleSimulationRequestDto {
     startDate?: Date | undefined;
     endDate?: Date | undefined;
     maxRecords?: number | undefined;
+    sendNotification?: boolean;
 }
 
 export class AlertRuleValidationResultDto implements IAlertRuleValidationResultDto {
@@ -14059,6 +14063,9 @@ export class AlertTestMatchDto implements IAlertTestMatchDto {
     sourceUrl?: string | undefined;
     triggerReason?: string | undefined;
     wouldTrigger?: boolean;
+    notificationSent?: boolean;
+    notificationStatus?: string | undefined;
+    notificationError?: string | undefined;
 
     constructor(data?: IAlertTestMatchDto) {
         if (data) {
@@ -14078,6 +14085,9 @@ export class AlertTestMatchDto implements IAlertTestMatchDto {
             this.sourceUrl = _data["sourceUrl"];
             this.triggerReason = _data["triggerReason"];
             this.wouldTrigger = _data["wouldTrigger"];
+            this.notificationSent = _data["notificationSent"];
+            this.notificationStatus = _data["notificationStatus"];
+            this.notificationError = _data["notificationError"];
         }
     }
 
@@ -14097,6 +14107,9 @@ export class AlertTestMatchDto implements IAlertTestMatchDto {
         data["sourceUrl"] = this.sourceUrl;
         data["triggerReason"] = this.triggerReason;
         data["wouldTrigger"] = this.wouldTrigger;
+        data["notificationSent"] = this.notificationSent;
+        data["notificationStatus"] = this.notificationStatus;
+        data["notificationError"] = this.notificationError;
         return data;
     }
 }
@@ -14109,6 +14122,9 @@ export interface IAlertTestMatchDto {
     sourceUrl?: string | undefined;
     triggerReason?: string | undefined;
     wouldTrigger?: boolean;
+    notificationSent?: boolean;
+    notificationStatus?: string | undefined;
+    notificationError?: string | undefined;
 }
 
 export class AlertTestRequestDto implements IAlertTestRequestDto {
@@ -14117,6 +14133,7 @@ export class AlertTestRequestDto implements IAlertTestRequestDto {
     startDate?: Date | undefined;
     endDate?: Date | undefined;
     maxRecords?: number | undefined;
+    sendNotification?: boolean;
 
     constructor(data?: IAlertTestRequestDto) {
         if (data) {
@@ -14134,6 +14151,7 @@ export class AlertTestRequestDto implements IAlertTestRequestDto {
             this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : <any>undefined;
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : <any>undefined;
             this.maxRecords = _data["maxRecords"];
+            this.sendNotification = _data["sendNotification"];
         }
     }
 
@@ -14151,6 +14169,7 @@ export class AlertTestRequestDto implements IAlertTestRequestDto {
         data["startDate"] = this.startDate ? this.startDate.toISOString() : <any>undefined;
         data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
         data["maxRecords"] = this.maxRecords;
+        data["sendNotification"] = this.sendNotification;
         return data;
     }
 }
@@ -14161,6 +14180,7 @@ export interface IAlertTestRequestDto {
     startDate?: Date | undefined;
     endDate?: Date | undefined;
     maxRecords?: number | undefined;
+    sendNotification?: boolean;
 }
 
 export class AlertTestResultDto implements IAlertTestResultDto {
@@ -14173,6 +14193,10 @@ export class AlertTestResultDto implements IAlertTestResultDto {
     matches?: AlertTestMatchDto[] | undefined;
     errorMessage?: string | undefined;
     testedAt?: Date;
+    notificationsEnabled?: boolean;
+    notificationsSent?: number;
+    notificationsFailed?: number;
+    overallNotificationStatus?: string | undefined;
 
     constructor(data?: IAlertTestResultDto) {
         if (data) {
@@ -14198,6 +14222,10 @@ export class AlertTestResultDto implements IAlertTestResultDto {
             }
             this.errorMessage = _data["errorMessage"];
             this.testedAt = _data["testedAt"] ? new Date(_data["testedAt"].toString()) : <any>undefined;
+            this.notificationsEnabled = _data["notificationsEnabled"];
+            this.notificationsSent = _data["notificationsSent"];
+            this.notificationsFailed = _data["notificationsFailed"];
+            this.overallNotificationStatus = _data["overallNotificationStatus"];
         }
     }
 
@@ -14223,6 +14251,10 @@ export class AlertTestResultDto implements IAlertTestResultDto {
         }
         data["errorMessage"] = this.errorMessage;
         data["testedAt"] = this.testedAt ? this.testedAt.toISOString() : <any>undefined;
+        data["notificationsEnabled"] = this.notificationsEnabled;
+        data["notificationsSent"] = this.notificationsSent;
+        data["notificationsFailed"] = this.notificationsFailed;
+        data["overallNotificationStatus"] = this.overallNotificationStatus;
         return data;
     }
 }
@@ -14237,6 +14269,10 @@ export interface IAlertTestResultDto {
     matches?: AlertTestMatchDto[] | undefined;
     errorMessage?: string | undefined;
     testedAt?: Date;
+    notificationsEnabled?: boolean;
+    notificationsSent?: number;
+    notificationsFailed?: number;
+    overallNotificationStatus?: string | undefined;
 }
 
 export class AlertTestResultDtoApiResponse implements IAlertTestResultDtoApiResponse {
@@ -29801,6 +29837,7 @@ export class TestPricePointDto implements ITestPricePointDto {
     sellerName?: string | undefined;
     sourceUrl?: string | undefined;
     timestamp?: Date | undefined;
+    sendNotification?: boolean;
 
     constructor(data?: ITestPricePointDto) {
         if (data) {
@@ -29818,6 +29855,7 @@ export class TestPricePointDto implements ITestPricePointDto {
             this.sellerName = _data["sellerName"];
             this.sourceUrl = _data["sourceUrl"];
             this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.sendNotification = _data["sendNotification"];
         }
     }
 
@@ -29835,6 +29873,7 @@ export class TestPricePointDto implements ITestPricePointDto {
         data["sellerName"] = this.sellerName;
         data["sourceUrl"] = this.sourceUrl;
         data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["sendNotification"] = this.sendNotification;
         return data;
     }
 }
@@ -29845,6 +29884,7 @@ export interface ITestPricePointDto {
     sellerName?: string | undefined;
     sourceUrl?: string | undefined;
     timestamp?: Date | undefined;
+    sendNotification?: boolean;
 }
 
 export class TestReliabilityMetrics implements ITestReliabilityMetrics {

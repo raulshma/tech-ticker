@@ -1,0 +1,39 @@
+            <!-- Discord Notification Toggle Section -->
+            <mat-card class="config-section notification-section" appearance="outlined">
+              <mat-card-header>
+                <mat-card-title class="section-title">
+                  <mat-icon>notifications</mat-icon>
+                  Discord Notifications
+                </mat-card-title>
+                <mat-card-subtitle>Choose whether to send actual Discord notifications during testing</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="notification-toggle-section">
+                  <mat-slide-toggle [(ngModel)]="sendNotifications" color="primary" class="notification-toggle">
+                    Send Discord Notifications
+                  </mat-slide-toggle>
+                  <p class="notification-description mat-body-medium">
+                    {{ sendNotifications ? 
+                      'Real Discord notifications will be sent when alerts trigger during testing' : 
+                      'Only test evaluation will be performed - no Discord notifications will be sent' }}
+                  </p>
+                  <div class="notification-warning" *ngIf="sendNotifications">
+                    <mat-icon class="warning-icon">warning</mat-icon>
+                    <span class="warning-text">
+                      This will send actual notifications to your configured Discord channels. 
+                      Use sparingly to avoid spamming your channels.
+                    </span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Quick Test Section -->
+            <mat-card class="config-section quick-test-section" appearance="outlined">
+              <mat-card-header>
+                <mat-card-title class="section-title">
+                  <mat-icon>speed</mat-icon>
+                  Test Parameters
+                </mat-card-title>
+                <mat-card-subtitle>Specify the price point to test against your alert</mat-card-subtitle>
+              </mat-card-header> 

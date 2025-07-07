@@ -25,6 +25,8 @@ public class AlertTestRequestDto
     /// Limit the number of historical records to test against
     /// </summary>
     public int? MaxRecords { get; set; } = 100;
+    
+    public bool SendNotification { get; set; } = false;
 }
 
 /// <summary>
@@ -47,6 +49,8 @@ public class TestPricePointDto
     public string? SourceUrl { get; set; }
 
     public DateTimeOffset? Timestamp { get; set; }
+    
+    public bool SendNotification { get; set; } = false;
 }
 
 /// <summary>
@@ -63,6 +67,10 @@ public class AlertTestResultDto
     public List<AlertTestMatchDto> Matches { get; set; } = new();
     public string? ErrorMessage { get; set; }
     public DateTimeOffset TestedAt { get; set; } = DateTimeOffset.UtcNow;
+    public bool NotificationsEnabled { get; set; } = false;
+    public int NotificationsSent { get; set; } = 0;
+    public int NotificationsFailed { get; set; } = 0;
+    public string? OverallNotificationStatus { get; set; }
 }
 
 /// <summary>
@@ -77,6 +85,9 @@ public class AlertTestMatchDto
     public string? SourceUrl { get; set; }
     public string TriggerReason { get; set; } = null!;
     public bool WouldTrigger { get; set; }
+    public bool NotificationSent { get; set; } = false;
+    public string? NotificationStatus { get; set; }
+    public string? NotificationError { get; set; }
 }
 
 /// <summary>
@@ -130,4 +141,6 @@ public class AlertRuleSimulationRequestDto
     /// Limit the number of historical records to test against
     /// </summary>
     public int? MaxRecords { get; set; } = 100;
+    
+    public bool SendNotification { get; set; } = false;
 }

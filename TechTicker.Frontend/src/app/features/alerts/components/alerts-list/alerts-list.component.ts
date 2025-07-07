@@ -15,6 +15,7 @@ import { MatDividerModule } from '@angular/material/divider';
 
 import { AlertsService } from '../../services/alerts.service';
 import { AlertRuleDto, UpdateAlertRuleDto } from '../../../../shared/api/api-client';
+import { AlertTestDialogComponent, AlertTestDialogData } from '../alert-test-dialog/alert-test-dialog.component';
 
 @Component({
   selector: 'app-alerts-list',
@@ -437,7 +438,26 @@ export class AlertsListComponent implements OnInit {
   }
 
   testAlert(alert: AlertRuleDto): void {
-    this.snackBar.open('Alert testing functionality coming soon', 'Close', { duration: 2000 });
+    const dialogData: AlertTestDialogData = {
+      alert: alert
+    };
+
+    const dialogRef = this.dialog.open(AlertTestDialogComponent, {
+      data: dialogData,
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      panelClass: 'full-screen-dialog',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      // Handle any cleanup or actions after dialog closes
+      if (result) {
+        console.log('Alert test completed:', result);
+      }
+    });
   }
 
   duplicateAlert(alert: AlertRuleDto): void {

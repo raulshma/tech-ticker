@@ -1,0 +1,502 @@
+.test-results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+// Summary Card Styles
+.summary-card {
+  flex-shrink: 0;
+  
+  mat-card-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1rem;
+    
+    .result-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin-right: 1rem;
+      
+      &.success-icon {
+        background: var(--mat-sys-primary-container);
+        color: var(--mat-sys-on-primary-container);
+      }
+      
+      &.error-icon {
+        background: var(--mat-sys-error-container);
+        color: var(--mat-sys-on-error-container);
+      }
+      
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+    
+    div {
+      flex: 1;
+    }
+    
+    mat-card-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    mat-card-subtitle {
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+  
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--mat-sys-on-surface-variant);
+      font-weight: 500;
+    }
+    
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--mat-sys-on-surface);
+      
+      &.trigger-count {
+        &.no-triggers {
+          color: var(--mat-sys-on-surface-variant);
+        }
+        
+        &.few-triggers {
+          color: var(--mat-sys-primary);
+        }
+        
+        &.many-triggers {
+          color: var(--mat-sys-error);
+        }
+      }
+    }
+    
+    .stat-chip {
+      align-self: flex-start;
+      max-width: fit-content;
+    }
+  }
+}
+
+// Single Point Result Styles
+.single-result {
+  margin-top: 1rem;
+  
+  .result-explanation {
+    padding: 1rem 0;
+    
+    h4 {
+      margin: 0 0 1rem 0;
+      font-size: 1.125rem;
+      font-weight: 500;
+    }
+    
+    .explanation-text {
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: var(--mat-sys-surface-container-low);
+      border-radius: 8px;
+      
+      .explanation-icon {
+        margin-right: 0.75rem;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+    
+    .test-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--mat-sys-outline-variant);
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        .detail-label {
+          font-weight: 500;
+          color: var(--mat-sys-on-surface-variant);
+        }
+        
+        .detail-value {
+          font-weight: 500;
+          
+          &.price-value {
+            font-size: 1.125rem;
+            color: var(--mat-sys-primary);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Historical Results Table Styles
+.matches-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  
+  mat-card-header {
+    flex-shrink: 0;
+    
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+  
+  mat-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+}
+
+.table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  
+  .view-toggle {
+    button {
+      &.active {
+        background: var(--mat-sys-primary-container);
+        color: var(--mat-sys-on-primary-container);
+      }
+      
+      mat-icon {
+        margin-right: 0.5rem;
+      }
+    }
+  }
+}
+
+.table-container {
+  flex: 1;
+  overflow: auto;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+}
+
+.matches-table {
+  width: 100%;
+  
+  .timestamp-cell {
+    .date {
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+    
+    .time {
+      font-size: 0.75rem;
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+  
+  .price-cell {
+    font-weight: 500;
+    
+    &.trigger-price {
+      color: var(--mat-sys-primary);
+      font-weight: 600;
+    }
+  }
+  
+  .stock-chip-small {
+    font-size: 0.75rem;
+    height: 24px;
+    
+    &.in-stock {
+      background: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
+    }
+    
+    &.out-of-stock {
+      background: var(--mat-sys-error-container);
+      color: var(--mat-sys-on-error-container);
+    }
+    
+    &.limited-stock {
+      background: var(--mat-sys-tertiary-container);
+      color: var(--mat-sys-on-tertiary-container);
+    }
+    
+    &.preorder {
+      background: var(--mat-sys-secondary-container);
+      color: var(--mat-sys-on-secondary-container);
+    }
+    
+    &.unknown-stock {
+      background: var(--mat-sys-surface-variant);
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+  
+  .seller-cell {
+    font-size: 0.875rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+  
+  .trigger-cell {
+    display: flex;
+    justify-content: center;
+    
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+  
+  .trigger-row {
+    background: var(--mat-sys-primary-container);
+    
+    &:hover {
+      background: var(--mat-sys-primary-container);
+      opacity: 0.8;
+    }
+  }
+  
+  .no-trigger-row {
+    &:hover {
+      background: var(--mat-sys-surface-variant);
+    }
+  }
+}
+
+// Stock status chips in detail view
+.stock-chip {
+  &.in-stock {
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+  
+  &.out-of-stock {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+  
+  &.limited-stock {
+    background: var(--mat-sys-tertiary-container);
+    color: var(--mat-sys-on-tertiary-container);
+  }
+  
+  &.preorder {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+  }
+  
+  &.unknown-stock {
+    background: var(--mat-sys-surface-variant);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+// No matches/results messages
+.no-matches,
+.no-results-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+  
+  h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+  
+  p {
+    margin: 0;
+    max-width: 400px;
+    line-height: 1.5;
+  }
+}
+
+.no-results-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .matches-table {
+    font-size: 0.875rem;
+    
+    .timestamp-cell .date {
+      font-size: 0.8125rem;
+    }
+    
+    .timestamp-cell .time {
+      font-size: 0.6875rem;
+    }
+  }
+  
+  .single-result .test-details .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    
+    .detail-value {
+      align-self: flex-end;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .summary-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .table-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+}
+
+// Animation for results appearing
+.test-results-container {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Error text styling
+.error-text {
+  color: var(--error-color, #f44336);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+// Notification-related styles
+.notification-chip {
+  &.success-notification-chip {
+    background-color: var(--success-surface, #e8f5e8);
+    color: var(--success-on-surface, #2e7d32);
+    
+    mat-icon {
+      color: var(--success-color, #4caf50);
+    }
+  }
+  
+  &.error-notification-chip {
+    background-color: var(--error-surface, #ffebee);
+    color: var(--error-on-surface, #c62828);
+    
+    mat-icon {
+      color: var(--error-color, #f44336);
+    }
+  }
+  
+  &.active-notification {
+    background-color: var(--primary-surface, #e3f2fd);
+    color: var(--primary-on-surface, #1565c0);
+    
+    mat-icon {
+      color: var(--primary-color, #2196f3);
+    }
+  }
+  
+  &.inactive-notification {
+    background-color: var(--surface-variant, #f5f5f5);
+    color: var(--on-surface-variant, #666);
+    
+    mat-icon {
+      color: var(--on-surface-variant, #666);
+    }
+  }
+}
+
+.notification-status {
+  &.active-notification {
+    color: var(--success-color, #4caf50);
+    font-weight: 500;
+  }
+  
+  &.inactive-notification {
+    color: var(--on-surface-variant, #666);
+  }
+}
+
+.notification-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notification-status-chip {
+  font-size: 0.75rem;
+  height: 24px;
+  
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+} 
