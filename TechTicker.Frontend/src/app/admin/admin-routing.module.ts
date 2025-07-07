@@ -5,6 +5,7 @@ import { ProxyFormComponent } from './proxy-management/proxy-form/proxy-form.com
 import { BulkImportComponent } from './proxy-management/bulk-import/bulk-import.component';
 import { AiSettingsComponent } from './ai-settings/ai-settings.component';
 import { BrowserAutomationTesterComponent } from './browser-automation-tester/browser-automation-tester.component';
+import { ProductImageManagementComponent } from './product-image-management/product-image-management.component';
 
 const routes: Routes = [
   {
@@ -41,6 +42,11 @@ const routes: Routes = [
     path: 'browser-automation-tester',
     component: BrowserAutomationTesterComponent,
     data: { title: 'Browser Automation Tester' }
+  },
+  {
+    path: 'image-management',
+    component: ProductImageManagementComponent,
+    data: { title: 'Product Image Management' }
   }
 ];
 

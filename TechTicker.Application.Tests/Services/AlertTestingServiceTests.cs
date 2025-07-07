@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
+using TechTicker.Application.Configuration;
 using TechTicker.Application.DTOs;
 using TechTicker.Application.Services;
 using TechTicker.Application.Services.Interfaces;
@@ -17,6 +19,8 @@ public class AlertTestingServiceTests : IDisposable
     private readonly TechTickerDbContext _context;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<ILogger<AlertTestingService>> _loggerMock;
+    private readonly Mock<IMessagePublisher> _messagePublisherMock;
+    private readonly Mock<IOptions<MessagingConfiguration>> _messagingConfigMock;
     private readonly AlertTestingService _service;
 
     public AlertTestingServiceTests()
@@ -28,10 +32,17 @@ public class AlertTestingServiceTests : IDisposable
         _context = new TechTickerDbContext(options);
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _loggerMock = new Mock<ILogger<AlertTestingService>>();
+        _messagePublisherMock = new Mock<IMessagePublisher>();
+        _messagingConfigMock = new Mock<IOptions<MessagingConfiguration>>();
+        
+        // Setup messaging configuration with default values
+        _messagingConfigMock.Setup(x => x.Value).Returns(new MessagingConfiguration());
 
         _service = new AlertTestingService(
             _unitOfWorkMock.Object,
-            _loggerMock.Object);
+            _loggerMock.Object,
+            _messagePublisherMock.Object,
+            _messagingConfigMock.Object);
     }
 
     [Fact]

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using FluentAssertions;
@@ -6,6 +7,7 @@ using TechTicker.Application.Services;
 using TechTicker.Application.Services.Interfaces;
 using TechTicker.DataAccess.Repositories.Interfaces;
 using TechTicker.Domain.Entities;
+using TechTicker.Shared.Services;
 
 namespace TechTicker.ScrapingWorker.Tests.Services;
 
@@ -15,18 +17,24 @@ public class ProductImageServiceTests
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly Mock<IProductRepository> _mockProductRepository;
     private readonly Mock<ILogger<ProductImageService>> _mockLogger;
+    private readonly Mock<IImageStorageService> _mockImageStorageService;
+    private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
 
     public ProductImageServiceTests()
     {
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockProductRepository = new Mock<IProductRepository>();
         _mockLogger = new Mock<ILogger<ProductImageService>>();
+        _mockImageStorageService = new Mock<IImageStorageService>();
+        _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         _mockUnitOfWork.Setup(x => x.Products).Returns(_mockProductRepository.Object);
 
         _productImageService = new ProductImageService(
             _mockUnitOfWork.Object,
-            _mockLogger.Object);
+            _mockImageStorageService.Object,
+            _mockLogger.Object,
+            _mockHttpContextAccessor.Object);
     }
 
     [Fact]

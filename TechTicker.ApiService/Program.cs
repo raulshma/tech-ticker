@@ -240,6 +240,10 @@ builder.Services.AddScoped<IRecommendationGenerationService, RecommendationGener
 builder.Services.AddScoped<IIntegrationsAndFeaturesService, IntegrationsAndFeaturesService>();
 builder.Services.AddHttpClient<IntegrationsAndFeaturesService>();
 
+// Add Product Image Management Services
+builder.Services.AddScoped<IProductImageService, ProductImageService>();
+builder.Services.AddScoped<TechTicker.Shared.Services.IImageStorageService, TechTicker.ScrapingWorker.Services.ImageStorageService>();
+
 // Add Browser Automation Test Services
 builder.Services.AddScoped<IBrowserAutomationWebSocketService, BrowserAutomationWebSocketService>();
 

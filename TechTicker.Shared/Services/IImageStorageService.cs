@@ -1,4 +1,4 @@
-namespace TechTicker.ScrapingWorker.Services;
+namespace TechTicker.Shared.Services;
 
 /// <summary>
 /// Service for storing images locally
@@ -77,4 +77,4 @@ public class ImageUploadData
     public string FileName { get; set; } = null!;
     public string ContentType { get; set; } = null!;
     public string OriginalUrl { get; set; } = null!;
-}
+} 

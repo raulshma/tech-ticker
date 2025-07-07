@@ -4497,6 +4497,526 @@ export class TechTickerApiClient {
     }
 
     /**
+     * @param images (optional) 
+     * @return OK
+     */
+    uploadImages(productId: string, images: ImageUploadDto[] | undefined): Observable<ImageDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/Images/products/{productId}/upload";
+        if (productId === undefined || productId === null)
+            throw new Error("The parameter 'productId' must be defined.");
+        url_ = url_.replace("{productId}", encodeURIComponent("" + productId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (images === null || images === undefined)
+            throw new Error("The parameter 'images' cannot be null.");
+        else
+            images.forEach(item_ => content_.append("images", item_.toString()));
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUploadImages(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUploadImages(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ImageDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ImageDtoListApiResponse>;
+        }));
+    }
+
+    protected processUploadImages(response: HttpResponseBase): Observable<ImageDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ImageDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getProductImages(productId: string): Observable<ImageDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/Images/products/{productId}";
+        if (productId === undefined || productId === null)
+            throw new Error("The parameter 'productId' must be defined.");
+        url_ = url_.replace("{productId}", encodeURIComponent("" + productId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetProductImages(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetProductImages(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ImageDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ImageDtoListApiResponse>;
+        }));
+    }
+
+    protected processGetProductImages(response: HttpResponseBase): Observable<ImageDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ImageDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param imageUrl (optional) 
+     * @return OK
+     */
+    deleteImage(productId: string, imageUrl: string | undefined): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/Images/products/{productId}/images?";
+        if (productId === undefined || productId === null)
+            throw new Error("The parameter 'productId' must be defined.");
+        url_ = url_.replace("{productId}", encodeURIComponent("" + productId));
+        if (imageUrl === null)
+            throw new Error("The parameter 'imageUrl' cannot be null.");
+        else if (imageUrl !== undefined)
+            url_ += "imageUrl=" + encodeURIComponent("" + imageUrl) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteImage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteImage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processDeleteImage(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    setPrimaryImage(productId: string, body: SetPrimaryImageDto | undefined): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/Images/products/{productId}/primary";
+        if (productId === undefined || productId === null)
+            throw new Error("The parameter 'productId' must be defined.");
+        url_ = url_.replace("{productId}", encodeURIComponent("" + productId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSetPrimaryImage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSetPrimaryImage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processSetPrimaryImage(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    reorderImages(productId: string, body: ImageReorderDto | undefined): Observable<BooleanApiResponse> {
+        let url_ = this.baseUrl + "/api/Images/products/{productId}/reorder";
+        if (productId === undefined || productId === null)
+            throw new Error("The parameter 'productId' must be defined.");
+        url_ = url_.replace("{productId}", encodeURIComponent("" + productId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processReorderImages(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processReorderImages(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanApiResponse>;
+        }));
+    }
+
+    protected processReorderImages(response: HttpResponseBase): Observable<BooleanApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    bulkDeleteImages(productId: string, body: BulkImageOperationDto | undefined): Observable<BulkImageOperationResultDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Images/products/{productId}/bulk";
+        if (productId === undefined || productId === null)
+            throw new Error("The parameter 'productId' must be defined.");
+        url_ = url_.replace("{productId}", encodeURIComponent("" + productId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBulkDeleteImages(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBulkDeleteImages(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BulkImageOperationResultDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BulkImageOperationResultDtoApiResponse>;
+        }));
+    }
+
+    protected processBulkDeleteImages(response: HttpResponseBase): Observable<BulkImageOperationResultDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BulkImageOperationResultDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param imageUrl (optional) 
+     * @return OK
+     */
+    getImageMetadata(imageUrl: string | undefined): Observable<ImageMetadataDtoApiResponse> {
+        let url_ = this.baseUrl + "/api/Images/metadata?";
+        if (imageUrl === null)
+            throw new Error("The parameter 'imageUrl' cannot be null.");
+        else if (imageUrl !== undefined)
+            url_ += "imageUrl=" + encodeURIComponent("" + imageUrl) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetImageMetadata(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetImageMetadata(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ImageMetadataDtoApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ImageMetadataDtoApiResponse>;
+        }));
+    }
+
+    protected processGetImageMetadata(response: HttpResponseBase): Observable<ImageMetadataDtoApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ImageMetadataDtoApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param pageNumber (optional) 
+     * @param pageSize (optional) 
+     * @return OK
+     */
+    getImageManagementSummary(pageNumber: number | undefined, pageSize: number | undefined): Observable<ProductImageSummaryDtoListApiResponse> {
+        let url_ = this.baseUrl + "/api/Images/summary?";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "pageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "pageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetImageManagementSummary(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetImageManagementSummary(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProductImageSummaryDtoListApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProductImageSummaryDtoListApiResponse>;
+        }));
+    }
+
+    protected processGetImageManagementSummary(response: HttpResponseBase): Observable<ProductImageSummaryDtoListApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProductImageSummaryDtoListApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getHealthStatus(): Observable<ObjectApiResponse> {
+        let url_ = this.baseUrl + "/api/Images/health";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHealthStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetHealthStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ObjectApiResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ObjectApiResponse>;
+        }));
+    }
+
+    protected processGetHealthStatus(response: HttpResponseBase): Observable<ObjectApiResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ObjectApiResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @return OK
      */
     getIntegrationsAndFeatures(): Observable<IntegrationsAndFeaturesDtoApiResponse> {
@@ -16455,6 +16975,205 @@ export interface IBulkDeleteTestResultsRequestDto {
     resultIds?: string[] | undefined;
 }
 
+export class BulkImageOperationDto implements IBulkImageOperationDto {
+    imageUrls!: string[];
+
+    constructor(data?: IBulkImageOperationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.imageUrls = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["imageUrls"])) {
+                this.imageUrls = [] as any;
+                for (let item of _data["imageUrls"])
+                    this.imageUrls!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): BulkImageOperationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkImageOperationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.imageUrls)) {
+            data["imageUrls"] = [];
+            for (let item of this.imageUrls)
+                data["imageUrls"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IBulkImageOperationDto {
+    imageUrls: string[];
+}
+
+export class BulkImageOperationResultDto implements IBulkImageOperationResultDto {
+    totalRequested?: number;
+    successfulOperations?: number;
+    failedOperations?: number;
+    successfulUrls?: string[] | undefined;
+    errors?: ImageOperationErrorDto[] | undefined;
+
+    constructor(data?: IBulkImageOperationResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalRequested = _data["totalRequested"];
+            this.successfulOperations = _data["successfulOperations"];
+            this.failedOperations = _data["failedOperations"];
+            if (Array.isArray(_data["successfulUrls"])) {
+                this.successfulUrls = [] as any;
+                for (let item of _data["successfulUrls"])
+                    this.successfulUrls!.push(item);
+            }
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(ImageOperationErrorDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): BulkImageOperationResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkImageOperationResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalRequested"] = this.totalRequested;
+        data["successfulOperations"] = this.successfulOperations;
+        data["failedOperations"] = this.failedOperations;
+        if (Array.isArray(this.successfulUrls)) {
+            data["successfulUrls"] = [];
+            for (let item of this.successfulUrls)
+                data["successfulUrls"].push(item);
+        }
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item ? item.toJSON() : <any>undefined);
+        }
+        return data;
+    }
+}
+
+export interface IBulkImageOperationResultDto {
+    totalRequested?: number;
+    successfulOperations?: number;
+    failedOperations?: number;
+    successfulUrls?: string[] | undefined;
+    errors?: ImageOperationErrorDto[] | undefined;
+}
+
+export class BulkImageOperationResultDtoApiResponse implements IBulkImageOperationResultDtoApiResponse {
+    success?: boolean;
+    data?: BulkImageOperationResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IBulkImageOperationResultDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? BulkImageOperationResultDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BulkImageOperationResultDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkImageOperationResultDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBulkImageOperationResultDtoApiResponse {
+    success?: boolean;
+    data?: BulkImageOperationResultDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
 export class BulkProxyActiveStatusDto implements IBulkProxyActiveStatusDto {
     proxyIds?: string[] | undefined;
     isActive?: boolean;
@@ -19495,6 +20214,457 @@ export interface IGenericAiResponseDtoApiResponse {
     correlationId?: string | undefined;
     statusCode?: number;
     meta?: { [key: string]: any; } | undefined;
+}
+
+export class ImageDto implements IImageDto {
+    url?: string | undefined;
+    isPrimary?: boolean;
+    altText?: string | undefined;
+    description?: string | undefined;
+    fileSize?: number;
+    width?: number | undefined;
+    height?: number | undefined;
+    contentType?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    order?: number;
+
+    constructor(data?: IImageDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.url = _data["url"];
+            this.isPrimary = _data["isPrimary"];
+            this.altText = _data["altText"];
+            this.description = _data["description"];
+            this.fileSize = _data["fileSize"];
+            this.width = _data["width"];
+            this.height = _data["height"];
+            this.contentType = _data["contentType"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+            this.order = _data["order"];
+        }
+    }
+
+    static fromJS(data: any): ImageDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ImageDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["url"] = this.url;
+        data["isPrimary"] = this.isPrimary;
+        data["altText"] = this.altText;
+        data["description"] = this.description;
+        data["fileSize"] = this.fileSize;
+        data["width"] = this.width;
+        data["height"] = this.height;
+        data["contentType"] = this.contentType;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        data["order"] = this.order;
+        return data;
+    }
+}
+
+export interface IImageDto {
+    url?: string | undefined;
+    isPrimary?: boolean;
+    altText?: string | undefined;
+    description?: string | undefined;
+    fileSize?: number;
+    width?: number | undefined;
+    height?: number | undefined;
+    contentType?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    order?: number;
+}
+
+export class ImageDtoListApiResponse implements IImageDtoListApiResponse {
+    success?: boolean;
+    data?: ImageDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IImageDtoListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ImageDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ImageDtoListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ImageDtoListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IImageDtoListApiResponse {
+    success?: boolean;
+    data?: ImageDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ImageMetadataDto implements IImageMetadataDto {
+    url?: string | undefined;
+    fileSize?: number;
+    width?: number | undefined;
+    height?: number | undefined;
+    contentType?: string | undefined;
+    createdAt?: Date;
+    hash?: string | undefined;
+    isValid?: boolean;
+
+    constructor(data?: IImageMetadataDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.url = _data["url"];
+            this.fileSize = _data["fileSize"];
+            this.width = _data["width"];
+            this.height = _data["height"];
+            this.contentType = _data["contentType"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.hash = _data["hash"];
+            this.isValid = _data["isValid"];
+        }
+    }
+
+    static fromJS(data: any): ImageMetadataDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ImageMetadataDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["url"] = this.url;
+        data["fileSize"] = this.fileSize;
+        data["width"] = this.width;
+        data["height"] = this.height;
+        data["contentType"] = this.contentType;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["hash"] = this.hash;
+        data["isValid"] = this.isValid;
+        return data;
+    }
+}
+
+export interface IImageMetadataDto {
+    url?: string | undefined;
+    fileSize?: number;
+    width?: number | undefined;
+    height?: number | undefined;
+    contentType?: string | undefined;
+    createdAt?: Date;
+    hash?: string | undefined;
+    isValid?: boolean;
+}
+
+export class ImageMetadataDtoApiResponse implements IImageMetadataDtoApiResponse {
+    success?: boolean;
+    data?: ImageMetadataDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IImageMetadataDtoApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            this.data = _data["data"] ? ImageMetadataDto.fromJS(_data["data"]) : <any>undefined;
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ImageMetadataDtoApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ImageMetadataDtoApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        data["data"] = this.data ? this.data.toJSON() : <any>undefined;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IImageMetadataDtoApiResponse {
+    success?: boolean;
+    data?: ImageMetadataDto;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ImageOperationErrorDto implements IImageOperationErrorDto {
+    imageUrl?: string | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+
+    constructor(data?: IImageOperationErrorDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.imageUrl = _data["imageUrl"];
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+        }
+    }
+
+    static fromJS(data: any): ImageOperationErrorDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ImageOperationErrorDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["imageUrl"] = this.imageUrl;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        return data;
+    }
+}
+
+export interface IImageOperationErrorDto {
+    imageUrl?: string | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+}
+
+export class ImageReorderDto implements IImageReorderDto {
+    imageUrls!: string[];
+
+    constructor(data?: IImageReorderDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.imageUrls = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["imageUrls"])) {
+                this.imageUrls = [] as any;
+                for (let item of _data["imageUrls"])
+                    this.imageUrls!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ImageReorderDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ImageReorderDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.imageUrls)) {
+            data["imageUrls"] = [];
+            for (let item of this.imageUrls)
+                data["imageUrls"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IImageReorderDto {
+    imageUrls: string[];
+}
+
+export class ImageUploadDto implements IImageUploadDto {
+    file!: string;
+    altText?: string | undefined;
+    description?: string | undefined;
+
+    constructor(data?: IImageUploadDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.file = _data["file"];
+            this.altText = _data["altText"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): ImageUploadDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ImageUploadDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["file"] = this.file;
+        data["altText"] = this.altText;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+export interface IImageUploadDto {
+    file: string;
+    altText?: string | undefined;
+    description?: string | undefined;
 }
 
 export class Int32ApiResponse implements IInt32ApiResponse {
@@ -22569,6 +23739,154 @@ export class ProductDtoPagedResponseApiResponse implements IProductDtoPagedRespo
 export interface IProductDtoPagedResponseApiResponse {
     success?: boolean;
     data?: ProductDtoPagedResponse;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+}
+
+export class ProductImageSummaryDto implements IProductImageSummaryDto {
+    productId?: string;
+    productName?: string | undefined;
+    totalImages?: number;
+    hasPrimaryImage?: boolean;
+    totalSize?: number;
+    lastImageUpdate?: Date | undefined;
+
+    constructor(data?: IProductImageSummaryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productId = _data["productId"];
+            this.productName = _data["productName"];
+            this.totalImages = _data["totalImages"];
+            this.hasPrimaryImage = _data["hasPrimaryImage"];
+            this.totalSize = _data["totalSize"];
+            this.lastImageUpdate = _data["lastImageUpdate"] ? new Date(_data["lastImageUpdate"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProductImageSummaryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductImageSummaryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productId"] = this.productId;
+        data["productName"] = this.productName;
+        data["totalImages"] = this.totalImages;
+        data["hasPrimaryImage"] = this.hasPrimaryImage;
+        data["totalSize"] = this.totalSize;
+        data["lastImageUpdate"] = this.lastImageUpdate ? this.lastImageUpdate.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IProductImageSummaryDto {
+    productId?: string;
+    productName?: string | undefined;
+    totalImages?: number;
+    hasPrimaryImage?: boolean;
+    totalSize?: number;
+    lastImageUpdate?: Date | undefined;
+}
+
+export class ProductImageSummaryDtoListApiResponse implements IProductImageSummaryDtoListApiResponse {
+    success?: boolean;
+    data?: ProductImageSummaryDto[] | undefined;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    timestamp?: Date;
+    correlationId?: string | undefined;
+    statusCode?: number;
+    meta?: { [key: string]: any; } | undefined;
+
+    constructor(data?: IProductImageSummaryDtoListApiResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["success"];
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ProductImageSummaryDto.fromJS(item));
+            }
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.timestamp = _data["timestamp"] ? new Date(_data["timestamp"].toString()) : <any>undefined;
+            this.correlationId = _data["correlationId"];
+            this.statusCode = _data["statusCode"];
+            if (_data["meta"]) {
+                this.meta = {} as any;
+                for (let key in _data["meta"]) {
+                    if (_data["meta"].hasOwnProperty(key))
+                        (<any>this.meta)![key] = _data["meta"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductImageSummaryDtoListApiResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductImageSummaryDtoListApiResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["success"] = this.success;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : <any>undefined);
+        }
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["correlationId"] = this.correlationId;
+        data["statusCode"] = this.statusCode;
+        if (this.meta) {
+            data["meta"] = {};
+            for (let key in this.meta) {
+                if (this.meta.hasOwnProperty(key))
+                    (<any>data["meta"])[key] = (<any>this.meta)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IProductImageSummaryDtoListApiResponse {
+    success?: boolean;
+    data?: ProductImageSummaryDto[] | undefined;
     message?: string | undefined;
     errors?: string[] | undefined;
     timestamp?: Date;
@@ -28095,6 +29413,42 @@ export interface ISellerPriceComparisonDto {
     product2StockStatus?: string | undefined;
     priceDifference?: number | undefined;
     availabilityAdvantage?: string | undefined;
+}
+
+export class SetPrimaryImageDto implements ISetPrimaryImageDto {
+    imageUrl!: string;
+
+    constructor(data?: ISetPrimaryImageDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.imageUrl = _data["imageUrl"];
+        }
+    }
+
+    static fromJS(data: any): SetPrimaryImageDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SetPrimaryImageDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["imageUrl"] = this.imageUrl;
+        return data;
+    }
+}
+
+export interface ISetPrimaryImageDto {
+    imageUrl: string;
 }
 
 export class SpecificationComparisonDto implements ISpecificationComparisonDto {

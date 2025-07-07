@@ -1,0 +1,221 @@
+<div class="image-management-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <h1 class="header-title">
+        <mat-icon>image</mat-icon>
+        Product Image Management
+      </h1>
+      <p class="header-subtitle">Manage product images for your catalog</p>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Sidebar - Product Selection -->
+    <div class="sidebar" [class.collapsed]="hasSelectedProduct">
+      <div class="sidebar-content">
+        <!-- Product Search -->
+        <div class="search-section">
+          <h3>Select Product</h3>
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search products...</mat-label>
+            <input matInput [formControl]="searchControl" placeholder="Type to search products">
+            <mat-icon matSuffix>search</mat-icon>
+            <mat-progress-bar *ngIf="isSearching" mode="indeterminate" class="search-progress"></mat-progress-bar>
+          </mat-form-field>
+
+          <!-- Search Results -->
+          <div class="search-results" *ngIf="searchResults.length > 0">
+            <div class="search-result-item" 
+                 *ngFor="let product of searchResults" 
+                 (click)="selectProduct(product)">
+              <div class="product-info">
+                <div class="product-name">{{ product.name }}</div>
+                <div class="product-details">
+                  <span *ngIf="product.manufacturer">{{ product.manufacturer }}</span>
+                  <span *ngIf="product.modelNumber"> - {{ product.modelNumber }}</span>
+                </div>
+                <div class="product-meta">
+                  <span class="price" *ngIf="product.lowestCurrentPrice">
+                    ${{ product.lowestCurrentPrice | number:'1.2-2' }}
+                  </span>
+                  <span class="seller-count" *ngIf="product.availableSellersCount">
+                    {{ product.availableSellersCount }} sellers
+                  </span>
+                </div>
+              </div>
+              <mat-icon>chevron_right</mat-icon>
+            </div>
+          </div>
+
+          <!-- No Results -->
+          <div class="no-results" *ngIf="searchControl.value && searchControl.value.length >= 2 && searchResults.length === 0 && !isSearching">
+            <mat-icon>search_off</mat-icon>
+            <p>No products found</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Area - Image Management -->
+    <div class="content-area" [class.full-width]="!hasSelectedProduct">
+      <!-- No Product Selected State -->
+      <div class="empty-state" *ngIf="!hasSelectedProduct">
+        <mat-icon class="empty-icon">image_search</mat-icon>
+        <h2>Select a Product</h2>
+        <p>Search for and select a product from the sidebar to manage its images.</p>
+      </div>
+
+      <!-- Product Selected - Image Management -->
+      <div class="image-management" *ngIf="hasSelectedProduct">
+        <!-- Selected Product Header -->
+        <div class="selected-product-header">
+          <div class="product-info">
+            <h2>{{ selectedProduct?.name }}</h2>
+            <div class="product-meta">
+              <span *ngIf="selectedProduct?.manufacturer">{{ selectedProduct?.manufacturer }}</span>
+              <span *ngIf="selectedProduct?.modelNumber"> - {{ selectedProduct?.modelNumber }}</span>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button mat-stroked-button (click)="toggleUploadArea()" [class.active]="showUploadArea">
+              <mat-icon>cloud_upload</mat-icon>
+              Upload Images
+            </button>
+            <button mat-stroked-button (click)="clearProductSelection()">
+              <mat-icon>clear</mat-icon>
+              Clear Selection
+            </button>
+          </div>
+        </div>
+
+        <!-- Upload Area -->
+        <div class="upload-section" *ngIf="showUploadArea">
+          <div class="upload-area" 
+               (dragover)="$event.preventDefault()" 
+               (drop)="$event.preventDefault(); onFilesSelected($event.dataTransfer?.files!)">
+            <input type="file" 
+                   #fileInput 
+                   multiple 
+                   accept="image/*" 
+                   (change)="onFileInputChange($event)" 
+                   style="display: none;">
+            
+            <div class="upload-content" (click)="fileInput.click()">
+              <mat-icon class="upload-icon">cloud_upload</mat-icon>
+              <h3>Drop images here or click to select</h3>
+              <p>Supports JPG, PNG, GIF, WebP (max 10MB each)</p>
+            </div>
+
+            <div class="upload-progress" *ngIf="isUploadingImages">
+              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+              <p>Uploading images...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bulk Actions Toolbar -->
+        <div class="bulk-actions-toolbar" *ngIf="showBulkActions">
+          <div class="selection-info">
+            <span>{{ selectedImageCount }} image(s) selected</span>
+          </div>
+          <div class="bulk-actions">
+            <button mat-button (click)="selectAllImages()">
+              <mat-icon>select_all</mat-icon>
+              Select All
+            </button>
+            <button mat-button (click)="clearSelection()">
+              <mat-icon>clear</mat-icon>
+              Clear Selection
+            </button>
+            <button mat-button color="warn" (click)="deleteSelectedImages()" [disabled]="selectedImageCount === 0">
+              <mat-icon>delete</mat-icon>
+              Delete Selected
+            </button>
+          </div>
+        </div>
+
+        <!-- Images Grid -->
+        <div class="images-section">
+          <!-- Loading State -->
+          <div class="loading-state" *ngIf="isLoadingImages">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>Loading images...</p>
+          </div>
+
+          <!-- No Images State -->
+          <div class="empty-images-state" *ngIf="!isLoadingImages && !hasImages">
+            <mat-icon class="empty-icon">image_not_supported</mat-icon>
+            <h3>No Images Found</h3>
+            <p>This product doesn't have any images yet. Upload some images to get started.</p>
+            <button mat-raised-button color="primary" (click)="toggleUploadArea()">
+              <mat-icon>cloud_upload</mat-icon>
+              Upload Images
+            </button>
+          </div>
+
+          <!-- Images Grid -->
+          <div class="images-grid" *ngIf="!isLoadingImages && hasImages">
+            <div class="image-card" 
+                 *ngFor="let image of productImages; trackBy: trackByImageUrl"
+                 [class.selected]="isImageSelected(image.url!)"
+                 [class.primary]="image.isPrimary">
+              
+              <!-- Selection Checkbox -->
+              <div class="image-selection">
+                <mat-checkbox 
+                  [checked]="isImageSelected(image.url!)"
+                  (change)="toggleImageSelection(image.url!)">
+                </mat-checkbox>
+              </div>
+
+              <!-- Primary Badge -->
+              <div class="primary-badge" *ngIf="image.isPrimary">
+                <mat-icon>star</mat-icon>
+                <span>Primary</span>
+              </div>
+
+              <!-- Image -->
+              <div class="image-container">
+                <img [src]="getImageDisplayUrl(image.url!)" 
+                     [alt]="image.altText || 'Product image'"
+                     (error)="onImageError($event)">
+              </div>
+
+              <!-- Image Info -->
+              <div class="image-info">
+                <div class="image-meta">
+                  <span class="file-size" *ngIf="image.fileSize">
+                    {{ (image.fileSize / 1024 / 1024) | number:'1.1-1' }} MB
+                  </span>
+                  <span class="dimensions" *ngIf="image.width && image.height">
+                    {{ image.width }}×{{ image.height }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Image Actions -->
+              <div class="image-actions">
+                <button mat-icon-button 
+                        matTooltip="Set as primary" 
+                        (click)="setPrimaryImage(image.url!)"
+                        [disabled]="image.isPrimary">
+                  <mat-icon [class.primary-star]="image.isPrimary">
+                    {{ image.isPrimary ? 'star' : 'star_border' }}
+                  </mat-icon>
+                </button>
+                <button mat-icon-button 
+                        matTooltip="Delete image" 
+                        color="warn"
+                        (click)="deleteImage(image.url!)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -60,7 +60,7 @@ builder.Services.AddHttpClient("fallback", client =>
 });
 
 // Add image storage and scraping services
-builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
+builder.Services.AddScoped<TechTicker.Shared.Services.IImageStorageService, ImageStorageService>();
 builder.Services.AddScoped<IImageScrapingService, ImageScrapingService>();
 
 // Add scraping services

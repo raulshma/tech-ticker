@@ -13,7 +13,7 @@ public partial class ImageScrapingService : IImageScrapingService
 {
     private readonly ILogger<ImageScrapingService> _logger;
     private readonly ProxyAwareHttpClientService _proxyHttpClient;
-    private readonly IImageStorageService _imageStorageService;
+    private readonly TechTicker.Shared.Services.IImageStorageService _imageStorageService;
     private readonly IProductImageService _productImageService;
 
     [GeneratedRegex(@"^https?://", RegexOptions.IgnoreCase)]
@@ -22,7 +22,7 @@ public partial class ImageScrapingService : IImageScrapingService
     public ImageScrapingService(
         ILogger<ImageScrapingService> logger,
         ProxyAwareHttpClientService proxyHttpClient,
-        IImageStorageService imageStorageService,
+        TechTicker.Shared.Services.IImageStorageService imageStorageService,
         IProductImageService productImageService)
     {
         _logger = logger;
@@ -140,7 +140,7 @@ public partial class ImageScrapingService : IImageScrapingService
                 existingPaths.Count, urlsToDownload.Count);
 
             // Download new images with enhanced duplicate detection
-            var imageUploadData = new List<ImageUploadData>();
+            var imageUploadData = new List<TechTicker.Shared.Services.ImageUploadData>();
             var newSavedPaths = new List<string>();
 
             foreach (var imageUrl in urlsToDownload)
@@ -388,7 +388,7 @@ public partial class ImageScrapingService : IImageScrapingService
         }
     }
 
-    private async Task<ImageUploadData?> DownloadImageAsync(string imageUrl)
+    private async Task<TechTicker.Shared.Services.ImageUploadData?> DownloadImageAsync(string imageUrl)
     {
         try
         {
@@ -416,7 +416,7 @@ public partial class ImageScrapingService : IImageScrapingService
                 fileName = $"image_{Guid.NewGuid():N}.jpg";
             }
 
-            return new ImageUploadData
+            return new TechTicker.Shared.Services.ImageUploadData
             {
                 Data = imageData,
                 FileName = fileName,

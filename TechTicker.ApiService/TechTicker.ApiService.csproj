@@ -25,6 +25,7 @@
     <ProjectReference Include="..\TechTicker.Application\TechTicker.Application.csproj" />
     <ProjectReference Include="..\TechTicker.ServiceDefaults\TechTicker.ServiceDefaults.csproj" />
     <ProjectReference Include="..\TechTicker.Shared\TechTicker.Shared.csproj" />
+    <ProjectReference Include="..\TechTicker.ScrapingWorker\TechTicker.ScrapingWorker.csproj" />
   </ItemGroup>
 
 </Project>

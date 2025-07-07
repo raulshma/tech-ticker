@@ -1,5 +1,6 @@
 using AngleSharp;
 using AngleSharp.Html.Dom;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -12,6 +13,7 @@ using TechTicker.DataAccess.Repositories.Interfaces;
 using TechTicker.Domain.Entities;
 using TechTicker.ScrapingWorker.Services;
 using TechTicker.ScrapingWorker.Services.Interfaces;
+using TechTicker.Shared.Services;
 
 namespace TechTicker.ScrapingWorker.Tests.Services;
 
@@ -107,7 +109,13 @@ public class ImageScrapingOptimizationTests
         mockProductRepository.Setup(x => x.GetByIdAsync(productId))
             .ReturnsAsync(product);
 
-        var productImageService = new ProductImageService(mockUnitOfWork.Object, mockLogger.Object);
+        var mockImageStorageService = new Mock<IImageStorageService>();
+        var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        var productImageService = new ProductImageService(
+            mockUnitOfWork.Object, 
+            mockImageStorageService.Object, 
+            mockLogger.Object, 
+            mockHttpContextAccessor.Object);
 
         // Act
         var result = await productImageService.GetExistingImageMappingsAsync(productId);

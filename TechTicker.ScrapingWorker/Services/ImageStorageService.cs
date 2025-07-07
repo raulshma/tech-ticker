@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using TechTicker.Shared.Services;
 
 namespace TechTicker.ScrapingWorker.Services;
 
